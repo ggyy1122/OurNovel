@@ -1,0 +1,157 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OurNovel</name>
+    </assembly>
+    <members>
+        <!-- Badly formed XML comment ignored for member "T:OurNovel.Controllers.BaseController`2" -->
+        <member name="M:OurNovel.Controllers.BaseController`2.GetAll">
+            <summary>
+            获取所有实体数据
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.BaseController`2.GetById(`1)">
+            <summary>
+            根据主键获取单个实体
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.BaseController`2.Create(`0)">
+            <summary>
+            添加实体
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.BaseController`2.Update(`1,`0)">
+            <summary>
+            更新实体
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.BaseController`2.Delete(`1)">
+            <summary>
+            删除实体
+            </summary>
+        </member>
+        <member name="T:OurNovel.Controllers.ReaderController">
+            <summary>
+            读者控制器，继承基类控制器，实现对 Reader 实体的 CRUD 操作
+            </summary>
+        </member>
+        <member name="T:OurNovel.Data.AppDbContext">
+            <summary>
+            应用程序的数据库上下文类，继承自 EF Core 的 DbContext
+            用于定义数据库连接和表映射
+            </summary>
+        </member>
+        <member name="M:OurNovel.Data.AppDbContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions{OurNovel.Data.AppDbContext})">
+            <summary>
+            构造函数，接收配置好的 DbContextOptions 并传递给基类
+            </summary>
+            <param name="options">数据库上下文配置项</param>
+        </member>
+        <member name="M:OurNovel.Data.AppDbContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <summary>
+            配置实体和数据库表结构映射关系的方法
+            </summary>
+            <param name="modelBuilder">用于构建模型的 ModelBuilder 对象</param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "T:OurNovel.Data.Configurations.ReaderConfiguration" -->
+        <member name="M:OurNovel.Data.Configurations.ReaderConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{OurNovel.Models.Reader})">
+            <summary>
+            配置 Reader 实体对应的数据库表结构
+            </summary>
+            <param name="entity">实体构建器，用于配置字段属性和关系</param>
+        </member>
+        <member name="T:OurNovel.Repositories.IRepository`2">
+            <summary>
+            泛型仓储接口，定义常用的增删查改方法
+            </summary>
+        </member>
+        <member name="T:OurNovel.Repositories.Repository`2">
+            <summary>
+            泛型仓储基类，封装对数据库表的通用CRUD操作
+            </summary>
+            <typeparam name="T">实体类型（如Reader、Post）</typeparam>
+            <typeparam name="TKey">实体主键类型（如int、string）</typeparam>
+        </member>
+        <member name="M:OurNovel.Repositories.Repository`2.#ctor(OurNovel.Data.AppDbContext)">
+            <summary>
+            构造函数，通过依赖注入获取数据库上下文
+            </summary>
+            <param name="context">数据库上下文实例</param>
+        </member>
+        <member name="M:OurNovel.Repositories.Repository`2.GetAllAsync">
+            <summary>
+            异步获取所有实体记录
+            </summary>
+            <returns>实体集合（IEnumerable）</returns>
+        </member>
+        <member name="M:OurNovel.Repositories.Repository`2.AddAsync(`0)">
+            <summary>
+            异步添加新实体到数据库
+            </summary>
+            <param name="entity">要添加的实体对象</param>
+        </member>
+        <member name="M:OurNovel.Repositories.Repository`2.UpdateAsync(`0)">
+            <summary>
+            异步更新现有实体
+            </summary>
+            <param name="entity">要更新的实体对象</param>
+        </member>
+        <member name="M:OurNovel.Repositories.Repository`2.GetByIdAsync(`1)">
+            <summary>
+            异步根据主键ID查询单个实体
+            </summary>
+            <param name="id">主键值</param>
+            <returns>找到的实体或null</returns>
+        </member>
+        <member name="M:OurNovel.Repositories.Repository`2.DeleteAsync(`1)">
+            <summary>
+            异步根据主键ID删除实体
+            </summary>
+            <param name="id">主键值</param>
+        </member>
+        <member name="T:OurNovel.Services.BaseService`2">
+            <summary>
+            泛型基础服务，封装常规增删查改
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.BaseService`2.#ctor(OurNovel.Repositories.IRepository{`0,`1})">
+            <summary>
+            构造函数，注入仓储实例
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.BaseService`2.GetAllAsync">
+            <summary>
+            获取所有实体记录
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.BaseService`2.AddAsync(`0)">
+            <summary>
+            添加新实体
+            </summary>
+            <param name="entity">要添加的实体对象</param>
+        </member>
+        <member name="M:OurNovel.Services.BaseService`2.UpdateAsync(`0)">
+            <summary>
+            更新现有实体
+            </summary>
+            <param name="entity">要更新的实体对象</param>
+        </member>
+        <member name="M:OurNovel.Services.BaseService`2.GetByIdAsync(`1)">
+            <summary>
+            根据主键ID获取单个实体
+            </summary>
+            <param name="id">实体主键ID</param>
+        </member>
+        <member name="M:OurNovel.Services.BaseService`2.DeleteAsync(`1)">
+            <summary>
+            根据主键ID删除实体
+            </summary>
+            <param name="id">要删除的实体主键ID</param>
+        </member>
+        <member name="T:OurNovel.Services.ReaderService">
+            <summary>
+            Reader 服务，继承基础服务，如有特殊业务再扩展
+            </summary>
+        </member>
+    </members>
+</doc>
