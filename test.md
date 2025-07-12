@@ -2,6 +2,7 @@
 
 
 [管理员界面](https://github.com/zxwk1998/vue-admin-better.git)
+
 [小说界面](https://gitee.com/wangyubao996/vue-novel)
 
 
@@ -87,11 +88,6 @@ git remote -v
 git add .                
 git commit -m "test:测试" 
 git push -u origin master:frontend
-```
-
-成功后，以后只用git push 就可以了：
-```bash
-git push  
 ```
 
 
