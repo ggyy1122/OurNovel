@@ -1,70 +1,102 @@
-
-[管理页面](https://github.com/zxwk1998/vue-admin-better.git)
-
+## 参考资料，这别人的前端搭建
 
 
-下面是从0开始使用Git管理前端项目的详细步骤，包含初始化仓库、提交代码、关联远程仓库等操作：
+[管理员界面](https://github.com/zxwk1998/vue-admin-better.git)
+[小说界面](https://gitee.com/wangyubao996/vue-novel)
 
 
-### **1. 初始化本地Git仓库**
-在你的前端项目根目录（例如 `my-frontend-project`）下执行：
+
+### 初始化本地Git仓库
+
+创建个空文件夹，用vscode打开，作为你的前端项目根目录。
+
+
+在你的前端项目根目录（例如 我的`D:\vue_project\data_project>`）下执行，vscode打开终端即可：
+
+
+#### 只克隆 frontend 分支
+使用 --single-branch 参数只克隆指定分支：
 ```bash
-cd my-frontend-project  # 进入项目目录
-git init                # 初始化Git仓库
+git clone --single-branch --branch frontend https://github.com/ggyy1122/OurNovel.git
 ```
 
+若连不上，用ssh服务，否则跳过：
 
-### **2. 创建 `.gitignore` 文件**
+#### ssh配置(你https连不上仓库时)
 
-
+##### **1. 检查是否已有 SSH 密钥（若你之前用过）**
 ```bash
-ni .gitignore
+ls -Force ~/.ssh   # 查看是否存在id_ed25519.pub 文件
 ```
-编辑 `.gitignore` 内容：
-```gitignore
-# 常见前端忽略规则
-node_modules/
-dist/
-build/
-.DS_Store
-.env
-npm-debug.log*
-```
+- 若存在，可直接跳到步骤 3。
+- 若不存在，需生成新密钥。
 
 
-### **3. 首次提交代码**
+##### **2. 生成新的 SSH 密钥**
 ```bash
-git add .                # 添加所有文件到暂存区
-git commit -m "初始化前端项目"  # 提交到本地仓库
+ssh-keygen -t ed25519 -C "your_email@example.com"  #填你github绑定的邮箱
 ```
+按提示完成操作（可直接回车使用默认路径和密码）。
 
 
-### **4. 在远程仓库（如GitHub/GitLab）创建新仓库**
-- 登录你的代码托管平台，创建一个新的空仓库（例如命名为 `my-frontend`）。
-- **不要**在远程仓库初始化 README、LICENSE 等文件（保持空仓库）。
-
-
-### **5. 关联本地仓库与远程仓库**
+##### **3. 复制公钥到剪贴板**
 ```bash
-# 添加远程仓库地址
-git config --global --add safe.directory D:/vue_project/data_project
-
-git remote add origin https://github.com/ggyy1122/OurNovel.git
-
-# 推送本地主分支到远程（首次推送需指定上游分支）
-git push -u origin main  # 若使用GitHub默认分支为main
-# 或使用git push -u origin master  # 若使用master分支
+cat ~/.ssh/id_ed25519.pub | clip  # Ed25519 密钥
 ```
 
+##### **4. 将公钥添加到 GitHub 账户**
+1. 登录 GitHub → 点击右上角头像 → Settings → SSH and GPG keys。
+2. 点击 **New SSH key**。
+3. 添加标题（如 `My PC`），粘贴剪贴板中的公钥内容。
+4. 点击 **Add SSH key**。
 
-### **6. 创建并切换到 `frontend` 分支（可选）**
-如果你想将前端代码放在独立分支：
+
+##### **5. 测试 SSH 连接**
 ```bash
-git branch -d frontend
+ssh -T git@github.com
+```
+- 首次连接会提示确认指纹，输入 `yes`。
+- 若看到 `Hi username! You've successfully authenticated...`，则连接成功。它会显示叉，是对的。
+
+
+##### **6. 克隆仓库**
+```bash
+git clone --single-branch --branch frontend git@github.com:ggyy1122/OurNovel.git
 ```
 
 
-### **7. 日常开发流程**
+##### **6. 修改 Git 远程仓库 URL**
+将 HTTPS 地址替换为 SSH 格式：ba
+```bash
+# 查看当前远程地址
+git remote -v
+
+# 修改为 SSH 地址
+git remote set-url origin git@github.com:ggyy1122/OurNovel.git
+
+# 验证修改
+git remote -v
+```
+
+### 推送代码
+
+你可以修改下test.md验证：
+
+使用 SSH 协议推送：
+```bash
+git add .                
+git commit -m "test:测试" 
+git push -u origin master:frontend
+```
+
+成功后，以后只用git push 就可以了：
+```bash
+git push  
+```
+
+
+
+### 日常开发流程
 ```bash
 # 拉取最新代码
 git pull origin frontend  # 拉取远程前端分支
@@ -74,42 +106,6 @@ git pull origin frontend  # 拉取远程前端分支
 
 # 提交代码
 git add .
-git commit -m "添加登录页面"
-git push origin frontend  # 推送到远程
+git commit -m "信息"
+git push  # 推送到远程
 ```
-
-
-### **8. 解决冲突（如果有）**
-若多人协作导致冲突，拉取代码时会提示：
-```bash
-git pull origin frontend  # 拉取时发现冲突
-
-# 手动解决冲突后
-git add .
-git commit -m "解决冲突"
-git push origin frontend
-```
-
-
-### **9. 查看分支状态**
-```bash
-git branch       # 查看本地分支
-git branch -r    # 查看远程分支
-git branch -a    # 查看所有分支
-```
-
-
-### **10. 切换分支**
-```bash
-git checkout main       # 切换到main分支
-git checkout frontend   # 切换到frontend分支
-```
-
-
-### **注意事项**
-1. **使用 `.gitignore`**：避免提交不必要的文件，尤其是 `node_modules`。
-2. **分支命名**：建议使用 `main`/`master` 作为主分支，`frontend` 作为前端分支。
-3. **提交信息**：编写清晰的提交信息（如 `fix: 修复登录按钮样式`）。
-4. **定期拉取**：开发前先 `git pull`，减少冲突。
-
-通过以上步骤，你可以完整地使用Git管理前端项目，后续可以按需创建更多分支（如 `dev`、`feature/login` 等）进行协作开发。
