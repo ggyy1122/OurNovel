@@ -1,6 +1,9 @@
 <template>
     <div style="text-align:center; margin-top:100px;">
-        <button @click="goToLogin">管理员登录</button>
+        <button @click="goToLogin1">管理员登录</button>
+    </div>
+    <div style="text-align:center; margin-top:100px;">
+        <button @click="goToLogin2">用户登录</button>
     </div>
     <div id="app" style="text-align:center; margin-top:100px;">
         <h1>Oracle API 测试</h1>
@@ -20,8 +23,11 @@ import { fetchOracleData } from '@/API/oracleAPI'
 const router = useRouter()
 const apiResponse = ref(null)
 
-function goToLogin() {
+function goToLogin1() {
     router.push('/Admin/Admin_Login')
+}
+function goToLogin2() {
+    router.push('/Novels/Novel_Login')
 }
 
 async function testOracleApi() {

@@ -4,6 +4,8 @@ import Admin_Layout from '@/Admin/Admin_Layout.vue'
 import Dash_board from '@/Admin/Dash_Board.vue'
 import Novels_Board from '@/Admin/Novels_Board.vue'
 import Home from '@/views/Home_test.vue'
+import Novel_Layout from '@/Novels/Novel_Layout.vue'
+import Novel_Login from '@/Novels/Novel_Login.vue'
 
 const routes = [
     {
@@ -32,26 +34,21 @@ const routes = [
             // 其他管理路由可以在这里添加
         ]
     },
+    {
+        path: '/Novels/Novel_Login',
+        name: 'Novel_Login',
+        component: Novel_Login
+    },
+    {
+        path: '/Novels/Novel_Layout',
+        name: 'Novel_Layout',
+        component: Novel_Layout
+    },
 ]
 
 const router = createRouter({
     history: createWebHistory(),
     routes
-})
-
-// 添加路由守卫
-router.beforeEach((to) => {
-    const isLoggedIn = localStorage.getItem('isLoggedIn')
-
-    // 如果需要认证但未登录，重定向到登录页
-    if (to.meta.requiresAuth && !isLoggedIn) {
-        return '/Admin/Admin_Login'
-    }
-
-    // 如果已经登录但访问登录页，重定向到仪表盘
-    if (to.path === '/Admin/Admin_Login' && isLoggedIn) {
-        return '/Admin/Admin_Login/dashboard'
-    }
 })
 
 export default router

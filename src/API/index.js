@@ -3,7 +3,7 @@ import axios from 'axios'
 // 创建 axios 实例
 const service = axios.create({
     baseURL: process.env.VUE_APP_BASE_API, // 从环境变量获取 API 地址
-    timeout: 50000 // 请求超时时间
+    timeout: 5000 // 请求超时时间
 })
 
 // 请求拦截器
