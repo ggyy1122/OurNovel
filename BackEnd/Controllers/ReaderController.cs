@@ -11,10 +11,36 @@ namespace OurNovel.Controllers
     [Route("api/[controller]")]
     public class ReaderController : BaseController<Reader, int>
     {
-        public ReaderController(BaseService<Reader, int> service) : base(service)
+        private readonly ReaderService _readerService;
+
+        // 这里注入 ReaderService，而不是 BaseService
+        public ReaderController(ReaderService readerService) : base(readerService)
         {
+            _readerService = readerService;
         }
 
         // 如果 Reader 有特殊的业务接口，可以在这里扩展
+
+        /// <summary>
+        /// 上传读者头像，并更新头像URL
+        /// </summary>
+        /// <param name="readerId">读者ID</param>
+        /// <param name="avatarFile">头像文件</param>
+        /// <returns>头像URL</returns>
+        [HttpPost("UploadAvatar")]
+        [Consumes("multipart/form-data")]
+        [ApiExplorerSettings(IgnoreApi = true)] 
+        public async Task<IActionResult> UploadAvatar([FromForm] int readerId, [FromForm] IFormFile avatarFile)
+        {
+            try
+            {
+                var avatarUrl = await _readerService.UploadAvatarAsync(readerId, avatarFile);
+                return Ok(new { success = true, avatarUrl });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
     }
 }

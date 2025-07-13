@@ -2,7 +2,12 @@
 using OurNovel.Data;
 using OurNovel.Repositories;
 using OurNovel.Services;
+using OurNovel.Services.FileStorage.Interfaces;
+using OurNovel.Services.FileStorage;
 using System.Reflection;
+
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +27,11 @@ builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
 builder.Services.AddScoped(typeof(BaseService<,>));
 // 注册具体业务服务
 builder.Services.AddScoped<ReaderService>();
+// 注册文件存储配置
+builder.Services.Configure<FileStorageOptions>(
+    builder.Configuration.GetSection("FileStorage"));
+// 注册文件存储服务
+builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
 
 // ========================================
 // 3️⃣ 添加控制器服务
@@ -57,6 +67,8 @@ builder.Services.AddSwaggerGen(c =>
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     c.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
+
+
 });
 
 // ========================================
