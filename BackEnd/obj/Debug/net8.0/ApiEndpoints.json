@@ -1,6 +1,16 @@
 [
   {
     "ContainingType": "OurNovel.Controllers.BaseController\u00602[[OurNovel.Models.Reader, OurNovel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+    "Method": "Options",
+    "RelativePath": "api/Reader",
+    "HttpMethod": "OPTIONS",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "OurNovel.Controllers.BaseController\u00602[[OurNovel.Models.Reader, OurNovel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
     "Method": "GetAll",
     "RelativePath": "api/Reader",
     "HttpMethod": "GET",

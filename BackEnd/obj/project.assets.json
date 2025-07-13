@@ -1616,11 +1616,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\g3056\\Desktop\\BackEnd\\OurNovel.csproj",
+      "projectUniqueName": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\OurNovel.csproj",
       "projectName": "OurNovel",
-      "projectPath": "C:\\Users\\g3056\\Desktop\\BackEnd\\OurNovel.csproj",
+      "projectPath": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\OurNovel.csproj",
       "packagesPath": "C:\\Users\\g3056\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\g3056\\Desktop\\BackEnd\\obj\\",
+      "outputPath": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

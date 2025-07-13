@@ -1,58 +1,54 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\g3056\\Desktop\\BackEnd\\",
+  "WorkspaceRootPath": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|c:\\users\\g3056\\desktop\\backend\\controllers\\basecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|c:\\users\\g3056\\desktop\\ournovel\\backend\\controllers\\basecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|solutionrelative:controllers\\basecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|c:\\users\\g3056\\desktop\\backend\\controllers\\readercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|c:\\users\\g3056\\desktop\\ournovel\\backend\\controllers\\readercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|solutionrelative:controllers\\readercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|BackEnd.csproj|c:\\users\\g3056\\desktop\\backend\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|BackEnd.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|c:\\users\\g3056\\desktop\\ournovel\\backend\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|BackEnd.csproj|c:\\users\\g3056\\desktop\\backend\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|BackEnd.csproj|solutionrelative:data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|c:\\users\\g3056\\desktop\\ournovel\\backend\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|c:\\users\\g3056\\desktop\\backend\\data\\configurations\\readerconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|solutionrelative:data\\configurations\\readerconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|BackEnd.csproj|c:\\users\\g3056\\desktop\\backend\\models\\reader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|BackEnd.csproj|solutionrelative:models\\reader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|c:\\users\\g3056\\desktop\\backend\\services\\readerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|c:\\users\\g3056\\desktop\\ournovel\\backend\\services\\readerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|solutionrelative:services\\readerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|c:\\users\\g3056\\desktop\\backend\\repositories\\repository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|solutionrelative:repositories\\repository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|c:\\users\\g3056\\desktop\\backend\\services\\baseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|c:\\users\\g3056\\desktop\\ournovel\\backend\\services\\baseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|solutionrelative:services\\baseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|c:\\users\\g3056\\desktop\\backend\\repositories\\irepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|c:\\users\\g3056\\desktop\\ournovel\\backend\\models\\reader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|solutionrelative:models\\reader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|c:\\users\\g3056\\desktop\\ournovel\\backend\\data\\configurations\\readerconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|solutionrelative:data\\configurations\\readerconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|c:\\users\\g3056\\desktop\\ournovel\\backend\\repositories\\repository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|solutionrelative:repositories\\repository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|c:\\users\\g3056\\desktop\\ournovel\\backend\\repositories\\irepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|solutionrelative:repositories\\irepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|c:\\users\\g3056\\desktop\\backend\\models\\ientity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|c:\\users\\g3056\\desktop\\ournovel\\backend\\models\\ientity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|solutionrelative:models\\ientity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|BackEnd.csproj|c:\\users\\g3056\\desktop\\backend\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|BackEnd.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|BackEnd.csproj|c:\\users\\g3056\\desktop\\backend\\weatherforecast.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|BackEnd.csproj|solutionrelative:weatherforecast.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|c:\\users\\g3056\\desktop\\ournovel\\backend\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{827630E4-337C-42CD-945D-A8FC7161A0FD}|OurNovel.csproj|solutionrelative:data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -62,7 +58,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Bookmark",
@@ -74,63 +70,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "BaseController.cs",
-              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\BackEnd\\Controllers\\BaseController.cs",
-              "RelativeDocumentMoniker": "Controllers\\BaseController.cs",
-              "ToolTip": "C:\\Users\\g3056\\Desktop\\BackEnd\\Controllers\\BaseController.cs",
-              "RelativeToolTip": "Controllers\\BaseController.cs",
-              "ViewState": "AgIAACIAAAAAAAAAAAAYwDMAAABKAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-12T09:52:23.475Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\BackEnd\\Program.cs",
-              "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "C:\\Users\\g3056\\Desktop\\BackEnd\\Program.cs",
-              "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAAAAABMAAABGAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-12T07:30:56.246Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "ReaderConfiguration.cs",
-              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\BackEnd\\Data\\Configurations\\ReaderConfiguration.cs",
-              "RelativeDocumentMoniker": "Data\\Configurations\\ReaderConfiguration.cs",
-              "ToolTip": "C:\\Users\\g3056\\Desktop\\BackEnd\\Data\\Configurations\\ReaderConfiguration.cs",
-              "RelativeToolTip": "Data\\Configurations\\ReaderConfiguration.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAHAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-12T08:40:01.435Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "AppDbContext.cs",
-              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\BackEnd\\Data\\AppDbContext.cs",
-              "RelativeDocumentMoniker": "Data\\AppDbContext.cs",
-              "ToolTip": "C:\\Users\\g3056\\Desktop\\BackEnd\\Data\\AppDbContext.cs",
-              "RelativeToolTip": "Data\\AppDbContext.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAABIAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-12T07:59:58.445Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
               "Title": "ReaderService.cs",
-              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\BackEnd\\Services\\ReaderService.cs",
+              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\Services\\ReaderService.cs",
               "RelativeDocumentMoniker": "Services\\ReaderService.cs",
-              "ToolTip": "C:\\Users\\g3056\\Desktop\\BackEnd\\Services\\ReaderService.cs",
+              "ToolTip": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\Services\\ReaderService.cs",
               "RelativeToolTip": "Services\\ReaderService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAABTAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -139,50 +83,24 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "Reader.cs",
-              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\BackEnd\\Models\\Reader.cs",
+              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\Models\\Reader.cs",
               "RelativeDocumentMoniker": "Models\\Reader.cs",
-              "ToolTip": "C:\\Users\\g3056\\Desktop\\BackEnd\\Models\\Reader.cs",
+              "ToolTip": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\Models\\Reader.cs",
               "RelativeToolTip": "Models\\Reader.cs",
-              "ViewState": "AgIAAA0AAAAAAAAAAAA5wAgAAAAkAAAAAAAAAA==",
+              "ViewState": "AgIAAAQAAAAAAAAAAAAzwAgAAAAkAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-12T08:05:38.6Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "ReaderController.cs",
-              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\BackEnd\\Controllers\\ReaderController.cs",
-              "RelativeDocumentMoniker": "Controllers\\ReaderController.cs",
-              "ToolTip": "C:\\Users\\g3056\\Desktop\\BackEnd\\Controllers\\ReaderController.cs",
-              "RelativeToolTip": "Controllers\\ReaderController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAfAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-12T10:21:47.655Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "Repository.cs",
-              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\BackEnd\\Repositories\\Repository.cs",
-              "RelativeDocumentMoniker": "Repositories\\Repository.cs",
-              "ToolTip": "C:\\Users\\g3056\\Desktop\\BackEnd\\Repositories\\Repository.cs",
-              "RelativeToolTip": "Repositories\\Repository.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAA+AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-12T09:25:07.068Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 5,
               "Title": "BaseService.cs",
-              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\BackEnd\\Services\\BaseService.cs",
+              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\Services\\BaseService.cs",
               "RelativeDocumentMoniker": "Services\\BaseService.cs",
-              "ToolTip": "C:\\Users\\g3056\\Desktop\\BackEnd\\Services\\BaseService.cs",
+              "ToolTip": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\Services\\BaseService.cs",
               "RelativeToolTip": "Services\\BaseService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -191,55 +109,115 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "IRepository.cs",
-              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\BackEnd\\Repositories\\IRepository.cs",
-              "RelativeDocumentMoniker": "Repositories\\IRepository.cs",
-              "ToolTip": "C:\\Users\\g3056\\Desktop\\BackEnd\\Repositories\\IRepository.cs",
-              "RelativeToolTip": "Repositories\\IRepository.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-12T09:23:50.283Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "IEntity.cs",
-              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\BackEnd\\Models\\IEntity.cs",
-              "RelativeDocumentMoniker": "Models\\IEntity.cs",
-              "ToolTip": "C:\\Users\\g3056\\Desktop\\BackEnd\\Models\\IEntity.cs",
-              "RelativeToolTip": "Models\\IEntity.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAdAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-12T09:58:58.434Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 3,
               "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\BackEnd\\appsettings.json",
+              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\appsettings.json",
               "RelativeDocumentMoniker": "appsettings.json",
-              "ToolTip": "C:\\Users\\g3056\\Desktop\\BackEnd\\appsettings.json",
+              "ToolTip": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\appsettings.json",
               "RelativeToolTip": "appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAABlAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAEAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
               "WhenOpened": "2025-07-12T07:54:15.679Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "WeatherForecast.cs",
-              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\BackEnd\\WeatherForecast.cs",
-              "RelativeDocumentMoniker": "WeatherForecast.cs",
-              "ToolTip": "C:\\Users\\g3056\\Desktop\\BackEnd\\WeatherForecast.cs",
-              "RelativeToolTip": "WeatherForecast.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAABgAAAAAAAAAAAAcwCwAAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-12T07:34:58.905Z",
+              "WhenOpened": "2025-07-12T07:30:56.246Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "BaseController.cs",
+              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\Controllers\\BaseController.cs",
+              "RelativeDocumentMoniker": "Controllers\\BaseController.cs",
+              "ToolTip": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\Controllers\\BaseController.cs",
+              "RelativeToolTip": "Controllers\\BaseController.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAgwBYAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-12T09:52:23.475Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ReaderController.cs",
+              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\Controllers\\ReaderController.cs",
+              "RelativeDocumentMoniker": "Controllers\\ReaderController.cs",
+              "ToolTip": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\Controllers\\ReaderController.cs",
+              "RelativeToolTip": "Controllers\\ReaderController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-12T10:21:47.655Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "AppDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\Data\\AppDbContext.cs",
+              "RelativeDocumentMoniker": "Data\\AppDbContext.cs",
+              "ToolTip": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\Data\\AppDbContext.cs",
+              "RelativeToolTip": "Data\\AppDbContext.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABIAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-12T07:59:58.445Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "ReaderConfiguration.cs",
+              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\Data\\Configurations\\ReaderConfiguration.cs",
+              "RelativeDocumentMoniker": "Data\\Configurations\\ReaderConfiguration.cs",
+              "ToolTip": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\Data\\Configurations\\ReaderConfiguration.cs",
+              "RelativeToolTip": "Data\\Configurations\\ReaderConfiguration.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-12T08:40:01.435Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Repository.cs",
+              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\Repositories\\Repository.cs",
+              "RelativeDocumentMoniker": "Repositories\\Repository.cs",
+              "ToolTip": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\Repositories\\Repository.cs",
+              "RelativeToolTip": "Repositories\\Repository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAA+AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-12T09:25:07.068Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "IRepository.cs",
+              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\Repositories\\IRepository.cs",
+              "RelativeDocumentMoniker": "Repositories\\IRepository.cs",
+              "ToolTip": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\Repositories\\IRepository.cs",
+              "RelativeToolTip": "Repositories\\IRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-12T09:23:50.283Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "IEntity.cs",
+              "DocumentMoniker": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\Models\\IEntity.cs",
+              "RelativeDocumentMoniker": "Models\\IEntity.cs",
+              "ToolTip": "C:\\Users\\g3056\\Desktop\\OurNovel\\BackEnd\\Models\\IEntity.cs",
+              "RelativeToolTip": "Models\\IEntity.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-12T09:58:58.434Z"
             }
           ]
         }

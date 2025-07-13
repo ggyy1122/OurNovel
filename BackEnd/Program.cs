@@ -29,7 +29,26 @@ builder.Services.AddScoped<ReaderService>();
 builder.Services.AddControllers();
 
 // ========================================
-// 4️⃣ 配置 Swagger（带 XML 注释文档）
+// 4️⃣ 配置 CORS（新增部分）
+// ========================================
+var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
+    ?? throw new Exception("CORS 配置未找到！请检查 appsettings.json");
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("SpecificOrigins", policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+
+        // 如需凭证（如 Cookies），取消注释：
+        // .AllowCredentials(); 
+    });
+});
+
+// ========================================
+// 5  配置 Swagger（带 XML 注释文档）
 // ========================================
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -41,12 +60,12 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // ========================================
-// 5️⃣ 构建应用
+// 6   构建应用
 // ========================================
 var app = builder.Build();
 
 // ========================================
-// 6️⃣ 配置中间件管道
+// 7  配置中间件管道
 // ========================================
 
 // 开发环境启用 Swagger
@@ -58,6 +77,11 @@ if (app.Environment.IsDevelopment())
 
 // HTTPS 强制跳转
 app.UseHttpsRedirection();
+
+app.UseRouting();
+
+// 启用 CORS 中间件（必须在 UseRouting 之后，UseEndpoints 之前）
+app.UseCors("SpecificOrigins");
 
 // 授权中间件（如果后续启用认证）
 app.UseAuthorization();

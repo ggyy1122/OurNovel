@@ -6,6 +6,17 @@
   },
   "paths": {
     "/api/Reader": {
+      "options": {
+        "tags": [
+          "Reader"
+        ],
+        "summary": "处理 CORS 预检请求（OPTIONS）",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
       "get": {
         "tags": [
           "Reader"

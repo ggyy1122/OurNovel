@@ -5,6 +5,11 @@
     </assembly>
     <members>
         <!-- Badly formed XML comment ignored for member "T:OurNovel.Controllers.BaseController`2" -->
+        <member name="M:OurNovel.Controllers.BaseController`2.Options">
+            <summary>
+            处理 CORS 预检请求（OPTIONS）
+            </summary>
+        </member>
         <member name="M:OurNovel.Controllers.BaseController`2.GetAll">
             <summary>
             获取所有实体数据

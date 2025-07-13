@@ -20,7 +20,15 @@ namespace OurNovel.Controllers
         {
             _service = service;
         }
-
+        /// <summary>
+        /// 处理 CORS 预检请求（OPTIONS）
+        /// </summary>
+        [HttpOptions]
+        public virtual IActionResult Options()
+        {
+            // 返回空响应，HTTP状态码200即可
+            return Ok();
+        }
         /// <summary>
         /// 获取所有实体数据
         /// </summary>
