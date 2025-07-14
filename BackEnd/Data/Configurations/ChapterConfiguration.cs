@@ -6,7 +6,7 @@ using OurNovel.Models;
 namespace OurNovel.Data.Configurations
 {
 	/// <summary>
-	/// Chapter ÊµÌåÀàµÄÊı¾İ¿âÅäÖÃ£¨Í¨¹ı Fluent API£©
+	/// Chapter å®ä½“ç±»çš„æ•°æ®åº“é…ç½®ï¼ˆé€šè¿‡ Fluent APIï¼‰
 	/// </summary>
 	public class ChapterConfiguration : IEntityTypeConfiguration<Chapter>
 	{
@@ -14,59 +14,62 @@ namespace OurNovel.Data.Configurations
 		{
 			entity.ToTable("CHAPTER");
 
-			// ? ÉèÖÃ¸´ºÏÖ÷¼ü£ºNOVEL_ID + CHAPTER_ID
+			// ? è®¾ç½®å¤åˆä¸»é”®ï¼šNOVEL_ID + CHAPTER_ID
 			entity.HasKey(e => new { e.NovelId, e.ChapterId });
 
-			// Ö÷¼ü×Ö¶ÎÓ³Éä
+			// ä¸»é”®å­—æ®µæ˜ å°„
 			entity.Property(e => e.NovelId).HasColumnName("NOVEL_ID");
 			entity.Property(e => e.ChapterId).HasColumnName("CHAPTER_ID");
 
-			// ±êÌâ×Ö¶Î
+			// æ ‡é¢˜å­—æ®µ
 			entity.Property(e => e.Title)
 				  .HasColumnName("TITLE")
 				  .HasMaxLength(40)
 				  .IsRequired();
 
-			// ÄÚÈİ×Ö¶Î£¨CLOB ÀàĞÍ£©
+			// å†…å®¹å­—æ®µï¼ˆCLOB ç±»å‹ï¼‰
 			entity.Property(e => e.Content)
 				  .HasColumnName("CONTENT")
 				  .HasColumnType("CLOB");
 
-			// ×ÖÊı×Ö¶Î
+			// å­—æ•°å­—æ®µ
 			entity.Property(e => e.WordCount)
 				  .HasColumnName("WORD_COUNT")
 				  .IsRequired();
 
-			// Ç§×Öµ¥¼Û×Ö¶Î
+			// åƒå­—å•ä»·å­—æ®µ
 			entity.Property(e => e.PricePerKilo)
 				  .HasColumnName("PRICE_PER_KILO")
 				  .HasColumnType("NUMBER(10,2)")
 				  .HasDefaultValue(0.50m);
 
-			// ÊÇ·ñÊÕ·Ñ×Ö¶Î
+			// æ˜¯å¦æ”¶è´¹å­—æ®µ
 			entity.Property(e => e.IsCharged)
 				  .HasColumnName("IS_CHARGED")
 				  .HasMaxLength(2);
 
-			// ·¢²¼Ê±¼ä×Ö¶Î
+			// å‘å¸ƒæ—¶é—´å­—æ®µ
 			entity.Property(e => e.PublishTime)
 				  .HasColumnName("PUBLISH_TIME");
 
-			// ×´Ì¬×Ö¶Î
+			// çŠ¶æ€å­—æ®µ
 			entity.Property(e => e.Status)
 				  .HasColumnName("STATUS")
 				  .HasMaxLength(10)
-				  .HasDefaultValue("Í¨¹ı");
+				  .HasDefaultValue("é€šè¿‡");
 
-			// ºöÂÔ×Ô¶¯¼ÆËã×Ö¶Î
+			// å¿½ç•¥è‡ªåŠ¨è®¡ç®—å­—æ®µ
 			entity.Ignore(e => e.CalculatedPrice);
 
-            // ? Íâ¼üÅäÖÃ£ºCHAPTER(NOVEL_ID) ¡ú NOVEL(NOVEL_ID)£¬±ØĞëÓĞ¶ÔÓ¦µÄĞ¡Ëµ
+            // ? å¤–é”®é…ç½®ï¼šCHAPTER(NOVEL_ID) â†’ NOVEL(NOVEL_ID)ï¼Œå¿…é¡»æœ‰å¯¹åº”çš„å°è¯´
             entity.HasOne(e => e.Novel)
 				  .WithMany(n => n.Chapters)
 				  .HasForeignKey(e => e.NovelId)
 				  .IsRequired()
-				  .OnDelete(DeleteBehavior.Cascade); // Ğ¡Ëµ±»É¾Ê±£¬ÕÂ½ÚÒ²É¾³ı
-		}
+				  .OnDelete(DeleteBehavior.Cascade); // å°è¯´è¢«åˆ æ—¶ï¼Œç« èŠ‚ä¹Ÿåˆ é™¤
+
+            entity.Property(c => c.NovelId)
+        .HasColumnName("NOVEL_ID");
+        }
 	}
 }
