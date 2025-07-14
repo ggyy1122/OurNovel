@@ -35,11 +35,8 @@ namespace OurNovel.Data
 
             // 应用单独配置类，对 Reader 实体表映射进行详细配置
             modelBuilder.ApplyConfiguration(new ReaderConfiguration());
-<<<<<<< HEAD
             modelBuilder.ApplyConfiguration(new ChapterConfiguration());
-=======
             modelBuilder.ApplyConfiguration(new NovelConfiguration());
->>>>>>> c993fb85c5241547d159508c1ed608240af2d0d1
 
             // ⚠️ 后续其他表的配置也在这里调用，例如：
             // modelBuilder.ApplyConfiguration(new NovelConfiguration());
