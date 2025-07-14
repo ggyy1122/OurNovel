@@ -22,12 +22,8 @@ namespace OurNovel.Data
 
         //以下为各个实体对应的 DbSet，提供对实体的增删查改操作
         public DbSet<Reader> Reads { get; set; }
-<<<<<<< HEAD
         public DbSet<Chapter> Chapters { get; set; }
-=======
         public DbSet<Novel> Novels { get; set; }
-
->>>>>>> c993fb85c5241547d159508c1ed608240af2d0d1
 
         /// <summary>
         /// 配置实体和数据库表结构映射关系的方法
