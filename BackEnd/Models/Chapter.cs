@@ -1,50 +1,54 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+//using Newtonsoft.Json;
 
 namespace OurNovel.Models
 {
     /// <summary>
-    /// ÕÂ½ÚÊµÌåÀà£¬Ê¹ÓÃ¸´ºÏÖ÷¼ü£¨NovelId + ChapterId£©
+    /// ç« èŠ‚å®ä½“ç±»ï¼Œä½¿ç”¨å¤åˆä¸»é”®ï¼ˆNovelId + ChapterIdï¼‰
     /// </summary>
     public class Chapter
     {   
-        /// ËùÊôĞ¡ËµID£¨¸´ºÏÖ÷¼üÖ®Ò»£©
+        /// æ‰€å±å°è¯´IDï¼ˆå¤åˆä¸»é”®ä¹‹ä¸€ï¼‰
         public int NovelId { get; set; }
 
-        /// ÕÂ½Ú±àºÅ£¨¸´ºÏÖ÷¼üÖ®Ò»£©
+        /// å¤–é”®å¯¼èˆªå±æ€§ï¼šç« èŠ‚æ‰€å±å°è¯´ï¼ˆå¿…é¡»å­˜åœ¨ï¼‰
+        [JsonIgnore]
+        public Novel? Novel { get; set; } // åŠ ä¸Šé—®å·
+
+
+        /// ç« èŠ‚ç¼–å·ï¼ˆå¤åˆä¸»é”®ä¹‹ä¸€ï¼‰
         public int ChapterId { get; set; }
 
-        /// Íâ¼üµ¼º½ÊôĞÔ£ºÕÂ½ÚËùÊôĞ¡Ëµ£¨±ØĞë´æÔÚ£©
-       public Novel Novel { get; set; } = null!;
-
-        /// ±êÌâ£¬×î´ó³¤¶È40£¬²»ÄÜÎª¿Õ
+        /// æ ‡é¢˜ï¼Œæœ€å¤§é•¿åº¦40ï¼Œä¸èƒ½ä¸ºç©º
         [Required]
         [MaxLength(40)]
         public string Title { get; set; } = null!;
 
-        /// ÕÂ½ÚÄÚÈİ£¨³¤ÎÄ±¾£©
+        /// ç« èŠ‚å†…å®¹ï¼ˆé•¿æ–‡æœ¬ï¼‰
         public string? Content { get; set; }
 
-        /// ×ÖÊı£¬²»ÄÜÎª¿Õ
+        /// å­—æ•°ï¼Œä¸èƒ½ä¸ºç©º
         [Required]
         public int WordCount { get; set; }
 
-        /// Ç§×Öµ¥¼Û£¬Ä¬ÈÏ0.50£¬±£ÁôÁ½Î»Ğ¡Êı
+        /// åƒå­—å•ä»·ï¼Œé»˜è®¤0.50ï¼Œä¿ç•™ä¸¤ä½å°æ•°
         [Column(TypeName = "decimal(10,2)")]
         public decimal PricePerKilo { get; set; } = 0.50m;
 
-        /// ¼ÆËã¼Û¸ñ£¬×Ô¶¯¼ÆËã£¨·ÇÓ³Éä×Ö¶Î£©
+        /// è®¡ç®—ä»·æ ¼ï¼Œè‡ªåŠ¨è®¡ç®—ï¼ˆéæ˜ å°„å­—æ®µï¼‰
         [NotMapped]
         public decimal CalculatedPrice =>
             Math.Round((WordCount / 1000m) * PricePerKilo, 2);
 
-        /// ÊÇ·ñÊÕ·Ñ£ºÊÇ/·ñ
+        /// æ˜¯å¦æ”¶è´¹ï¼šæ˜¯/å¦
         public string? IsCharged { get; set; }
 
-        /// ·¢²¼Ê±¼ä
+        /// å‘å¸ƒæ—¶é—´
         public DateTime? PublishTime { get; set; }
 
-        /// ×´Ì¬£ºÍ¨¹ı / ·â½û£¨Ä¬ÈÏÍ¨¹ı£©
-        public string Status { get; set; } = "Í¨¹ı";
+        /// çŠ¶æ€ï¼šé€šè¿‡ / å°ç¦ï¼ˆé»˜è®¤é€šè¿‡ï¼‰
+        public string Status { get; set; } = "é€šè¿‡";
     }
 }
