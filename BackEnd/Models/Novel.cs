@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 namespace OurNovel.Models
 {
     public class Novel : IEntity<int>
@@ -11,7 +12,7 @@ namespace OurNovel.Models
 
         public int AuthorId { get; set; }                  // 外键，对应 author_id
         [JsonIgnore]
-        public Authorl? Author { get; set; }               // 导航属性     
+        public Author? Author { get; set; }                // 导航属性     
 
         public string? NovelName { get; set; } = null!;    // Novel_NAME 可空
 
