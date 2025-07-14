@@ -4,9 +4,6 @@ using OurNovel.Services;
 
 namespace OurNovel.Controllers
 {
-    /// <summary>
-    /// ÕÂ½Ú¿ØÖÆÆ÷£ºÌá¹©ÕÂ½ÚµÄÔöÉ¾²é¸Ä½Ó¿Ú£¬»ùÓÚ¸´ºÏÖ÷¼ü NovelId + ChapterId
-    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class ChapterController : ControllerBase
@@ -18,56 +15,66 @@ namespace OurNovel.Controllers
             _chapterService = chapterService;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var chapters = await _chapterService.GetAllAsync();
+            return Ok(chapters);
+        }
+
+
         /// <summary>
-        /// »ñÈ¡Ö¸¶¨Ğ¡ËµÏÂµÄËùÓĞÕÂ½Ú
+        /// è·å–æŒ‡å®šå°è¯´ä¸‹çš„æ‰€æœ‰ç« èŠ‚
         /// </summary>
         [HttpGet("novel/{novelId}")]
         public async Task<IActionResult> GetChaptersByNovel(int novelId)
         {
-            var chapters = await _chapterService.GetChaptersByNovelAsync(novelId);
+            var chapters = await _chapterService.GetByNovelIdAsync(novelId);
             return Ok(chapters);
         }
 
         /// <summary>
-        /// »ñÈ¡Ä³Ò»ÕÂ½Ú£¨Í¨¹ı NovelId ºÍ ChapterId£©
+        /// è·å–æŒ‡å®šç« èŠ‚
         /// </summary>
-        [HttpGet("{novelId}/{chapterId}")]
+        [HttpGet("{novelId:int}/{chapterId:int}")]
         public async Task<IActionResult> GetChapter(int novelId, int chapterId)
         {
-            var chapter = await _chapterService.GetChapterAsync(novelId, chapterId);
-            if (chapter == null)
-                return NotFound();
+            var chapter = await _chapterService.GetByIdAsync(novelId, chapterId);
+            if (chapter == null) return NotFound();
             return Ok(chapter);
         }
 
         /// <summary>
-        /// Ìí¼ÓÕÂ½Ú
+        /// æ·»åŠ ç« èŠ‚ï¼ˆæ­£æ–‡ç›´æ¥é€šè¿‡ Content å±æ€§æäº¤ï¼‰
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> AddChapter([FromBody] Chapter chapter)
+        public async Task<IActionResult> Create([FromBody] Chapter chapter)
         {
-            await _chapterService.AddChapterAsync(chapter);
-            return Ok(new { success = true });
+            await _chapterService.AddAsync(chapter);
+            return CreatedAtAction(nameof(GetChapter), new { novelId = chapter.NovelId, chapterId = chapter.ChapterId }, chapter);
         }
 
         /// <summary>
-        /// ¸üĞÂÕÂ½Ú
+        /// æ›´æ–°ç« èŠ‚
         /// </summary>
-        [HttpPut]
-        public async Task<IActionResult> UpdateChapter([FromBody] Chapter chapter)
+        [HttpPut("{novelId:int}/{chapterId:int}")]
+        public async Task<IActionResult> Update(int novelId, int chapterId, [FromBody] Chapter chapter)
         {
-            await _chapterService.UpdateChapterAsync(chapter);
-            return Ok(new { success = true });
+            if (chapter.NovelId != novelId || chapter.ChapterId != chapterId)
+                return BadRequest("è·¯å¾„å‚æ•°ä¸å®ä½“IDä¸ä¸€è‡´");
+
+            await _chapterService.UpdateAsync(chapter);
+            return NoContent();
         }
 
         /// <summary>
-        /// É¾³ıÕÂ½Ú£¨Í¨¹ı NovelId ºÍ ChapterId£©
+        /// åˆ é™¤ç« èŠ‚
         /// </summary>
-        [HttpDelete("{novelId}/{chapterId}")]
-        public async Task<IActionResult> DeleteChapter(int novelId, int chapterId)
+        [HttpDelete("{novelId:int}/{chapterId:int}")]
+        public async Task<IActionResult> Delete(int novelId, int chapterId)
         {
-            await _chapterService.DeleteChapterAsync(novelId, chapterId);
-            return Ok(new { success = true });
+            await _chapterService.DeleteAsync(novelId, chapterId);
+            return NoContent();
         }
     }
 }
