@@ -29,7 +29,6 @@ namespace OurNovel.Data
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Author> Authors { get; set; }
 
-        public DbSet<Category> Categories { get; set; }
 
         /// <summary>
         /// 配置实体和数据库表结构映射关系的方法
