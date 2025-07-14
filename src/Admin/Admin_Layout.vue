@@ -29,7 +29,7 @@ const router = useRouter()
 
 const logout = () => {
     localStorage.removeItem('isLoggedIn')
-    router.push('/Admin/Admin_Login')
+    router.push('/L_R/login')
 }
 </script>
 

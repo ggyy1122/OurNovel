@@ -3,8 +3,8 @@
         <!-- 顶部导航栏 -->
         <header class="header" ref="mainHeader">
             <div class="logo">
-                <img src="@/assets/logo.png" alt="七猫中文网" />
-                <h1>七猫中文网</h1>
+                <img src="@/assets/logo.png" alt="TJ小说网" />
+                <h1>TJ小说网</h1>
                 <p>匠心打磨好作品</p>
             </div>
             <div class="search-bar">
@@ -108,7 +108,7 @@ const handleSearch = () => {
 
 const logout = () => {
     localStorage.removeItem('isLoggedIn')
-    router.push('/Novels/Novel_Login')
+    router.push('/L_R/login')
 }
 
 // 监听滚动，显示悬浮导航栏
