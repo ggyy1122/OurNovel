@@ -119,5 +119,39 @@ $RECYCLE.BIN/
 # *.rar
 # *.tar.gz
 
-# NuGet 缓存文件
+# Visual Studio
+.vs/
+BackEnd/.vs/
+*.user
+*.suo
+*.sln.docstates
+*.VC.db
+
+# Build output
+BackEnd/bin/
+BackEnd/obj/
+*.dll
+*.exe
+*.pdb
+*.cache
+*.db
+
+# NuGet 缓存
 *.nuget.cache
+packages/
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Rider 或 VS Code（如你用了）
+.idea/
+.vscode/
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Optional: Database generated backup files
+*.bak
+
