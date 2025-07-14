@@ -27,12 +27,8 @@ builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
 builder.Services.AddScoped(typeof(BaseService<,>));
 // 注册具体业务服务
 builder.Services.AddScoped<ReaderService>();
-<<<<<<< HEAD
 builder.Services.AddScoped<IChapterRepository, ChapterRepository>();
-
-=======
 builder.Services.AddScoped<NovelService>();
->>>>>>> c993fb85c5241547d159508c1ed608240af2d0d1
 // 注册文件存储配置
 builder.Services.Configure<FileStorageOptions>(
     builder.Configuration.GetSection("FileStorage"));
