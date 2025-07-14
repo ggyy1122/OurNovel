@@ -31,6 +31,8 @@ builder.Services.AddScoped<IChapterRepository, ChapterRepository>();
 builder.Services.AddScoped<ChapterService>();
 builder.Services.AddScoped<NovelService>();
 builder.Services.AddScoped<CategoryService>();
+builder.Services.AddScoped<AuthorService>();
+builder.Services.AddScoped<CommentsService>();
 // 注册文件存储配置
 builder.Services.Configure<FileStorageOptions>(
     builder.Configuration.GetSection("FileStorage"));

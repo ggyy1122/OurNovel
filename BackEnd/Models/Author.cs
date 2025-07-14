@@ -19,5 +19,7 @@ namespace OurNovel.Models
         public string? Phone { get; set; }              // PHONE 可空
 
         public string? AvatarUrl { get; set; }          // AVATAR_URL 可空
+
+        public ICollection<Novel> Novels { get; set; } = new List<Novel>();  // 维护反向Novel导航
     }
 }
