@@ -22,7 +22,7 @@ namespace OurNovel.Data
 
         //以下为各个实体对应的 DbSet，提供对实体的增删查改操作
         public DbSet<Reader> Reads { get; set; }
-
+        public DbSet<Chapter> Chapters { get; set; }
 
         /// <summary>
         /// 配置实体和数据库表结构映射关系的方法
@@ -34,6 +34,7 @@ namespace OurNovel.Data
 
             // 应用单独配置类，对 Reader 实体表映射进行详细配置
             modelBuilder.ApplyConfiguration(new ReaderConfiguration());
+            modelBuilder.ApplyConfiguration(new ChapterConfiguration());
 
             // ⚠️ 后续其他表的配置也在这里调用，例如：
             // modelBuilder.ApplyConfiguration(new NovelConfiguration());
@@ -42,3 +43,5 @@ namespace OurNovel.Data
         }
     }
 }
+
+

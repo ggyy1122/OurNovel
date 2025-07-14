@@ -35,6 +35,36 @@
             删除实体
             </summary>
         </member>
+        <member name="T:OurNovel.Controllers.ChapterController">
+            <summary>
+            章节控制器：提供章节的增删查改接口，基于复合主键 NovelId + ChapterId
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.ChapterController.GetChaptersByNovel(System.Int32)">
+            <summary>
+            获取指定小说下的所有章节
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.ChapterController.GetChapter(System.Int32,System.Int32)">
+            <summary>
+            获取某一章节（通过 NovelId 和 ChapterId）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.ChapterController.AddChapter(OurNovel.Models.Chapter)">
+            <summary>
+            添加章节
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.ChapterController.UpdateChapter(OurNovel.Models.Chapter)">
+            <summary>
+            更新章节
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.ChapterController.DeleteChapter(System.Int32,System.Int32)">
+            <summary>
+            删除章节（通过 NovelId 和 ChapterId）
+            </summary>
+        </member>
         <member name="T:OurNovel.Controllers.ReaderController">
             <summary>
             读者控制器，继承基类控制器，实现对 Reader 实体的 CRUD 操作
@@ -66,12 +96,102 @@
             </summary>
             <param name="modelBuilder">用于构建模型的 ModelBuilder 对象</param>
         </member>
+        <member name="T:OurNovel.Data.Configurations.ChapterConfiguration">
+            <summary>
+            Chapter 实体类的数据库配置（通过 Fluent API）
+            </summary>
+        </member>
         <!-- Badly formed XML comment ignored for member "T:OurNovel.Data.Configurations.ReaderConfiguration" -->
         <member name="M:OurNovel.Data.Configurations.ReaderConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{OurNovel.Models.Reader})">
             <summary>
             配置 Reader 实体对应的数据库表结构
             </summary>
             <param name="entity">实体构建器，用于配置字段属性和关系</param>
+        </member>
+        <member name="T:OurNovel.Models.Chapter">
+            <summary>
+            章节实体类，使用复合主键（NovelId + ChapterId）
+            </summary>
+        </member>
+        <member name="P:OurNovel.Models.Chapter.NovelId">
+            所属小说ID（复合主键之一）
+        </member>
+        <member name="P:OurNovel.Models.Chapter.ChapterId">
+            章节编号（复合主键之一）
+        </member>
+        <member name="P:OurNovel.Models.Chapter.Title">
+            标题，最大长度40，不能为空
+        </member>
+        <member name="P:OurNovel.Models.Chapter.Content">
+            章节内容（长文本）
+        </member>
+        <member name="P:OurNovel.Models.Chapter.WordCount">
+            字数，不能为空
+        </member>
+        <member name="P:OurNovel.Models.Chapter.PricePerKilo">
+            千字单价，默认0.50，保留两位小数
+        </member>
+        <member name="P:OurNovel.Models.Chapter.CalculatedPrice">
+            计算价格，自动计算（非映射字段）
+        </member>
+        <member name="P:OurNovel.Models.Chapter.IsCharged">
+            是否收费：是/否
+        </member>
+        <member name="P:OurNovel.Models.Chapter.PublishTime">
+            发布时间
+        </member>
+        <member name="P:OurNovel.Models.Chapter.Status">
+            状态：通过 / 封禁（默认通过）
+        </member>
+        <member name="T:OurNovel.Repositories.ChapterRepository">
+            <summary>
+            Chapter 仓储实现类，适配复合主键（NovelId + ChapterId）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Repositories.ChapterRepository.GetByNovelIdAsync(System.Int32)">
+            <summary>
+            获取某部小说下的所有章节
+            </summary>
+        </member>
+        <member name="M:OurNovel.Repositories.ChapterRepository.GetByIdAsync(System.Int32,System.Int32)">
+            <summary>
+            根据复合主键获取章节
+            </summary>
+        </member>
+        <member name="M:OurNovel.Repositories.ChapterRepository.AddAsync(OurNovel.Models.Chapter)">
+            <summary>
+            添加新章节
+            </summary>
+        </member>
+        <member name="M:OurNovel.Repositories.ChapterRepository.UpdateAsync(OurNovel.Models.Chapter)">
+            <summary>
+            更新章节
+            </summary>
+        </member>
+        <member name="M:OurNovel.Repositories.ChapterRepository.DeleteAsync(System.Int32,System.Int32)">
+            <summary>
+            删除章节
+            </summary>
+        </member>
+        <member name="T:OurNovel.Repositories.IChapterRepository">
+            <summary>
+            Chapter 仓储接口，适配复合主键，定义章节数据访问方法
+            </summary>
+        </member>
+        <member name="M:OurNovel.Repositories.IChapterRepository.GetByNovelIdAsync(System.Int32)">
+            获取某部小说下的所有章节
+        </member>
+        <member name="M:OurNovel.Repositories.IChapterRepository.GetByIdAsync(System.Int32,System.Int32)">
+            根据主键（novelId, chapterId）获取章节
+        </member>
+        <member name="M:OurNovel.Repositories.IChapterRepository.AddAsync(OurNovel.Models.Chapter)">
+            添加新章节
+        </member>
+        <member name="M:OurNovel.Repositories.IChapterRepository.UpdateAsync(OurNovel.Models.Chapter)">
+            更新章节
+        </member>
+        <member name="M:OurNovel.Repositories.IChapterRepository.DeleteAsync(System.Int32,System.Int32)">
+            删除章节
         </member>
         <member name="T:OurNovel.Repositories.IRepository`2">
             <summary>
@@ -160,6 +280,36 @@
             根据主键ID删除实体
             </summary>
             <param name="id">要删除的实体主键ID</param>
+        </member>
+        <member name="T:OurNovel.Services.ChapterService">
+            <summary>
+            Chapter 服务类，提供章节相关的业务逻辑
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.ChapterService.GetChaptersByNovelAsync(System.Int32)">
+            <summary>
+            获取指定小说下的所有章节
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.ChapterService.GetChapterAsync(System.Int32,System.Int32)">
+            <summary>
+            获取指定章节
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.ChapterService.AddChapterAsync(OurNovel.Models.Chapter)">
+            <summary>
+            添加新章节
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.ChapterService.UpdateChapterAsync(OurNovel.Models.Chapter)">
+            <summary>
+            更新章节内容
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.ChapterService.DeleteChapterAsync(System.Int32,System.Int32)">
+            <summary>
+            删除章节
+            </summary>
         </member>
         <member name="T:OurNovel.Services.FileStorage.LocalFileStorageService">
             <summary>

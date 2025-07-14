@@ -8,7 +8,7 @@ namespace OurNovel.Services
     /// <summary>
     /// Reader 服务，继承基础服务，如有特殊业务再扩展
     /// </summary>
-    public class ReaderService : BaseService<Reader,int>
+    public class ReaderService : BaseService<Reader, int>
     {
         private readonly IFileStorageService _fileStorageService;
 
