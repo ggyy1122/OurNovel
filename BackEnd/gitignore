@@ -50,7 +50,7 @@
 ###############
 ## Backup & restore
 ###############
-_ReSharper*/  # JetBrains���
+_ReSharper*/  # JetBrains²å¼þ
 *.orig
 
 ###############
@@ -118,3 +118,6 @@ $RECYCLE.BIN/
 # *.7z
 # *.rar
 # *.tar.gz
+
+# NuGet 缓存文件
+*.nuget.cache
