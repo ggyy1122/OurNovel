@@ -5,24 +5,24 @@ using OurNovel.Models;
 namespace OurNovel.Data.Configurations
 {
     /// <summary>
-    /// Novel ÊµÌåÀàµÄÊı¾İ¿âÅäÖÃ£¨Í¨¹ı Fluent API£©
-    /// ÊµÏÖ IEntityTypeConfiguration<T> ½Ó¿Ú¶¨Òå±í½á¹¹
+    /// Novel å®ä½“ç±»çš„æ•°æ®åº“é…ç½®ï¼ˆé€šè¿‡ Fluent APIï¼‰
+    /// å®ç° IEntityTypeConfiguration<T> æ¥å£å®šä¹‰è¡¨ç»“æ„
     /// </summary>
     public class NovelConfiguration : IEntityTypeConfiguration<Novel>
     {
         /// <summary>
-        /// ÅäÖÃ Novel ÊµÌå¶ÔÓ¦µÄÊı¾İ¿â±í½á¹¹
+        /// é…ç½® Novel å®ä½“å¯¹åº”çš„æ•°æ®åº“è¡¨ç»“æ„
         /// </summary>
-        /// <param name="entity">ÊµÌå¹¹½¨Æ÷£¬ÓÃÓÚÅäÖÃ×Ö¶ÎÊôĞÔºÍ¹ØÏµ</param>
+        /// <param name="entity">å®ä½“æ„å»ºå™¨ï¼Œç”¨äºé…ç½®å­—æ®µå±æ€§å’Œå…³ç³»</param>
         public void Configure(EntityTypeBuilder<Novel> entity)
         {
-            // ±íÃû
+            // è¡¨å
             entity.ToTable("NOVEL");
 
-            // Ö÷¼ü
+            // ä¸»é”®
             entity.HasKey(e => e.NovelId);
 
-            // ×Ö¶ÎÓ³Éä
+            // å­—æ®µæ˜ å°„
             entity.Property(e => e.NovelId).HasColumnName("NOVEL_ID");
             entity.Property(e => e.AuthorId).HasColumnName("AUTHOR_ID");
             entity.Property(e => e.NovelName).HasColumnName("NOVEL_NAME");
@@ -35,15 +35,13 @@ namespace OurNovel.Data.Configurations
             entity.Property(e => e.CollectedCount).HasColumnName("COLLECTED_COUNT");
             entity.Property(e => e.Status)
                   .HasColumnName("STATUS")
-                  .HasDefaultValue("´ıÉóºË");
-            /*
-            // Íâ¼ü¹ØÏµ£ºÒ»¸ö Novel ¶ÔÓ¦Ò»¸ö Author£¨¶à¶ÔÒ»£©
+                  .HasDefaultValue("å¾…å®¡æ ¸");
+            
+            // å¤–é”®å…³ç³»ï¼šä¸€ä¸ª Novel å¯¹åº”ä¸€ä¸ª Authorï¼ˆå¤šå¯¹ä¸€ï¼‰
             entity.HasOne(e => e.Author)
                   .WithMany(a => a.Novels)
                   .HasForeignKey(e => e.AuthorId)
-                  .OnDelete(DeleteBehavior.Cascade);  // É¾³ı×÷ÕßÊ±£¬Ïà¹ØĞ¡ËµÒ²É¾³ı£¨°´ĞèÇó¿É¸Ä£©
-             * 
-             */
+                  .OnDelete(DeleteBehavior.Cascade);  // åˆ é™¤ä½œè€…æ—¶ï¼Œç›¸å…³å°è¯´ä¹Ÿåˆ é™¤ï¼ˆæŒ‰éœ€æ±‚å¯æ”¹ï¼‰
 
 
         }
