@@ -1610,11 +1610,16 @@
     ]
   },
   "packageFolders": {
+<<<<<<< HEAD
     "C:\\Users\\33807\\.nuget\\packages\\": {}
+=======
+    "C:\\Users\\Judy Le\\.nuget\\packages\\": {}
+>>>>>>> c993fb85c5241547d159508c1ed608240af2d0d1
   },
   "project": {
     "version": "1.0.0",
     "restore": {
+<<<<<<< HEAD
       "projectUniqueName": "D:\\university_study\\2024-2025spring\\DBdesign\\OurNovel\\BackEnd\\OurNovel.csproj",
       "projectName": "OurNovel",
       "projectPath": "D:\\university_study\\2024-2025spring\\DBdesign\\OurNovel\\BackEnd\\OurNovel.csproj",
@@ -1623,6 +1628,16 @@
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\33807\\AppData\\Roaming\\NuGet\\NuGet.Config",
+=======
+      "projectUniqueName": "D:\\Judy_Tongji\\Database\\OurNovel\\BackEnd\\OurNovel.csproj",
+      "projectName": "OurNovel",
+      "projectPath": "D:\\Judy_Tongji\\Database\\OurNovel\\BackEnd\\OurNovel.csproj",
+      "packagesPath": "C:\\Users\\Judy Le\\.nuget\\packages\\",
+      "outputPath": "D:\\Judy_Tongji\\Database\\OurNovel\\BackEnd\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\Judy Le\\AppData\\Roaming\\NuGet\\NuGet.Config",
+>>>>>>> c993fb85c5241547d159508c1ed608240af2d0d1
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -1681,7 +1696,11 @@
             "privateAssets": "all"
           }
         },
+<<<<<<< HEAD
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
+=======
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
+>>>>>>> c993fb85c5241547d159508c1ed608240af2d0d1
       }
     }
   }
