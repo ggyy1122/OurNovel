@@ -2,34 +2,35 @@ namespace OurNovel.Models
 {
     public class Novel : IEntity<int>
     {
-        public int NovelId { get; set; }                   // Novel_ID Ö÷¼ü
+        public int NovelId { get; set; }                   // Novel_ID ä¸»é”®
         int IEntity<int>.Id
         {
             get => NovelId;
             set => NovelId = value;
         }
 
-        public int AuthorId { get; set; }                  // Íâ¼ü£¬¶ÔÓ¦ author_id
-        //public Author Author { get; set; } = null!;        // µ¼º½ÊôĞÔ
+        public int AuthorId { get; set; }                  // å¤–é”®ï¼Œå¯¹åº” author_id
+        [JsonIgnore]
+        public Authorl? Author { get; set; }               // å¯¼èˆªå±æ€§     
 
-        public string? NovelName { get; set; } = null!;    // Novel_NAME ¿É¿Õ
+        public string? NovelName { get; set; } = null!;    // Novel_NAME å¯ç©º
 
-        public string? Introduction { get; set; } = null!; // Introduction ¿É¿Õ
+        public string? Introduction { get; set; } = null!; // Introduction å¯ç©º
 
-        public DateTime? CreateTime { get; set; }          // CreateTime ¿É¿Õ
+        public DateTime? CreateTime { get; set; }          // CreateTime å¯ç©º
 
-        public string? CoverUrl { get; set; }              // CoverUrl ¿É¿Õ
+        public string? CoverUrl { get; set; }              // CoverUrl å¯ç©º
 
-        public int? Score { get; set; }                    // Score ¿É¿Õ
+        public int? Score { get; set; }                    // Score å¯ç©º
 
-        public long? TotalWordCount { get; set; }          // TotalWordCount ¿É¿Õ
+        public long? TotalWordCount { get; set; }          // TotalWordCount å¯ç©º
 
-        public int? RecommendCount { get; set; }           // RecommendCount ¿É¿Õ
+        public int? RecommendCount { get; set; }           // RecommendCount å¯ç©º
 
-        public int? CollectedCount { get; set; }             // CollectedCount ¿É¿Õ
+        public int? CollectedCount { get; set; }             // CollectedCount å¯ç©º
 
-        public string? Status { get; set; } = "´ıÉóºË";    // IS_RECOMMEND_VISIBLE "´ıÉóºË"/"Á¬ÔØ"/"Íê½á"
+        public string? Status { get; set; } = "å¾…å®¡æ ¸";    // IS_RECOMMEND_VISIBLE "å¾…å®¡æ ¸"/"è¿è½½"/"å®Œç»“"
 
-        //public ICollection<Chapter> Chapters { get; set; } = new List<Chapter>();  // Î¬»¤·´ÏòChapterµ¼º½
+        public ICollection<Chapter> Chapters { get; set; } = new List<Chapter>();  // ç»´æŠ¤åå‘Chapterå¯¼èˆª
     }
 }
