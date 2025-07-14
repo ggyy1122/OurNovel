@@ -1,58 +1,91 @@
 using OurNovel.Models;
 using OurNovel.Repositories;
+using OurNovel.Services.FileStorage.Interfaces;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace OurNovel.Services
 {
-	/// <summary>
-	/// Chapter ·şÎñÀà£¬Ìá¹©ÕÂ½ÚÏà¹ØµÄÒµÎñÂß¼­
-	/// </summary>
-	public class ChapterService
-	{
-		private readonly IChapterRepository _repository;
+    public class ChapterService
+    {
+        private readonly IChapterRepository _chapterRepository;
+        private readonly IFileStorageService _fileStorageService;
 
-		public ChapterService(IChapterRepository repository)
-		{
-			_repository = repository;
-		}
+        public ChapterService(IChapterRepository chapterRepository, IFileStorageService fileStorageService)
+        {
+            _chapterRepository = chapterRepository;
+            _fileStorageService = fileStorageService;
+        }
 
-		/// <summary>
-		/// »ñÈ¡Ö¸¶¨Ğ¡ËµÏÂµÄËùÓĞÕÂ½Ú
-		/// </summary>
-		public async Task<IEnumerable<Chapter>> GetChaptersByNovelAsync(int novelId)
-		{
-			return await _repository.GetByNovelIdAsync(novelId);
-		}
+        public async Task<IEnumerable<Chapter>> GetByNovelIdAsync(int novelId)
+        {
+            return await _chapterRepository.GetByNovelIdAsync(novelId);
+        }
 
-		/// <summary>
-		/// »ñÈ¡Ö¸¶¨ÕÂ½Ú
-		/// </summary>
-		public async Task<Chapter?> GetChapterAsync(int novelId, int chapterId)
-		{
-			return await _repository.GetByIdAsync(novelId, chapterId);
-		}
+        public async Task<Chapter?> GetByIdAsync(int novelId, int chapterId)
+        {
+            return await _chapterRepository.GetByIdAsync(novelId, chapterId);
+        }
 
-		/// <summary>
-		/// Ìí¼ÓĞÂÕÂ½Ú
-		/// </summary>
-		public async Task AddChapterAsync(Chapter chapter)
-		{
-			await _repository.AddAsync(chapter);
-		}
+        public async Task AddAsync(Chapter chapter)
+        {
+            var existing = await _chapterRepository.GetByIdAsync(chapter.NovelId, chapter.ChapterId);
+            if (existing != null)
+            {
+                throw new Exception($"ç« èŠ‚å·²å­˜åœ¨ï¼ˆNovelId={chapter.NovelId}, ChapterId={chapter.ChapterId}ï¼‰");
+            }
 
-		/// <summary>
-		/// ¸üĞÂÕÂ½ÚÄÚÈİ
-		/// </summary>
-		public async Task UpdateChapterAsync(Chapter chapter)
-		{
-			await _repository.UpdateAsync(chapter);
-		}
+            await _chapterRepository.AddAsync(chapter);
+        }
 
-		/// <summary>
-		/// É¾³ıÕÂ½Ú
-		/// </summary>
-		public async Task DeleteChapterAsync(int novelId, int chapterId)
-		{
-			await _repository.DeleteAsync(novelId, chapterId);
-		}
-	}
+        public async Task UpdateAsync(Chapter chapter)
+        {
+            await _chapterRepository.UpdateAsync(chapter);
+        }
+        public async Task<IEnumerable<Chapter>> GetAllAsync()
+        {
+            return await _chapterRepository.GetAllAsync();
+        }
+
+
+        public async Task DeleteAsync(int novelId, int chapterId)
+        {
+            await _chapterRepository.DeleteAsync(novelId, chapterId);
+        }
+
+        public async Task<string> UploadChapterContentAsync(int novelId, int chapterId, IFormFile chapterFile)
+        {
+            if (chapterFile == null || chapterFile.Length == 0)
+                throw new ArgumentException("ä¸Šä¼ æ–‡ä»¶ä¸èƒ½ä¸ºç©º");
+
+            string fileUrl = null;
+
+            try
+            {
+                fileUrl = await _fileStorageService.UploadAsync(chapterFile, "chapters");
+
+                using var reader = new StreamReader(chapterFile.OpenReadStream());
+                string content = await reader.ReadToEndAsync();
+
+                var chapter = await _chapterRepository.GetByIdAsync(novelId, chapterId);
+                if (chapter == null)
+                    throw new Exception($"æœªæ‰¾åˆ°å°è¯´ {novelId} çš„ç« èŠ‚ {chapterId}");
+
+                chapter.Content = content;
+                await _chapterRepository.UpdateAsync(chapter);
+
+                return fileUrl;
+            }
+            catch (Exception)
+            {
+                if (!string.IsNullOrEmpty(fileUrl))
+                    _fileStorageService.Delete(fileUrl, "chapters");
+
+                throw;
+            }
+        }
+    }
 }
