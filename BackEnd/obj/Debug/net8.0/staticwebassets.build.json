@@ -1,12 +1,11 @@
 {
   "Version": 1,
-  "Hash": "aaWYdO7tmydKC8CxSwUN7vLf3Xs1CzsJwz/dQ6Xs+hk=",
+  "Hash": "ZDv7lEVaqElZuqhFALaURqbX32+WBL06Ff8PqOdr8h0=",
   "Source": "OurNovel",
   "BasePath": "_content/OurNovel",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
   "DiscoveryPatterns": [],
-  "Assets": [],
-  "Endpoints": []
+  "Assets": []
 }

@@ -1,0 +1,15 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\BackEnd",
+    "\\BackEnd\\Controllers",
+    "\\BackEnd\\Data",
+    "\\BackEnd\\Data\\Configurations",
+    "\\BackEnd\\Models",
+    "\\BackEnd\\Repositories",
+    "\\BackEnd\\Services",
+    "\\DataBase\\01_schema"
+  ],
+  "SelectedNode": "\\BackEnd\\Program.cs",
+  "PreviewInSolutionExplorer": false
+}

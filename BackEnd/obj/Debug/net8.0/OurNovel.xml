@@ -35,6 +35,19 @@
             删除实体
             </summary>
         </member>
+        <member name="T:OurNovel.Controllers.NovelController">
+            <summary>
+            小说控制器，继承基类控制器，实现对 Novel 实体的 CRUD 操作
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.NovelController.UploadCover(System.Int32,Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            上传小说封面，并更新封面URL
+            </summary>
+            <param name="novelId">小说ID</param>
+            <param name="coverFile">封面文件</param>
+            <returns>封面URL</returns>
+        </member>
         <member name="T:OurNovel.Controllers.ReaderController">
             <summary>
             读者控制器，继承基类控制器，实现对 Reader 实体的 CRUD 操作
@@ -65,6 +78,13 @@
             配置实体和数据库表结构映射关系的方法
             </summary>
             <param name="modelBuilder">用于构建模型的 ModelBuilder 对象</param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "T:OurNovel.Data.Configurations.NovelConfiguration" -->
+        <member name="M:OurNovel.Data.Configurations.NovelConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{OurNovel.Models.Novel})">
+            <summary>
+            配置 Novel 实体对应的数据库表结构
+            </summary>
+            <param name="entity">实体构建器，用于配置字段属性和关系</param>
         </member>
         <!-- Badly formed XML comment ignored for member "T:OurNovel.Data.Configurations.ReaderConfiguration" -->
         <member name="M:OurNovel.Data.Configurations.ReaderConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{OurNovel.Models.Reader})">
@@ -200,6 +220,19 @@
             </summary>
             <param name="fileUrl">文件的完整URL或相对路径</param>
             <param name="subFolder">文件所在的子目录名（不带斜杠）</param>
+        </member>
+        <member name="T:OurNovel.Services.NovelService">
+            <summary>
+            Novel 服务，继承基础服务，如有特殊业务再扩展
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.NovelService.UploadCoverAsync(System.Int32,Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            上传小说封面，并更新封面地址
+            </summary>
+            <param name="novelId">小说ID</param>
+            <param name="coverFile">封面文件</param>
+            <returns>封面URL</returns>
         </member>
         <member name="T:OurNovel.Services.ReaderService">
             <summary>
