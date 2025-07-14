@@ -27,7 +27,7 @@ const router = useRouter();
 const handleLogin = () => {
     if (username.value && password.value) {
         localStorage.setItem('isLoggedIn', 'true')
-        router.push('/Novels/Novel_Layout') 
+        router.push('/Novels/Novel_Layout/home') 
     } else {
         alert('请输入用户名和密码')
     }

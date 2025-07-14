@@ -6,6 +6,9 @@ import Novels_Board from '@/Admin/Novels_Board.vue'
 import Home from '@/views/Home_test.vue'
 import Novel_Layout from '@/Novels/Novel_Layout.vue'
 import Novel_Login from '@/Novels/Novel_Login.vue'
+import Novel_Home from '@/Novels/Novel_Home.vue'
+import Novel_Category from '@/Novels/Novel_Category.vue'
+import Novel_Rank from '@/Novels/Novel_Rank.vue'
 
 const routes = [
     {
@@ -41,8 +44,25 @@ const routes = [
     },
     {
         path: '/Novels/Novel_Layout',
-        name: 'Novel_Layout',
-        component: Novel_Layout
+        component: Novel_Layout,
+        meta: { requiresAuth: true },
+        children: [
+            {
+                path: 'home',
+                name: 'Novel_Home',
+                component: Novel_Home
+            },
+            {
+                path: 'category',
+                name: 'Novel_Category',
+                component: Novel_Category
+            },
+            {
+                path: 'rank',
+                name: 'Novel_Rank',
+                component: Novel_Rank
+            }
+        ]
     },
 ]
 
