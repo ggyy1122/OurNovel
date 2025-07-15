@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OurNovel.Services;
 using OurNovel.Models;
+using OurNovel.Repositories;
+using OurNovel.Services.Interfaces;
 namespace OurNovel.Controllers
 {
     /// <summary>
@@ -10,11 +12,16 @@ namespace OurNovel.Controllers
     [Route("api/[controller]")]
     public class ReaderController : BaseController<Reader, int>
     {
+        private readonly IImageResourceService _imageResourceService;
+        private readonly IRepository<Reader, int> _readerRepository;
         private readonly ReaderService _readerService;
 
         // 这里注入 ReaderService，而不是 BaseService
-        public ReaderController(ReaderService readerService) : base(readerService)
+        public ReaderController(ReaderService readerService , IImageResourceService imageResourceService,
+            IRepository<Reader, int> readerRepository) : base(readerService)
         {
+            _imageResourceService = imageResourceService;
+            _readerRepository = readerRepository;
             _readerService = readerService;
         }
 
@@ -33,7 +40,11 @@ namespace OurNovel.Controllers
         {
             try
             {
-                var avatarUrl = await _readerService.UploadAvatarAsync(readerId, avatarFile);
+                var avatarUrl = await _imageResourceService.UploadImageAsync<Reader, int>(
+                  readerId,
+                  avatarFile,
+                  "AvatarUrl",
+                  _readerRepository);
                 return Ok(new { success = true, avatarUrl });
             }
             catch (System.Exception ex)

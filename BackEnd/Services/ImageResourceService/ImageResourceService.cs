@@ -1,7 +1,7 @@
 ﻿using OurNovel.Repositories;
 using OurNovel.Services.Interfaces;
 
-namespace OurNovel.Services
+namespace OurNovel.Services.ImageResourceService
 {
     public class ImageResourceService : IImageResourceService
     {
