@@ -10,11 +10,11 @@ namespace OurNovel.Controllers
     [Route("api/[controller]")]
     public class ReportsController : BaseController<Report, int>
     {
-        private readonly ReportsService _reportsService;
+        private readonly ReportService _reportService;
 
-        public ReportsController(ReportsService reportsService) : base(reportsService)
+        public ReportsController(ReportService reportService) : base(reportService)
         {
-            _reportsService = reportsService;
+            _reportService = reportService;
         }
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace OurNovel.Controllers
         {
             try
             {
-                await _reportsService.ReportCommentAsync(commentId, readerId, reason);
+                await _reportService.ReportCommentAsync(commentId, readerId, reason);
                 return Ok(new { success = true, message = "举报成功" });
             }
             catch (Exception ex)
@@ -46,7 +46,7 @@ namespace OurNovel.Controllers
         {
             try
             {
-                await _reportsService.ProcessReportAsync(reportId, progress);
+                await _reportService.ProcessReportAsync(reportId, progress);
                 return Ok(new { success = true, message = "处理成功" });
             }
             catch (Exception ex)

@@ -9,9 +9,9 @@ namespace OurNovel.Services
     /// <summary>
     /// 举报服务，处理评论举报相关逻辑
     /// </summary>
-    public class ReportsService : BaseService<Report, int>
+    public class ReportService : BaseService<Report, int>
     {
-        public ReportsService(IRepository<Report, int> repository) : base(repository)
+        public ReportService(IRepository<Report, int> repository) : base(repository)
         {
         }
 
