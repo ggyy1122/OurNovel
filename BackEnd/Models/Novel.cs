@@ -32,6 +32,6 @@ namespace OurNovel.Models
 
         public string? Status { get; set; } = "待审核";    // IS_RECOMMEND_VISIBLE "待审核"/"连载"/"完结"
 
-        public ICollection<Chapter> Chapters { get; set; } = new List<Chapter>();  // 维护反向Chapter导航
+        // public ICollection<Chapter> Chapters { get; set; } = new List<Chapter>();  // 维护反向Chapter导航
     }
 }
