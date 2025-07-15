@@ -31,6 +31,7 @@ namespace OurNovel.Data
 
         public DbSet<NovelCategory> NovelCategories { get; set; }
         public DbSet<Collect> Collects { get; set; }
+        public DbSet<Recommend> Recommends { get; set; }
 
         /// <summary>
         /// 配置实体和数据库表结构映射关系的方法
@@ -81,6 +82,19 @@ namespace OurNovel.Data
                 .HasOne(c => c.Reader)
                 .WithMany()  
                 .HasForeignKey(c => c.ReaderId);
+
+            //  Recommend 的复合主键为 （NovelId, ReaderId）
+            modelBuilder.Entity<Recommend>()
+            .HasKey(r => new { r.NovelId, r.ReaderId });
+            modelBuilder.Entity<Recommend>().ToTable("RECOMMEND");
+            modelBuilder.Entity<Recommend>()
+            .HasOne(r => r.Novel)
+            .WithMany()
+            .HasForeignKey(r => r.NovelId);
+            modelBuilder.Entity<Recommend>()
+            .HasOne(r => r.Reader)
+            .WithMany() 
+            .HasForeignKey(r => r.ReaderId);
         }
     }
 }
