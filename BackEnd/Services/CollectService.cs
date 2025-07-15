@@ -20,6 +20,17 @@ public class CollectService : ICollectService
         await _repository.AddAsync(entity);
     }
 
+    public async Task AddOrUpdateAsync(int novelId, int readerId, string? isPublic)
+    {
+        var entity = new Collect
+        {
+            NovelId = novelId,
+            ReaderId = readerId,
+            IsPublic = isPublic
+        };
+        await _repository.AddOrUpdateAsync(entity);
+    }
+
     public async Task DeleteAsync(int novelId, int readerId)
     {
         await _repository.DeleteAsync(novelId, readerId);

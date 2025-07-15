@@ -20,6 +20,20 @@ public class CollectRepository : ICollectRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task AddOrUpdateAsync(Collect entity)
+    {
+        var existing = await _context.Collects.FindAsync(entity.NovelId, entity.ReaderId);
+        if (existing != null)
+        {
+            existing.IsPublic = entity.IsPublic;
+        }
+        else
+        {
+            _context.Collects.Add(entity);
+        }
+        await _context.SaveChangesAsync();
+    }
+
     public async Task DeleteAsync(int novelId, int readerId)
     {
         var entity = await _context.Collects.FindAsync(novelId, readerId);

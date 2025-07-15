@@ -18,18 +18,19 @@ public class CollectController : ControllerBase
     }
 
     /// <summary>
-    /// 收藏小说（新增一条收藏记录）
+    /// 添加或更新收藏记录（更新 IsPublic ）
     /// </summary>
     /// <param name="novelId">小说 ID</param>
     /// <param name="readerId">读者 ID</param>
     /// <param name="isPublic">是否公开（"yes" 或 "no"）</param>
     /// <returns>操作成功提示</returns>
     [HttpPost]
-    public async Task<IActionResult> Add(int novelId, int readerId, string? isPublic)
+    public async Task<IActionResult> AddOrUpdate(int novelId, int readerId, string? isPublic)
     {
-        await _service.AddAsync(novelId, readerId, isPublic);
-        return Ok("收藏成功");
+        await _service.AddOrUpdateAsync(novelId, readerId, isPublic);
+        return Ok("收藏记录已添加或更新");
     }
+
 
     /// <summary>
     /// 取消收藏（删除一条收藏记录）
