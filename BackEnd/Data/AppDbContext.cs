@@ -22,6 +22,12 @@ namespace OurNovel.Data
 
         //以下为各个实体对应的 DbSet，提供对实体的增删查改操作
         public DbSet<Reader> Reads { get; set; }
+        public DbSet<Chapter> Chapters { get; set; }
+        public DbSet<Novel> Novels { get; set; }
+        public DbSet<Category> Categories { get; set; }
+
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<Author> Authors { get; set; }
 
 
         /// <summary>
@@ -34,11 +40,22 @@ namespace OurNovel.Data
 
             // 应用单独配置类，对 Reader 实体表映射进行详细配置
             modelBuilder.ApplyConfiguration(new ReaderConfiguration());
-
+            modelBuilder.ApplyConfiguration(new ChapterConfiguration());
+            modelBuilder.ApplyConfiguration(new NovelConfiguration());
+            modelBuilder.ApplyConfiguration(new AuthorConfiguration());
+            modelBuilder.ApplyConfiguration(new CategoryConfiguration());
+            modelBuilder.ApplyConfiguration(new CommentsConfiguration());
             // ⚠️ 后续其他表的配置也在这里调用，例如：
             // modelBuilder.ApplyConfiguration(new NovelConfiguration());
             // modelBuilder.ApplyConfiguration(new ChapterConfiguration());
 
+            // 显式指定 Category 的主键为 CategoryName
+            modelBuilder.Entity<Category>()
+                .HasKey(c => c.CategoryName);
+            modelBuilder.Entity<Category>().ToTable("CATEGORY");
+
         }
     }
 }
+
+

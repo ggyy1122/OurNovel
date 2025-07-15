@@ -29,11 +29,19 @@ builder.Services.AddScoped(typeof(BaseService<,>));
 // 注册具体业务服务
 builder.Services.AddScoped<ReaderService>();
 builder.Services.AddScoped<IImageResourceService, ImageResourceService>();
+
+builder.Services.AddScoped<IChapterRepository, ChapterRepository>();
+builder.Services.AddScoped<ChapterService>();
+builder.Services.AddScoped<NovelService>();
+builder.Services.AddScoped<CategoryService>();
+builder.Services.AddScoped<AuthorService>();
+builder.Services.AddScoped<CommentsService>();
 // 注册OSS储配置
 builder.Services.Configure<OssConfig>(builder.Configuration.GetSection("OssConfig"));
 builder.Services.AddSingleton<IOssService, OssService>();
-//builder.Services.Configure<FileStorageOptions>(
-//   builder.Configuration.GetSection("FileStorage"));
+// 注册文件存储配置
+builder.Services.Configure<FileStorageOptions>(
+    builder.Configuration.GetSection("FileStorage"));
 // 注册文件存储服务
 //builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
 

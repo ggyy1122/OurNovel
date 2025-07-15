@@ -35,7 +35,7 @@ namespace OurNovel.Controllers
         /// <returns>头像URL</returns>
         [HttpPost("UploadAvatar")]
         [Consumes("multipart/form-data")]
-        [ApiExplorerSettings(IgnoreApi = true)] 
+        [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> UploadAvatar([FromForm] int readerId, [FromForm] IFormFile avatarFile)
         {
             try
