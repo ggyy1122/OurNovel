@@ -32,11 +32,13 @@ builder.Services.AddScoped<ReaderService>();
 builder.Services.AddScoped<IImageResourceService, ImageResourceService>();
 
 builder.Services.AddScoped<IChapterRepository, ChapterRepository>();
+builder.Services.AddScoped<ILikesRepository, LikesRepository>();
 builder.Services.AddScoped<ChapterService>();
 builder.Services.AddScoped<NovelService>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<AuthorService>();
 builder.Services.AddScoped<CommentsService>();
+builder.Services.AddScoped<ILikesService,LikesService>();
 // 注册OSS储配置
 builder.Services.Configure<OssConfig>(builder.Configuration.GetSection("OssConfig"));
 builder.Services.AddSingleton<IOssService, OssService>();
