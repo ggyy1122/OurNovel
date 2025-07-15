@@ -33,7 +33,7 @@ namespace OurNovel.Data
         public DbSet<NovelCategory> NovelCategories { get; set; }
         public DbSet<Collect> Collects { get; set; }
         public DbSet<Recommend> Recommends { get; set; }
-
+        public DbSet<Rate> Rates { get; set; }
         public DbSet<CommentReply> CommentReplies { get; set; }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace OurNovel.Data
             modelBuilder.ApplyConfiguration(new RecommendConfiguration());
             modelBuilder.ApplyConfiguration(new NovelCategoryConfiguration());
             modelBuilder.ApplyConfiguration(new CollectConfiguration());
-
+            modelBuilder.ApplyConfiguration(new RateConfiguration());
 
             // ⚠️ 后续其他表的配置也在这里调用，例如：
             // modelBuilder.ApplyConfiguration(new NovelConfiguration());

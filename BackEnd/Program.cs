@@ -49,6 +49,8 @@ builder.Services.AddScoped<ICollectService, CollectService>();
 
 builder.Services.AddScoped<IRecommendRepository, RecommendRepository>();
 builder.Services.AddScoped<IRecommendService, RecommendService>();
+builder.Services.AddScoped<IRateRepository, RateRepository>();
+builder.Services.AddScoped<IRateService, RateService>();
 // 注册OSS储配置
 builder.Services.Configure<OssConfig>(builder.Configuration.GetSection("OssConfig"));
 builder.Services.AddSingleton<IOssService, OssService>();
