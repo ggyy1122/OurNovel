@@ -61,13 +61,6 @@ namespace OurNovel.Data.Configurations
 			// 忽略自动计算字段
 			entity.Ignore(e => e.CalculatedPrice);
 
-            // ? 外键配置：CHAPTER(NOVEL_ID) → NOVEL(NOVEL_ID)，必须有对应的小说
-            entity.HasOne(e => e.Novel)
-				  .WithMany(n => n.Chapters)
-				  .HasForeignKey(e => e.NovelId)
-				  .IsRequired()
-				  .OnDelete(DeleteBehavior.Cascade); // 小说被删时，章节也删除
-
             entity.Property(c => c.NovelId)
         .HasColumnName("NOVEL_ID");
         }
