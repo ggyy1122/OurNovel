@@ -29,7 +29,12 @@ namespace OurNovel.Data
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Author> Authors { get; set; }
 
+<<<<<<< HEAD
         public DbSet<Like> Likes { get; set; }
+=======
+        public DbSet<NovelCategory> NovelCategories { get; set; }
+        public DbSet<Collect> Collects { get; set; }
+>>>>>>> 65965fa4951a642e8d2699852cdd15b009dc6fb7
 
         /// <summary>
         /// 配置实体和数据库表结构映射关系的方法
@@ -56,6 +61,31 @@ namespace OurNovel.Data
                 .HasKey(c => c.CategoryName);
             modelBuilder.Entity<Category>().ToTable("CATEGORY");
 
+            // NovelCategory 的复合主键为 （NovelId, CategoryName）
+            modelBuilder.Entity<NovelCategory>()
+                .HasKey(nc => new { nc.NovelId, nc.CategoryName });
+            modelBuilder.Entity<NovelCategory>().ToTable("NOVEL_CATEGORY");
+            modelBuilder.Entity<NovelCategory>()
+                .HasOne(nc => nc.Novel)
+                .WithMany()
+                .HasForeignKey(nc => nc.NovelId);
+            modelBuilder.Entity<NovelCategory>()
+                .HasOne(nc => nc.Category)
+                .WithMany()
+                .HasForeignKey(nc => nc.CategoryName);
+
+            //  Collect 的复合主键为 （NovelId, ReaderId）
+            modelBuilder.Entity<Collect>()
+                .HasKey(c => new { c.NovelId, c.ReaderId });
+            modelBuilder.Entity<Collect>().ToTable("COLLECT");
+            modelBuilder.Entity<Collect>()
+                .HasOne(c => c.Novel)
+                .WithMany()    
+                .HasForeignKey(c => c.NovelId);
+            modelBuilder.Entity<Collect>()
+                .HasOne(c => c.Reader)
+                .WithMany()  
+                .HasForeignKey(c => c.ReaderId);
         }
     }
 }

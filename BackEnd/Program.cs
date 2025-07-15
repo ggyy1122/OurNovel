@@ -38,7 +38,15 @@ builder.Services.AddScoped<NovelService>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<AuthorService>();
 builder.Services.AddScoped<CommentsService>();
+
 builder.Services.AddScoped<ILikesService,LikesService>();
+
+builder.Services.AddScoped<INovelCategoryRepository, NovelCategoryRepository>();
+builder.Services.AddScoped<INovelCategoryService, NovelCategoryService>();
+
+builder.Services.AddScoped<ICollectRepository, CollectRepository>();
+builder.Services.AddScoped<ICollectService, CollectService>();
+
 // 注册OSS储配置
 builder.Services.Configure<OssConfig>(builder.Configuration.GetSection("OssConfig"));
 builder.Services.AddSingleton<IOssService, OssService>();
