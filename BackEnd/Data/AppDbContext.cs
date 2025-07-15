@@ -30,7 +30,7 @@ namespace OurNovel.Data
         public DbSet<Author> Authors { get; set; }
 
         public DbSet<NovelCategory> NovelCategories { get; set; }
-
+        public DbSet<Collect> Collects { get; set; }
 
         /// <summary>
         /// 配置实体和数据库表结构映射关系的方法
@@ -68,6 +68,19 @@ namespace OurNovel.Data
                 .HasOne(nc => nc.Category)
                 .WithMany()
                 .HasForeignKey(nc => nc.CategoryName);
+
+            //  Collect 的复合主键为 （NovelId, ReaderId）
+            modelBuilder.Entity<Collect>()
+                .HasKey(c => new { c.NovelId, c.ReaderId });
+            modelBuilder.Entity<Collect>().ToTable("COLLECT");
+            modelBuilder.Entity<Collect>()
+                .HasOne(c => c.Novel)
+                .WithMany()    
+                .HasForeignKey(c => c.NovelId);
+            modelBuilder.Entity<Collect>()
+                .HasOne(c => c.Reader)
+                .WithMany()  
+                .HasForeignKey(c => c.ReaderId);
         }
     }
 }
