@@ -1,6 +1,5 @@
 using OurNovel.Models;
 using OurNovel.Repositories;
-using OurNovel.Services.FileStorage.Interfaces;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -12,12 +11,10 @@ namespace OurNovel.Services
     public class ChapterService
     {
         private readonly IChapterRepository _chapterRepository;
-        private readonly IFileStorageService _fileStorageService;
 
-        public ChapterService(IChapterRepository chapterRepository, IFileStorageService fileStorageService)
+        public ChapterService(IChapterRepository chapterRepository)
         {
             _chapterRepository = chapterRepository;
-            _fileStorageService = fileStorageService;
         }
 
         public async Task<IEnumerable<Chapter>> GetByNovelIdAsync(int novelId)
@@ -56,6 +53,7 @@ namespace OurNovel.Services
             await _chapterRepository.DeleteAsync(novelId, chapterId);
         }
 
+        /*
         public async Task<string> UploadChapterContentAsync(int novelId, int chapterId, IFormFile chapterFile)
         {
             if (chapterFile == null || chapterFile.Length == 0)
@@ -87,5 +85,6 @@ namespace OurNovel.Services
                 throw;
             }
         }
+        */
     }
 }

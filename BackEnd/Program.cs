@@ -3,6 +3,7 @@ using OurNovel.Data;
 using OurNovel.Repositories;
 using OurNovel.Services;
 using OurNovel.Services.Interfaces;
+using OurNovel.Services.ImageResourceService;
 using Aliyun.OSS;
 using OurNovel.Services.OSS;
 using System.Reflection;
@@ -39,11 +40,6 @@ builder.Services.AddScoped<CommentsService>();
 // 注册OSS储配置
 builder.Services.Configure<OssConfig>(builder.Configuration.GetSection("OssConfig"));
 builder.Services.AddSingleton<IOssService, OssService>();
-// 注册文件存储配置
-builder.Services.Configure<FileStorageOptions>(
-    builder.Configuration.GetSection("FileStorage"));
-// 注册文件存储服务
-//builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
 
 // ========================================
 // 3️⃣ 添加控制器服务

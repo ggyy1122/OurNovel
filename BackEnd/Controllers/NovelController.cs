@@ -27,6 +27,9 @@ namespace OurNovel.Controllers
         /// <param name="novelId">小说ID</param>
         /// <param name="coverFile">封面文件</param>
         /// <returns>封面URL</returns>
+        /// 
+
+        /*
         [HttpPost("UploadCover")]
         [Consumes("multipart/form-data")]
         [ApiExplorerSettings(IgnoreApi = true)]
@@ -42,5 +45,6 @@ namespace OurNovel.Controllers
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
+        */
     }
 }

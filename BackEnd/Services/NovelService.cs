@@ -1,8 +1,6 @@
 using OurNovel.Models;
 using OurNovel.Repositories;
 using Microsoft.AspNetCore.Http;
-using OurNovel.Services.FileStorage.Interfaces;
-
 namespace OurNovel.Services
 {
     /// <summary>
@@ -10,12 +8,10 @@ namespace OurNovel.Services
     /// </summary>
     public class NovelService : BaseService<Novel, int>
     {
-        private readonly IFileStorageService _fileStorageService;
 
-        public NovelService(IRepository<Novel, int> repository, IFileStorageService fileStorageService)
+        public NovelService(IRepository<Novel, int> repository)
             : base(repository)
         {
-            _fileStorageService = fileStorageService;
         }
 
         /// <summary>
@@ -24,6 +20,9 @@ namespace OurNovel.Services
         /// <param name="novelId">小说ID</param>
         /// <param name="coverFile">封面文件</param>
         /// <returns>封面URL</returns>
+        /// 
+
+        /*
         public async Task<string> UploadCoverAsync(int novelId, IFormFile coverFile)
         {
             if (coverFile == null || coverFile.Length == 0)
@@ -59,6 +58,7 @@ namespace OurNovel.Services
                 throw;
             }
         }
+        */
 
     }
 }
