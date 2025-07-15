@@ -81,5 +81,15 @@ namespace OurNovel.Controllers
             var count = await _likesService.GetLikeCountAsync(commentId);
             return Ok(new { commentId, likeCount = count });
         }
+        /// <summary>
+        /// 获取所有点赞记录
+        /// </summary>
+        /// <returns>点赞记录列表</returns>
+        [HttpGet]
+        public async Task<IActionResult> GetAllLikes()
+        {
+            var likes = await _likesService.GetAllLikesAsync();
+            return Ok(likes);
+        }
     }
 }

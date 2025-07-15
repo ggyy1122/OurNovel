@@ -8,5 +8,7 @@ namespace OurNovel.Services
         Task UnlikeAsync(int commentId, int readerId);
         Task<bool> IsLikedAsync(int commentId, int readerId);
         Task<int> GetLikeCountAsync(int commentId);
+        Task<IEnumerable<Like>> GetAllLikesAsync();
+
     }
 }
