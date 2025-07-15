@@ -62,11 +62,11 @@ namespace OurNovel.Controllers
         /// </summary>
         /// <param name="chapterId">章节 ID</param>
         /// <returns>评论列表</returns>
-        [HttpGet("ByChapter/{chapterId}")]
-        public async Task<IActionResult> GetByChapter(int chapterId)
+        [HttpGet("ByChapter/{novelId}/{chapterId}")]
+        public async Task<IActionResult> GetByChapter(int novelId, int chapterId)
         {
             var all = await _commentsService.GetAllAsync();
-            var result = all.Where(c => c.ChapterId == chapterId && c.Status == "通过");
+            var result = all.Where(c => c.NovelId == novelId && c.ChapterId == chapterId && c.Status == "通过");
             return Ok(result);
         }
 
