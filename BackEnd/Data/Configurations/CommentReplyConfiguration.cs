@@ -7,7 +7,12 @@ namespace OurNovel.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<CommentReply> builder)
         {
-            builder.ToTable("comment_reply");
+            builder.HasKey(l => new { l.CommentId, l.PreComId }); // 复合主键
+
+            builder.Property(l => l.CommentId).HasColumnName("COMMENT_ID");
+            builder.Property(l => l.PreComId).HasColumnName("PRE_COM_ID");
+            builder.Property(l => l.CommentLevel).HasColumnName("COMMENT_LEVEL");
+            builder.ToTable("COMMENT_REPLY");
 
             builder.HasKey(cr => cr.CommentId);
 

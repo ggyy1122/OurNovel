@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using OurNovel.Models;
 
 public class CommentReply
@@ -13,9 +14,11 @@ public class CommentReply
     public int CommentLevel { get; set; }
 
     // 导航属性（可选）
+    [JsonIgnore]
     [ForeignKey(nameof(CommentId))]
     public Comment? Comment { get; set; }
 
+    [JsonIgnore]
     [ForeignKey(nameof(PreComId))]
     public Comment? ParentComment { get; set; }
 }

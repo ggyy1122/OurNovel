@@ -33,6 +33,7 @@ builder.Services.AddScoped<IImageResourceService, ImageResourceService>();
 
 builder.Services.AddScoped<IChapterRepository, ChapterRepository>();
 builder.Services.AddScoped<ILikesRepository, LikesRepository>();
+
 builder.Services.AddScoped<ChapterService>();
 builder.Services.AddScoped<NovelService>();
 builder.Services.AddScoped<CategoryService>();
@@ -40,6 +41,9 @@ builder.Services.AddScoped<AuthorService>();
 builder.Services.AddScoped<CommentsService>();
 
 builder.Services.AddScoped<ILikesService,LikesService>();
+
+builder.Services.AddScoped<ICommentReplyRepository, CommentReplyRepository>();
+builder.Services.AddScoped<ICommentReplyService, CommentReplyService>();
 
 builder.Services.AddScoped<INovelCategoryRepository, NovelCategoryRepository>();
 builder.Services.AddScoped<INovelCategoryService, NovelCategoryService>();

@@ -53,6 +53,7 @@ namespace OurNovel.Data
             modelBuilder.ApplyConfiguration(new CommentsConfiguration());
             modelBuilder.ApplyConfiguration(new LikesConfiguration());
             modelBuilder.ApplyConfiguration(new CommentReplyConfiguration());
+
             // ⚠️ 后续其他表的配置也在这里调用，例如：
             // modelBuilder.ApplyConfiguration(new NovelConfiguration());
             // modelBuilder.ApplyConfiguration(new ChapterConfiguration());
