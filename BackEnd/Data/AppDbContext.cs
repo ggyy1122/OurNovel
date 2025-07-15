@@ -29,6 +29,8 @@ namespace OurNovel.Data
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Author> Authors { get; set; }
 
+        public DbSet<NovelCategory> NovelCategories { get; set; }
+
 
         /// <summary>
         /// 配置实体和数据库表结构映射关系的方法
@@ -54,6 +56,18 @@ namespace OurNovel.Data
                 .HasKey(c => c.CategoryName);
             modelBuilder.Entity<Category>().ToTable("CATEGORY");
 
+            // NovelCategory 的复合主键为 （NovelId, CategoryName）
+            modelBuilder.Entity<NovelCategory>()
+                .HasKey(nc => new { nc.NovelId, nc.CategoryName });
+            modelBuilder.Entity<NovelCategory>().ToTable("NOVEL_CATEGORY");
+            modelBuilder.Entity<NovelCategory>()
+                .HasOne(nc => nc.Novel)
+                .WithMany()
+                .HasForeignKey(nc => nc.NovelId);
+            modelBuilder.Entity<NovelCategory>()
+                .HasOne(nc => nc.Category)
+                .WithMany()
+                .HasForeignKey(nc => nc.CategoryName);
         }
     }
 }
