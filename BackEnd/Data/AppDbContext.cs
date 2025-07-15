@@ -29,12 +29,11 @@ namespace OurNovel.Data
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Author> Authors { get; set; }
 
-<<<<<<< HEAD
         public DbSet<Like> Likes { get; set; }
-=======
         public DbSet<NovelCategory> NovelCategories { get; set; }
         public DbSet<Collect> Collects { get; set; }
->>>>>>> 65965fa4951a642e8d2699852cdd15b009dc6fb7
+
+        public DbSet<CommentReply> CommentReplies { get; set; }
 
         /// <summary>
         /// 配置实体和数据库表结构映射关系的方法
@@ -52,6 +51,7 @@ namespace OurNovel.Data
             modelBuilder.ApplyConfiguration(new CategoryConfiguration());
             modelBuilder.ApplyConfiguration(new CommentsConfiguration());
             modelBuilder.ApplyConfiguration(new LikesConfiguration());
+            modelBuilder.ApplyConfiguration(new CommentReplyConfiguration());
             // ⚠️ 后续其他表的配置也在这里调用，例如：
             // modelBuilder.ApplyConfiguration(new NovelConfiguration());
             // modelBuilder.ApplyConfiguration(new ChapterConfiguration());
