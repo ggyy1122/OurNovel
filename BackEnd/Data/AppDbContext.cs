@@ -28,6 +28,7 @@ namespace OurNovel.Data
 
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Author> Authors { get; set; }
+        public DbSet<Reader> Readers { get; set; }
 
 
         /// <summary>
