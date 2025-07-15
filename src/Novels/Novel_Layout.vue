@@ -25,7 +25,7 @@
         </header>
 
         <!-- 导航菜单 -->
-        <nav class="nav-menu" ref="mainNav">
+        <nav class="nav-menu" ref="mainNav" v-if="showNavMenu">
             <ul>
                 <li>
                     <router-link to="/Novels/Novel_Layout/home" active-class="active-link">首页</router-link>
@@ -40,8 +40,7 @@
         </nav>
 
         <!-- 悬浮导航栏 -->
-        <!-- 悬浮导航栏部分，替换为如下内容 -->
-        <div v-if="showStickyNav" class="sticky-nav">
+        <div v-if="showNavMenu && showStickyNav" class="sticky-nav">
             <div class="sticky-header-content">
                 <div class="logo">
                     <img src="@/assets/logo.png" alt="七猫中文网" />
@@ -94,14 +93,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+
 const router = useRouter()
+const route = useRoute()
 const searchQuery = ref('')
 const showStickyNav = ref(false)
 const mainHeader = ref(null)
 const mainNav = ref(null)
 
+
+const showNavMenu = computed(() => {
+    return !route.meta.hideNav;
+})
 const handleSearch = () => {
     console.log('搜索关键词:', searchQuery.value)
 }

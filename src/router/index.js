@@ -10,6 +10,7 @@ import Novel_Rank from '@/Novels/Novel_Rank.vue'
 import LoginForm from '@/Login_Register/LoginForm.vue'
 import RegisterForm from '@/Login_Register/RegisterForm.vue'
 import L_R from '@/Login_Register/L_R.vue'
+import Novel_Reader from '@/Novels/Novel_Reader.vue'
 
 
 const routes = [
@@ -70,6 +71,15 @@ const routes = [
                 path: 'rank',
                 name: 'Novel_Rank',
                 component: Novel_Rank
+            },
+            {
+                path: 'reader',
+                name: 'NovelReader',
+                component: Novel_Reader,
+                meta: { hideNav: true },
+                props: (route) => ({
+                    novel: route.query.novel ? JSON.parse(decodeURIComponent(route.query.novel)) : null
+                })
             }
         ]
     },
