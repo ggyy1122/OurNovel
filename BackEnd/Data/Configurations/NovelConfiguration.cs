@@ -36,12 +36,6 @@ namespace OurNovel.Data.Configurations
             entity.Property(e => e.Status)
                   .HasColumnName("STATUS")
                   .HasDefaultValue("待审核");
-            
-            // 外键关系：一个 Novel 对应一个 Author（多对一）
-            entity.HasOne(e => e.Author)
-                  .WithMany(a => a.Novels)
-                  .HasForeignKey(e => e.AuthorId)
-                  .OnDelete(DeleteBehavior.Cascade);  // 删除作者时，相关小说也删除（按需求可改）
 
 
         }
