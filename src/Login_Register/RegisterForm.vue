@@ -78,8 +78,19 @@
             <div class="reg-options">
                 <label>
                     <input type="checkbox" v-model="agree" />
-                    我已阅读并同意 <a href="#">服务条款和隐私政策</a>
+                    我已阅读并同意 <a href="#" @click.prevent="showModal = true">服务条款和隐私政策</a>
                 </label>
+                <div class="modal-overlay" v-if="showModal" @click.self="showModal = false">
+                    <div class="modal-content">
+                        <h2>服务条款和隐私政策</h2>
+                        <div class="modal-body">
+                            <p>这里是个人信息保护及隐私政策详细内容...</p>
+                            <p>请您务必审慎阅读、充分理解本协议各条款内容，特别是以加粗形式标注提示的条款，以及开通或使用某项服务的单独政策，并选择接受或不接受。我们将在明确获得您同意和接受后，为您提供相应的服务。</p>
+                            <p>1. 如果您未满18周岁，请在监护人的陪同下阅读本协议，并特别注意未成年人保护条款。</p>
+                        </div>
+                        <button @click="showModal = false">关闭</button>
+                    </div>
+                </div>
             </div>
             <button type="submit" class="reg-btn" :disabled="!agree">立即注册</button>
         </form>
@@ -93,6 +104,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { current_state } from '@/store/index';
+const showModal = ref(false)
 const state = current_state();
 
 const username = ref("");
@@ -140,6 +152,47 @@ function goLogin() {
 </script>
 
 <style scoped>
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal-body {
+    margin: 1.5rem 0;
+}
+
+button {
+    padding: 0.5rem 1rem;
+    background-color: #ffd100;
+    color: #f5eeee;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #e89a09;
+    color:#222
+}
+
 .register-left {
     width: 70%;
     padding: 60px 50px 0 50px;
