@@ -47,6 +47,8 @@ builder.Services.AddScoped<INovelCategoryService, NovelCategoryService>();
 builder.Services.AddScoped<ICollectRepository, CollectRepository>();
 builder.Services.AddScoped<ICollectService, CollectService>();
 
+builder.Services.AddScoped<IRecommendRepository, RecommendRepository>();
+builder.Services.AddScoped<IRecommendService, RecommendService>();
 // 注册OSS储配置
 builder.Services.Configure<OssConfig>(builder.Configuration.GetSection("OssConfig"));
 builder.Services.AddSingleton<IOssService, OssService>();

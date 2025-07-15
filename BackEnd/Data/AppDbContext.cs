@@ -32,6 +32,7 @@ namespace OurNovel.Data
         public DbSet<Like> Likes { get; set; }
         public DbSet<NovelCategory> NovelCategories { get; set; }
         public DbSet<Collect> Collects { get; set; }
+        public DbSet<Recommend> Recommends { get; set; }
 
         public DbSet<CommentReply> CommentReplies { get; set; }
 
@@ -86,6 +87,19 @@ namespace OurNovel.Data
                 .HasOne(c => c.Reader)
                 .WithMany()  
                 .HasForeignKey(c => c.ReaderId);
+
+            //  Recommend 的复合主键为 （NovelId, ReaderId）
+            modelBuilder.Entity<Recommend>()
+            .HasKey(r => new { r.NovelId, r.ReaderId });
+            modelBuilder.Entity<Recommend>().ToTable("RECOMMEND");
+            modelBuilder.Entity<Recommend>()
+            .HasOne(r => r.Novel)
+            .WithMany()
+            .HasForeignKey(r => r.NovelId);
+            modelBuilder.Entity<Recommend>()
+            .HasOne(r => r.Reader)
+            .WithMany() 
+            .HasForeignKey(r => r.ReaderId);
         }
     }
 }
