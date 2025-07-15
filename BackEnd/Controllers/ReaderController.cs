@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OurNovel.Services;
 using OurNovel.Models;
-
 namespace OurNovel.Controllers
 {
     /// <summary>

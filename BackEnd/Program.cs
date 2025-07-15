@@ -2,8 +2,9 @@
 using OurNovel.Data;
 using OurNovel.Repositories;
 using OurNovel.Services;
-using OurNovel.Services.FileStorage.Interfaces;
-using OurNovel.Services.FileStorage;
+using OurNovel.Services.Interfaces;
+using Aliyun.OSS;
+using OurNovel.Services.OSS;
 using System.Reflection;
 
 
@@ -27,11 +28,14 @@ builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
 builder.Services.AddScoped(typeof(BaseService<,>));
 // 注册具体业务服务
 builder.Services.AddScoped<ReaderService>();
-// 注册文件存储配置
-builder.Services.Configure<FileStorageOptions>(
-    builder.Configuration.GetSection("FileStorage"));
+builder.Services.AddScoped<IImageResourceService, ImageResourceService>();
+// 注册OSS储配置
+builder.Services.Configure<OssConfig>(builder.Configuration.GetSection("OssConfig"));
+builder.Services.AddSingleton<IOssService, OssService>();
+//builder.Services.Configure<FileStorageOptions>(
+//   builder.Configuration.GetSection("FileStorage"));
 // 注册文件存储服务
-builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
+//builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
 
 // ========================================
 // 3️⃣ 添加控制器服务
@@ -75,11 +79,27 @@ builder.Services.AddSwaggerGen(c =>
 // 6   构建应用
 // ========================================
 var app = builder.Build();
+// 检查OSS连接
+try
+{
+    var testClient = new OssClient("oss-cn-hangzhou.aliyuncs.com", "your-ak", "your-sk");
+    var exists = testClient.DoesBucketExist("novelprogram123");
+    Console.WriteLine($"OSS连接测试: {(exists ? "成功" : "Bucket不存在")}");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"!!! OSS初始化失败: {ex.Message}");
+}
 
 // ========================================
 // 7  配置中间件管道
 // ========================================
-
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"收到请求: {context.Request.Method} {context.Request.Path}");
+    await next();
+    Console.WriteLine($"响应状态码: {context.Response.StatusCode}"); // 检查是否进入响应阶段
+});
 // 开发环境启用 Swagger
 if (app.Environment.IsDevelopment())
 {
@@ -88,7 +108,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // HTTPS 强制跳转
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseRouting();
 
