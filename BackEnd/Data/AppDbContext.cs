@@ -33,7 +33,7 @@ namespace OurNovel.Data
         public DbSet<NovelCategory> NovelCategories { get; set; }
         public DbSet<Collect> Collects { get; set; }
         public DbSet<Recommend> Recommends { get; set; }
-
+        public DbSet<Rate> Rates { get; set; }
         public DbSet<CommentReply> CommentReplies { get; set; }
 
         /// <summary>
@@ -54,6 +54,12 @@ namespace OurNovel.Data
             modelBuilder.ApplyConfiguration(new LikesConfiguration());
             modelBuilder.ApplyConfiguration(new CommentReplyConfiguration());
 
+            modelBuilder.ApplyConfiguration(new RecommendConfiguration());
+            modelBuilder.ApplyConfiguration(new NovelCategoryConfiguration());
+            modelBuilder.ApplyConfiguration(new CollectConfiguration());
+            modelBuilder.ApplyConfiguration(new RateConfiguration());
+
+
             // ⚠️ 后续其他表的配置也在这里调用，例如：
             // modelBuilder.ApplyConfiguration(new NovelConfiguration());
             // modelBuilder.ApplyConfiguration(new ChapterConfiguration());
@@ -63,44 +69,6 @@ namespace OurNovel.Data
                 .HasKey(c => c.CategoryName);
             modelBuilder.Entity<Category>().ToTable("CATEGORY");
 
-            // NovelCategory 的复合主键为 （NovelId, CategoryName）
-            modelBuilder.Entity<NovelCategory>()
-                .HasKey(nc => new { nc.NovelId, nc.CategoryName });
-            modelBuilder.Entity<NovelCategory>().ToTable("NOVEL_CATEGORY");
-            modelBuilder.Entity<NovelCategory>()
-                .HasOne(nc => nc.Novel)
-                .WithMany()
-                .HasForeignKey(nc => nc.NovelId);
-            modelBuilder.Entity<NovelCategory>()
-                .HasOne(nc => nc.Category)
-                .WithMany()
-                .HasForeignKey(nc => nc.CategoryName);
-
-            //  Collect 的复合主键为 （NovelId, ReaderId）
-            modelBuilder.Entity<Collect>()
-                .HasKey(c => new { c.NovelId, c.ReaderId });
-            modelBuilder.Entity<Collect>().ToTable("COLLECT");
-            modelBuilder.Entity<Collect>()
-                .HasOne(c => c.Novel)
-                .WithMany()    
-                .HasForeignKey(c => c.NovelId);
-            modelBuilder.Entity<Collect>()
-                .HasOne(c => c.Reader)
-                .WithMany()  
-                .HasForeignKey(c => c.ReaderId);
-
-            //  Recommend 的复合主键为 （NovelId, ReaderId）
-            modelBuilder.Entity<Recommend>()
-            .HasKey(r => new { r.NovelId, r.ReaderId });
-            modelBuilder.Entity<Recommend>().ToTable("RECOMMEND");
-            modelBuilder.Entity<Recommend>()
-            .HasOne(r => r.Novel)
-            .WithMany()
-            .HasForeignKey(r => r.NovelId);
-            modelBuilder.Entity<Recommend>()
-            .HasOne(r => r.Reader)
-            .WithMany() 
-            .HasForeignKey(r => r.ReaderId);
         }
     }
 }
