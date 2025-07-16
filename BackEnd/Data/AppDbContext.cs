@@ -28,6 +28,8 @@ namespace OurNovel.Data
 
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Author> Authors { get; set; }
+        public DbSet<Author> Manager{ get; set; }
+
 
 
         /// <summary>
@@ -45,6 +47,8 @@ namespace OurNovel.Data
             modelBuilder.ApplyConfiguration(new AuthorConfiguration());
             modelBuilder.ApplyConfiguration(new CategoryConfiguration());
             modelBuilder.ApplyConfiguration(new CommentsConfiguration());
+            modelBuilder.ApplyConfiguration(new ManagerConfiguration());
+
             // ⚠️ 后续其他表的配置也在这里调用，例如：
             // modelBuilder.ApplyConfiguration(new NovelConfiguration());
             // modelBuilder.ApplyConfiguration(new ChapterConfiguration());

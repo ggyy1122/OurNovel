@@ -26,5 +26,6 @@
         public string? IsCollectVisible { get; set; }    // IS_COLLECT_VISIBLE "是"/"否"
 
         public string? IsRecommendVisible { get; set; }  // IS_RECOMMEND_VISIBLE "是"/"否"
+
     }
 }

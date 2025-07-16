@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace OurNovel.Models
 {
     public class Novel : IEntity<int>
@@ -33,5 +34,6 @@ namespace OurNovel.Models
         public string? Status { get; set; } = "待审核";    // IS_RECOMMEND_VISIBLE "待审核"/"连载"/"完结"
 
         // public ICollection<Chapter> Chapters { get; set; } = new List<Chapter>();  // 维护反向Chapter导航
+
     }
 }
