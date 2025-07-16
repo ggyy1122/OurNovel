@@ -37,12 +37,15 @@
 
         <!-- 4: 更新评论 -->
         <h1>4: 更新评论</h1>
-        <input v-model="commentId4" placeholder="评论ID" type="number" />
-        <input v-model="updateData.title" placeholder="新标题" />
-        <input v-model="updateData.content" placeholder="新内容" />
-        <input v-model="updateData.likes" placeholder="新点赞数" type="number" />
-        <input v-model="updateData.status" placeholder="新状态" />
-        <button @click="function4">更新评论</button>
+        <input v-model="commentId4" placeholder="输入评论ID" type="number" />
+        <button @click="getCommentForUpdate">获取评论</button>
+        <div v-if="originalComment4">
+            <input v-model="updateData4.title" placeholder="新标题" />
+            <input v-model="updateData4.content" placeholder="新内容" />
+            <input v-model.number="updateData4.likes" placeholder="新点赞数" type="number" />
+            <input v-model="updateData4.status" placeholder="新状态" />
+            <button @click="function4">更新评论</button>
+        </div>
         <div v-if="apiResponse4">
             <h3>响应数据：</h3>
             <pre>{{ apiResponse4 }}</pre>
@@ -151,10 +154,13 @@ const createData = ref({
     title: '',
     content: '',
     likes: 0,
-    status: '通过'
+    status: '通过',
+    createTime: ''
 })
 async function function3() {
     try {
+        const now = new Date().toISOString()
+        createData.value.createTime = now     // 设置创建时间为当前时间
         const response = await createComment(createData.value)
         apiResponse3.value = response
         console.log('创建响应:', response)
@@ -164,20 +170,53 @@ async function function3() {
 }
 
 // 4: 更新评论
-const apiResponse4 = ref(null)
 const commentId4 = ref('')
-const updateData = ref({
+const originalComment4 = ref(null) // 存储从API获取的原始评论数据
+const updateData4 = ref({
     title: '',
     content: '',
     likes: 0,
     status: ''
 })
-async function function4() {
+const apiResponse4 = ref(null)
+// 获取评论以填充表单
+async function getCommentForUpdate() {
     if (!commentId4.value) return
     try {
+        const response = await getComment(commentId4.value)
+        originalComment4.value = response
+        updateData4.value.title = response.title
+        updateData4.value.content = response.content || ''
+        updateData4.value.likes = response.likes
+        updateData4.value.status = response.status
+    } catch (error) {
+        apiResponse4.value = { error: '获取评论失败: ' + error.message }
+    }
+}
+
+// 更新评论
+async function function4() {
+    if (!commentId4.value || !originalComment4.value) {
+        apiResponse4.value = { error: '请先获取评论' }
+        return
+    }
+    try {
+        const now = new Date().toISOString()
+        // 构建完整的评论对象
+        const commentData = {
+            commentId: originalComment4.value.commentId,
+            readerId: originalComment4.value.readerId,
+            novelId: originalComment4.value.novelId,
+            chapterId: originalComment4.value.chapterId,
+            title: updateData4.value.title,
+            content: updateData4.value.content,
+            likes: updateData4.value.likes,
+            status: updateData4.value.status,
+            createTime: now // 使用当前时间
+        }
         const response = await updateComment(
             commentId4.value,
-            updateData.value
+            commentData
         )
         apiResponse4.value = response
         console.log('更新响应:', response)
