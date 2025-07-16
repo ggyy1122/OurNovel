@@ -18,24 +18,6 @@ namespace OurNovel.Controllers
             _commentsService = commentsService;
         }
 
-        /// <summary>
-        /// 点赞某条评论（将 Likes +1）
-        /// </summary>
-        /// <param name="id">评论 ID</param>
-        /// <returns>操作结果</returns>
-        [HttpPost("Like/{id}")]
-        public async Task<IActionResult> Like(int id)
-        {
-            try
-            {
-                await _commentsService.LikeCommentAsync(id);
-                return Ok(new { success = true, message = "点赞成功" });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
-        }
 
         /// <summary>
         /// 设置评论状态（如“通过”或“封禁”）
