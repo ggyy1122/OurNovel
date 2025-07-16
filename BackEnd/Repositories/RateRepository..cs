@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OurNovel.Data;
 using OurNovel.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,18 +14,9 @@ public class RateRepository : IRateRepository
         _context = context;
     }
 
-    public async Task AddOrUpdateAsync(Rate rate)
+    public async Task AddAsync(Rate entity)
     {
-        var existing = await _context.Rates.FindAsync(rate.NovelId, rate.ReaderId);
-        if (existing != null)
-        {
-            existing.Score = rate.Score;
-            existing.RatingTime = rate.RatingTime;
-        }
-        else
-        {
-            _context.Rates.Add(rate);
-        }
+        _context.Rates.Add(entity);
         await _context.SaveChangesAsync();
     }
 
@@ -38,6 +28,11 @@ public class RateRepository : IRateRepository
             _context.Rates.Remove(rate);
             await _context.SaveChangesAsync();
         }
+    }
+
+    public async Task<Rate?> FindAsync(int novelId, int readerId)
+    {
+        return await _context.Rates.FindAsync(novelId, readerId);
     }
 
     public async Task<IEnumerable<Rate>> GetByNovelIdAsync(int novelId)
