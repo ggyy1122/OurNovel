@@ -73,10 +73,15 @@ export function createComment(commentData) {
  * 更新评论
  * @param {number} commentId - 评论ID
  * @param {Object} updateData - 更新数据
+ * @param {number} [updateData.commentId] - 评论ID（必须）
+ * @param {number} [updateData.readerId] - 读者ID
+ * @param {number} [updateData.novelId] - 小说ID
+ * @param {number} [updateData.chapterId] - 章节ID
  * @param {string} [updateData.title] - 新标题
  * @param {string} [updateData.content] - 新内容
  * @param {number} [updateData.likes] - 新点赞数
  * @param {string} [updateData.status] - 新状态
+ * @param {string} [updateData.createTime] - 新创建时间
  * @returns {Promise<Comment>} 更新后的评论
  */
 export function updateComment(commentId, updateData) {
