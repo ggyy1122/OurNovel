@@ -1,6 +1,8 @@
 <template>
     <div id="app" style="text-align:center; margin-top:100px;">
 
+        <button @click="Home">返回登录页面</button>
+
 
         <h1>1:获取所有作者</h1>
         <button @click="function1">所有作者</button>
@@ -60,9 +62,13 @@
 
 <script setup>
 import { ref } from 'vue'
-import { getAllAuthors,getAuthor,createAuthor ,updateAuthor,deleteAuthor} from '@/API/Author_API'
+import { getAllAuthors, getAuthor, createAuthor, updateAuthor, deleteAuthor } from '@/API/Author_API'
 
-
+import { useRouter } from 'vue-router'
+const router = useRouter()
+function Home() {
+    router.push('/')
+}
 
 //1:获取所有作者
 const apiResponse1 = ref(null)
@@ -80,7 +86,7 @@ async function function1() {
 
 //2:获取1个作者
 const apiResponse2 = ref(null)
-const authorId2 = ref(0)
+const authorId2 = ref('')
 async function fuction2() {
     try {
         const response = await getAuthor(authorId2.value)
@@ -96,7 +102,7 @@ async function fuction2() {
 //3:创建作者
 const authorName3 = ref('')
 const password3 = ref('')
-const earning3 = ref(0)
+const earning3 = ref('')
 const phone3 = ref('')
 const avatarUrl3 = ref('')
 const apiResponse3 = ref(null)
@@ -120,10 +126,10 @@ async function fuction3() {
 
 
 //4:更新作者
-const authorId4 = ref(0)
+const authorId4 = ref('')
 const authorName4 = ref('')
 const password4 = ref('')
-const earning4 = ref(0)
+const earning4 = ref('')
 const phone4 = ref('')
 const avatarUrl4 = ref('')
 const apiResponse4 = ref(null)
@@ -148,7 +154,7 @@ async function fuction4() {
 
 
 //5:删除作者
-const authorId5 = ref(0)
+const authorId5 = ref('')
 const apiResponse5 = ref(null)
 async function fuction5() {
     try {
