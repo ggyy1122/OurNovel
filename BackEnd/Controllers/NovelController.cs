@@ -27,13 +27,22 @@ namespace OurNovel.Controllers
         [HttpPut("{id}/review")]
         public async Task<IActionResult> ReviewNovel(int id, [FromQuery] string newStatus)
         {
-            var success = await (_service as NovelService)?.ReviewNovelAsync(id, newStatus)!;
+            // 从登录态获取管理员ID
+            var managerIdStr = User.FindFirst("ManagerId")?.Value;
+            if (!int.TryParse(managerIdStr, out var managerId))
+            {
+                return Unauthorized(new { success = false, message = "未登录或管理员身份信息无效" });
+            }
+
+            // 调用审核并写入日志
+            var success = await (_service as NovelService)?.ReviewNovelAsync(id, newStatus, managerId)!;
 
             if (!success)
                 return BadRequest("审核失败，可能是ID不存在或状态非法（必须为‘连载’或‘完结’）");
 
             return Ok(new { success = true, message = "小说状态已更新" });
         }
+
 
         /// <summary>
         /// 上传小说封面，并更新封面URL

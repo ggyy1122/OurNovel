@@ -8,15 +8,18 @@ namespace OurNovel.Services
     /// </summary>
     public class NovelService : BaseService<Novel, int>
     {
+        private readonly NovelManagementService _novelManagementService;
 
-        public NovelService(IRepository<Novel, int> repository)
+        public NovelService(IRepository<Novel, int> repository, NovelManagementService novelManagementService)
             : base(repository)
         {
+            _novelManagementService = novelManagementService;
         }
+
         /// <summary>
         /// 审核小说，修改状态为“连载”或“完结”
         /// </summary>
-        public async Task<bool> ReviewNovelAsync(int novelId, string newStatus)
+        public async Task<bool> ReviewNovelAsync(int novelId, string newStatus,int managerId)
         {
             // 合法性检查（业务约束）
             if (newStatus != "连载" && newStatus != "完结")
@@ -28,6 +31,10 @@ namespace OurNovel.Services
 
             novel.Status = newStatus;
             await _repository.UpdateAsync(novel);
+
+            var result = $"审核结束，状态修改为 {newStatus}";
+            await _novelManagementService.RecordManagementAsync(managerId, result, novelId);
+
             return true;
         }
         /// <summary>

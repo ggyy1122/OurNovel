@@ -9,6 +9,7 @@ using OurNovel.Services.OSS;
 using System.Reflection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.OpenApi.Models;
 
 
 
@@ -61,6 +62,10 @@ builder.Services.AddScoped<IRateService, RateService>();
 builder.Services.AddScoped<ReportService>();
 builder.Services.AddScoped<ManagerService>();
 builder.Services.AddScoped<ManagementService>();
+
+builder.Services.AddScoped<NovelManagementService>();
+builder.Services.AddScoped<CommentManagementService>();
+builder.Services.AddScoped<ReportManagementService>();
 
 // 注册OSS储配置
 builder.Services.Configure<OssConfig>(builder.Configuration.GetSection("OssConfig"));
@@ -119,7 +124,32 @@ builder.Services.AddSwaggerGen(c =>
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     c.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
 
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "请输入Bearer格式的JWT，例如: Bearer eyJhbGciOiJIUzI1NiIs...",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
 
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                Scheme = "oauth2",
+                Name = "Bearer",
+                In = ParameterLocation.Header
+            },
+            new List<string>()
+        }
+    });
 });
 
 // ========================================

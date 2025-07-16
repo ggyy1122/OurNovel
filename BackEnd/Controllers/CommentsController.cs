@@ -28,9 +28,16 @@ namespace OurNovel.Controllers
         [HttpPost("Status")]
         public async Task<IActionResult> SetStatus([FromForm] int commentId, [FromForm] string status)
         {
+            // 从登录态获取管理员ID
+            var managerIdStr = User.FindFirst("ManagerId")?.Value;
+            if (!int.TryParse(managerIdStr, out var managerId))
+            {
+                return Unauthorized(new { success = false, message = "未登录或管理员身份信息无效" });
+            }
+
             try
             {
-                await _commentsService.SetCommentStatusAsync(commentId, status);
+                await _commentsService.SetCommentStatusAsync(commentId, status,managerId);
                 return Ok(new { success = true, message = $"状态已修改为：{status}" });
             }
             catch (Exception ex)

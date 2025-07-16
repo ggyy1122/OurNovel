@@ -19,5 +19,6 @@ namespace OurNovel.Models
 
         [JsonIgnore]
         public Manager? Manager { get; set; }
+
     }
 }
