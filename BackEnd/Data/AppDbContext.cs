@@ -32,7 +32,7 @@ namespace OurNovel.Data
         public DbSet<Reader> Readers { get; set; }
         public DbSet<Manager> Manager{ get; set; }
         public DbSet<Manager> Managers { get; set; } = null!;
-
+        public DbSet<Management> Managements { get; set; }
 
 
         /// <summary>
@@ -52,6 +52,7 @@ namespace OurNovel.Data
             modelBuilder.ApplyConfiguration(new CommentsConfiguration());
             modelBuilder.ApplyConfiguration(new ReportConfiguration());
             modelBuilder.ApplyConfiguration(new ManagerConfiguration());
+            modelBuilder.ApplyConfiguration(new ManagementConfiguration());
             // ⚠️ 后续其他表的配置也在这里调用，例如：
             // modelBuilder.ApplyConfiguration(new NovelConfiguration());
             // modelBuilder.ApplyConfiguration(new ChapterConfiguration());
