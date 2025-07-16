@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 public interface IRateService
 {
-    Task AddOrUpdateAsync(int novelId, int readerId, int score);
+    Task AddAsync(int novelId, int readerId, int score);
     Task DeleteAsync(int novelId, int readerId);
     Task<IEnumerable<Rate>> GetByNovelIdAsync(int novelId);
     Task<IEnumerable<Rate>> GetByReaderIdAsync(int readerId);

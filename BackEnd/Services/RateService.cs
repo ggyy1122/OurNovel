@@ -12,8 +12,14 @@ public class RateService : IRateService
         _repository = repository;
     }
 
-    public async Task AddOrUpdateAsync(int novelId, int readerId, int score)
+    public async Task AddAsync(int novelId, int readerId, int score)
     {
+        var existing = await _repository.FindAsync(novelId, readerId);
+        if (existing != null)
+        {
+            throw new InvalidOperationException("评分已存在，不能重复评分");
+        }
+
         var rate = new Rate
         {
             NovelId = novelId,
@@ -21,7 +27,8 @@ public class RateService : IRateService
             Score = score,
             RatingTime = DateTime.UtcNow
         };
-        await _repository.AddOrUpdateAsync(rate);
+
+        await _repository.AddAsync(rate);
     }
 
     public async Task DeleteAsync(int novelId, int readerId)
