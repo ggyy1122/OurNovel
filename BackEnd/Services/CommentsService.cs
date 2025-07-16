@@ -8,18 +8,19 @@ namespace OurNovel.Services
     /// </summary>
     public class CommentsService : BaseService<Comment, int>
     {
-        public CommentsService(IRepository<Comment, int> repository)
+        private readonly ICommentReplyRepository _replyRepository;
+
+        public CommentsService(
+            IRepository<Comment, int> repository,
+            ICommentReplyRepository replyRepository)
             : base(repository)
         {
+            _replyRepository = replyRepository;
         }
-
-        // 在这里添加评论相关的特殊业务逻辑方法
 
         /// <summary>
         /// 审核评论：设置评论状态为“通过”或“封禁”
         /// </summary>
-        /// <param name="commentId">评论ID</param>
-        /// <param name="status">状态（通过/封禁）</param>
         public async Task SetCommentStatusAsync(int commentId, string status)
         {
             var comment = await _repository.GetByIdAsync(commentId);
@@ -33,7 +34,6 @@ namespace OurNovel.Services
         /// <summary>
         /// 点赞评论：将评论的 Likes 加一
         /// </summary>
-        /// <param name="commentId">评论ID</param>
         public async Task LikeCommentAsync(int commentId)
         {
             var comment = await _repository.GetByIdAsync(commentId);
@@ -42,6 +42,45 @@ namespace OurNovel.Services
 
             comment.Likes++;
             await _repository.UpdateAsync(comment);
+        }
+
+        /// <summary>
+        /// 递归删除指定评论及其所有子评论（包括评论回复关系）
+        /// </summary>
+        public async Task DeleteCommentRecursivelyAsync(int commentId)
+        {
+            // 获取所有评论回复关系
+            var allReplies = (await _replyRepository.GetAllAsync()).ToList();
+
+            // 递归获取所有子评论 ID
+            List<int> commentsToDelete = new List<int> { commentId };
+            CollectChildCommentIds(commentId, allReplies, commentsToDelete);
+
+            // 删除所有评论（从子评论到父评论）
+            foreach (var id in commentsToDelete.Distinct())
+            {
+                await _repository.DeleteAsync(id);
+            }
+        }
+
+        /// <summary>
+        /// 递归获取所有子评论 ID
+        /// </summary>
+        private void CollectChildCommentIds(int parentId, List<CommentReply> allReplies, List<int> result)
+        {
+            var children = allReplies
+                .Where(r => r.PreComId == parentId)
+                .Select(r => r.CommentId)
+                .ToList();
+
+            foreach (var childId in children)
+            {
+                if (!result.Contains(childId))
+                {
+                    result.Add(childId);
+                    CollectChildCommentIds(childId, allReplies, result);
+                }
+            }
         }
     }
 }

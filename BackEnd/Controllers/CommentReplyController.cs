@@ -52,5 +52,15 @@ namespace OurNovel.Controllers
             var replies = await _replyService.GetRepliesByParentIdAsync(parentId);
             return Ok(replies);
         }
+        /// <summary>
+        /// 获取所有评论回复联系集
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> GetAllReplies()
+        {
+            var allReplies = await _replyService.GetAllRepliesAsync();
+            return Ok(allReplies);
+        }
+
     }
 }

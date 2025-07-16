@@ -82,5 +82,25 @@ namespace OurNovel.Controllers
             var result = all.Where(c => c.NovelId == novelId && c.Status == "通过");
             return Ok(result);
         }
+
+        /// <summary>
+        /// 递归删除评论及其所有子评论
+        /// </summary>
+        /// <param name="commentId">评论 ID</param>
+        /// <returns>操作结果</returns>
+        [HttpDelete("DeleteRecursive/{commentId}")]
+        public async Task<IActionResult> DeleteRecursive(int commentId)
+        {
+            try
+            {
+                await _commentsService.DeleteCommentRecursivelyAsync(commentId);
+                return Ok(new { success = true, message = $"已递归删除评论 {commentId} 及其子评论" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
     }
 }

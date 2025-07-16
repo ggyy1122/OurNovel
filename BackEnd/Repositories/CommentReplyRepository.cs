@@ -29,4 +29,18 @@ public class CommentReplyRepository : ICommentReplyRepository
             .Where(r => r.PreComId == parentCommentId)
             .ToListAsync();
     }
+    public async Task<IEnumerable<CommentReply>> GetAllAsync()
+    {
+        return await _context.CommentReplies.ToListAsync();
+    }
+    public async Task DeleteAsync(int commentId)
+    {
+        var reply = await _context.CommentReplies.FirstOrDefaultAsync(r => r.CommentId == commentId);
+        if (reply != null)
+        {
+            _context.CommentReplies.Remove(reply);
+            await _context.SaveChangesAsync();
+        }
+    }
+
 }

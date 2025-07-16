@@ -26,5 +26,18 @@ namespace OurNovel.Services
         {
             return await _replyRepository.GetRepliesByParentIdAsync(parentCommentId);
         }
+        public async Task DeleteByCommentIdAsync(int commentId)
+        {
+            var reply = await _replyRepository.GetByCommentIdAsync(commentId);
+            if (reply != null)
+            {
+                await _replyRepository.DeleteAsync(commentId);
+            }
+        }
+        public async Task<IEnumerable<CommentReply>> GetAllRepliesAsync()
+        {
+            return await _replyRepository.GetAllAsync();
+        }
+
     }
 }
