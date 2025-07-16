@@ -56,6 +56,22 @@ namespace OurNovel.Services
             return new OkObjectResult(author);
         }
 
+        /// <summary>
+        /// 重置密码（按用户名）
+        /// </summary>
+        public async Task<IActionResult> ResetPasswordAsync(string authorName, string newPassword)
+        {
+            var author = _context.Authors.FirstOrDefault(a => a.AuthorName == authorName);
+            if (author == null)
+            {
+                return new NotFoundObjectResult("用户不存在");
+            }
+
+            author.Password = PasswordHasher.HashPassword(newPassword);
+            await _context.SaveChangesAsync();
+
+            return new OkObjectResult("密码重置成功");
+        }
 
 
 

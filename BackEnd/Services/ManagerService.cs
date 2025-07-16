@@ -38,6 +38,19 @@ namespace OurNovel.Services
 
             return new OkObjectResult(manager);
         }
+        public async Task<IActionResult> ResetPasswordAsync(string managerName, string newPassword)
+        {
+            var manager = _context.Managers.FirstOrDefault(m => m.ManagerName == managerName);
+            if (manager == null)
+            {
+                return new NotFoundObjectResult("用户不存在");
+            }
+
+            manager.Password = PasswordHasher.HashPassword(newPassword);
+            await _context.SaveChangesAsync();
+
+            return new OkObjectResult("密码重置成功");
+        }
 
         public IEnumerable<Manager> GetAllManagers()
         {
