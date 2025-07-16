@@ -22,6 +22,20 @@ namespace OurNovel.Controllers
         // 如果 Novel 有特殊的业务接口，可以在这里扩展
 
         /// <summary>
+        /// 审核小说
+        /// </summary>
+        [HttpPut("{id}/review")]
+        public async Task<IActionResult> ReviewNovel(int id, [FromQuery] string newStatus)
+        {
+            var success = await (_service as NovelService)?.ReviewNovelAsync(id, newStatus)!;
+
+            if (!success)
+                return BadRequest("审核失败，可能是ID不存在或状态非法（必须为‘连载’或‘完结’）");
+
+            return Ok(new { success = true, message = "小说状态已更新" });
+        }
+
+        /// <summary>
         /// 上传小说封面，并更新封面URL
         /// </summary>
         /// <param name="novelId">小说ID</param>

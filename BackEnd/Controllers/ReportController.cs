@@ -19,8 +19,6 @@ namespace OurNovel.Controllers
 
         /// <summary>
         /// 举报评论
-        /// POST /api/comment/{commentId}/report
-        /// 注意这里路由和基类路由不同，单独写
         /// </summary>
         [HttpPost("/api/comment/{commentId}/report")]
         public async Task<IActionResult> ReportComment(int commentId, [FromForm] int readerId, [FromForm] string reason)
@@ -39,7 +37,6 @@ namespace OurNovel.Controllers
 
         /// <summary>
         /// 处理举报
-        /// POST /api/report/{reportId}/process
         /// </summary>
         [HttpPost("/api/report/{reportId}/process")]
         public async Task<IActionResult> ProcessReport(int reportId, [FromForm] string progress)

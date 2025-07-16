@@ -28,9 +28,9 @@ namespace OurNovel.Models
 
         public int? RecommendCount { get; set; }           // RecommendCount 可空
 
-        public int? CollectedCount { get; set; }             // CollectedCount 可空
+        public int? CollectedCount { get; set; }           // CollectedCount 可空
 
-        public string? Status { get; set; } = "待审核";    // IS_RECOMMEND_VISIBLE "待审核"/"连载"/"完结"
+        public string? Status { get; set; } = "待审核";    // Status "待审核"/"连载"/"完结"
 
         // public ICollection<Chapter> Chapters { get; set; } = new List<Chapter>();  // 维护反向Chapter导航
     }
