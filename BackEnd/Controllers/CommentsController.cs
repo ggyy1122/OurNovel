@@ -102,5 +102,18 @@ namespace OurNovel.Controllers
             }
         }
 
+        /// <summary>
+        /// 审核评论
+        /// </summary>
+        [HttpPut("{id}/review")]
+        public async Task<IActionResult> ReviewComment(int id, [FromQuery] string newStatus)
+        {
+            var success = await (_service as CommentsService)?.ReviewCommentAsync(id, newStatus)!;
+
+            if (!success)
+                return BadRequest("审核失败，可能是ID不存在或状态非法（必须为‘通过’或‘封禁’）");
+
+            return Ok(new { success = true, message = "评论状态已更新" });
+        }
     }
 }
