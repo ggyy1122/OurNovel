@@ -13,7 +13,23 @@ namespace OurNovel.Services
             : base(repository)
         {
         }
+        /// <summary>
+        /// 审核小说，修改状态为“连载”或“完结”
+        /// </summary>
+        public async Task<bool> ReviewNovelAsync(int novelId, string newStatus)
+        {
+            // 合法性检查（业务约束）
+            if (newStatus != "连载" && newStatus != "完结")
+                return false;
 
+            var novel = await _repository.GetByIdAsync(novelId);
+            if (novel == null)
+                return false;
+
+            novel.Status = newStatus;
+            await _repository.UpdateAsync(novel);
+            return true;
+        }
         /// <summary>
         /// 上传小说封面，并更新封面地址
         /// </summary>

@@ -27,8 +27,19 @@ namespace OurNovel.Data
         public DbSet<Category> Categories { get; set; }
 
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<Report> Reports { get; set; }
         public DbSet<Author> Authors { get; set; }
+        public DbSet<Reader> Readers { get; set; }
+        public DbSet<Manager> Manager{ get; set; }
+        public DbSet<Manager> Managers { get; set; } = null!;
+        public DbSet<Management> Managements { get; set; }
 
+        public DbSet<Like> Likes { get; set; }
+        public DbSet<NovelCategory> NovelCategories { get; set; }
+        public DbSet<Collect> Collects { get; set; }
+        public DbSet<Recommend> Recommends { get; set; }
+        public DbSet<Rate> Rates { get; set; }
+        public DbSet<CommentReply> CommentReplies { get; set; }
 
         /// <summary>
         /// 配置实体和数据库表结构映射关系的方法
@@ -45,6 +56,19 @@ namespace OurNovel.Data
             modelBuilder.ApplyConfiguration(new AuthorConfiguration());
             modelBuilder.ApplyConfiguration(new CategoryConfiguration());
             modelBuilder.ApplyConfiguration(new CommentsConfiguration());
+
+            modelBuilder.ApplyConfiguration(new LikesConfiguration());
+            modelBuilder.ApplyConfiguration(new CommentReplyConfiguration());
+
+            modelBuilder.ApplyConfiguration(new RecommendConfiguration());
+            modelBuilder.ApplyConfiguration(new NovelCategoryConfiguration());
+            modelBuilder.ApplyConfiguration(new CollectConfiguration());
+            modelBuilder.ApplyConfiguration(new RateConfiguration());
+
+            modelBuilder.ApplyConfiguration(new ReportConfiguration());
+            modelBuilder.ApplyConfiguration(new ManagerConfiguration());
+            modelBuilder.ApplyConfiguration(new ManagementConfiguration());
+
             // ⚠️ 后续其他表的配置也在这里调用，例如：
             // modelBuilder.ApplyConfiguration(new NovelConfiguration());
             // modelBuilder.ApplyConfiguration(new ChapterConfiguration());

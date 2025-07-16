@@ -76,5 +76,19 @@ namespace OurNovel.Controllers
             await _chapterService.DeleteAsync(novelId, chapterId);
             return NoContent();
         }
+
+        /// <summary>
+        /// 审核章节
+        /// </summary>
+        [HttpPut("novels/{novelId}/chapters/{chapterId}/review")]
+        public async Task<IActionResult> ReviewChapter(int novelId, int chapterId, [FromQuery] string newStatus)
+        {
+            var success = await (_chapterService as ChapterService)?.ReviewChapterAsync(novelId, chapterId, newStatus)!;
+
+            if (!success)
+                return BadRequest("审核失败，可能是章节不存在或状态非法（必须为‘通过’或‘封禁’）");
+
+            return Ok(new { success = true, message = "章节状态已更新" });
+        }
     }
 }

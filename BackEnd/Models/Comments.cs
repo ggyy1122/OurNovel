@@ -28,6 +28,9 @@ public class Comment : IEntity<int>
     [JsonIgnore]
     public Chapter? Chapter { get; set; } = null!;
 
+    [JsonIgnore]
+    public ICollection<Like> LikesList { get; set; } = new List<Like>();
+
     int IEntity<int>.Id
     {
         get => CommentId;

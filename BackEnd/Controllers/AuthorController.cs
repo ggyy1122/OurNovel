@@ -1,20 +1,60 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OurNovel.Services;
 using OurNovel.Models;
+using OurNovel.Repositories;
+using OurNovel.Services.Interfaces;
 
 namespace OurNovel.Controllers
 {
     /// <summary>
-    /// 作者控制器，继承基类控制器，实现对 Author 实体的 CRUD 操作
+    /// 作者控制器，继承基类控制器，实现对 Author 实体的 CRUD 操作，并支持头像上传
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class AuthorController : BaseController<Author, int>
     {
-        public AuthorController(BaseService<Author, int> service) : base(service)
+        private readonly IImageResourceService _imageResourceService;
+        private readonly IRepository<Author, int> _authorRepository;
+        private readonly AuthorService _authorService;
+
+        public AuthorController(
+            AuthorService authorService,
+            IImageResourceService imageResourceService,
+            IRepository<Author, int> authorRepository
+        ) : base(authorService)
         {
+            _imageResourceService = imageResourceService;
+            _authorRepository = authorRepository;
+            _authorService = authorService;
         }
 
-        // 如果 Author 有特殊的业务接口，可以在这里扩展
+        /// <summary>
+        /// 上传作者头像，并更新头像URL
+        /// </summary>
+        /// <param name="authorId">作者ID</param>
+        /// <param name="avatarFile">头像文件</param>
+        /// <returns>头像URL</returns>
+        [HttpPost("UploadAvatar")]
+        [Consumes("multipart/form-data")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> UploadAvatar([FromForm] int authorId, [FromForm] IFormFile avatarFile)
+        {
+            try
+            {
+                var avatarUrl = await _imageResourceService.UploadImageAsync<Author, int>(
+                    authorId,
+                    avatarFile,
+                    "AvatarUrl",
+                    _authorRepository);
+
+                return Ok(new { success = true, avatarUrl });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        // 可继续扩展作者特殊业务接口，如作品统计、收入查询等
     }
 }

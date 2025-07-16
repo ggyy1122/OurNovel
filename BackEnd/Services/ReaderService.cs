@@ -1,20 +1,47 @@
-﻿using OurNovel.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using OurNovel.Data;
+using OurNovel.Models;
 using OurNovel.Repositories;
-using Microsoft.AspNetCore.Http;
-using OurNovel.Services.Interfaces;
 
 namespace OurNovel.Services
 {
-    /// <summary>
-    /// Reader 服务，继承基础服务，如有特殊业务再扩展
-    /// </summary>
     public class ReaderService : BaseService<Reader, int>
     {
-        private readonly IOssService _ossService;
+        private readonly AppDbContext _context;
 
-        public ReaderService(IRepository<Reader, int> repository)
+        public ReaderService(IRepository<Reader, int> repository, AppDbContext context)
             : base(repository)
         {
+            _context = context;
         }
+
+        public async Task<IActionResult> RegisterAsync(string readerName, string password)
+        {
+            if (_context.Readers.Count(r => r.ReaderName == readerName) > 0)
+            {
+                return new BadRequestObjectResult("用户名已存在");
+            }
+            
+            
+         
+            var hashedPassword = PasswordHasher.HashPassword(password);
+
+            var reader = new Reader
+            {
+                ReaderName = readerName,
+                Password = hashedPassword,
+                Balance = 0
+            };
+
+            _context.Readers.Add(reader);
+            await _context.SaveChangesAsync();
+
+            return new OkObjectResult(reader);
+        }
+
+        public IEnumerable<Reader> GetAllReaders() => _context.Readers;
+
+        public Reader? GetByReaderName(string name) =>
+            _context.Readers.FirstOrDefault(r => r.ReaderName == name);
     }
 }

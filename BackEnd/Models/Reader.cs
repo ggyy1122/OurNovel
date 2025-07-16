@@ -1,4 +1,6 @@
-﻿namespace OurNovel.Models
+﻿using System.Text.Json.Serialization;
+
+namespace OurNovel.Models
 {
     public class Reader : IEntity<int>
     {
@@ -26,5 +28,9 @@
         public string? IsCollectVisible { get; set; }    // IS_COLLECT_VISIBLE "是"/"否"
 
         public string? IsRecommendVisible { get; set; }  // IS_RECOMMEND_VISIBLE "是"/"否"
+
+        [JsonIgnore]
+        public ICollection<Like> LikedComments { get; set; } = new List<Like>();
+
     }
 }
