@@ -19,16 +19,16 @@ public class RateController : ControllerBase
     }
 
     /// <summary>
-    /// 添加或更新评分
+    /// 添加评分（不可更新，已存在则报错）
     /// </summary>
     /// <param name="novelId">小说 ID</param>
     /// <param name="readerId">读者 ID</param>
     /// <param name="score">评分值（0 到 10 之间）</param>
     /// <returns>操作结果</returns>
     [HttpPost]
-    public async Task<IActionResult> AddOrUpdate(int novelId, int readerId, int score)
+    public async Task<IActionResult> Add(int novelId, int readerId, int score)
     {
-        await _service.AddOrUpdateAsync(novelId, readerId, score);
+        await _service.AddAsync(novelId, readerId, score);
         return Ok("评分成功");
     }
 

@@ -9,4 +9,5 @@ public interface IRecommendService
     Task<IEnumerable<Recommend>> GetByReaderIdAsync(int readerId);
     Task<IEnumerable<Recommend>> GetByNovelIdAsync(int novelId);
     Task<IEnumerable<Recommend>> GetAllAsync();
+    Task UpdateRecommendCountAsync(int novelId);
 }
