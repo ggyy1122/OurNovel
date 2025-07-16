@@ -7,6 +7,8 @@ using OurNovel.Services.ImageResourceService;
 using Aliyun.OSS;
 using OurNovel.Services.OSS;
 using System.Reflection;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 
 
@@ -55,9 +57,32 @@ builder.Services.AddScoped<IRecommendRepository, RecommendRepository>();
 builder.Services.AddScoped<IRecommendService, RecommendService>();
 builder.Services.AddScoped<IRateRepository, RateRepository>();
 builder.Services.AddScoped<IRateService, RateService>();
+
+builder.Services.AddScoped<ReportService>();
+builder.Services.AddScoped<ManagerService>();
+builder.Services.AddScoped<ManagementService>();
+
 // 注册OSS储配置
 builder.Services.Configure<OssConfig>(builder.Configuration.GetSection("OssConfig"));
 builder.Services.AddSingleton<IOssService, OssService>();
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
+            )
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 // ========================================
 // 3️⃣ 添加控制器服务
@@ -137,6 +162,8 @@ app.UseRouting();
 // 启用 CORS 中间件（必须在 UseRouting 之后，UseEndpoints 之前）
 app.UseCors("SpecificOrigins");
 
+//启用身份认证和权限控制
+app.UseAuthentication();
 // 授权中间件（如果后续启用认证）
 app.UseAuthorization();
 

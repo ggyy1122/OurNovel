@@ -53,6 +53,26 @@ namespace OurNovel.Services
             await _chapterRepository.DeleteAsync(novelId, chapterId);
         }
 
+        /// <summary>
+        /// 审核章节，修改状态为“通过”或“封禁”
+        /// </summary>
+        public async Task<bool> ReviewChapterAsync(int novelId, int chapterId, string newStatus)
+        {
+            // 状态值合法性校验
+            if (newStatus != "通过" && newStatus != "封禁")
+                return false;
+
+            // 复合主键查找章节
+            var chapter = await _chapterRepository.GetByIdAsync(novelId, chapterId);
+            if (chapter == null)
+                return false;
+
+            // 修改状态
+            chapter.Status = newStatus;
+            await _chapterRepository.UpdateAsync(chapter);
+            return true;
+        }
+
         /*
         public async Task<string> UploadChapterContentAsync(int novelId, int chapterId, IFormFile chapterFile)
         {

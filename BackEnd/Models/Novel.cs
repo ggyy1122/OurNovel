@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace OurNovel.Models
 {
     public class Novel : IEntity<int>
@@ -10,7 +11,7 @@ namespace OurNovel.Models
             set => NovelId = value;
         }
 
-        public int AuthorId { get; set; }                  // 外键，对应 author_id
+        public int AuthorId { get; set; }                  // 外键，对应 AuthorId
         [JsonIgnore]
         public Author? Author { get; set; }                // 导航属性     
 
@@ -28,10 +29,11 @@ namespace OurNovel.Models
 
         public int? RecommendCount { get; set; }           // RecommendCount 可空
 
-        public int? CollectedCount { get; set; }             // CollectedCount 可空
+        public int? CollectedCount { get; set; }           // CollectedCount 可空
 
-        public string? Status { get; set; } = "待审核";    // IS_RECOMMEND_VISIBLE "待审核"/"连载"/"完结"
+        public string? Status { get; set; } = "待审核";    // Status "待审核"/"连载"/"完结"
 
         // public ICollection<Chapter> Chapters { get; set; } = new List<Chapter>();  // 维护反向Chapter导航
+
     }
 }

@@ -31,5 +31,6 @@ namespace OurNovel.Models
 
         [JsonIgnore]
         public ICollection<Like> LikedComments { get; set; } = new List<Like>();
+
     }
 }
