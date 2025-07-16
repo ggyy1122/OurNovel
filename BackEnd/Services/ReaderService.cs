@@ -1,7 +1,7 @@
-﻿using OurNovel.Models;
-using OurNovel.Repositories;
+﻿using OurNovel.Repositories;
 using Microsoft.AspNetCore.Http;
 using OurNovel.Services.Interfaces;
+using OurNovel.Models;
 
 namespace OurNovel.Services
 {

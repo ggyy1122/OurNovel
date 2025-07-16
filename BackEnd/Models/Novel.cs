@@ -10,9 +10,7 @@ namespace OurNovel.Models
             set => NovelId = value;
         }
 
-        public int AuthorId { get; set; }                  // 外键，对应 author_id
-        [JsonIgnore]
-        public Author? Author { get; set; }                // 导航属性     
+        public int AuthorId { get; set; }                  // 外键，对应 author_id 
 
         public string? NovelName { get; set; } = null!;    // Novel_NAME 可空
 
