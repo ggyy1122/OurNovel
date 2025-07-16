@@ -23,7 +23,7 @@
                         </path>
                     </svg>
                 </span>
-                <input type="text" v-model="phone" maxlength="11" placeholder="请输入手机号" class="login-input"
+                <input type="text" v-model="phone" maxlength="11" placeholder="请输入手机号(先随便输，以后再说)" class="login-input"
                     autocomplete="tel" />
                 <span class="phone-len">{{ phone.length }} / 11</span>
             </div>
@@ -39,7 +39,7 @@
                         </path>
                     </svg>
                 </span>
-                <input type="text" v-model="code" placeholder="手机验证码" class="login-input"
+                <input type="text" v-model="code" placeholder="手机验证码(先随便输)" class="login-input"
                     autocomplete="one-time-code" />
                 <button type="button" class="code-btn" @click="getCode" :disabled="codeCountdown > 0">获取验证码</button>
             </div>
@@ -85,7 +85,8 @@
                         <h2>服务条款和隐私政策</h2>
                         <div class="modal-body">
                             <p>这里是个人信息保护及隐私政策详细内容...</p>
-                            <p>请您务必审慎阅读、充分理解本协议各条款内容，特别是以加粗形式标注提示的条款，以及开通或使用某项服务的单独政策，并选择接受或不接受。我们将在明确获得您同意和接受后，为您提供相应的服务。</p>
+                            <p>请您务必审慎阅读、充分理解本协议各条款内容，特别是以加粗形式标注提示的条款，以及开通或使用某项服务的单独政策，并选择接受或不接受。我们将在明确获得您同意和接受后，为您提供相应的服务。
+                            </p>
                             <p>1. 如果您未满18周岁，请在监护人的陪同下阅读本协议，并特别注意未成年人保护条款。</p>
                         </div>
                         <button @click="showModal = false">关闭</button>
@@ -104,6 +105,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { current_state } from '@/store/index';
+import { registerAuthor, registerManager, registerReader } from '@/API/Log_API';
 const showModal = ref(false)
 const state = current_state();
 
@@ -135,14 +137,43 @@ function getCode() {
     alert("验证码已发送到手机: " + phone.value);
 }
 
-const handleRegister = () => {
+const handleRegister = async () => {
+    // Validate inputs
     usernameError.value = !username.value;
     phoneError.value = !phone.value || phone.value.length !== 11;
     codeError.value = !code.value;
     passwordError.value = !password.value;
-    if (!(usernameError.value || phoneError.value || codeError.value || passwordError.value) && agree.value) {
-        alert("注册成功！");
-        router.push('/L_R/login');
+    
+    if (usernameError.value || phoneError.value || codeError.value || passwordError.value || !agree.value) {
+        return;
+    }
+
+    try {
+        let response;
+        if (state.value === 0) { // Reader registration
+            response = await registerReader({
+                readerName: username.value,
+                password: password.value
+            });
+        } else if (state.value === 1) { // Author registration
+            response = await registerAuthor({
+                authorName: username.value,
+                password: password.value
+            });
+        } else if (state.value === 2) { // Manager registration
+            response = await registerManager({
+                managerName: username.value,
+                password: password.value
+            });
+        }
+
+        if (response) {
+            alert("注册成功！");
+            router.push('/L_R/login');
+        }
+    } catch (error) {
+        console.error('注册失败:', error);
+        alert('注册失败，请稍后再试');
     }
 }
 
@@ -190,7 +221,7 @@ button {
 
 button:hover {
     background-color: #e89a09;
-    color:#222
+    color: #222
 }
 
 .register-left {

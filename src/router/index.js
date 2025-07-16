@@ -13,6 +13,7 @@ import L_R from '@/Login_Register/L_R.vue'
 import Novel_Reader from '@/Novels/Novel_Reader.vue'
 import Author_api_test from '@/API_Test/Author_Test.vue'
 import Comment_api_test from '@/API_Test/Comment_Test.vue'
+import ResetForm from '@/Login_Register/ResetForm.vue'
 
 
 const routes = [
@@ -45,6 +46,11 @@ const routes = [
                 path: 'register',
                 name: 'Register',
                 component: RegisterForm
+            },
+            {
+                path: 'reset',
+                name: 'Reset',
+                component: ResetForm
             }
         ]
     },
