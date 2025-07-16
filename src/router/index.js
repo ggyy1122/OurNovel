@@ -11,6 +11,8 @@ import LoginForm from '@/Login_Register/LoginForm.vue'
 import RegisterForm from '@/Login_Register/RegisterForm.vue'
 import L_R from '@/Login_Register/L_R.vue'
 import Novel_Reader from '@/Novels/Novel_Reader.vue'
+import Author_api_test from '@/API_Test/Author_Test.vue'
+import Comment_api_test from '@/API_Test/Comment_Test.vue'
 
 
 const routes = [
@@ -18,6 +20,16 @@ const routes = [
         path: '/',
         name: 'Home',
         component: Home
+    },
+        {
+        path: '/Comment_api_test',
+        name: 'Comment_api_test',
+        component: Comment_api_test
+    },
+    {
+        path: '/Author_api_test',
+        name: 'Author_api_test',
+        component: Author_api_test
     },
     {
         path: '/L_R',
