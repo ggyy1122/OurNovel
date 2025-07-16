@@ -31,6 +31,7 @@ namespace OurNovel.Data
         public DbSet<Author> Authors { get; set; }
         public DbSet<Reader> Readers { get; set; }
         public DbSet<Manager> Manager{ get; set; }
+        public DbSet<Manager> Managers { get; set; } = null!;
 
 
 

@@ -12,7 +12,7 @@ using OurNovel.Data;
 namespace OurNovel.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/LogAuthor")]
     public class LogController : ControllerBase
     {
         private readonly AuthorService _authorService;
