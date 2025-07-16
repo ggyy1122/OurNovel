@@ -82,5 +82,23 @@ namespace OurNovel.Services
                 }
             }
         }
+
+        /// <summary>
+        /// 审核评论，修改状态为“通过”或“封禁”
+        /// </summary>
+        public async Task<bool> ReviewCommentAsync(int commentId, string newStatus)
+        {
+            // 合法性检查（只能是“通过”或“封禁”）
+            if (newStatus != "通过" && newStatus != "封禁")
+                return false;
+
+            var comment = await _repository.GetByIdAsync(commentId);
+            if (comment == null)
+                return false;
+
+            comment.Status = newStatus;
+            await _repository.UpdateAsync(comment);
+            return true;
+        }
     }
 }
