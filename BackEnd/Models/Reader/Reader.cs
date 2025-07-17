@@ -19,7 +19,7 @@ namespace OurNovel.Models
 
         public string? Gender { get; set; }              // GENDER 只能是 "男" 或 "女"
 
-        public decimal Balance { get; set; } = 0m;       // BALANCE 默认0，整型
+        public decimal Balance { get; set; } = 0m;       // BALANCE 默认0，浮点型
 
         public string? AvatarUrl { get; set; }           // AVATAR_URL 可空
 

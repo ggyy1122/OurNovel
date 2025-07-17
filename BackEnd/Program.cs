@@ -9,6 +9,7 @@ using OurNovel.Services.OSS;
 using System.Reflection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using OurNovel.Models;
 
 
 
@@ -46,21 +47,22 @@ builder.Services.AddScoped<ILikesService,LikesService>();
 
 builder.Services.AddScoped<ICommentReplyRepository, CommentReplyRepository>();
 builder.Services.AddScoped<ICommentReplyService, CommentReplyService>();
-
 builder.Services.AddScoped<INovelCategoryRepository, NovelCategoryRepository>();
 builder.Services.AddScoped<INovelCategoryService, NovelCategoryService>();
-
 builder.Services.AddScoped<ICollectRepository, CollectRepository>();
 builder.Services.AddScoped<ICollectService, CollectService>();
-
 builder.Services.AddScoped<IRecommendRepository, RecommendRepository>();
 builder.Services.AddScoped<IRecommendService, RecommendService>();
 builder.Services.AddScoped<IRateRepository, RateRepository>();
 builder.Services.AddScoped<IRateService, RateService>();
-
 builder.Services.AddScoped<ReportService>();
 builder.Services.AddScoped<ManagerService>();
 builder.Services.AddScoped<ManagementService>();
+builder.Services.AddScoped<TransactionService>();
+builder.Services.AddScoped<RewardService>();
+builder.Services.AddScoped<AuthorIncomeService>();
+builder.Services.AddScoped<IRepository<AuthorIncome, long>, Repository<AuthorIncome, long>>();
+
 
 // 注册OSS储配置
 builder.Services.Configure<OssConfig>(builder.Configuration.GetSection("OssConfig"));

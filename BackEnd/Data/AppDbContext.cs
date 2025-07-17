@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OurNovel.Data.Configurations;
 using OurNovel.Models;
+using OurNovel.Models;
+using OurNovel.Models;
 
 namespace OurNovel.Data
 {
@@ -40,6 +42,9 @@ namespace OurNovel.Data
         public DbSet<Recommend> Recommends { get; set; }
         public DbSet<Rate> Rates { get; set; }
         public DbSet<CommentReply> CommentReplies { get; set; }
+        public DbSet<Reward> Rewards { get; set; }
+        public DbSet<AuthorIncome> AuthorIncomes { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
 
         /// <summary>
         /// 配置实体和数据库表结构映射关系的方法
@@ -68,6 +73,10 @@ namespace OurNovel.Data
             modelBuilder.ApplyConfiguration(new ReportConfiguration());
             modelBuilder.ApplyConfiguration(new ManagerConfiguration());
             modelBuilder.ApplyConfiguration(new ManagementConfiguration());
+
+            modelBuilder.ApplyConfiguration(new TransactionConfiguration());
+            modelBuilder.ApplyConfiguration(new RewardConfiguration());
+            modelBuilder.ApplyConfiguration(new AuthorIncomeConfiguration());
 
             // ⚠️ 后续其他表的配置也在这里调用，例如：
             // modelBuilder.ApplyConfiguration(new NovelConfiguration());

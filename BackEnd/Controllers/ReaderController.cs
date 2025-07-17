@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OurNovel.Services;
-using OurNovel.Models;
 using OurNovel.Repositories;
 using OurNovel.Services.Interfaces;
+using OurNovel.Models;
 namespace OurNovel.Controllers
 {
     /// <summary>
