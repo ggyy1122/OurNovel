@@ -63,6 +63,9 @@ builder.Services.AddScoped<RewardService>();
 builder.Services.AddScoped<AuthorIncomeService>();
 builder.Services.AddScoped<IRepository<AuthorIncome, long>, Repository<AuthorIncome, long>>();
 
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseOracle(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<PurchaseService>();
 
 // 注册OSS储配置
 builder.Services.Configure<OssConfig>(builder.Configuration.GetSection("OssConfig"));

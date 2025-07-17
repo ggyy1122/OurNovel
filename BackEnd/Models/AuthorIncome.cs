@@ -1,4 +1,3 @@
-
 namespace OurNovel.Models
 {
     /// <summary>
