@@ -62,6 +62,10 @@ builder.Services.AddScoped<ReportService>();
 builder.Services.AddScoped<ManagerService>();
 builder.Services.AddScoped<ManagementService>();
 
+builder.Services.AddScoped<INovelRepository, NovelRepository>();
+builder.Services.AddScoped<NovelService>();
+
+
 // 注册OSS储配置
 builder.Services.Configure<OssConfig>(builder.Configuration.GetSection("OssConfig"));
 builder.Services.AddSingleton<IOssService, OssService>();

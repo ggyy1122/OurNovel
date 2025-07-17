@@ -1,6 +1,8 @@
-using OurNovel.Models;
-using OurNovel.Repositories;
 using Microsoft.AspNetCore.Http;
+using OurNovel.Models;
+using OurNovel.Models.Dto;
+using OurNovel.Repositories;
+
 namespace OurNovel.Services
 {
     /// <summary>
@@ -8,11 +10,14 @@ namespace OurNovel.Services
     /// </summary>
     public class NovelService : BaseService<Novel, int>
     {
+        private readonly INovelRepository _novelRepository;
 
-        public NovelService(IRepository<Novel, int> repository)
+        public NovelService(IRepository<Novel, int> repository, INovelRepository novelRepository)
             : base(repository)
         {
+            _novelRepository = novelRepository;
         }
+
         /// <summary>
         /// 审核小说，修改状态为“连载”或“完结”
         /// </summary>
@@ -37,6 +42,14 @@ namespace OurNovel.Services
         /// <param name="coverFile">封面文件</param>
         /// <returns>封面URL</returns>
         /// 
+
+        /// <summary>
+        /// 获取收藏榜单
+        /// </summary>
+        public async Task<List<CollectRankingDto>> GetTopCollectedNovelsAsync(int topN)
+        {
+            return await _novelRepository.GetTopCollectedNovelsAsync(topN);
+        }
 
         /*
         public async Task<string> UploadCoverAsync(int novelId, IFormFile coverFile)
