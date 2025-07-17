@@ -25,15 +25,8 @@ namespace OurNovel.Controllers
         /// 审核小说
         /// </summary>
         [HttpPut("{id}/review")]
-        public async Task<IActionResult> ReviewNovel(int id, [FromQuery] string newStatus)
+        public async Task<IActionResult> ReviewNovel(int id, [FromQuery] string newStatus, [FromQuery] int managerId)
         {
-            // 从登录态获取管理员ID
-            var managerIdStr = User.FindFirst("ManagerId")?.Value;
-            if (!int.TryParse(managerIdStr, out var managerId))
-            {
-                return Unauthorized(new { success = false, message = "未登录或管理员身份信息无效" });
-            }
-
             // 调用审核并写入日志
             var success = await (_service as NovelService)?.ReviewNovelAsync(id, newStatus, managerId)!;
 

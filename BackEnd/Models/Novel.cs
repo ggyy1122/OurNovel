@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace OurNovel.Models
 {
     public class Novel : IEntity<int>

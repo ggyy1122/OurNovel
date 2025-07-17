@@ -39,15 +39,8 @@ namespace OurNovel.Controllers
         /// 处理举报
         /// </summary>
         [HttpPost("/api/report/{reportId}/process")]
-        public async Task<IActionResult> ProcessReport(int reportId, [FromForm] string progress)
+        public async Task<IActionResult> ProcessReport(int reportId, [FromQuery] string progress, [FromQuery] int managerId)
         {
-            // 从登录态获取管理员ID
-            var managerIdStr = User.FindFirst("managerId")?.Value;
-            if (!int.TryParse(managerIdStr, out var managerId))
-            {
-                return Unauthorized(new { success = false, message = "未登录或管理员身份信息无效" });
-            }
-
             try
             {
                 await _reportService.ProcessReportAsync(reportId, progress, managerId);
@@ -58,7 +51,6 @@ namespace OurNovel.Controllers
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
-
 
         // GetAll 和 GetById 等基础接口继承自 BaseController，无需重复编写
     }

@@ -19,6 +19,7 @@ namespace OurNovel.Controllers
         }
 
 
+
         /// <summary>
         /// 设置评论状态（如“通过”或“封禁”）
         /// </summary>
@@ -26,15 +27,8 @@ namespace OurNovel.Controllers
         /// <param name="status">目标状态</param>
         /// <returns>操作结果</returns>
         [HttpPost("Status")]
-        public async Task<IActionResult> SetStatus([FromForm] int commentId, [FromForm] string status)
+        public async Task<IActionResult> SetStatus([FromQuery] int commentId, [FromQuery] string status, [FromQuery] int managerId)
         {
-            // 从登录态获取管理员ID
-            var managerIdStr = User.FindFirst("ManagerId")?.Value;
-            if (!int.TryParse(managerIdStr, out var managerId))
-            {
-                return Unauthorized(new { success = false, message = "未登录或管理员身份信息无效" });
-            }
-
             try
             {
                 await _commentsService.SetCommentStatusAsync(commentId, status,managerId);
