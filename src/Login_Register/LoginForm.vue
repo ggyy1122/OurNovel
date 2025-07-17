@@ -77,11 +77,15 @@ const rememberMe = ref(false);
 const usernameError = ref(false);
 const passwordError = ref(false);
 const router = useRouter();
-function saveToken(token) {
+function saveToken(token, name, id) {
     if (rememberMe.value) {
         localStorage.setItem('token', token);
+        localStorage.setItem('name', name);
+        localStorage.setItem('id', id);
     } else {
         sessionStorage.setItem('token', token);
+        sessionStorage.setItem('name', name);
+        sessionStorage.setItem('id', id);
     }
 }
 const handleLogin = async () => {
@@ -95,21 +99,24 @@ const handleLogin = async () => {
                     readerName: username.value,
                     password: password.value
                 });
-                saveToken(response.token);
+                saveToken(response.token, response.readerName, response.readerId);
+                state.setUserInfo(response.readerName, response.readerId); // 存入 Pinia
                 router.push('/Novels/Novel_Layout/home');
             } else if (state.value === 1) { // 作者
                 response = await loginAuthor({
                     authorName: username.value,
                     password: password.value
                 });
-                saveToken(response.token);
+                saveToken(response.token, response.authorName, response.authorId);
+                state.setUserInfo(response.authorName, response.authorId); // 存入 Pinia
                 router.push('/Novels/Novel_Layout/home');
             } else if (state.value === 2) { // 管理员
                 response = await loginManager({
                     managerName: username.value,
                     password: password.value
                 });
-                saveToken(response.token);
+                saveToken(response.token, response.managerName, response.managerId);
+                state.setUserInfo(response.managerName, response.managerId); // 存入 Pinia
                 router.push('/Admin/Admin_Layout/dashboard');
             }
             console.log('登录成功', response.data);
