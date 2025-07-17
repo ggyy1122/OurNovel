@@ -11,8 +11,12 @@ namespace OurNovel.Services
     /// </summary>
     public class ReportService : BaseService<Report, int>
     {
-        public ReportService(IRepository<Report, int> repository) : base(repository)
+        private readonly ReportManagementService _reportManagementService;
+
+        public ReportService(IRepository<Report, int> repository, ReportManagementService reportManagementService)
+            : base(repository)
         {
+            _reportManagementService = reportManagementService;
         }
 
         /// <summary>
@@ -40,7 +44,7 @@ namespace OurNovel.Services
         /// </summary>
         /// <param name="reportId">举报ID</param>
         /// <param name="progress">处理进度：成功、失败、未处理</param>
-        public async Task ProcessReportAsync(int reportId, string progress)
+        public async Task ProcessReportAsync(int reportId, string progress, int managerId)
         {
             var report = await GetByIdAsync(reportId);
             if (report == null)
@@ -55,6 +59,10 @@ namespace OurNovel.Services
 
             report.Progress = progress;
             await UpdateAsync(report);
+
+            // 记录操作日志
+            var result = $"举报处理：审核结果为 {progress}";
+            await _reportManagementService.RecordManagementAsync(result, reportId,managerId);
         }
     }
 }

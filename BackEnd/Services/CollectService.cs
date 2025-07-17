@@ -1,12 +1,15 @@
-﻿using OurNovel.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using OurNovel.Data;
+using OurNovel.Models;
 
 public class CollectService : ICollectService
 {
     private readonly ICollectRepository _repository;
-
-    public CollectService(ICollectRepository repository)
+    private readonly AppDbContext _context;
+    public CollectService(ICollectRepository repository, AppDbContext context)
     {
         _repository = repository;
+        _context = context;
     }
 
     public async Task AddAsync(int novelId, int readerId, string? isPublic)
@@ -49,5 +52,21 @@ public class CollectService : ICollectService
     public async Task<IEnumerable<Collect>> GetAllAsync()
     {
         return await _repository.GetAllAsync();
+    }
+
+    // 更新单本小说的收藏数
+    public async Task UpdateCollectCountAsync(int novelId)
+    {
+        var count = await _context.Collects
+            .CountAsync(r => r.NovelId == novelId);
+
+        var novel = await _context.Novels
+            .FirstOrDefaultAsync(n => n.NovelId == novelId);
+
+        if (novel != null)
+        {
+            novel.CollectedCount = count;
+            await _context.SaveChangesAsync();
+        }
     }
 }

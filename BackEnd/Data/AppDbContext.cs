@@ -32,9 +32,12 @@ namespace OurNovel.Data
         public DbSet<Report> Reports { get; set; }
         public DbSet<Author> Authors { get; set; }
         public DbSet<Reader> Readers { get; set; }
-        public DbSet<Manager> Manager{ get; set; }
         public DbSet<Manager> Managers { get; set; } = null!;
         public DbSet<Management> Managements { get; set; }
+        public DbSet<ReportManagement> ReportManagements { get; set; }
+        public DbSet<CommentManagement> CommentManagements { get; set; }
+        public DbSet<NovelManagement> NovelManagements { get; set; }
+        public DbSet<ChapterManagement> ChapterManagements { get; set; }
 
         public DbSet<Like> Likes { get; set; }
         public DbSet<NovelCategory> NovelCategories { get; set; }
@@ -75,11 +78,15 @@ namespace OurNovel.Data
             modelBuilder.ApplyConfiguration(new ManagerConfiguration());
             modelBuilder.ApplyConfiguration(new ManagementConfiguration());
 
+
             modelBuilder.ApplyConfiguration(new TransactionConfiguration());
             modelBuilder.ApplyConfiguration(new RewardConfiguration());
             modelBuilder.ApplyConfiguration(new AuthorIncomeConfiguration());
-
             modelBuilder.ApplyConfiguration(new PurchaseConfiguration());
+            modelBuilder.ApplyConfiguration(new ReportManagementConfiguration());
+            modelBuilder.ApplyConfiguration(new CommentManagementConfiguration());
+            modelBuilder.ApplyConfiguration(new NovelManagementConfiguration());
+            modelBuilder.ApplyConfiguration(new ChapterManagementConfiguration());
 
 
             // ⚠️ 后续其他表的配置也在这里调用，例如：

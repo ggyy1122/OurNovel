@@ -2,14 +2,18 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using OurNovel.Data;
+using Microsoft.EntityFrameworkCore;
 
 public class RecommendService : IRecommendService
 {
     private readonly IRecommendRepository _repository;
+    private readonly AppDbContext _context;
 
-    public RecommendService(IRecommendRepository repository)
+    public RecommendService(IRecommendRepository repository, AppDbContext context)
     {
         _repository = repository;
+        _context = context;
     }
 
     public async Task AddAsync(int novelId, int readerId, string? reason)
@@ -41,5 +45,22 @@ public class RecommendService : IRecommendService
     public async Task<IEnumerable<Recommend>> GetAllAsync()
     {
         return await _repository.GetAllAsync();
+    }
+
+    
+    // 更新单本小说的推荐数
+    public async Task UpdateRecommendCountAsync(int novelId)
+    {
+        var count = await _context.Recommends
+            .CountAsync(r => r.NovelId == novelId);
+
+        var novel = await _context.Novels
+            .FirstOrDefaultAsync(n => n.NovelId == novelId);
+
+        if (novel != null)
+        {
+            novel.RecommendCount = count;
+            await _context.SaveChangesAsync();
+        }
     }
 }

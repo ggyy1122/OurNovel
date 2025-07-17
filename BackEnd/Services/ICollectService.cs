@@ -10,4 +10,5 @@ public interface ICollectService
     Task<IEnumerable<Collect>> GetByReaderIdAsync(int readerId);
     Task<IEnumerable<Collect>> GetByNovelIdAsync(int novelId);
     Task<IEnumerable<Collect>> GetAllAsync();
+    Task UpdateCollectCountAsync(int novelId);
 }
