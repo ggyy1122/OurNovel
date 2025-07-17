@@ -20,6 +20,20 @@ namespace OurNovel.Services
             _chapterManagementService = chapterManagementService;
         }
 
+        private static int CountWords(string? content)
+        {
+            if (string.IsNullOrWhiteSpace(content))
+                return 0;
+
+            // 正则匹配英文单词（含数字）或中文字符
+            var matches = System.Text.RegularExpressions.Regex.Matches(
+                content,
+                @"[\u4e00-\u9fa5]|[a-zA-Z0-9]+"
+            );
+
+            return matches.Count;
+        }
+
         public async Task<IEnumerable<Chapter>> GetByNovelIdAsync(int novelId)
         {
             return await _chapterRepository.GetByNovelIdAsync(novelId);
@@ -38,11 +52,17 @@ namespace OurNovel.Services
                 throw new Exception($"章节已存在（NovelId={chapter.NovelId}, ChapterId={chapter.ChapterId}）");
             }
 
+            // 自动计算字数（忽略空内容）
+            chapter.WordCount = CountWords(chapter.Content);
+
             await _chapterRepository.AddAsync(chapter);
         }
 
         public async Task UpdateAsync(Chapter chapter)
         {
+            // 自动更新字数
+            chapter.WordCount = CountWords(chapter.Content);
+
             await _chapterRepository.UpdateAsync(chapter);
         }
         public async Task<IEnumerable<Chapter>> GetAllAsync()
