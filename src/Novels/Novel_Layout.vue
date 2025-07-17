@@ -11,8 +11,9 @@
                 <input type="text" placeholder="请输入书名/作者/主角" v-model="searchQuery" />
                 <button @click="handleSearch">搜索</button>
             </div>
-            <div class="user-actions" @click="logout">
-                <button class="login-btn">
+            <div class="user-actions">
+                <!-- 未登录状态 -->
+                <button v-if="!state.isloggedin" class="login-btn" @click="goToLogin">
                     <span class="login-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                             <circle cx="12" cy="8" r="4" stroke="#222" stroke-width="2" />
@@ -21,6 +22,23 @@
                     </span>
                     立即登录
                 </button>
+                <!-- 已登录状态 -->
+                <div v-else class="user-dropdown" @mouseenter="showDropdown = true" @mouseleave="showDropdown = false">
+                    <img src="@/assets/logo.png" alt="用户头像" class="user-avatar">
+                    <div v-if="showDropdown" class="dropdown-menu">
+                        <div class="user-info">
+                            <p>用户名：{{ state.name }}</p>
+                            <p>Lv1</p>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" @click.prevent="goToBookshelf" class="dropdown-item">
+                            <i class="fa fa-book mr-2"></i> 我的书架
+                        </a>
+                        <a href="#" @click.prevent="logout" class="dropdown-item">
+                            <i class="fa fa-sign-out mr-2"></i> 退出
+                        </a>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -61,8 +79,9 @@
                     <input type="text" placeholder="请输入书名/作者/主角" v-model="searchQuery" />
                     <button @click="handleSearch">搜索</button>
                 </div>
-                <div class="user-actions" @click="logout">
-                    <button class="login-btn">
+                <div class="user-actions">
+                    <!-- 未登录状态显示登录按钮 -->
+                    <button v-if="!state.isloggedin" class="login-btn" @click="goToLogin">
                         <span class="login-icon">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                                 <circle cx="12" cy="8" r="4" stroke="#222" stroke-width="2" />
@@ -71,15 +90,31 @@
                         </span>
                         立即登录
                     </button>
+                    <!-- 已登录状态显示用户头像和下拉菜单 -->
+                    <div v-else class="user-dropdown" @mouseenter="showDropdown = true"
+                        @mouseleave="showDropdown = false">
+                        <img src="@/assets/logo.png" alt="用户头像" class="user-avatar">
+                        <div v-if="showDropdown" class="dropdown-menu">
+                            <div class="user-info">
+                                <p>用户名：{{ state.name }}</p>
+                                <p>Lv1</p>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" @click.prevent="goToBookshelf" class="dropdown-item">
+                                <i class="fa fa-book mr-2"></i> 我的书架
+                            </a>
+                            <a href="#" @click.prevent="logout" class="dropdown-item">
+                                <i class="fa fa-sign-out mr-2"></i> 退出
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
         <!-- 主要内容区域 -->
         <main class="main-content">
             <router-view></router-view>
         </main>
-
         <!-- 底部信息 -->
         <footer class="footer">
             <div class="container">
@@ -95,25 +130,41 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { current_state } from '@/store/index'
+const state = current_state()
 
 const router = useRouter()
 const route = useRoute()
 const searchQuery = ref('')
 const showStickyNav = ref(false)
+const showDropdown = ref(false)
 const mainHeader = ref(null)
 const mainNav = ref(null)
+// const userAvatar = ref('@/assets/logo.png') // 默认头像路径
 
 
 const showNavMenu = computed(() => {
     return !route.meta.hideNav;
 })
-const handleSearch = () => {
-    console.log('搜索关键词:', searchQuery.value)
+function goToLogin() {
+    router.push('/L_R/login');
 }
 
-const logout = () => {
-    localStorage.removeItem('isLoggedIn')
-    router.push('/L_R/login')
+function goToBookshelf() {
+    // router.push('/Novels/Bookshelf');
+}
+function logout() {
+    state.clearUserInfo();
+    localStorage.removeItem('token');
+    localStorage.removeItem('name');
+    localStorage.removeItem('id');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('name');
+    sessionStorage.removeItem('id');
+    router.push('/L_R/login');
+}
+const handleSearch = () => {
+    console.log('搜索关键词:', searchQuery.value)
 }
 
 // 监听滚动，显示悬浮导航栏
@@ -182,7 +233,7 @@ onUnmounted(() => {
     max-width: 400px;
     margin: 0 auto;
     height: 40px;
-    margin-right: 70px;
+    margin-right: 180px;
 }
 
 .search-bar input {
@@ -469,5 +520,86 @@ onUnmounted(() => {
 
 .sticky-header-content {
     margin-right: 70px;
+}
+
+.user-dropdown {
+    position: relative;
+    cursor: pointer;
+    margin-right: 120px;
+}
+
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ffd100;
+}
+
+.dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    width: 180px;
+    background: linear-gradient(to bottom, #f4dfa5 0%, #f3f3f0 100%);
+    border-radius: 8px;
+    z-index: 100;
+    padding: 10px 0;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.user-info {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.user-info p:first-child {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #000;
+}
+
+.user-info p:last-child {
+    font-size: 12px;
+    color: #888;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: #eee;
+    margin: 5px 0;
+}
+
+.dropdown-item {
+    display: block;
+    padding: 8px 15px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.dropdown-item:hover {
+    background: #f5f5f5;
+    color: #f7b604;
+}
+
+.dropdown-item i {
+    width: 20px;
+    text-align: center;
+}
+
+.sticky-header-content .user-dropdown {
+    margin-right: 20px;
+}
+
+.sticky-header-content .user-avatar {
+    width: 30px;
+    height: 30px;
+}
+
+.sticky-header-content .dropdown-menu {
+    top: 120%;
+    right: -10px;
 }
 </style>
