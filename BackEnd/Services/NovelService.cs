@@ -1,25 +1,32 @@
-using OurNovel.Models;
-using OurNovel.Repositories;
 using Microsoft.AspNetCore.Http;
+using OurNovel.Models;
+using OurNovel.Models.Dto;
+using OurNovel.Repositories;
+
 namespace OurNovel.Services
 {
     /// <summary>
-    /// Novel ·şÎñ£¬¼Ì³Ğ»ù´¡·şÎñ£¬ÈçÓĞÌØÊâÒµÎñÔÙÀ©Õ¹
+    /// Novel æœåŠ¡ï¼Œç»§æ‰¿åŸºç¡€æœåŠ¡ï¼Œå¦‚æœ‰ç‰¹æ®Šä¸šåŠ¡å†æ‰©å±•
     /// </summary>
     public class NovelService : BaseService<Novel, int>
     {
+        private readonly INovelRepository _novelRepository;
+        private readonly NovelManagementService _novelManagementService;
 
-        public NovelService(IRepository<Novel, int> repository)
+        public NovelService(IRepository<Novel, int> repository, INovelRepository novelRepository, NovelManagementService novelManagementService)
             : base(repository)
         {
+            _novelRepository = novelRepository;
+            _novelManagementService = novelManagementService;
         }
+
         /// <summary>
-        /// ÉóºËĞ¡Ëµ£¬ĞŞ¸Ä×´Ì¬Îª¡°Á¬ÔØ¡±»ò¡°Íê½á¡±
+        /// å®¡æ ¸å°è¯´ï¼Œä¿®æ”¹çŠ¶æ€ä¸ºâ€œè¿è½½â€æˆ–â€œå®Œç»“â€
         /// </summary>
-        public async Task<bool> ReviewNovelAsync(int novelId, string newStatus)
+        public async Task<bool> ReviewNovelAsync(int novelId, string newStatus,int managerId)
         {
-            // ºÏ·¨ĞÔ¼ì²é£¨ÒµÎñÔ¼Êø£©
-            if (newStatus != "Á¬ÔØ" && newStatus != "Íê½á")
+            // åˆæ³•æ€§æ£€æŸ¥ï¼ˆä¸šåŠ¡çº¦æŸï¼‰
+            if (newStatus != "è¿è½½" && newStatus != "å®Œç»“")
                 return false;
 
             var novel = await _repository.GetByIdAsync(novelId);
@@ -28,35 +35,70 @@ namespace OurNovel.Services
 
             novel.Status = newStatus;
             await _repository.UpdateAsync(novel);
+
+            var result = $"å®¡æ ¸ç»“æŸï¼ŒçŠ¶æ€ä¿®æ”¹ä¸º {newStatus}";
+            await _novelManagementService.RecordManagementAsync(managerId, result, novelId);
+
             return true;
         }
         /// <summary>
-        /// ÉÏ´«Ğ¡Ëµ·âÃæ£¬²¢¸üĞÂ·âÃæµØÖ·
+        /// ä¸Šä¼ å°è¯´å°é¢ï¼Œå¹¶æ›´æ–°å°é¢åœ°å€Ö·
         /// </summary>
-        /// <param name="novelId">Ğ¡ËµID</param>
-        /// <param name="coverFile">·âÃæÎÄ¼ş</param>
-        /// <returns>·âÃæURL</returns>
+        /// <param name="novelId">å°è¯´ID</param>
+        /// <param name="coverFile">å°é¢æ–‡ä»¶</param>
+        /// <returns>å°é¢URL</returns>
         /// 
+
+        /// <summary>
+        /// è·å–æ”¶è—æ¦œå•
+        /// </summary>
+        /// <param name="topN"></param>
+        /// <returns></returns>
+        public async Task<List<CollectRankingDto>> GetTopCollectedNovelsAsync(int topN)
+        {
+            return await _novelRepository.GetTopCollectedNovelsAsync(topN);
+        }
+
+        /// <summary>
+        /// è·å–æ¨èæ¦œå•
+        /// </summary>
+        /// <param name="topN"></param>
+        /// <returns></returns>
+        public async Task<List<RecommendRankingDto>> GetTopRecommendedNovelsAsync(int topN)
+        {
+            return await _novelRepository.GetTopRecommendedNovelsAsync(topN);
+        }
+
+        /// <summary>
+        /// è·å–è¯„åˆ†æ¦œå•
+        /// </summary>
+        /// <param name="topN"></param>
+        /// <returns></returns>
+        public async Task<List<ScoreRankingDto>> GetTopScoredNovelsAsync(int topN)
+        {
+            return await _novelRepository.GetTopScoredNovelsAsync(topN);
+        }
+
 
         /*
         public async Task<string> UploadCoverAsync(int novelId, IFormFile coverFile)
         {
             if (coverFile == null || coverFile.Length == 0)
-                throw new ArgumentException("·âÃæÎÄ¼ş²»ÄÜÎª¿Õ");
+                throw new ArgumentException("å°é¢æ–‡ä»¶ä¸èƒ½ä¸ºç©º");
 
             string coverUrl = null;
 
             try
             {
-                // ÉÏ´«ÎÄ¼ş
+                // ä¸Šä¼ æ–‡ä»¶
                 coverUrl = await _fileStorageService.UploadAsync(coverFile, "covers");
 
-                // ²éÕÒĞ¡Ëµ
+                // æŸ¥æ‰¾å°è¯´
                 var novel = await _repository.GetByIdAsync(novelId);
                 if (novel == null)
-                    throw new Exception($"Î´ÕÒµ½IDÎª {novelId} µÄĞ¡Ëµ");
+                    throw new Exception($"æœªæ‰¾åˆ°IDä¸º {novelId} çš„å°è¯´");
 
-                // ¸üĞÂÊı¾İ¿â
+                // æ›´æ–°æ•°æ®åº“
                 novel.CoverUrl = coverUrl;
                 await _repository.UpdateAsync(novel);
 
@@ -64,13 +106,13 @@ namespace OurNovel.Services
             }
             catch (Exception)
             {
-                //  ²¹³¥É¾³ı¸Õ²ÅÉÏ´«µÄÎÄ¼ş
+                //  è¡¥å¿åˆ é™¤åˆšæ‰ä¸Šä¼ çš„æ–‡ä»¶
                 if (!string.IsNullOrEmpty(coverUrl))
                 {
                     _fileStorageService.Delete(coverUrl, "covers");
                 }
 
-                // °ÑÒì³£¼ÌĞøÅ×³öÈ¥£¬¸øÉÏ²ã´¦Àí
+                // æŠŠå¼‚å¸¸ç»§ç»­æŠ›å‡ºå»ï¼Œç»™ä¸Šå±‚å¤„ç†
                 throw;
             }
         }

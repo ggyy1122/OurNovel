@@ -19,6 +19,7 @@ namespace OurNovel.Controllers
         }
 
 
+
         /// <summary>
         /// 设置评论状态（如“通过”或“封禁”）
         /// </summary>
@@ -26,11 +27,11 @@ namespace OurNovel.Controllers
         /// <param name="status">目标状态</param>
         /// <returns>操作结果</returns>
         [HttpPost("Status")]
-        public async Task<IActionResult> SetStatus([FromForm] int commentId, [FromForm] string status)
+        public async Task<IActionResult> SetStatus([FromQuery] int commentId, [FromQuery] string status, [FromQuery] int managerId)
         {
             try
             {
-                await _commentsService.SetCommentStatusAsync(commentId, status);
+                await _commentsService.SetCommentStatusAsync(commentId, status,managerId);
                 return Ok(new { success = true, message = $"状态已修改为：{status}" });
             }
             catch (Exception ex)

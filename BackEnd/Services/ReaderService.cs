@@ -3,6 +3,12 @@ using OurNovel.Data;
 using OurNovel.Models;
 using OurNovel.Repositories;
 
+﻿using OurNovel.Repositories;
+using Microsoft.AspNetCore.Http;
+using OurNovel.Services.Interfaces;
+using OurNovel.Models;
+
+
 namespace OurNovel.Services
 {
     public class ReaderService : BaseService<Reader, int>
@@ -37,6 +43,19 @@ namespace OurNovel.Services
             await _context.SaveChangesAsync();
 
             return new OkObjectResult(reader);
+        }
+        public async Task<IActionResult> ResetPasswordAsync(string readerName, string newPassword)
+        {
+            var reader = _context.Readers.FirstOrDefault(r => r.ReaderName == readerName);
+            if (reader == null)
+            {
+                return new NotFoundObjectResult("用户不存在");
+            }
+
+            reader.Password = PasswordHasher.HashPassword(newPassword);
+            await _context.SaveChangesAsync();
+
+            return new OkObjectResult("密码重置成功");
         }
 
         public IEnumerable<Reader> GetAllReaders() => _context.Readers;

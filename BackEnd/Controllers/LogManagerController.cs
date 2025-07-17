@@ -10,6 +10,9 @@ using OurNovel.Data;
 
 namespace OurNovel.Controllers
 {
+    /// <summary>
+    /// 管理员登录、注册与认证相关接口控制器
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class LogManagerController : ControllerBase
@@ -25,12 +28,18 @@ namespace OurNovel.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// 管理员注册接口（传入 ManagerName + Password）
+        /// </summary>
         [HttpPost("register-manager")]
         public async Task<IActionResult> RegisterManager([FromBody] ManagerRegisterDto dto)
         {
             return await _managerService.RegisterAsync(dto.ManagerName, dto.Password);
         }
 
+        /// <summary>
+        /// 管理员登录接口，验证用户名和密码，返回 JWT Token
+        /// </summary>
         [HttpPost("login-manager")]
         public IActionResult LoginManager([FromBody] ManagerRegisterDto dto)
         {
@@ -43,6 +52,7 @@ namespace OurNovel.Controllers
             if (!PasswordHasher.VerifyPassword(dto.Password, manager.Password))
                 return Unauthorized("密码错误");
 
+            // 生成 JWT Token
             var claims = new[]
             {
                 new Claim(ClaimTypes.Name, manager.ManagerName),
@@ -68,6 +78,18 @@ namespace OurNovel.Controllers
             });
         }
 
+        /// <summary>
+        /// 重置管理员密码（若用户名存在则更新密码，否则返回错误信息）
+        /// </summary>
+        [HttpPost("reset-manager-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ManagerRegisterDto dto)
+        {
+            return await _managerService.ResetPasswordAsync(dto.ManagerName, dto.Password);
+        }
+
+        /// <summary>
+        /// 管理员登出接口（JWT 无状态，前端清除 Token 即可）
+        /// </summary>
         [HttpPost("logout")]
         public IActionResult Logout()
         {

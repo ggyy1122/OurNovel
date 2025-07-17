@@ -41,10 +41,12 @@ namespace OurNovel.Data.Configurations
 			entity.Property(e => e.PricePerKilo)
 				  .HasColumnName("PRICE_PER_KILO")
 				  .HasColumnType("NUMBER(10,2)")
-				  .HasDefaultValue(0.50m);
+				  .HasDefaultValue(0.50m)
+				  .ValueGeneratedNever(); // 不要让 EF 自动生成
 
-			// 是否收费字段
-			entity.Property(e => e.IsCharged)
+
+            // 是否收费字段
+            entity.Property(e => e.IsCharged)
 				  .HasColumnName("IS_CHARGED")
 				  .HasMaxLength(2);
 

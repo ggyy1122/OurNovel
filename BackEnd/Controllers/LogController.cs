@@ -82,6 +82,16 @@ namespace OurNovel.Controllers
         }
 
         /// <summary>
+        /// 重置作者密码（提供用户名和新密码）
+        /// </summary>
+        [HttpPost("reset-author-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] AuthorRegisterDto dto)
+        {
+            return await _authorService.ResetPasswordAsync(dto.AuthorName, dto.Password);
+        }
+
+
+        /// <summary>
         /// 登出接口（前端清除 token 即可）
         /// </summary>
         [HttpPost("logout")]

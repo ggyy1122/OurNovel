@@ -9,6 +9,9 @@ using OurNovel.Services.OSS;
 using System.Reflection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using OurNovel.Models;
+using Aop.Api;
+using Microsoft.OpenApi.Models;
 
 
 
@@ -46,21 +49,38 @@ builder.Services.AddScoped<ILikesService,LikesService>();
 
 builder.Services.AddScoped<ICommentReplyRepository, CommentReplyRepository>();
 builder.Services.AddScoped<ICommentReplyService, CommentReplyService>();
-
 builder.Services.AddScoped<INovelCategoryRepository, NovelCategoryRepository>();
 builder.Services.AddScoped<INovelCategoryService, NovelCategoryService>();
-
 builder.Services.AddScoped<ICollectRepository, CollectRepository>();
 builder.Services.AddScoped<ICollectService, CollectService>();
-
 builder.Services.AddScoped<IRecommendRepository, RecommendRepository>();
 builder.Services.AddScoped<IRecommendService, RecommendService>();
 builder.Services.AddScoped<IRateRepository, RateRepository>();
 builder.Services.AddScoped<IRateService, RateService>();
-
 builder.Services.AddScoped<ReportService>();
 builder.Services.AddScoped<ManagerService>();
 builder.Services.AddScoped<ManagementService>();
+builder.Services.AddScoped<TransactionService>();
+builder.Services.AddScoped<RewardService>();
+builder.Services.AddScoped<AuthorIncomeService>();
+builder.Services.AddScoped<RechargeService>();
+builder.Services.AddSingleton<AlipayService>();
+builder.Services.Configure<AlipayConfig>(builder.Configuration.GetSection("Alipay"));  // 配置支付宝参数
+builder.Services.AddScoped<IRepository<AuthorIncome, long>, Repository<AuthorIncome, long>>();
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseOracle(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<PurchaseService>();
+
+builder.Services.AddScoped<INovelRepository, NovelRepository>();
+builder.Services.AddScoped<NovelService>();
+
+
+builder.Services.AddScoped<NovelManagementService>();
+builder.Services.AddScoped<CommentManagementService>();
+builder.Services.AddScoped<ReportManagementService>();
+builder.Services.AddScoped<ChapterManagementService>();
+
 
 // 注册OSS储配置
 builder.Services.Configure<OssConfig>(builder.Configuration.GetSection("OssConfig"));
@@ -119,7 +139,32 @@ builder.Services.AddSwaggerGen(c =>
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     c.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
 
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "请输入Bearer格式的JWT，例如: Bearer eyJhbGciOiJIUzI1NiIs...",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
 
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                Scheme = "oauth2",
+                Name = "Bearer",
+                In = ParameterLocation.Header
+            },
+            new List<string>()
+        }
+    });
 });
 
 // ========================================
