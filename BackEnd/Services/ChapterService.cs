@@ -5,16 +5,19 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.ComponentModel.Design;
 
 namespace OurNovel.Services
 {
     public class ChapterService
     {
         private readonly IChapterRepository _chapterRepository;
+        private readonly ChapterManagementService _chapterManagementService;
 
-        public ChapterService(IChapterRepository chapterRepository)
+        public ChapterService(IChapterRepository chapterRepository, ChapterManagementService chapterManagementService)
         {
             _chapterRepository = chapterRepository;
+            _chapterManagementService = chapterManagementService;
         }
 
         public async Task<IEnumerable<Chapter>> GetByNovelIdAsync(int novelId)
@@ -56,7 +59,7 @@ namespace OurNovel.Services
         /// <summary>
         /// 审核章节，修改状态为“通过”或“封禁”
         /// </summary>
-        public async Task<bool> ReviewChapterAsync(int novelId, int chapterId, string newStatus)
+        public async Task<bool> ReviewChapterAsync(int novelId, int chapterId, string newStatus, int managerId)
         {
             // 状态值合法性校验
             if (newStatus != "通过" && newStatus != "封禁")
@@ -70,6 +73,9 @@ namespace OurNovel.Services
             // 修改状态
             chapter.Status = newStatus;
             await _chapterRepository.UpdateAsync(chapter);
+            var result = $"审核章节完成，状态变更为 {newStatus}";
+            await _chapterManagementService.RecordManagementAsync(managerId, result, chapter.NovelId, chapter.ChapterId);
+
             return true;
         }
 
