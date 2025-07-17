@@ -11,7 +11,7 @@ namespace OurNovel.Models
         }
 
         public int AuthorId { get; set; }                  // 外键，对应 AuthorId
-        [JsonIgnore]
+
         public Author? Author { get; set; }                // 导航属性     
 
         public string? NovelName { get; set; } = null!;    // Novel_NAME 可空
