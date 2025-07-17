@@ -52,10 +52,33 @@ namespace OurNovel.Services
         /// <summary>
         /// 获取收藏榜单
         /// </summary>
+        /// <param name="topN"></param>
+        /// <returns></returns>
         public async Task<List<CollectRankingDto>> GetTopCollectedNovelsAsync(int topN)
         {
             return await _novelRepository.GetTopCollectedNovelsAsync(topN);
         }
+
+        /// <summary>
+        /// 获取推荐榜单
+        /// </summary>
+        /// <param name="topN"></param>
+        /// <returns></returns>
+        public async Task<List<RecommendRankingDto>> GetTopRecommendedNovelsAsync(int topN)
+        {
+            return await _novelRepository.GetTopRecommendedNovelsAsync(topN);
+        }
+
+        /// <summary>
+        /// 获取评分榜单
+        /// </summary>
+        /// <param name="topN"></param>
+        /// <returns></returns>
+        public async Task<List<ScoreRankingDto>> GetTopScoredNovelsAsync(int topN)
+        {
+            return await _novelRepository.GetTopScoredNovelsAsync(topN);
+        }
+
 
         /*
         public async Task<string> UploadCoverAsync(int novelId, IFormFile coverFile)

@@ -15,7 +15,6 @@ public class NovelRepository : Repository<Novel, int>, INovelRepository
 
     public async Task<List<CollectRankingDto>> GetTopCollectedNovelsAsync(int topN)
     {
-        // 先查收藏数最高的小说ID和收藏数
         var topCollected = await _context.Collects
             .GroupBy(c => c.NovelId)
             .Select(g => new { NovelId = g.Key, CollectCount = g.Count() })
@@ -25,13 +24,11 @@ public class NovelRepository : Repository<Novel, int>, INovelRepository
 
         var novelIds = topCollected.Select(x => x.NovelId).ToList();
 
-        // 再批量查小说并加载作者信息
         var novels = await _context.Novels
             .Where(n => novelIds.Contains(n.NovelId))
             .Include(n => n.Author) // 重点：加载导航属性
             .ToListAsync();
 
-        // 最后把两边数据join组装DTO
         var result = topCollected.Join(novels,
             c => c.NovelId,
             n => n.NovelId,
@@ -44,10 +41,55 @@ public class NovelRepository : Repository<Novel, int>, INovelRepository
                 Introduction = n.Introduction ?? string.Empty,
                 CollectCount = c.CollectCount
             })
-            .OrderByDescending(x => x.CollectCount) // 可选：再次排序保证顺序
+            .OrderByDescending(x => x.CollectCount) 
             .ToList();
 
         return result;
     }
+
+    public async Task<List<RecommendRankingDto>> GetTopRecommendedNovelsAsync(int topN)
+    {
+        var novels = await _context.Novels
+            .Include(n => n.Author) // 加载作者信息
+            .Where(n => n.RecommendCount > 0)
+            .OrderByDescending(n => n.RecommendCount)
+            .Take(topN)
+            .ToListAsync();
+
+        var result = novels.Select(n => new RecommendRankingDto
+        {
+            NovelId = n.NovelId,
+            NovelName = n.NovelName ?? string.Empty,
+            AuthorName = n.Author?.AuthorName ?? "未知作者",
+            CoverUrl = n.CoverUrl ?? string.Empty,
+            Introduction = n.Introduction ?? string.Empty,
+            RecommendCount = n.RecommendCount ?? 0
+        }).ToList();
+
+        return result;
+    }
+
+    public async Task<List<ScoreRankingDto>> GetTopScoredNovelsAsync(int topN)
+    {
+        var novels = await _context.Novels
+            .Include(n => n.Author)
+            .Where(n => n.Score > 0)
+            .OrderByDescending(n => n.Score)
+            .Take(topN)
+            .ToListAsync();
+
+        var result = novels.Select(n => new ScoreRankingDto
+        {
+            NovelId = n.NovelId,
+            NovelName = n.NovelName ?? string.Empty,
+            AuthorName = n.Author?.AuthorName ?? "未知作者",
+            CoverUrl = n.CoverUrl ?? string.Empty,
+            Introduction = n.Introduction ?? string.Empty,
+            Score = n.Score ?? 0
+        }).ToList();
+
+        return result;
+    }
+
 
 }
