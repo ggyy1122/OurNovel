@@ -59,5 +59,18 @@ namespace OurNovel.Services
                 .Select(cm => cm.Management)
                 .ToListAsync();
         }
+
+        /// <summary>
+        /// 获取所有评论的管理日志
+        /// </summary>
+        /// <returns>CommentManagement 列表</returns>
+        public async Task<List<CommentManagement>> GetAllCommentManagementLogsAsync()
+        {
+            return await _context.CommentManagements
+                .Include(nm => nm.Management)
+                    .ThenInclude(m => m.Manager)
+                .OrderByDescending(nm => nm.Management.Time ?? DateTime.MinValue)
+                .ToListAsync();
+        }
     }
 }

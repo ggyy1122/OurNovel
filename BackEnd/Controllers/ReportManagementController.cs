@@ -40,5 +40,37 @@ namespace OurNovel.Controllers
 
             return Ok(new { success = true, data = result });
         }
+
+        /// <summary>
+        /// 获取所有举报的管理日志列表
+        /// GET: api/NovelManagement/logs/all
+        /// </summary>
+        /// <returns>管理日志列表</returns>
+        [HttpGet("logs/all")]
+        public async Task<IActionResult> GetAllNovelLogs()
+        {
+            var reportManagements = await _reportManagementService.GetAllReportManagementLogsAsync();
+
+            if (reportManagements == null || reportManagements.Count == 0)
+            {
+                return NotFound(new { success = false, message = "未找到小说管理日志" });
+            }
+
+            var result = reportManagements.Select(nm => new
+            {
+                nm.Management!.ManagementId,
+                nm.Management.ManagerId,
+                ManagerName = nm.Management.Manager != null ? nm.Management.Manager.ManagerName : null,
+                nm.ReportId,
+                nm.Management.Result,
+                Time = nm.Management.Time?.ToString("yyyy-MM-dd HH:mm:ss"),
+            });
+
+            return Ok(new
+            {
+                success = true,
+                data = result
+            });
+        }
     }
 }

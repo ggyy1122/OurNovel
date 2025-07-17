@@ -52,4 +52,18 @@ public class ReportManagementService
             .Select(rm => rm.Management)
             .ToListAsync();
     }
+
+    /// <summary>
+    /// 获取所有举报的管理日志
+    /// </summary>
+    /// <returns>ReportManagement 列表</returns>
+    public async Task<List<ReportManagement>> GetAllReportManagementLogsAsync()
+    {
+        return await _context.ReportManagements
+            .Include(nm => nm.Management)
+                .ThenInclude(m => m.Manager)
+            .OrderByDescending(nm => nm.Management.Time ?? DateTime.MinValue)
+            .ToListAsync();
+    }
+
 }

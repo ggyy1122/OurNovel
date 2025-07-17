@@ -59,5 +59,19 @@ namespace OurNovel.Services
                 .Select(nm => nm.Management)
                 .ToListAsync();
         }
+
+        /// <summary>
+        /// 获取所有小说的管理日志
+        /// </summary>
+        /// <returns>NovelManagement 列表</returns>
+        public async Task<List<NovelManagement>> GetAllNovelManagementLogsAsync()
+        {
+            return await _context.NovelManagements
+                .Include(nm => nm.Management)
+                    .ThenInclude(m => m.Manager)
+                .OrderByDescending(nm => nm.Management.Time ?? DateTime.MinValue)
+                .ToListAsync();
+        }
+
     }
 }
