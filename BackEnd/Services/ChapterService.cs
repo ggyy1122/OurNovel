@@ -54,6 +54,20 @@ namespace OurNovel.Services
 
             // 自动计算字数（忽略空内容）
             chapter.WordCount = CountWords(chapter.Content);
+            Console.WriteLine($"IsCharged = [{chapter.IsCharged}]");
+
+            var isCharged = (chapter.IsCharged ?? "").Trim();
+            if (isCharged == "否")
+            {
+                
+                chapter.PricePerKilo = 0;
+                Console.WriteLine($"halo!");
+            }
+            else if (chapter.PricePerKilo == 0)
+            {
+                chapter.PricePerKilo = 0.50m;
+            }
+
 
             await _chapterRepository.AddAsync(chapter);
         }
@@ -62,6 +76,15 @@ namespace OurNovel.Services
         {
             // 自动更新字数
             chapter.WordCount = CountWords(chapter.Content);
+            var isCharged = (chapter.IsCharged ?? "").Trim();
+            if (isCharged == "否")
+            {
+                chapter.PricePerKilo = 0;
+            }
+            else if (chapter.PricePerKilo == 0)
+            {
+                chapter.PricePerKilo = 0.50m;
+            }
 
             await _chapterRepository.UpdateAsync(chapter);
         }
