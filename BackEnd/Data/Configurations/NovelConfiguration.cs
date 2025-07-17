@@ -36,8 +36,6 @@ namespace OurNovel.Data.Configurations
             entity.Property(e => e.Status)
                   .HasColumnName("STATUS")
                   .HasDefaultValue("待审核");
-
-
         }
     }
 }
