@@ -1,36 +1,47 @@
 using OurNovel.Models;
 using OurNovel.Repositories;
+using System;
+using System.Threading.Tasks;
 
 namespace OurNovel.Services
 {
     /// <summary>
-    /// CommentsService：评论业务逻辑类，继承基础服务
+    /// CommentsService：评论业务逻辑类，继承基础服务，带管理日志写入
     /// </summary>
     public class CommentsService : BaseService<Comment, int>
     {
+
         private readonly ICommentReplyRepository _replyRepository;
+        private readonly CommentManagementService _commentManagementService;
 
         public CommentsService(
             IRepository<Comment, int> repository,
-            ICommentReplyRepository replyRepository)
+            CommentManagementService commentManagementService,ICommentReplyRepository replyRepository)
             : base(repository)
         {
             _replyRepository = replyRepository;
+            _commentManagementService = commentManagementService;
         }
 
-        /// <summary>
-        /// 审核评论：设置评论状态为“通过”或“封禁”
-        /// </summary>
-        public async Task SetCommentStatusAsync(int commentId, string status)
+        /// <param name="commentId">评论ID</param>
+        /// <param name="status">状态（通过/封禁）</param>
+        /// <param name="managerId">操作管理员ID</param>
+        public async Task SetCommentStatusAsync(int commentId, string status, int managerId)
         {
+            if (status != "通过" && status != "封禁")
+                throw new Exception("非法的评论状态，应为“通过”或“封禁”");
+
             var comment = await _repository.GetByIdAsync(commentId);
             if (comment == null)
                 throw new Exception($"未找到 ID 为 {commentId} 的评论");
 
             comment.Status = status;
             await _repository.UpdateAsync(comment);
-        }
 
+            var result = $"审核评论完成，状态修改为 {status}";
+            await _commentManagementService.RecordManagementAsync(managerId, result, commentId);
+        }
+      
         /// <summary>
         /// 点赞评论：将评论的 Likes 加一
         /// </summary>

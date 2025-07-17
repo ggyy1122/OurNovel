@@ -39,11 +39,11 @@ namespace OurNovel.Controllers
         /// 处理举报
         /// </summary>
         [HttpPost("/api/report/{reportId}/process")]
-        public async Task<IActionResult> ProcessReport(int reportId, [FromForm] string progress)
+        public async Task<IActionResult> ProcessReport(int reportId, [FromQuery] string progress, [FromQuery] int managerId)
         {
             try
             {
-                await _reportService.ProcessReportAsync(reportId, progress);
+                await _reportService.ProcessReportAsync(reportId, progress, managerId);
                 return Ok(new { success = true, message = "处理成功" });
             }
             catch (Exception ex)

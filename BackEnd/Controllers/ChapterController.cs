@@ -81,9 +81,9 @@ namespace OurNovel.Controllers
         /// 审核章节
         /// </summary>
         [HttpPut("novels/{novelId}/chapters/{chapterId}/review")]
-        public async Task<IActionResult> ReviewChapter(int novelId, int chapterId, [FromQuery] string newStatus)
+        public async Task<IActionResult> ReviewChapter(int novelId, int chapterId, [FromQuery] string newStatus, [FromQuery] int managerId)
         {
-            var success = await (_chapterService as ChapterService)?.ReviewChapterAsync(novelId, chapterId, newStatus)!;
+            var success = await (_chapterService as ChapterService)?.ReviewChapterAsync(novelId, chapterId, newStatus,managerId)!;
 
             if (!success)
                 return BadRequest("审核失败，可能是章节不存在或状态非法（必须为‘通过’或‘封禁’）");

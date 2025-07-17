@@ -6,25 +6,34 @@ using OurNovel.Repositories;
 namespace OurNovel.Services
 {
     /// <summary>
-    /// Novel ·þÎñ£¬¼Ì³Ð»ù´¡·þÎñ£¬ÈçÓÐÌØÊâÒµÎñÔÙÀ©Õ¹
+    /// Novel ï¿½ï¿½ï¿½ñ£¬¼Ì³Ð»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¹
     /// </summary>
     public class NovelService : BaseService<Novel, int>
     {
+
         private readonly INovelRepository _novelRepository;
 
         public NovelService(IRepository<Novel, int> repository, INovelRepository novelRepository)
             : base(repository)
         {
             _novelRepository = novelRepository;
+
+        private readonly NovelManagementService _novelManagementService;
+
+        public NovelService(IRepository<Novel, int> repository, NovelManagementService novelManagementService)
+            : base(repository)
+        {
+            _novelManagementService = novelManagementService;
+
         }
 
         /// <summary>
-        /// ÉóºËÐ¡Ëµ£¬ÐÞ¸Ä×´Ì¬Îª¡°Á¬ÔØ¡±»ò¡°Íê½á¡±
+        /// ï¿½ï¿½ï¿½Ð¡Ëµï¿½ï¿½ï¿½Þ¸ï¿½×´Ì¬Îªï¿½ï¿½ï¿½ï¿½ï¿½Ø¡ï¿½ï¿½ï¿½ï¿½ï¿½á¡±
         /// </summary>
-        public async Task<bool> ReviewNovelAsync(int novelId, string newStatus)
+        public async Task<bool> ReviewNovelAsync(int novelId, string newStatus,int managerId)
         {
-            // ºÏ·¨ÐÔ¼ì²é£¨ÒµÎñÔ¼Êø£©
-            if (newStatus != "Á¬ÔØ" && newStatus != "Íê½á")
+            // ï¿½Ï·ï¿½ï¿½Ô¼ï¿½é£¨Òµï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½
+            if (newStatus != "ï¿½ï¿½ï¿½ï¿½" && newStatus != "ï¿½ï¿½ï¿½")
                 return false;
 
             var novel = await _repository.GetByIdAsync(novelId);
@@ -33,18 +42,22 @@ namespace OurNovel.Services
 
             novel.Status = newStatus;
             await _repository.UpdateAsync(novel);
+
+            var result = $"ï¿½ï¿½Ë½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½Þ¸ï¿½Îª {newStatus}";
+            await _novelManagementService.RecordManagementAsync(managerId, result, novelId);
+
             return true;
         }
         /// <summary>
-        /// ÉÏ´«Ð¡Ëµ·âÃæ£¬²¢¸üÐÂ·âÃæµØÖ·
+        /// ï¿½Ï´ï¿½Ð¡Ëµï¿½ï¿½ï¿½æ£¬ï¿½ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½Ö·
         /// </summary>
         /// <param name="novelId">Ð¡ËµID</param>
-        /// <param name="coverFile">·âÃæÎÄ¼þ</param>
-        /// <returns>·âÃæURL</returns>
+        /// <param name="coverFile">ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½</param>
+        /// <returns>ï¿½ï¿½ï¿½ï¿½URL</returns>
         /// 
 
         /// <summary>
-        /// »ñÈ¡ÊÕ²Ø°ñµ¥
+        /// ï¿½ï¿½È¡ï¿½Õ²Ø°ï¿½
         /// </summary>
         public async Task<List<CollectRankingDto>> GetTopCollectedNovelsAsync(int topN)
         {
@@ -55,21 +68,21 @@ namespace OurNovel.Services
         public async Task<string> UploadCoverAsync(int novelId, IFormFile coverFile)
         {
             if (coverFile == null || coverFile.Length == 0)
-                throw new ArgumentException("·âÃæÎÄ¼þ²»ÄÜÎª¿Õ");
+                throw new ArgumentException("ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½");
 
             string coverUrl = null;
 
             try
             {
-                // ÉÏ´«ÎÄ¼þ
+                // ï¿½Ï´ï¿½ï¿½Ä¼ï¿½
                 coverUrl = await _fileStorageService.UploadAsync(coverFile, "covers");
 
-                // ²éÕÒÐ¡Ëµ
+                // ï¿½ï¿½ï¿½ï¿½Ð¡Ëµ
                 var novel = await _repository.GetByIdAsync(novelId);
                 if (novel == null)
-                    throw new Exception($"Î´ÕÒµ½IDÎª {novelId} µÄÐ¡Ëµ");
+                    throw new Exception($"Î´ï¿½Òµï¿½IDÎª {novelId} ï¿½ï¿½Ð¡Ëµ");
 
-                // ¸üÐÂÊý¾Ý¿â
+                // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¿ï¿½
                 novel.CoverUrl = coverUrl;
                 await _repository.UpdateAsync(novel);
 
@@ -77,13 +90,13 @@ namespace OurNovel.Services
             }
             catch (Exception)
             {
-                //  ²¹³¥É¾³ý¸Õ²ÅÉÏ´«µÄÎÄ¼þ
+                //  ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½ï¿½Õ²ï¿½ï¿½Ï´ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½
                 if (!string.IsNullOrEmpty(coverUrl))
                 {
                     _fileStorageService.Delete(coverUrl, "covers");
                 }
 
-                // °ÑÒì³£¼ÌÐøÅ×³öÈ¥£¬¸øÉÏ²ã´¦Àí
+                // ï¿½ï¿½ï¿½ì³£ï¿½ï¿½ï¿½ï¿½ï¿½×³ï¿½È¥ï¿½ï¿½ï¿½ï¿½ï¿½Ï²ã´¦ï¿½ï¿½
                 throw;
             }
         }
