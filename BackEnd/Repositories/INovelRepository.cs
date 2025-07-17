@@ -5,4 +5,7 @@ using OurNovel.Repositories;
 public interface INovelRepository : IRepository<Novel, int>
 {
     Task<List<CollectRankingDto>> GetTopCollectedNovelsAsync(int topN);
+    Task<List<RecommendRankingDto>> GetTopRecommendedNovelsAsync(int topN);
+    Task<List<ScoreRankingDto>> GetTopScoredNovelsAsync(int topN);
+
 }
