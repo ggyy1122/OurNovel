@@ -10,6 +10,7 @@ using System.Reflection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using OurNovel.Models;
+using Aop.Api;
 
 
 
@@ -61,6 +62,9 @@ builder.Services.AddScoped<ManagementService>();
 builder.Services.AddScoped<TransactionService>();
 builder.Services.AddScoped<RewardService>();
 builder.Services.AddScoped<AuthorIncomeService>();
+builder.Services.AddScoped<RechargeService>();
+builder.Services.AddSingleton<AlipayService>();
+builder.Services.Configure<AlipayConfig>(builder.Configuration.GetSection("Alipay"));  // 配置支付宝参数
 builder.Services.AddScoped<IRepository<AuthorIncome, long>, Repository<AuthorIncome, long>>();
 
 
