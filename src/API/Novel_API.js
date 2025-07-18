@@ -1,0 +1,132 @@
+import request from '@/API/index'
+
+/**
+ * 小说对象
+ * @typedef {Object} Novel
+ * @property {number} novelId - 小说ID
+ * @property {number} authorId - 作者ID
+ * @property {string} novelName - 小说名称
+ * @property {string} introduction - 小说简介
+ * @property {string} createTime - 创建时间
+ * @property {string|null} coverUrl - 封面URL
+ * @property {number} score - 评分
+ * @property {number} totalWordCount - 总字数
+ * @property {number} recommendCount - 推荐数
+ * @property {number} collectedCount - 收藏数
+ * @property {string} status - 状态（默认："待审核"）
+ */
+
+/**
+ * 获取所有小说
+ * @returns {Promise<Array<Novel>>} 返回小说数组
+ */
+export function getAllNovels() {
+    return request({
+        url: '/api/Novel',
+        method: 'get',
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+}
+
+/**
+ * 获取单个小说详情
+ * @param {number} novelId - 小说ID
+ * @returns {Promise<Novel>} 返回单个小说对象
+ */
+export function getNovel(novelId) {
+    return request({
+        url: `/api/Novel/${novelId}`,
+        method: 'get'
+    })
+}
+
+/**
+ * 创建小说
+ * @param {Object} novelData - 小说数据
+ * @param {string} novelData.novelName - 小说名称
+ * @param {number} novelData.authorId - 作者ID
+ * @param {string} [novelData.introduction] - 小说简介
+ * @param {string} [novelData.coverUrl] - 封面URL
+ * @param {number} [novelData.score=0] - 评分
+ * @param {number} [novelData.totalWordCount=0] - 总字数
+ * @param {number} [novelData.recommendCount=0] - 推荐数
+ * @param {number} [novelData.collectedCount=0] - 收藏数
+ * @param {string} [novelData.status="待审核"] - 状态
+ * @returns {Promise<Novel>}
+ */
+export function createNovel(novelData) {
+    return request({
+        url: '/api/Novel',
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        data: {
+            novelName: novelData.novelName,
+            authorId: novelData.authorId,
+            introduction: novelData.introduction || null,
+            coverUrl: novelData.coverUrl || null,
+            score: novelData.score || 0,
+            totalWordCount: novelData.totalWordCount || 0,
+            recommendCount: novelData.recommendCount || 0,
+            collectedCount: novelData.collectedCount || 0,
+            status: novelData.status || "待审核"
+        }
+    })
+}
+
+/**
+ * 更新小说
+ * @param {number} novelId - 小说ID
+ * @param {Object} updateData - 更新数据
+ * @param {string} [updateData.novelName] - 小说名称
+ * @param {number} [updateData.authorId] - 作者ID
+ * @param {string} [updateData.introduction] - 小说简介
+ * @param {string} [updateData.coverUrl] - 封面URL
+ * @param {number} [updateData.score] - 评分
+ * @param {number} [updateData.totalWordCount] - 总字数
+ * @param {number} [updateData.recommendCount] - 推荐数
+ * @param {number} [updateData.collectedCount] - 收藏数
+ * @param {string} [updateData.status] - 状态
+ * @returns {Promise<Novel>}
+ */
+export function updateNovel(novelId, updateData) {
+    return request({
+        url: `/api/Novel/${novelId}`,
+        method: 'put',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        data: updateData
+    })
+}
+
+/**
+ * 删除小说
+ * @param {number} novelId - 小说ID
+ * @returns {Promise<void>}
+ */
+export function deleteNovel(novelId) {
+    return request({
+        url: `/api/Novel/${novelId}`,
+        method: 'delete'
+    })
+}
+
+/**
+ * 审核小说
+ * @param {number} novelId - 小说ID
+ * @param {string} newStatus - 新状态（必须为"连载"或"完结"）
+ * @returns {Promise<{success: boolean, message: string}>}
+ */
+export function reviewNovel(novelId, newStatus) {
+    return request({
+        url: `/api/Novel/${novelId}/review`,
+        method: 'put',
+        params: {
+            newStatus: newStatus
+        }
+    })
+}

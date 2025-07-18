@@ -14,6 +14,7 @@ import Novel_Reader from '@/Novels/Novel_Reader.vue'
 import Author_api_test from '@/API_Test/Author_Test.vue'
 import Comment_api_test from '@/API_Test/Comment_Test.vue'
 import ResetForm from '@/Login_Register/ResetForm.vue'
+import Novel_api_test from '@/API_Test/Novel_Test.vue'
 
 
 const routes = [
@@ -31,6 +32,11 @@ const routes = [
         path: '/Author_api_test',
         name: 'Author_api_test',
         component: Author_api_test
+    },
+        {
+        path: '/Novel_api_test',
+        name: 'Novel_api_test',
+        component: Novel_api_test
     },
     {
         path: '/L_R',

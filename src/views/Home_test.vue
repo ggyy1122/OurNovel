@@ -5,8 +5,11 @@
     <div style="text-align:center; margin-top:100px;">
         <button @click="goToLogin1">Author的API测试</button>
     </div>
-        <div style="text-align:center; margin-top:100px;">
+    <div style="text-align:center; margin-top:100px;">
         <button @click="goToLogin2">Comment的API测试</button>
+    </div>
+    <div style="text-align:center; margin-top:100px;">
+        <button @click="goToLogin3">Novel的API测试</button>
     </div>
 </template>
 
@@ -22,5 +25,8 @@ function goToLogin1() {
 }
 function goToLogin2() {
     router.push('/Comment_api_test')
+}
+function goToLogin3() {
+    router.push('/Novel_api_test')
 }
 </script>
