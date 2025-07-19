@@ -89,7 +89,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { current_state } from '@/store/index';
+import { current_state } from '@/stores/index';
 import { resetAuthorPassword, resetManagerPassword, resetReaderPassword } from '@/API/Log_API';
 
 const state = current_state();

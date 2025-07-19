@@ -64,11 +64,13 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { current_state } from '@/store/index';
+import { current_state, readerState } from '@/stores/index';
 import { loginAuthor, loginManager, loginReader } from '@/API/Log_API';
+import { getReader } from '@/API/Reader_API';
 
 
 const state = current_state();
+const reader_state = readerState();
 
 const username = ref("");
 const password = ref("");
@@ -101,6 +103,22 @@ const handleLogin = async () => {
                 });
                 saveToken(response.token, response.readerName, response.readerId);
                 state.setUserInfo(response.readerName, response.readerId); // 存入 Pinia
+                const readerDetails = await getReader(response.readerId);
+                reader_state.initializeReader(readerDetails.readerId,
+                    readerDetails.readerName,
+                    readerDetails.avatarUrl
+                );
+                // reader_state.initializeReader(readerDetails.readerId,
+                //     readerDetails.readerName,
+                //     readerDetails.password,
+                //     readerDetails.phone,
+                //     readerDetails.gender,
+                //     readerDetails.balance,
+                //     readerDetails.avatarUrl,
+                //     readerDetails.backgroundUrl,
+                //     readerDetails.isCollectVisible,
+                //     readerDetails.isRecommendVisible
+                // );
                 router.push('/Novels/Novel_Layout/home');
             } else if (state.value === 1) { // 作者
                 response = await loginAuthor({
@@ -109,7 +127,7 @@ const handleLogin = async () => {
                 });
                 saveToken(response.token, response.authorName, response.authorId);
                 state.setUserInfo(response.authorName, response.authorId); // 存入 Pinia
-                router.push('/Novels/Novel_Layout/home');
+                router.push('/author/novels');
             } else if (state.value === 2) { // 管理员
                 response = await loginManager({
                     managerName: username.value,

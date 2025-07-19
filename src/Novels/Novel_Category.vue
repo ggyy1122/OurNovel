@@ -1,127 +1,208 @@
 <template>
-  <div class="category-filter">
-    <div class="filter-row" v-for="(group, groupKey) in filterGroups" :key="groupKey">
-      <span class="filter-label">{{ group.label }}:</span>
-      <button v-for="item in group.options" :key="item.value"
-        :class="['filter-btn', selected[groupKey] === item.value && 'active']"
-        @click="selectFilter(groupKey, item.value)">
-        {{ item.text }}
-      </button>
+  <div class="novel-category-container">
+    <div class="category-filter">
+      <div class="filter-row">
+        <span class="filter-label">作品分类:</span>
+        <button v-for="category in categoriesWithAll" :key="category.id"
+          :class="['filter-btn', selected.category === category.categoryName ? 'active' : '']"
+          @click="selectFilter('category', category.categoryName)">
+          {{ category.categoryName }}
+        </button>
+      </div>
+
+      <div class="filter-row">
+        <span class="filter-label">作品字数:</span>
+        <button v-for="option in wordCountOptions" :key="option.value"
+          :class="['filter-btn', selected.wordCount === option.value ? 'active' : '']"
+          @click="selectFilter('wordCount', option.value)">
+          {{ option.text }}
+        </button>
+      </div>
+
+      <div class="filter-row">
+        <span class="filter-label">是否完结:</span>
+        <button v-for="option in statusOptions" :key="option.value"
+          :class="['filter-btn', selected.isFinished === option.value ? 'active' : '']"
+          @click="selectFilter('isFinished', option.value)">
+          {{ option.text }}
+        </button>
+      </div>
+    </div>
+
+    <div class="novel-list">
+      <div v-if="loading" class="loading">加载中...</div>
+      <div v-else-if="!filteredNovels || filteredNovels.length === 0" class="no-data">暂无数据</div>
+      <template v-else>
+        <Novel_Card v-for="(novel, index) in filteredNovels" :key="novel.novelId" :novel="novel" :rank="index + 1" />
+      </template>
     </div>
   </div>
-  <!-- 下面是作品列表等内容，可根据需要扩展 -->
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
+import { getAllCategories } from '@/API/Category_API'
+import { getNovelsByCategory } from '@/API/NovelCategory_API'
+import { getAllNovels } from '@/API/Novel_API'
+import Novel_Card from '@/Novels/Novel_Card.vue'
 
-// 筛选项数据
-const filterGroups = {
-  channel: {
-    label: '频道',
-    options: [
-      { text: '全部', value: '' },
-      { text: '女生原创', value: 'female' },
-      { text: '男生原创', value: 'male' },
-      { text: '出版图书', value: 'publish' }
-    ]
-  },
-  category: {
-    label: '作品分类',
-    options: [
-      { text: '全部', value: '' },
-      { text: '现代言情', value: 'modern' },
-      { text: '古代言情', value: 'ancient' },
-      { text: '幻想言情', value: 'fantasy' },
-      { text: '历史', value: 'history' },
-      { text: '军事', value: 'military' },
-      { text: '科幻', value: 'science' },
-      { text: '游戏', value: 'game' },
-      { text: '游戏竞技', value: 'competition' },
-      { text: '玄幻奇幻', value: 'magic' },
-      { text: '都市', value: 'city' },
-      { text: '奇闻异事', value: 'strange' },
-      { text: '武侠仙侠', value: 'wuxia' },
-      { text: '体育', value: 'sport' },
-      { text: 'N次元', value: 'n' },
-      { text: '文学艺术', value: 'art' },
-      { text: '人文社科', value: 'human' },
-      { text: '经管励志', value: 'manage' },
-      { text: '经典文学', value: 'classic' },
-      { text: '出版小说', value: 'pubnovel' },
-      { text: '少儿教育', value: 'child' },
-      { text: '衍生言情', value: 'derivative' },
-      { text: '现实题材', value: 'real' },
-      { text: '现实主义', value: 'realism' }
-    ]
-  },
-  wordCount: {
-    label: '作品字数',
-    options: [
-      { text: '全部', value: '' },
-      { text: '30万以下', value: 'lt300k' },
-      { text: '30万-50万', value: '300k-500k' },
-      { text: '50万-100万', value: '500k-1m' },
-      { text: '100万-200万', value: '1m-2m' },
-      { text: '200万以上', value: 'gt2m' }
-    ]
-  },
-  updateTime: {
-    label: '更新时间',
-    options: [
-      { text: '全部', value: '' },
-      { text: '3天内', value: '3d' },
-      { text: '7天内', value: '7d' },
-      { text: '30天内', value: '30d' }
-    ]
-  },
-  isFinished: {
-    label: '是否完结',
-    options: [
-      { text: '全部', value: '' },
-      { text: '已完结', value: 'finished' },
-      { text: '连载中', value: 'serial' }
-    ]
-  }
-}
+// 分类数据
+const categories = ref([])
+const novels = ref([])
+const loading = ref(false)
 
-// 保存当前选择的标签
+// 添加全部选项后的分类数据
+const categoriesWithAll = ref([
+  { id: 0, categoryName: '全部' },
+  ...categories.value
+])
+
+// 筛选选项
+const wordCountOptions = [
+  { text: '全部', value: '' },
+  { text: '1万以下', value: '10k' },
+  { text: '1万~2万', value: '20k' },
+  { text: '2万~3万', value: '30k' },
+  { text: '3万以上', value: 'gt30k' }
+]
+
+const statusOptions = [
+  { text: '全部', value: '' },
+  { text: '已完结', value: '完结' },
+  { text: '连载中', value: '连载' }
+]
+
+// 当前选中的筛选条件
 const selected = reactive({
-  channel: '',
-  category: '',
+  category: '全部', // 默认选中"全部"
   wordCount: '',
-  updateTime: '',
   isFinished: ''
 })
 
-// 选择标签
-function selectFilter(groupKey, value) {
-  selected[groupKey] = value
-  // 这里可以加与后端交互的逻辑
+// 获取分类数据
+async function fetchCategories() {
+  try {
+    const response = await getAllCategories()
+    categories.value = response
+    categoriesWithAll.value = [
+      { id: 0, categoryName: '全部' },
+      ...response
+    ]
+  } catch (error) {
+    console.error('获取分类失败:', error)
+  }
 }
+
+// 获取小说数据
+async function fetchNovels() {
+  try {
+    loading.value = true
+    const response = await getAllNovels()
+    novels.value = response
+  } catch (error) {
+    console.error('获取小说列表失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 根据分类筛选小说 
+async function filterByCategory() {
+  if (!selected.category || selected.category === '全部') {
+    return novels.value
+  }
+  try {
+    loading.value = true
+    const response = await getNovelsByCategory(selected.category)
+    return Array.isArray(response) ? response : []
+  } catch (error) {
+    console.error('获取分类小说失败:', error)
+    return []
+  } finally {
+    loading.value = false
+  }
+}
+
+// 综合筛选结果
+const filteredNovels = ref([])
+async function applyFilters() {
+  try {
+    loading.value = true
+    let result = await filterByCategory()
+    if (!result) {
+      filteredNovels.value = []
+      return
+    }
+    if (selected.wordCount) {
+      result = result.filter(novel => {
+        const wordCount = novel.totalWordCount || 0
+        switch (selected.wordCount) {
+          case '10k': return wordCount < 10000
+          case '20k': return wordCount >= 10000 && wordCount < 20000
+          case '30k': return wordCount >= 20000 && wordCount < 30000
+          case 'gt30k': return wordCount >= 30000
+          default: return true
+        }
+      })
+    }
+    if (selected.isFinished) {
+      result = result.filter(novel => novel.status === selected.isFinished)
+    }
+    filteredNovels.value = result || []
+  } catch (error) {
+    console.error('筛选小说失败:', error)
+    filteredNovels.value = []
+  } finally {
+    loading.value = false
+  }
+}
+
+// 选择筛选条件
+function selectFilter(type, value) {
+  if (type === 'category' && selected[type] === value) {
+    return
+  }
+  selected[type] = value
+  applyFilters()
+}
+
+// 初始化数据
+onMounted(async () => {
+  await fetchCategories()
+  await fetchNovels()
+  applyFilters()
+})
+
+// 监听novels变化
+watch(novels, applyFilters)
 </script>
 
 <style scoped>
+.novel-category-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
 .category-filter {
   background: #fafafa;
   border-radius: 16px;
-  padding: 32px 32px 16px 32px;
-  margin: 24px auto;
-  max-width: 1200px;
+  padding: 20px;
+  margin-bottom: 24px;
 }
 
 .filter-row {
   display: flex;
   align-items: center;
-  margin-bottom: 18px;
+  margin-bottom: 15px;
   flex-wrap: wrap;
 }
 
 .filter-label {
   font-weight: bold;
-  font-size: 18px;
-  margin-right: 18px;
-  min-width: 90px;
+  font-size: 16px;
+  margin-right: 15px;
+  min-width: 80px;
   color: #666;
 }
 
@@ -129,16 +210,13 @@ function selectFilter(groupKey, value) {
   background: none;
   border: none;
   color: #222;
-  font-size: 16px;
-  margin-right: 18px;
-  margin-bottom: 6px;
-  padding: 0 16px;
-  height: 32px;
-  border-radius: 16px;
+  font-size: 14px;
+  margin-right: 12px;
+  margin-bottom: 8px;
+  padding: 6px 14px;
+  border-radius: 14px;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-  font-weight: 500;
-  outline: none;
+  transition: all 0.2s;
 }
 
 .filter-btn.active {
@@ -148,8 +226,20 @@ function selectFilter(groupKey, value) {
 }
 
 .filter-btn:hover {
-  color: #ff4d4f;
-  border: 1.5px solid #ffd100;
   background: #fffbe6;
+}
+
+.novel-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.loading,
+.no-data {
+  text-align: center;
+  padding: 50px;
+  font-size: 16px;
+  color: #888;
 }
 </style>

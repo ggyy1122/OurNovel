@@ -1,25 +1,25 @@
 <template>
     <div class="novel-card">
         <div class="rank-badge">{{ rank }}</div>
-        <img :src="novel.cover" alt="cover" class="cover" />
+        <img :src="novel.coverUrl || 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/e165315c-da2b-42c9-b3cf-c0457d168634.jpg'" alt="cover" class="cover" />
         <div class="info">
             <div class="title-row">
-                <span class="title" @click="handleTitleClick">{{ novel.title }}</span>
-                <span v-if="novel.badge" class="badge">{{ novel.badge }}</span>
+                <span class="title" @click="handleTitleClick">{{ novel.novelName }}</span>
+                <span v-if="novel.status === '完结'" class="badge">完结</span>
+                <span v-else class="badge">连载</span>
             </div>
             <div class="meta">
-                <span>{{ novel.author }}</span> |
-                <span>{{ novel.category }}</span> |
-                <span>{{ novel.status }}</span> |
-                <span>{{ novel.wordCount }}</span>
+                <span>作者ID: {{ novel.authorId }}</span> |
+                <span>{{ novel.totalWordCount || 0 }}字</span> |
+                <span>{{ novel.status }}</span>
             </div>
-            <div class="desc">{{ novel.desc }}</div>
-            <div class="update">{{ novel.update }}</div>
+            <div class="desc">{{ novel.introduction || '暂无简介' }}</div>
+            <div class="update">创建时间: {{ formatDate(novel.createTime) }}</div>
         </div>
         <div class="side">
             <div class="hot">
-                <span class="hot-num">{{ novel.hot }}</span>
-                <span class="hot-label">热度</span>
+                <span class="hot-num">{{ novel.recommendCount || 0 }}</span>
+                <span class="hot-label">推荐</span>
             </div>
             <div class="actions">
                 <button class="add-shelf" @click="handleAddShelf">加入书架</button>
@@ -39,25 +39,28 @@ const props = defineProps({
 })
 const router = useRouter();
 
+const formatDate = (dateString) => {
+    if (!dateString) return '未知时间'
+    const date = new Date(dateString)
+    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
+}
+
 const handleRead = () => {
     router.push({
         path: '/Novels/Novel_Layout/reader',
         query: {
-            novel: JSON.stringify(props.novel) // 传递整个小说对象
+            novel: JSON.stringify(props.novel)
         }
     });
 };
-// 点击标题函数框架
+
 const handleTitleClick = () => {
-    // TODO: 实现标题点击逻辑
-    console.log('标题点击:', props.novel.id);
+    console.log('标题点击:', props.novel.novelId);
 };
 
-// 加入书架函数框架
 const handleAddShelf = (event) => {
     event.stopPropagation();
-    // TODO: 实现加入书架逻辑
-    console.log('加入书架:', props.novel.id);
+    console.log('加入书架:', props.novel.novelId);
 };
 </script>
 
@@ -117,6 +120,7 @@ const handleAddShelf = (event) => {
     font-size: 20px;
     font-weight: bold;
     color: #222;
+    cursor: pointer;
 }
 
 .title:hover {

@@ -37,7 +37,7 @@
 
 <script setup>
 import { useRouter } from "vue-router";
-import { current_state} from '@/store/index';
+import { current_state} from '@/stores/index';
 const state =current_state();
 const router = useRouter();
 function goHome() {
