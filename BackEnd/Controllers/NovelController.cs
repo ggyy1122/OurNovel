@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using OurNovel.Services;
 using OurNovel.Models;
+using OurNovel.Services.Interfaces;
+using OurNovel.Repositories;
 
 namespace OurNovel.Controllers
 {
@@ -12,11 +14,16 @@ namespace OurNovel.Controllers
     public class NovelController : BaseController<Novel, int>
     {
         private readonly NovelService _novelService;
+        private readonly IImageResourceService _imageResourceService;
+        private readonly IRepository<Novel, int> _novelRepository;
 
-        // 注入 NovelService，而不是 BaseService
-        public NovelController(NovelService novelService) : base(novelService)
+        // 注入服务
+        public NovelController(NovelService novelService, IImageResourceService imageResourceService,
+            IRepository<Novel, int> novelRepository) : base(novelService)
         {
             _novelService = novelService;
+            _imageResourceService = imageResourceService;
+            _novelRepository = novelRepository;
         }
 
         // 如果 Novel 有特殊的业务接口，可以在这里扩展
@@ -43,17 +50,18 @@ namespace OurNovel.Controllers
         /// <param name="novelId">小说ID</param>
         /// <param name="coverFile">封面文件</param>
         /// <returns>封面URL</returns>
-        /// 
-
-        /*
-        [HttpPost("UploadCover")]
+        [HttpPost("UploadAvatar")]
         [Consumes("multipart/form-data")]
         [ApiExplorerSettings(IgnoreApi = true)]
-        public async Task<IActionResult> UploadCover([FromForm] int novelId, [FromForm] IFormFile coverFile)
+        public async Task<IActionResult> UploadAvatar([FromForm] int novelId, [FromForm] IFormFile coverFile)
         {
             try
             {
-                var coverUrl = await _novelService.UploadCoverAsync(novelId, coverFile);
+                var coverUrl = await _imageResourceService.UploadImageAsync<Novel, int>(
+                  novelId,
+                  coverFile,
+                  "CoverUrl",
+                  _novelRepository);
                 return Ok(new { success = true, coverUrl });
             }
             catch (System.Exception ex)
@@ -61,6 +69,8 @@ namespace OurNovel.Controllers
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
-        */
+
+
+
     }
 }
