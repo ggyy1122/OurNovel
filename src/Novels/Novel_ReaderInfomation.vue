@@ -34,7 +34,7 @@ import { readerState } from '@/stores/index'
 import { useRouter } from 'vue-router'
 
 // 获取 store 实例
-const store = readerState()
+const store = readerState()  //
 const router = useRouter()
 function goback() {
     router.push('/Novels/Novel_Layout/home')

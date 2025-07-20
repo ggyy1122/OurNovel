@@ -8,6 +8,7 @@ export const current_state = defineStore('state', {
         id: 0,   //ID
         isloggedin: false,  //是否已经登录
     }),
+    persist: true,  //持久化存储
     getters: {
         Role: (state) => (num) => state.roles[(state.value + num) % 3]
     },
@@ -50,8 +51,10 @@ export const readerState = defineStore('reader', {
         isloggedin: false,    // 是否已登录，貌似没用
         readHistory: [],      // 阅读历史，比如写主页时放历史阅读记录书籍的id(或整个对象)，随你
         favoriteBooks: [],    // 收藏书籍
+        recommendBooks: [],    // 推荐书籍
         //你还想记录什么属性可以加
     }),
+    persist: true,  //持久化存储
     getters: {
         formattedAvatarUrl: (state) => {
             const prefix = 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/';  //前缀
@@ -70,7 +73,7 @@ export const readerState = defineStore('reader', {
         favoriteCount: (state) => state.favoriteBooks.length
     },
     actions: {
-        initializeReader(id, name, password, phone, gender, balance, avatarUrl, backgroundUrl, isCollectVisible, isRecommendVisible) {
+        initializeReader(id, name, password, phone, gender, balance, avatarUrl, backgroundUrl, isCollectVisible, isRecommendVisible,favoriteBooks, recommendBooks) {
             this.readerId = id || 0;
             this.readerName = name || "";
             this.password = password || "";
@@ -81,6 +84,10 @@ export const readerState = defineStore('reader', {
             this.backgroundUrl = backgroundUrl || "";
             this.isCollectVisible = isCollectVisible || null;
             this.isRecommendVisible = isRecommendVisible || null;
+            
+            this.favoriteBooks = favoriteBooks || []; // 初始化收藏书籍
+            this.recommendBooks = recommendBooks || []; // 初始化推荐书籍
+            this.readHistory = []; // 初始化阅读历史
             this.isloggedin = true;
             this.lastLoginTime = new Date().toISOString(); // 设置最近登录时间
         },
@@ -101,6 +108,7 @@ export const readerState = defineStore('reader', {
             this.isloggedin = false;
             this.readHistory = [];
             this.favoriteBooks = [];
+            this.recommendBooks = [];
         }
     }
 })
@@ -109,11 +117,11 @@ export const readerState = defineStore('reader', {
 export const SelectNovel_State = defineStore('select_novel', {
     state: () => ({
         novelId: 0,
-        authorId: 0,
+        authorId: 0,    // 作者ID
         novelName: "",
         introduction: "",
         createTime: "",
-        coverUrl: "",
+        coverUrl: "",    //封面不用这个，用下面的formattedcoverUrl,加了前缀
         score: 0,
         totalWordCount: 0,
         recommendCount: 0,
@@ -121,9 +129,30 @@ export const SelectNovel_State = defineStore('select_novel', {
         status: "",
         selectedChapter: null, // 当前选中的章节
         selectedComment: null, // 当前选中的评论
+
+        authorName: "",      // 作者名称
+        authorPhone: "",     // 作者电话
+        authorAvatarUrl: "", // 作者头像URL,头像不用这个，用下面的formattedauthorAvatarUrl,加了前缀
     }),
+    persist: true,  //持久化存储
+    getters: {
+        formattedcoverUrl: (state) => {
+            const prefix = 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/';  //前缀
+            if (state.coverUrl) {
+                return prefix + state.coverUrl;
+            }
+            return prefix + 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg';  // 默认头像
+        },
+        formattedauthorAvatarUrl: (state) => {
+            const prefix = 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/';  //前缀
+            if (state.authorAvatarUrl) {
+                return prefix + state.authorAvatarUrl;
+            }
+            return prefix + 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg';  // 默认头像
+        }
+    },
     actions: {
-        resetNovel(id, authorId, name, introduction, createTime, coverUrl, score, totalWordCount, recommendCount, collectedCount, status) {
+        resetNovel(id, authorId, name, introduction, createTime, coverUrl, score, totalWordCount, recommendCount, collectedCount, status, authorName, authorPhone, authorAvatarUrl) {
             this.novelId = id || 0;
             this.authorId = authorId || 0;
             this.novelName = name || "";
@@ -135,6 +164,9 @@ export const SelectNovel_State = defineStore('select_novel', {
             this.recommendCount = recommendCount || 0;
             this.collectedCount = collectedCount || 0;
             this.status = status || "";
+            this.authorName = authorName || "";
+            this.authorPhone = authorPhone || "";
+            this.authorAvatarUrl = authorAvatarUrl || "";
             this.selectedChapter = null;
             this.selectedComment = null;
         }
