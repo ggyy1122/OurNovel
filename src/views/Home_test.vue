@@ -29,6 +29,9 @@
     <div style="text-align:center; margin-top:100px;">
         <button @click="goToLogin9">Reader的API测试</button>
     </div>
+    <div style="text-align:center; margin-top:100px;">
+        <button @click="goToLogin10">Recommend的API测试</button>
+    </div>
 </template>
 
 <script setup>
@@ -64,5 +67,8 @@ function goToLogin8() {
 }
 function goToLogin9() {
     router.push('/Reader_api_test')
+}
+function goToLogin10() {
+    router.push('/Recommend_api_test')
 }
 </script>

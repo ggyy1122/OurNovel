@@ -26,6 +26,7 @@ import Novel_Info from '@/Novels/Novel_Info.vue'
 import Novel_Info_home from '@/Novels/Novel_Info_home.vue'
 import Novel_Info_Comment from '@/Novels/Novel_Info_Comment.vue'
 import Novel_Info_Chapter from '@/Novels/Novel_Info_Chapter.vue'
+import Recommend_api_test from '@/API_Test/Recommend_Test.vue'
 //作者
 import AuthorLayout from '@/Author/AuthorLayout.vue'
 import NovelList from '@/Author/NovelList.vue'
@@ -88,6 +89,11 @@ const routes = [
         name: 'Reader_api_test',
         component: Reader_api_test
 
+    },
+    {
+        path: '/Recommend_api_test',
+        name: 'Recommend_api_test',
+        component: Recommend_api_test
     },
     {
         path: '/L_R',

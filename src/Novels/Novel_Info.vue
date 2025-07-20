@@ -12,6 +12,18 @@
             <span class="property-key">Name</span>:
             <span class="property-value">{{ selectNovelState.novelName }}</span>
         </div>
+        <div class="property-item">
+            <span class="property-key">authorname</span>:
+            <span class="property-value">{{ selectNovelState.authorName }}</span>
+        </div>
+        <div class="property-item">
+            <span class="property-key">authorid</span>:
+            <span class="property-value">{{ selectNovelState.authorId }}</span>
+        </div>
+        <div class="property-item">
+            <span class="property-key">author的头像</span>:
+            <span class="property-value">{{ selectNovelState.authorAvatarUrl }}</span>
+        </div>
     </div>
     <div class="novel-container">
         <nav class="nav-menu" ref="mainNav">
@@ -42,7 +54,7 @@
 </template>
 
 <script setup>
-import { useRouter} from 'vue-router';
+import { useRouter } from 'vue-router';
 import { SelectNovel_State } from '@/stores/index';
 const selectNovelState = SelectNovel_State();      //小说对象
 const router = useRouter();

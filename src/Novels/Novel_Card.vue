@@ -35,6 +35,7 @@
 import { defineProps } from 'vue';
 import { useRouter } from 'vue-router';
 import { SelectNovel_State } from '@/stores/index';
+import { getAuthor } from '@/API/Author_API'
 const selectNovelState = SelectNovel_State();
 
 const props = defineProps({
@@ -57,10 +58,13 @@ const handleRead = () => {
     //     }
     // });
 };
-const handle_NovelInfro = () => {
-    selectNovelState.resetNovel(props.novel.novelId,props.novel.authorId, props.novel.novelName,  props.novel.introduction, props.novel.createTime,props.novel.coverUrl,props.novel.score,props.novel.totalWordCount, props.novel.recommendCount,props.novel.collectCount, props.novel.status);
+async function handle_NovelInfro() {
+    const response = await getAuthor(props.novel.authorId);
+    console.log('作者信息:', response);
+    selectNovelState.resetNovel(props.novel.novelId, props.novel.authorId, props.novel.novelName, props.novel.introduction, props.novel.createTime, props.novel.coverUrl, props.novel.score, props.novel.totalWordCount, props.novel.recommendCount, props.novel.collectCount, props.novel.status,
+        response.authorName, response.phone, response.avatarUrl);
     router.push('/Novels/Novel_Info/home');
-};
+}
 
 const handleTitleClick = () => {
     console.log('标题点击:', props.novel.novelId);

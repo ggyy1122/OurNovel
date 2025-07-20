@@ -67,6 +67,8 @@ import { useRouter } from "vue-router";
 import { current_state, readerState } from '@/stores/index';
 import { loginAuthor, loginManager, loginReader } from '@/API/Log_API';
 import { getReader } from '@/API/Reader_API';
+import { getCollectsByReader } from '@/API/Collect_API';
+import { getRecommendsByReader } from '@/API/Recommend_API';
 
 
 const state = current_state();
@@ -104,6 +106,9 @@ const handleLogin = async () => {
                 saveToken(response.token, response.readerName, response.readerId);
                 state.setUserInfo(response.readerName, response.readerId); // 存入 Pinia
                 const readerDetails = await getReader(response.readerId);
+                const response_collect = await getCollectsByReader(response.readerId);
+                const response_recommend = await getRecommendsByReader(response.readerId)
+
                 reader_state.initializeReader(readerDetails.readerId,
                     readerDetails.readerName,
                     readerDetails.password,
@@ -113,7 +118,9 @@ const handleLogin = async () => {
                     readerDetails.avatarUrl,
                     readerDetails.backgroundUrl,
                     readerDetails.isCollectVisible,
-                    readerDetails.isRecommendVisible
+                    readerDetails.isRecommendVisible,
+                    response_collect,
+                    response_recommend
                 );
                 router.push('/Novels/Novel_Layout/home');
             } else if (state.value === 1) { // 作者
