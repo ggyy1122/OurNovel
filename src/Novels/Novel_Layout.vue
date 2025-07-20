@@ -24,14 +24,14 @@
                 </button>
                 <!-- 已登录状态 -->
                 <div v-else class="user-dropdown" @mouseenter="showDropdown = true" @mouseleave="showDropdown = false">
-                    <img src="@/assets/logo.png" alt="用户头像" class="user-avatar">
+                    <img :src="reader_state.formattedAvatarUrl" alt="用户头像" class="user-avatar" />
                     <div v-if="showDropdown" class="dropdown-menu">
                         <div class="user-info">
-                            <p>用户名：{{ state.name }}</p>
+                            <p>用户名：{{ reader_state.readerName }}</p>
                             <p>Lv1</p>
                         </div>
                         <div class="dropdown-divider"></div>
-                        <a href="#" @click.prevent="goToBookshelf" class="dropdown-item">
+                        <a href="#" @click.prevent="goToInf" class="dropdown-item">
                             <i class="fa fa-book mr-2"></i> 我的书架
                         </a>
                         <a href="#" @click.prevent="logout" class="dropdown-item">
@@ -62,7 +62,7 @@
             <div class="sticky-header-content">
                 <div class="logo">
                     <img src="@/assets/logo.png" alt="七猫中文网" />
-                    <h1>七猫中文网</h1>
+                    <h1>TJ中文网</h1>
                 </div>
                 <ul>
                     <li>
@@ -93,14 +93,14 @@
                     <!-- 已登录状态显示用户头像和下拉菜单 -->
                     <div v-else class="user-dropdown" @mouseenter="showDropdown = true"
                         @mouseleave="showDropdown = false">
-                        <img src="@/assets/logo.png" alt="用户头像" class="user-avatar">
+                        <img :src="reader_state.formattedAvatarUrl" alt="用户头像" class="user-avatar" />
                         <div v-if="showDropdown" class="dropdown-menu">
                             <div class="user-info">
-                                <p>用户名：{{ state.name }}</p>
+                                <p>用户名：{{ reader_state.readerName }}</p>
                                 <p>Lv1</p>
                             </div>
                             <div class="dropdown-divider"></div>
-                            <a href="#" @click.prevent="goToBookshelf" class="dropdown-item">
+                            <a href="#" @click.prevent="goToInf" class="dropdown-item">
                                 <i class="fa fa-book mr-2"></i> 我的书架
                             </a>
                             <a href="#" @click.prevent="logout" class="dropdown-item">
@@ -130,8 +130,9 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { current_state } from '@/store/index'
+import { current_state,readerState } from '@/stores/index'
 const state = current_state()
+const reader_state = readerState()
 
 const router = useRouter()
 const route = useRoute()
@@ -140,7 +141,6 @@ const showStickyNav = ref(false)
 const showDropdown = ref(false)
 const mainHeader = ref(null)
 const mainNav = ref(null)
-// const userAvatar = ref('@/assets/logo.png') // 默认头像路径
 
 
 const showNavMenu = computed(() => {
@@ -150,8 +150,8 @@ function goToLogin() {
     router.push('/L_R/login');
 }
 
-function goToBookshelf() {
-    // router.push('/Novels/Bookshelf');
+function goToInf() {
+    router.push('/Novels/ReaderInfomation');
 }
 function logout() {
     state.clearUserInfo();

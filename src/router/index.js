@@ -15,6 +15,26 @@ import Author_api_test from '@/API_Test/Author_Test.vue'
 import Comment_api_test from '@/API_Test/Comment_Test.vue'
 import ResetForm from '@/Login_Register/ResetForm.vue'
 import Novel_api_test from '@/API_Test/Novel_Test.vue'
+import Collect_api_test from '@/API_Test/Collect_Test.vue'
+import Rate_api_test from '@/API_Test/Rate_Test.vue'
+import Category_api_test from '@/API_Test/Category_Test.vue'
+import NovelCategory_api_test from '@/API_Test/NovelCategory_Test.vue'
+import Chapter_api_test from '@/API_Test/Chapter_Test.vue'
+import Reader_api_test from '@/API_Test/Reader_Test.vue'
+import Reader_imfromation from '@/Novels/Novel_ReaderInfomation.vue'
+import Novel_Info from '@/Novels/Novel_Info.vue'
+import Novel_Info_home from '@/Novels/Novel_Info_home.vue'
+import Novel_Info_Comment from '@/Novels/Novel_Info_Comment.vue'
+import Novel_Info_Chapter from '@/Novels/Novel_Info_Chapter.vue'
+//作者
+import AuthorLayout from '@/Author/AuthorLayout.vue'
+import NovelList from '@/Author/NovelList.vue'
+import CreateNovel from '@/Author/CreateNovel.vue'
+import NovelDetail from '@/Author/NovelDetail.vue'
+import NovelEdit from '@/Author/NovelEdit.vue'
+import ChapterList from '@/Author/ChapterList.vue'
+import AuthorStats from '@/Author/AuthorStats.vue'
+import AuthorSettings from '@/Author/AuthorSettings.vue'
 
 
 const routes = [
@@ -23,7 +43,7 @@ const routes = [
         name: 'Home',
         component: Home
     },
-        {
+    {
         path: '/Comment_api_test',
         name: 'Comment_api_test',
         component: Comment_api_test
@@ -33,10 +53,41 @@ const routes = [
         name: 'Author_api_test',
         component: Author_api_test
     },
-        {
+    {
         path: '/Novel_api_test',
         name: 'Novel_api_test',
         component: Novel_api_test
+    },
+    {
+        path: '/Collect_api_test',
+        name: 'Collect_api_test',
+        component: Collect_api_test
+    },
+    {
+        path: '/Rate_api_test',
+        name: 'Rate_api_test',
+        component: Rate_api_test
+    },
+    {
+        path: '/Category_api_test',
+        name: 'Category_api_test',
+        component: Category_api_test
+    },
+    {
+        path: '/NovelCategory_api_test',
+        name: 'NovelCategory_api_test',
+        component: NovelCategory_api_test
+    },
+    {
+        path: '/Chapter_api_test',
+        name: 'Chapter_api_test',
+        component: Chapter_api_test
+    },
+    {
+        path: '/Reader_api_test',
+        name: 'Reader_api_test',
+        component: Reader_api_test
+
     },
     {
         path: '/L_R',
@@ -104,6 +155,87 @@ const routes = [
                 props: (route) => ({
                     novel: route.query.novel ? JSON.parse(decodeURIComponent(route.query.novel)) : null
                 })
+            }
+        ]
+    },
+    {
+        path: '/Novels/ReaderInfomation',
+        name: 'ReaderInfomation',
+        component: Reader_imfromation,
+    },
+    {
+        path: '/Novels/Novel_Info',
+        component: Novel_Info,
+        meta: { requiresAuth: true },
+        children: [
+            {
+                path: 'home',
+                name: 'Novel_Info_home',
+                component: Novel_Info_home
+            },
+            {
+                path: 'chapter',
+                name: 'Novel_Info_chapter',
+                component: Novel_Info_Chapter
+            },
+            {
+                path: 'comment',
+                name: 'Novel_Info_comment',
+                component: Novel_Info_Comment
+            }
+        ]
+    },
+    // 作者路由组
+    {
+        path: '/author',
+        component: AuthorLayout,
+        redirect: '/author/novels',
+        meta: { requiresAuth: true },
+        children: [
+            {
+                path: 'novels',
+                name: 'AuthorNovelList',
+                component: NovelList,
+                meta: { title: '我的小说' }
+            },
+            {
+                path: 'novels/create',
+                name: 'CreateNovel',
+                component: CreateNovel,
+                meta: { title: '创建新小说' }
+            },
+            {
+                path: 'novels/:id',
+                name: 'NovelDetail',
+                component: NovelDetail,
+                props: true,
+                meta: { title: '小说详情' }
+            },
+            {
+                path: 'novels/:id/edit',
+                name: 'NovelEdit',
+                component: NovelEdit,
+                props: true,
+                meta: { title: '修改小说' }
+            },
+            {
+                path: 'novels/:id/chapters',
+                name: 'ChapterList',
+                component: ChapterList,
+                props: true,
+                meta: { title: '章节列表' }
+            },
+            {
+                path: 'stats',
+                name: 'AuthorStats',
+                component: AuthorStats,
+                meta: { title: '数据统计' }
+            },
+            {
+                path: 'settings',
+                name: 'AuthorSettings',
+                component: AuthorSettings,
+                meta: { title: '账号设置' }
             }
         ]
     }
