@@ -21,12 +21,12 @@ namespace OurNovel.Services
         }
 
         /// <summary>
-        /// 审核小说，修改状态为“连载”或“完结”
+        /// 审核小说，修改状态为“连载”或“封禁”
         /// </summary>
         public async Task<bool> ReviewNovelAsync(int novelId, string newStatus,int managerId)
         {
             // 合法性检查（业务约束）
-            if (newStatus != "连载" && newStatus != "完结")
+            if (newStatus != "连载" && newStatus != "封禁")
                 return false;
 
             var novel = await _repository.GetByIdAsync(novelId);

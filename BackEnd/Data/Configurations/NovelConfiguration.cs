@@ -36,6 +36,9 @@ namespace OurNovel.Data.Configurations
             entity.Property(e => e.Status)
                   .HasColumnName("STATUS")
                   .HasDefaultValue("待审核");
+            entity.Property(e => e.OriginalNovelId)
+                  .HasColumnName("ORIGINAL_NOVEL_ID")
+                  .HasDefaultValue(-1);
         }
     }
 }

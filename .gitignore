@@ -154,3 +154,6 @@ Thumbs.db
 
 # Optional: Database generated backup files
 *.bak
+
+# Node.js dependencies
+node_modules/
