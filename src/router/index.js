@@ -21,6 +21,11 @@ import Category_api_test from '@/API_Test/Category_Test.vue'
 import NovelCategory_api_test from '@/API_Test/NovelCategory_Test.vue'
 import Chapter_api_test from '@/API_Test/Chapter_Test.vue'
 import Reader_api_test from '@/API_Test/Reader_Test.vue'
+import Reader_imfromation from '@/Novels/Novel_ReaderInfomation.vue'
+import Novel_Info from '@/Novels/Novel_Info.vue'
+import Novel_Info_home from '@/Novels/Novel_Info_home.vue'
+import Novel_Info_Comment from '@/Novels/Novel_Info_Comment.vue'
+import Novel_Info_Chapter from '@/Novels/Novel_Info_Chapter.vue'
 //作者
 import AuthorLayout from '@/Author/AuthorLayout.vue'
 import NovelList from '@/Author/NovelList.vue'
@@ -150,6 +155,33 @@ const routes = [
                 props: (route) => ({
                     novel: route.query.novel ? JSON.parse(decodeURIComponent(route.query.novel)) : null
                 })
+            }
+        ]
+    },
+    {
+        path: '/Novels/ReaderInfomation',
+        name: 'ReaderInfomation',
+        component: Reader_imfromation,
+    },
+    {
+        path: '/Novels/Novel_Info',
+        component: Novel_Info,
+        meta: { requiresAuth: true },
+        children: [
+            {
+                path: 'home',
+                name: 'Novel_Info_home',
+                component: Novel_Info_home
+            },
+            {
+                path: 'chapter',
+                name: 'Novel_Info_chapter',
+                component: Novel_Info_Chapter
+            },
+            {
+                path: 'comment',
+                name: 'Novel_Info_comment',
+                component: Novel_Info_Comment
             }
         ]
     },

@@ -31,7 +31,7 @@
                             <p>Lv1</p>
                         </div>
                         <div class="dropdown-divider"></div>
-                        <a href="#" @click.prevent="goToBookshelf" class="dropdown-item">
+                        <a href="#" @click.prevent="goToInf" class="dropdown-item">
                             <i class="fa fa-book mr-2"></i> 我的书架
                         </a>
                         <a href="#" @click.prevent="logout" class="dropdown-item">
@@ -100,7 +100,7 @@
                                 <p>Lv1</p>
                             </div>
                             <div class="dropdown-divider"></div>
-                            <a href="#" @click.prevent="goToBookshelf" class="dropdown-item">
+                            <a href="#" @click.prevent="goToInf" class="dropdown-item">
                                 <i class="fa fa-book mr-2"></i> 我的书架
                             </a>
                             <a href="#" @click.prevent="logout" class="dropdown-item">
@@ -150,8 +150,8 @@ function goToLogin() {
     router.push('/L_R/login');
 }
 
-function goToBookshelf() {
-    // router.push('/Novels/Bookshelf');
+function goToInf() {
+    router.push('/Novels/ReaderInfomation');
 }
 function logout() {
     state.clearUserInfo();

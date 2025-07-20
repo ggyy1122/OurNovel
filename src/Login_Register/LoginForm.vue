@@ -106,19 +106,15 @@ const handleLogin = async () => {
                 const readerDetails = await getReader(response.readerId);
                 reader_state.initializeReader(readerDetails.readerId,
                     readerDetails.readerName,
-                    readerDetails.avatarUrl
+                    readerDetails.password,
+                    readerDetails.phone,
+                    readerDetails.gender,
+                    readerDetails.balance,
+                    readerDetails.avatarUrl,
+                    readerDetails.backgroundUrl,
+                    readerDetails.isCollectVisible,
+                    readerDetails.isRecommendVisible
                 );
-                // reader_state.initializeReader(readerDetails.readerId,
-                //     readerDetails.readerName,
-                //     readerDetails.password,
-                //     readerDetails.phone,
-                //     readerDetails.gender,
-                //     readerDetails.balance,
-                //     readerDetails.avatarUrl,
-                //     readerDetails.backgroundUrl,
-                //     readerDetails.isCollectVisible,
-                //     readerDetails.isRecommendVisible
-                // );
                 router.push('/Novels/Novel_Layout/home');
             } else if (state.value === 1) { // 作者
                 response = await loginAuthor({

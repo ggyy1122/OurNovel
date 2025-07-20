@@ -37,12 +37,12 @@ export const readerState = defineStore('reader', {
         //读者10个属性
         readerId: 0,
         readerName: "",
-        password: "",
-        phone: null,
-        gender: null,
+        // password: "",
+        phone: "",
+        gender: "",
         balance: 0,
         avatarUrl: "",      //头像不用这个，用下面的formattedAvatarUrl,加了前缀
-        backgroundUrl: null,
+        backgroundUrl: "",
         isCollectVisible: null,
         isRecommendVisible: null,
         //扩展属性
@@ -70,39 +70,31 @@ export const readerState = defineStore('reader', {
         favoriteCount: (state) => state.favoriteBooks.length
     },
     actions: {
-        // 登录时初始化读者信息
-        initializeReader(id, name, avatarUrl) {
+        initializeReader(id, name, password, phone, gender, balance, avatarUrl, backgroundUrl, isCollectVisible, isRecommendVisible) {
             this.readerId = id || 0;
             this.readerName = name || "";
+            this.password = password || "";
+            this.phone = phone || "110";
+            this.gender = gender || "男";
+            this.balance = balance || 0;
             this.avatarUrl = avatarUrl || "";
+            this.backgroundUrl = backgroundUrl || "";
+            this.isCollectVisible = isCollectVisible || null;
+            this.isRecommendVisible = isRecommendVisible || null;
             this.isloggedin = true;
             this.lastLoginTime = new Date().toISOString(); // 设置最近登录时间
         },
-        // initializeReader(id, name, password, phone, gender, balance, avatarUrl, backgroundUrl, isCollectVisible, isRecommendVisible) {
-        //     this.readerId = id || 0;
-        //     this.readerName = name || "";
-        //     this.password = password || "";
-        //     this.phone = phone || null
-        //     this.gender = gender || null;
-        //     this.balance = balance || 0;
-        //     this.avatarUrl = avatarUrl || "";
-        //     this.backgroundUrl = backgroundUrl || null;
-        //     this.isCollectVisible = isCollectVisible || null;
-        //     this.isRecommendVisible = isRecommendVisible || null;
-        //     this.isloggedin = true;
-        //     this.lastLoginTime = new Date().toISOString(); // 设置最近登录时间
-        // },
 
         // 登出时重置读者信息
         resetReaderInfo() {
             this.readerId = 0;
             this.readerName = "";
-            this.password = "";
-            this.phone = null;
-            this.gender = null;
+            // this.password = "";
+            this.phone = "";
+            this.gender = "";
             this.balance = 0;
             this.avatarUrl = "";
-            this.backgroundUrl = null;
+            this.backgroundUrl = "";
             this.isCollectVisible = null;
             this.isRecommendVisible = null;
             this.lastLoginTime = null;
@@ -112,3 +104,39 @@ export const readerState = defineStore('reader', {
         }
     }
 })
+
+
+export const SelectNovel_State = defineStore('select_novel', {
+    state: () => ({
+        novelId: 0,
+        authorId: 0,
+        novelName: "",
+        introduction: "",
+        createTime: "",
+        coverUrl: "",
+        score: 0,
+        totalWordCount: 0,
+        recommendCount: 0,
+        collectedCount: 0,
+        status: "",
+        selectedChapter: null, // 当前选中的章节
+        selectedComment: null, // 当前选中的评论
+    }),
+    actions: {
+        resetNovel(id, authorId, name, introduction, createTime, coverUrl, score, totalWordCount, recommendCount, collectedCount, status) {
+            this.novelId = id || 0;
+            this.authorId = authorId || 0;
+            this.novelName = name || "";
+            this.introduction = introduction || "";
+            this.createTime = createTime || "";
+            this.coverUrl = coverUrl || "";
+            this.score = score || 0;
+            this.totalWordCount = totalWordCount || 0;
+            this.recommendCount = recommendCount || 0;
+            this.collectedCount = collectedCount || 0;
+            this.status = status || "";
+            this.selectedChapter = null;
+            this.selectedComment = null;
+        }
+    }
+});

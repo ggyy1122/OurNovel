@@ -1,7 +1,8 @@
 <template>
     <div class="novel-card">
         <div class="rank-badge">{{ rank }}</div>
-        <img :src="novel.coverUrl || 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/e165315c-da2b-42c9-b3cf-c0457d168634.jpg'" alt="cover" class="cover" />
+        <img :src="novel.coverUrl || 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/e165315c-da2b-42c9-b3cf-c0457d168634.jpg'"
+            alt="cover" class="cover" />
         <div class="info">
             <div class="title-row">
                 <span class="title" @click="handleTitleClick">{{ novel.novelName }}</span>
@@ -24,6 +25,7 @@
             <div class="actions">
                 <button class="add-shelf" @click="handleAddShelf">加入书架</button>
                 <button class="read" @click="handleRead">立即阅读</button>
+                <button class="read" @click="handle_NovelInfro">作品主页</button>
             </div>
         </div>
     </div>
@@ -32,6 +34,8 @@
 <script setup>
 import { defineProps } from 'vue';
 import { useRouter } from 'vue-router';
+import { SelectNovel_State } from '@/stores/index';
+const selectNovelState = SelectNovel_State();
 
 const props = defineProps({
     novel: Object,
@@ -46,12 +50,16 @@ const formatDate = (dateString) => {
 }
 
 const handleRead = () => {
-    router.push({
-        path: '/Novels/Novel_Layout/reader',
-        query: {
-            novel: JSON.stringify(props.novel)
-        }
-    });
+    // router.push({
+    //     path: '/Novels/Novel_Layout/reader',
+    //     query: {
+    //         novel: JSON.stringify(props.novel)
+    //     }
+    // });
+};
+const handle_NovelInfro = () => {
+    selectNovelState.resetNovel(props.novel.novelId,props.novel.authorId, props.novel.novelName,  props.novel.introduction, props.novel.createTime,props.novel.coverUrl,props.novel.score,props.novel.totalWordCount, props.novel.recommendCount,props.novel.collectCount, props.novel.status);
+    router.push('/Novels/Novel_Info/home');
 };
 
 const handleTitleClick = () => {

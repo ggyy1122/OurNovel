@@ -18,7 +18,7 @@
             <pre>{{ apiResponse2 }}</pre>
         </div>
 
-        <h1>3:创建读者</h1>
+        <h1>3:创建读者(这里创建不会产生密钥，密码是登不上的)</h1>
         <input v-model="readerName3" placeholder="输入读者名称" />
         <input v-model="password3" placeholder="输入密码" />
         <input v-model="phone3" placeholder="输入电话" />
@@ -46,7 +46,7 @@
             <pre>{{ apiResponse3 }}</pre>
         </div>
 
-        <h1>4:更新读者</h1>
+        <h1>4:更新读者(这里也是，修改后密码是登不上的，还是密钥的问题。目前改密码在登录时忘记密码处)</h1>
         <input v-model="readerId4" placeholder="输入读者ID" />
         <input v-model="readerName4" placeholder="输入读者名称" />
         <input v-model="password4" placeholder="输入密码" />
@@ -187,6 +187,7 @@ const apiResponse4 = ref(null)
 async function function4() {
     try {
         const updateData = {
+            readerId: readerId4.value,
             readerName: readerName4.value,
             password: password4.value,
             phone: phone4.value,
