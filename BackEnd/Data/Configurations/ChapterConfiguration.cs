@@ -58,13 +58,13 @@ namespace OurNovel.Data.Configurations
 			entity.Property(e => e.Status)
 				  .HasColumnName("STATUS")
 				  .HasMaxLength(10)
-				  .HasDefaultValue("通过");
+				  .HasDefaultValue("草稿");
 
 			// 忽略自动计算字段
 			entity.Ignore(e => e.CalculatedPrice);
 
             entity.Property(c => c.NovelId)
-        .HasColumnName("NOVEL_ID");
+				  .HasColumnName("NOVEL_ID");
         }
 	}
 }

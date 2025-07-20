@@ -86,7 +86,7 @@ namespace OurNovel.Controllers
             var success = await (_chapterService as ChapterService)?.ReviewChapterAsync(novelId, chapterId, newStatus,managerId)!;
 
             if (!success)
-                return BadRequest("审核失败，可能是章节不存在或状态非法（必须为‘通过’或‘封禁’）");
+                return BadRequest("审核失败，可能是章节不存在或状态非法（必须为‘已发布’或‘封禁’）");
 
             return Ok(new { success = true, message = "章节状态已更新" });
         }
