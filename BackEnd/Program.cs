@@ -33,7 +33,8 @@ var searchIndex = builder.Configuration["Search:Index"];
 
 // 2. 注入 NovelSearchService 时，传入需要的字符串参数
 builder.Services.AddScoped<NovelSearchService>();
-
+builder.Services.AddScoped<ReaderSearchService>();
+builder.Services.AddScoped<AuthorSearchService>();
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 // 注册泛型仓储
 builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
