@@ -18,17 +18,22 @@ public class NovelSearchService
     {
         var novels = new List<Novel>();
 
+        string sanitizedKeyword = keyword.Replace("'", "''");
+
         using (var connection = new OracleConnection(_connectionString))
         {
             await connection.OpenAsync();
 
-            string query = @"SELECT novel_id, novel_name, introduction 
-                             FROM novel 
-                             WHERE CONTAINS(novel_name, :keyword, 1) > 0";
+
+            string query = $@"
+            SELECT novel_id, novel_name, introduction 
+            FROM novel 
+            WHERE CONTAINS(novel_name, '({sanitizedKeyword})', 1) > 0
+               OR LOWER(novel_name) LIKE :plain_keyword";
 
             using (var command = new OracleCommand(query, connection))
             {
-                command.Parameters.Add(":keyword", OracleDbType.Varchar2).Value = keyword;
+                command.Parameters.Add(":plain_keyword", OracleDbType.Varchar2).Value = "%" + keyword.ToLower() + "%";
 
                 using (var reader = await command.ExecuteReaderAsync())
                 {

@@ -21,16 +21,20 @@ public class ReaderSearchService
     {
         var readers = new List<Reader>();
 
+        // 对关键字进行转义防注入
+        string sanitizedKeyword = keyword.Replace("'", "''");
+
         using var connection = new OracleConnection(_connectionString);
         await connection.OpenAsync();
 
-        string query = @"
+        string query = $@"
         SELECT reader_id, reader_name, phone, gender, balance, avatar_url, background_url, is_collect_visible, is_recommend_visible
         FROM reader
-        WHERE CONTAINS(reader_name, :keyword, 1) > 0";
+        WHERE CONTAINS(reader_name, '({sanitizedKeyword})', 1) > 0
+           OR LOWER(reader_name) LIKE :plain_keyword";
 
         using var command = new OracleCommand(query, connection);
-        command.Parameters.Add(":keyword", OracleDbType.Varchar2).Value = keyword;
+        command.Parameters.Add(":plain_keyword", OracleDbType.Varchar2).Value = "%" + keyword.ToLower() + "%";
 
         using var reader = await command.ExecuteReaderAsync();
         while (await reader.ReadAsync())
