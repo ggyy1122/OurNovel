@@ -35,6 +35,8 @@ import Ranking_api_test from '@/API_Test/Ranking_Test.vue'
 import Report_api_test from '@/API_Test/Report_Test.vue'
 import Reward_api_test from '@/API_Test/Reward_Test.vue'
 import CommentReply_api_test from '@/API_Test/CommentReply_Test.vue'
+import Transaction_api_test from '@/API_Test/Transaction_Test.vue'
+import Recharge_api_test from '@/API_Test/Recharge_Test.vue'
 //作者
 import AuthorLayout from '@/Author/AuthorLayout.vue'
 import NovelList from '@/Author/NovelList.vue'
@@ -142,6 +144,16 @@ const routes = [
         path: '/CommentReply_api_test',
         name: 'CommentReply_api_test',
         component: CommentReply_api_test
+    },
+    {
+        path: '/Transaction_api_test',
+        name: 'Transaction_api_test',
+        component: Transaction_api_test
+    },
+    {
+        path: '/Recharge_api_test',
+        name: 'Recharge_api_test',
+        component: Recharge_api_test
     },
     {
         path: '/L_R',

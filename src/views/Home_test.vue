@@ -20,7 +20,7 @@
     <div style="text-align:center; margin-top:100px;">
         <button @click="goToLogin2">Comment的API测试</button>
     </div>
-        <div style="text-align:center; margin-top:100px;">
+    <div style="text-align:center; margin-top:100px;">
         <button @click="goToLogin18">CommentReply的API测试</button>
     </div>
     <div style="text-align:center; margin-top:100px;">
@@ -47,6 +47,9 @@
     <div style="text-align:center; margin-top:100px;">
         <button @click="goToLogin9">Reader的API测试</button>
     </div>
+        <div style="text-align:center; margin-top:100px;">
+        <button @click="goToLogin20">Recharge的API测试</button>
+    </div>
     <div style="text-align:center; margin-top:100px;">
         <button @click="goToLogin10">Recommend的API测试</button>
     </div>
@@ -55,6 +58,9 @@
     </div>
     <div style="text-align:center; margin-top:100px;">
         <button @click="goToLogin17">Reward的API测试</button>
+    </div>
+    <div style="text-align:center; margin-top:100px;">
+        <button @click="goToLogin19">Transaction的API测试</button>
     </div>
 </template>
 
@@ -118,5 +124,11 @@ function goToLogin17() {
 }
 function goToLogin18() {
     router.push('/CommentReply_api_test')
+}
+function goToLogin19() {
+    router.push('/Transaction_api_test')
+}
+function goToLogin20() {
+    router.push('/Recharge_api_test')
 }
 </script>
