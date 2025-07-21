@@ -1,7 +1,7 @@
 <template>
     <div class="novel-card">
         <div class="rank-badge">{{ rank }}</div>
-        <img :src="novel.coverUrl || 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/e165315c-da2b-42c9-b3cf-c0457d168634.jpg'"
+        <img :src=fullCoverUrl
             alt="cover" class="cover" />
         <div class="info">
             <div class="title-row">
@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps ,computed} from 'vue';
 import { useRouter } from 'vue-router';
 import { SelectNovel_State } from '@/stores/index';
 import { getAuthor } from '@/API/Author_API'
@@ -43,7 +43,14 @@ const props = defineProps({
     rank: Number
 })
 const router = useRouter();
-
+const fullCoverUrl=computed(
+    ()=>{
+         const defaultCover='e165315c-da2b-42c9-b3cf-c0457d168634.jpg';
+         return props.novel.coverUrl                
+        ? `https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/${props.novel.coverUrl}`
+        : `https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/${defaultCover}`;  
+    }
+)
 const formatDate = (dateString) => {
     if (!dateString) return '未知时间'
     const date = new Date(dateString)
