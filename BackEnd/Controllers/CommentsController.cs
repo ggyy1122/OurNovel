@@ -98,5 +98,31 @@ namespace OurNovel.Controllers
 
             return Ok(new { success = true, message = "评论状态已更新" });
         }
+
+        /// <summary>
+        /// 获取小说所有章节的第一级评论
+        /// </summary>
+        /// <param name="novelId">小说id</param>
+        /// <returns></returns>
+        [HttpGet("novel/{novelId}/top-level-comments")]
+        public async Task<IActionResult> GetTopLevelComments(int novelId)
+        {
+            var comments = await _commentsService.GetTopLevelCommentsByNovelAsync(novelId);
+            return Ok(comments);
+        }
+
+        /// <summary>
+        /// 获取小说所有章节的第一级评论的点赞数排行
+        /// </summary>
+        /// <param name="novelId">小说id</param>
+        /// <param name="topN">前几名</param>
+        /// <returns></returns>
+        [HttpGet("novel/{novelId}/top-liked-comments/{topN}")]
+        public async Task<IActionResult> GetTopNTopLevelCommentsByLikes(int novelId, int topN)
+        {
+            var comments = await _commentsService.GetTopNTopLevelCommentsByLikesAsync(novelId, topN);
+            return Ok(comments);
+        }
+
     }
 }

@@ -111,5 +111,60 @@ namespace OurNovel.Services
             await _repository.UpdateAsync(comment);
             return true;
         }
+
+        /// <summary>
+        /// 获取指定小说所有章节的第一级评论（即不作为回复的评论）
+        /// </summary>
+        public async Task<List<Comment>> GetTopLevelCommentsByNovelAsync(int novelId)
+        {
+            // 获取小说下所有评论
+            var allComments = (await _repository.GetAllAsync())
+                .Where(c => c.NovelId == novelId)
+                .ToList();
+
+            // 获取所有回复记录（涉及子评论）
+            var repliedCommentIds = (await _replyRepository.GetAllAsync())
+                .Select(r => r.CommentId)
+                .Distinct()
+                .ToHashSet();
+
+            // 第一级评论：不在 repliedCommentIds 中的评论
+            var topLevel = allComments
+                .Where(c => !repliedCommentIds.Contains(c.CommentId))
+                .ToList();
+
+            return topLevel;
+        }
+
+        /// <summary>
+        /// 获取小说所有章节的第一级评论的点赞数排行
+        /// </summary>
+        public async Task<List<Comment>> GetTopNTopLevelCommentsByLikesAsync(int novelId, int topN)
+        {
+            // 获取小说下所有评论
+            var allComments = (await _repository.GetAllAsync())
+                .Where(c => c.NovelId == novelId)
+                .ToList();
+
+            // 获取所有子评论 CommentReply 的 CommentId 列表
+            var repliedCommentIds = (await _replyRepository.GetAllAsync())
+                .Select(r => r.CommentId)
+                .Distinct()
+                .ToHashSet();
+
+            // 过滤出第一级评论
+            var topLevelComments = allComments
+                .Where(c => !repliedCommentIds.Contains(c.CommentId))
+                .ToList();
+
+            // 排序取前 N 条（按点赞数降序）
+            var topNComments = topLevelComments
+                .OrderByDescending(c => c.Likes)  
+                .Take(topN)
+                .ToList();
+
+            return topNComments;
+        }
+
     }
 }
