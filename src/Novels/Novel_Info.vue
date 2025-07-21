@@ -9,7 +9,7 @@
      <!-- 美观的书籍信息展示 -->
      <div class="book-display-card">
          <div class="book-content">
-             <!-- 左侧图片区域 -->
+                  <!-- 左侧图片区域 -->
                 <div class="book-image-section">
                      <div class="image-wrapper">
                           <img 
@@ -20,7 +20,7 @@
                         />
                      </div>
                 </div>
-                  <!-- 右侧信息区域 -->
+                  <!-- 中间信息区域 -->
                 <div class="book-info-section">
                              <!-- 标题 -->
                           <h1 class="book-title">{{ selectNovelState.novelName }}</h1> 
@@ -82,11 +82,33 @@
                                   </button>
                              </div>
                 </div>
+                <!-- 右侧作者卡片区域 -->
+      <div class="author-card-section">
+        <div class="author-card">
+          <img :src="selectNovelState.formattedauthorAvatarUrl || defaultAuthorAvatar" class="author-avatar" />
+           <h2>{{ selectNovelState.authorName }}</h2>
+             <p class="author-brief">{{ '作者简介:暂无作者简介' }}</p>
+            <div class="author-data-cards">
+  <div class="data-card">
+    <div class="data-value">5</div>
+    <div class="data-label">作品总数</div>
+  </div>
+  <div class="data-card">
+    <div class="data-value">1777</div>
+    <div class="data-label">累计字数</div>
+  </div>
+  <div class="data-card">
+    <div class="data-value">3465</div>
+    <div class="data-label">创作天数</div>
+  </div>
+</div>
+        </div>
+      </div>
          </div>
 
      </div>
-
-
+  
+ 
     <!-- 导航栏展示 -->
     <div class="novel-container">
         <nav class="nav-menu" ref="mainNav">
@@ -128,7 +150,7 @@ const categories=ref([]);                          //分类数组
 const isLoadingCategories = ref(false);            //是否在加载
 const router = useRouter();
 const defaultCoverImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E书籍封面%3C/text%3E%3C/svg%3E";// 默认封面图片
-//const defaultAuthorAvatar = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E作者头像%3C/text%3E%3C/svg%3E";// 默认作者头像
+const defaultAuthorAvatar = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E作者头像%3C/text%3E%3C/svg%3E";// 默认作者头像
 //返回
 function goback() {
     router.push('/Novels/Novel_Layout/home')
@@ -194,9 +216,10 @@ watch(() => selectNovelState.novelId, (newVal) => {
     background: #e2e8f0;
     color: #334155;
 }
+
 /* 书籍展示卡片 */
 .book-display-card {
-    max-width: 1000px;
+    max-width: 1200px;
     margin: 0 auto 30px;
     background: white;
     border-radius: 16px;
@@ -212,7 +235,7 @@ watch(() => selectNovelState.novelId, (newVal) => {
 
 /* 左侧图片区域 */
 .book-image-section {
-    flex: 0 0 320px;
+    flex: 0 0 240px;
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
     padding: 40px;
     display: flex;
@@ -257,9 +280,9 @@ watch(() => selectNovelState.novelId, (newVal) => {
 }
 /* 右侧信息区域 */
 .book-info-section {
-    flex: 1;
-    min-width: 400px;
-    padding: 40px;
+  flex: 1 1 400px;
+  padding: 40px;
+  min-width: 400px;
 }
 
 /* 标题行布局*/
@@ -332,15 +355,7 @@ watch(() => selectNovelState.novelId, (newVal) => {
     background-color: #3b82f6;
 }
 
-.author-name {
-  font-family: 'Helvetica Neue', sans-serif;
-  letter-spacing: 0.5px;
-  color: #374151;
-  background: transparent;
-  padding-left: 0;
-  border-left: none;
-  font-weight: 600;
-}
+
 
 /* 分类徽章样式 */
 .category-badge {
@@ -451,8 +466,101 @@ watch(() => selectNovelState.novelId, (newVal) => {
   }
 }
 
+.author-card-section {
+  flex: 0 0 300px;
+  padding: 40px 20px 40px 0;
+  display: flex;
+  align-items: center;
+}
+
+.author-card {
+  background: #f5f7fa;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(36, 37, 38, 0.04);
+  padding: 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.author-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  margin-bottom: 12px;
+  object-fit: cover;
+  border: 1px solid #e0e0e0;
+}
+.author-card h2 {
+  margin: 8px 0 0 0; /* 调整标题边距 */
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+}
+.author-name {
+  font-family: 'Helvetica Neue', sans-serif;
+  letter-spacing: 0.5px;
+  color: #374151;
+  background: transparent;
+  padding-left: 0;
+  border-left: none;
+  font-weight: 600;
+}
+.author-brief {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+  text-align: center;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 90%; /* 防止溢出 */
+}
+
+.author-data-cards {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  width: 90%;
+  background: white;
+  border-radius: 12px;
+  padding: 16px 16px 16px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.data-card {
+  flex: 1;
+  text-align: center;
+  position: relative;
+}
+
+.data-card:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 40px;
+  width: 1px;
+  background: #f1f5f9;
+}
+
+.data-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
 
 
+.data-label {
+  font-size: 14px;
+  color: #64748b;
+}
 
 .introduction-text {
     line-height: 1.6;
