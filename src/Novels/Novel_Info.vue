@@ -5,7 +5,6 @@
             </svg>
             返回
         </button>
-
      <!-- 美观的书籍信息展示 -->
      <div class="book-display-card">
          <div class="book-content">
@@ -71,8 +70,9 @@
                               <button class="blue-border-btn">
                                 开始阅读
                                   </button>
-                              <button class="blue-border-btn">
-                                 收藏作品
+                              <button class="blue-border-btn" :class="{ 'is-collected': isCollected }"
+      @click="toggleCollect">
+                                {{ isCollected ? '已收藏' : '收藏作品' }}
                                   </button>
                              <button class="blue-border-btn">
                                   推荐作品
@@ -139,15 +139,29 @@
 </template>
 
 <script setup>
-import {ref, onMounted ,watch} from 'vue';
+import {ref, onMounted ,watch,computed} from 'vue';
 import { useRouter} from 'vue-router';
-import { SelectNovel_State } from '@/stores/index';
+import { SelectNovel_State,readerState } from '@/stores/index';
 import { getCategoriesByNovel} from '@/API/NovelCategory_API';
-
+import {addOrUpdateCollect,deleteCollect} from '@/API/Collect_API';
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
 const selectNovelState = SelectNovel_State();      //小说对象
+const ReaderState=readerState();                   //当前读者对象
 const categories=ref([]);                          //分类数组
 const isLoadingCategories = ref(false);            //是否在加载
+
+//是否被收藏
+const isCollected=computed(()=>{
+  //当前小说ID
+  const currentNovelId = selectNovelState.novelId;
+   // 检查是否存在于收藏列表
+  return ReaderState.favoriteBooks.some(item => 
+    item.novel?.novelId === currentNovelId || 
+    item.novelId === currentNovelId
+  )
+   })
 const router = useRouter();
 const defaultCoverImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E书籍封面%3C/text%3E%3C/svg%3E";// 默认封面图片
 const defaultAuthorAvatar = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E作者头像%3C/text%3E%3C/svg%3E";// 默认作者头像
@@ -193,6 +207,48 @@ onMounted(() => {
 watch(() => selectNovelState.novelId, (newVal) => {
   if (newVal) fetchCategories()
 })
+/*收藏逻辑*/
+const toggleCollect = async () => {
+  const currentNovelId = selectNovelState.novelId;
+  const currentReaderId=ReaderState.readerId;
+  try {
+    if (isCollected.value) {
+      // 取消收藏
+      await deleteCollect(currentNovelId,currentReaderId);
+        ReaderState.favoriteBooks = ReaderState.favoriteBooks.filter(item => 
+      item.novel?.novelId !== currentNovelId && 
+      item.novelId !== currentNovelId
+      
+    );
+      toast("取消收藏", {
+     "type": "success",
+      "dangerouslyHTMLString": true
+      })
+      
+    } else {
+      // 添加收藏
+      await addOrUpdateCollect(currentNovelId,ReaderState.readerId,'no');
+      ReaderState.favoriteBooks.push({
+      novelId: currentNovelId,
+      novel: selectNovelState, // 保存完整作品信息
+     currentReaderId,
+      isPublic: "no",
+      collectTime: new Date().toISOString()
+    });
+      toast("收藏成功", {
+     "type": "success",
+      "dangerouslyHTMLString": true
+      })
+
+    }
+  } catch (error) {
+    console.error('收藏操作失败:', error);
+      toast("收藏失败", {
+     "type": "error",
+      "dangerouslyHTMLString": true
+      })
+  }
+};
 </script>
 
 <style scoped>
@@ -235,7 +291,7 @@ watch(() => selectNovelState.novelId, (newVal) => {
 
 /* 左侧图片区域 */
 .book-image-section {
-    flex: 0 0 240px;
+    flex: 0 0 220px;
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
     padding: 40px;
     display: flex;
@@ -451,6 +507,19 @@ watch(() => selectNovelState.novelId, (newVal) => {
   transform: translateY(0);
   border-color: #096dd9;
   color: #096dd9;
+}
+
+/* 新增的已收藏状态 */
+.blue-border-btn.is-collected {
+  border-color: #d9d9d9;
+  color: #8c8c8c;
+  background: #f5f5f5;
+}
+
+.blue-border-btn.is-collected:hover {
+  background: #f0f0f0;
+  border-color: #bfbfbf;
+  color: #595959;
 }
 
 /* 响应式设计 */
