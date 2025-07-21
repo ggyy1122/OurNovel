@@ -27,6 +27,16 @@ import Novel_Info_home from '@/Novels/Novel_Info_home.vue'
 import Novel_Info_Comment from '@/Novels/Novel_Info_Comment.vue'
 import Novel_Info_Chapter from '@/Novels/Novel_Info_Chapter.vue'
 import Recommend_api_test from '@/API_Test/Recommend_Test.vue'
+import AuthorIncome_api_test from '@/API_Test/AuthorIncome_Test.vue'
+import Likes_api_test from '@/API_Test/Likes_Test.vue'
+import Manager_api_test from '@/API_Test/Manager_Test.vue'
+import Purchase_api_test from '@/API_Test/Purchase_Test.vue'
+import Ranking_api_test from '@/API_Test/Ranking_Test.vue'
+import Report_api_test from '@/API_Test/Report_Test.vue'
+import Reward_api_test from '@/API_Test/Reward_Test.vue'
+import CommentReply_api_test from '@/API_Test/CommentReply_Test.vue'
+import Transaction_api_test from '@/API_Test/Transaction_Test.vue'
+import Recharge_api_test from '@/API_Test/Recharge_Test.vue'
 //作者
 import AuthorLayout from '@/Author/AuthorLayout.vue'
 import NovelList from '@/Author/NovelList.vue'
@@ -96,6 +106,56 @@ const routes = [
         component: Recommend_api_test
     },
     {
+        path: '/AuthorIncome_api_test',
+        name: 'AuthorIncome_api_test',
+        component: AuthorIncome_api_test
+    },
+    {
+        path: '/Likes_api_test',
+        name: 'Likes_api_test',
+        component: Likes_api_test
+    },
+    {
+        path: '/Manager_api_test',
+        name: 'Manager_api_test',
+        component: Manager_api_test
+    },
+    {
+        path: '/Purchase_api_test',
+        name: 'Purchase_api_test',
+        component: Purchase_api_test
+    },
+    {
+        path: '/Ranking_api_test',
+        name: 'Ranking_api_test',
+        component: Ranking_api_test
+    },
+    {
+        path: '/Report_api_test',
+        name: 'Report_api_test',
+        component: Report_api_test
+    },
+    {
+        path: '/Reward_api_test',
+        name: 'Reward_api_test',
+        component: Reward_api_test
+    },
+    {
+        path: '/CommentReply_api_test',
+        name: 'CommentReply_api_test',
+        component: CommentReply_api_test
+    },
+    {
+        path: '/Transaction_api_test',
+        name: 'Transaction_api_test',
+        component: Transaction_api_test
+    },
+    {
+        path: '/Recharge_api_test',
+        name: 'Recharge_api_test',
+        component: Recharge_api_test
+    },
+    {
         path: '/L_R',
         component: L_R,
         meta: { requiresAuth: true },
@@ -152,17 +212,13 @@ const routes = [
                 path: 'rank',
                 name: 'Novel_Rank',
                 component: Novel_Rank
-            },
-            {
-                path: 'reader',
-                name: 'NovelReader',
-                component: Novel_Reader,
-                meta: { hideNav: true },
-                props: (route) => ({
-                    novel: route.query.novel ? JSON.parse(decodeURIComponent(route.query.novel)) : null
-                })
             }
         ]
+    },
+    {
+        path: '/Novels/reader',
+        name: 'NovelReader',
+        component: Novel_Reader
     },
     {
         path: '/Novels/ReaderInfomation',
