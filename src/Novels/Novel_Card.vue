@@ -1,79 +1,100 @@
 <template>
     <div class="novel-card">
         <div class="rank-badge">{{ rank }}</div>
-        <img :src="novel.coverUrl || 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/e165315c-da2b-42c9-b3cf-c0457d168634.jpg'"
-            alt="cover" class="cover" />
+        <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + (novel.coverUrl || 'a3dc347b-45dd-4d89-8b9d-65b75477ee3d.jpg')"
+            alt="cover" class="cover" @click="handle_NovelInfro" />
         <div class="info">
             <div class="title-row">
-                <span class="title" @click="handleTitleClick">{{ novel.novelName }}</span>
-                <span v-if="novel.status === '完结'" class="badge">完结</span>
-                <span v-else class="badge">连载</span>
+                <span class="title" @click="handle_NovelInfro">{{ novel.novelName }}</span>
+                <span class="badge">{{ novel.status }}</span>
+                <span class="badge">评分：{{ novel.score || 0 }}分</span>
             </div>
             <div class="meta">
                 <span>作者ID: {{ novel.authorId }}</span> |
-                <span>{{ novel.totalWordCount || 0 }}字</span> |
-                <span>{{ novel.status }}</span>
+                <span>字数: {{ novel.totalWordCount || 0 }}字</span>
             </div>
             <div class="desc">{{ novel.introduction || '暂无简介' }}</div>
             <div class="update">创建时间: {{ formatDate(novel.createTime) }}</div>
         </div>
         <div class="side">
             <div class="hot">
-                <span class="hot-num">{{ novel.recommendCount || 0 }}</span>
-                <span class="hot-label">推荐</span>
+                <span>推荐数:{{ novel.recommendCount || 0 }}</span>
+                <span>收藏数:{{ novel.collectedCount || 0 }}</span>
             </div>
             <div class="actions">
-                <button class="add-shelf" @click="handleAddShelf">加入书架</button>
+                <button class="add-shelf" @click="handleAddShelf" :class="{ 'in-shelf': isFavorite }"
+                    :disabled="isFavorite">
+                    {{ isFavorite ? '已在书架' : '加入书架' }}
+                </button>
                 <button class="read" @click="handleRead">立即阅读</button>
-                <button class="read" @click="handle_NovelInfro">作品主页</button>
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { SelectNovel_State } from '@/stores/index';
+import { SelectNovel_State, readerState } from '@/stores/index';
 import { getAuthor } from '@/API/Author_API'
+import { addOrUpdateCollect, getCollectsByReader } from '@/API/Collect_API'
+import { getChapter } from '@/API/Chapter_API';
 const selectNovelState = SelectNovel_State();
-
+const reader_state = readerState();
 const props = defineProps({
     novel: Object,
     rank: Number
 })
 const router = useRouter();
-
 const formatDate = (dateString) => {
     if (!dateString) return '未知时间'
     const date = new Date(dateString)
     return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
 }
-
-const handleRead = () => {
-    // router.push({
-    //     path: '/Novels/Novel_Layout/reader',
-    //     query: {
-    //         novel: JSON.stringify(props.novel)
-    //     }
-    // });
-};
-async function handle_NovelInfro() {
+const isFavorite = ref(reader_state.isFavorite(props.novel.novelId));
+//加入书架
+async function handleAddShelf() {
+    if (isFavorite.value) return;
+    const response = await addOrUpdateCollect(props.novel.novelId, reader_state.readerId, 'yes');
+    if (response) {
+        isFavorite.value = true;
+        reader_state.favoriteBooks = await getCollectsByReader(reader_state.readerId);
+        alert('加入书架成功！');
+    } else {
+        alert('加入书架失败：' + response.message);
+    }
+}
+async function handle() {
     const response = await getAuthor(props.novel.authorId);
-    console.log('作者信息:', response);
-    selectNovelState.resetNovel(props.novel.novelId, props.novel.authorId, props.novel.novelName, props.novel.introduction, props.novel.createTime, props.novel.coverUrl, props.novel.score, props.novel.totalWordCount, props.novel.recommendCount, props.novel.collectCount, props.novel.status,
+    selectNovelState.resetNovel(props.novel.novelId, props.novel.authorId, props.novel.novelName, props.novel.introduction, props.novel.createTime, props.novel.coverUrl, props.novel.score, props.novel.totalWordCount, props.novel.recommendCount, props.novel.collectedCount, props.novel.status,
         response.authorName, response.phone, response.avatarUrl);
+}
+//立即阅读
+async function handleRead() {
+    try {
+        handle();
+        const response = await getChapter(props.novel.novelId, 1);
+        selectNovelState.resetChapter(
+            response.chapterId,
+            response.title,
+            response.content,
+            response.wordCount,
+            response.pricePerKilo,
+            response.calculatedPrice,
+            response.isCharged,
+            response.publishTime,
+            response.status
+        );
+        router.push('/Novels/reader');
+    } catch (error) {
+        alert('章节加载失败：该章节不存在!');
+    }
+}
+//作品主页
+async function handle_NovelInfro() {
+    handle();
     router.push('/Novels/Novel_Info/home');
 }
-
-const handleTitleClick = () => {
-    console.log('标题点击:', props.novel.novelId);
-};
-
-const handleAddShelf = (event) => {
-    event.stopPropagation();
-    console.log('加入书架:', props.novel.novelId);
-};
 </script>
 
 <style scoped>
@@ -112,6 +133,12 @@ const handleAddShelf = (event) => {
     object-fit: cover;
     margin-left: 50px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cover:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .info {
@@ -186,17 +213,9 @@ const handleAddShelf = (event) => {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    font-size: 18px;
-}
-
-.hot-num {
     font-weight: 700;
+    font-size: 16px;
     color: #fa9437;
-}
-
-.hot-label {
-    font-size: 14px;
-    color: #888;
 }
 
 .actions {
@@ -236,5 +255,15 @@ const handleAddShelf = (event) => {
 .read:hover {
     color: #222;
     box-shadow: 0 2px 8px rgba(250, 190, 50, 0.15);
+}
+
+.add-shelf.in-shelf {
+    background: #f0f0f0;
+    color: #999;
+    cursor: default;
+}
+
+.add-shelf:disabled {
+    opacity: 1;
 }
 </style>

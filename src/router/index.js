@@ -212,17 +212,13 @@ const routes = [
                 path: 'rank',
                 name: 'Novel_Rank',
                 component: Novel_Rank
-            },
-            {
-                path: 'reader',
-                name: 'NovelReader',
-                component: Novel_Reader,
-                meta: { hideNav: true },
-                props: (route) => ({
-                    novel: route.query.novel ? JSON.parse(decodeURIComponent(route.query.novel)) : null
-                })
             }
         ]
+    },
+    {
+        path: '/Novels/reader',
+        name: 'NovelReader',
+        component: Novel_Reader
     },
     {
         path: '/Novels/ReaderInfomation',

@@ -599,7 +599,7 @@ onUnmounted(() => {
 }
 
 .sticky-header-content .dropdown-menu {
-    top: 120%;
+    top: 100%;
     right: -10px;
 }
 </style>
