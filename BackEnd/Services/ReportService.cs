@@ -12,11 +12,16 @@ namespace OurNovel.Services
     public class ReportService : BaseService<Report, int>
     {
         private readonly ReportManagementService _reportManagementService;
+        private readonly CommentRepository _commentRepository;
 
-        public ReportService(IRepository<Report, int> repository, ReportManagementService reportManagementService)
+        public ReportService(
+            IRepository<Report, int> repository, 
+            ReportManagementService reportManagementService, 
+            CommentRepository commentRepository)
             : base(repository)
         {
             _reportManagementService = reportManagementService;
+            _commentRepository = commentRepository;
         }
 
         /// <summary>
@@ -55,6 +60,16 @@ namespace OurNovel.Services
             if (progress != "成功" && progress != "失败" && progress != "未处理")
             {
                 throw new Exception("无效的处理状态");
+            }
+
+            if (progress == "成功")
+            {
+                var comment = await _commentRepository.GetByIdAsync(report.CommentId);
+                if (comment != null && comment.Status != "封禁")
+                {
+                    comment.Status = "封禁";
+                    await _commentRepository.UpdateAsync(comment);
+                }
             }
 
             report.Progress = progress;

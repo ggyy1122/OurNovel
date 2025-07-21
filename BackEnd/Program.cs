@@ -47,6 +47,7 @@ builder.Services.AddScoped<CommentsService>();
 
 builder.Services.AddScoped<ILikesService,LikesService>();
 
+builder.Services.AddScoped<CommentRepository>();
 builder.Services.AddScoped<ICommentReplyRepository, CommentReplyRepository>();
 builder.Services.AddScoped<ICommentReplyService, CommentReplyService>();
 builder.Services.AddScoped<INovelCategoryRepository, NovelCategoryRepository>();
