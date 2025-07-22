@@ -107,7 +107,7 @@ const handleLogin = async () => {
                 state.setUserInfo(response.readerName, response.readerId); // 存入 Pinia
                 const readerDetails = await getReader(response.readerId);
                 const response_collect = await getCollectsByReader(response.readerId);
-                const response_recommend = await getRecommendsByReader(response.readerId)
+                const response_recommend = await getRecommendsByReader(response.readerId);
 
                 reader_state.initializeReader(readerDetails.readerId,
                     readerDetails.readerName,
