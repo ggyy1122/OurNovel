@@ -1,14 +1,106 @@
-using System.Runtime.InteropServices;
+using Microsoft.EntityFrameworkCore;
+using OurNovel.Models;
+using OurNovel.DTOs;
+using OurNovel.Data;
 
-// 在此类的 SDK 样式项目中，现在，在此文件中早前定义的几个程序集属性将在生成期间自动添加，并使用在项目属性中定义的值进行填充。有关包含的属性以及如何定制此过程的详细信息，请参阅
-// https://aka.ms/assembly-info-properties
+namespace OurNovel.Services
+{
+    public class WholePurchaseService
+    {
+        private readonly AppDbContext _context;
+
+        public WholePurchaseService(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        /// <summary>
+        /// 整本小说买断方法
+        /// </summary>
+        public async Task<PurchaseResultDto> PurchaseWholeNovelAsync(WholePurchaseDto dto)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            var result = new PurchaseResultDto();
+
+            try
+            {
+                var reader = await _context.Readers.FindAsync(dto.ReaderId);
+                if (reader == null)
+                    return new PurchaseResultDto { Success = 0, Message = "读者不存在" };
+
+                var novel = await _context.Novels.FindAsync(dto.NovelId);
+                if (novel == null)
+                    return new PurchaseResultDto { Success = 0, Message = "小说不存在" };
+
+                if (novel.TotalPrice == null || novel.TotalPrice <= 0)
+                    return new PurchaseResultDto { Success = 0, Message = "该小说无需买断" };
+
+                // 是否已买断
+                var alreadyBought = await _context.WholePurchases
+                 .Where(wp => wp.ReaderId == dto.ReaderId && wp.NovelId == dto.NovelId)
+                 .Select(wp => wp.IsBought)
+                 .FirstOrDefaultAsync();
+
+                if (alreadyBought == "是")
+                    return new PurchaseResultDto { Success = 0, Message = "您已买断整本小说" };
 
 
-// 将 ComVisible 设置为 false 会使此程序集中的类型对 COM 组件不可见。如果需要从 COM 访问此程序集中的类型，请将该类型的 ComVisible
-// 属性设置为 true。
+                decimal finalPrice = novel.TotalPrice.Value;
 
-[assembly: ComVisible(false)]
+                if (reader.Balance < finalPrice)
+                    return new PurchaseResultDto { Success = 0, Message = "余额不足" };
 
-// 如果此项目向 COM 公开，则下列 GUID 用于 typelib 的 ID。
 
-[assembly: Guid("f4009d81-9698-49e1-be19-443d36b4dc65")]
+
+                // 扣除余额
+                reader.Balance -= finalPrice;
+                _context.Readers.Update(reader);
+
+
+
+
+
+                // 写入 WholePurchase 表
+                _context.WholePurchases.Add(new WholePurchase
+                {
+                    ReaderId = dto.ReaderId,
+                    NovelId = dto.NovelId,
+                    IsBought = "是"
+                });
+
+                // 处理作者收入
+                var author = await _context.Authors.FindAsync(novel.AuthorId);
+                if (author == null)
+                    throw new Exception("作者不存在");
+
+                _context.AuthorIncomes.Add(new AuthorIncome
+                {
+                    AuthorId = author.AuthorId,
+                    Amount = finalPrice,
+                    Type = "整本买断",
+                    CreateTime = DateTime.Now
+                });
+
+                author.Earning += finalPrice;
+                _context.Authors.Update(author);
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                result.Success = 1;
+                result.Message = "整本购买成功";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                // 记录详细的异常信息
+                Console.WriteLine($"详细异常信息：{ex.ToString()}");
+
+
+                await transaction.RollbackAsync();
+                return new PurchaseResultDto { Success = 0, Message = "服务器异常：" + ex.Message };
+            }
+
+        }
+    }
+}

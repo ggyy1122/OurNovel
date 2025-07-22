@@ -12,7 +12,7 @@ namespace OurNovel.Data.Configurations
         public void Configure(EntityTypeBuilder<WholePurchase> entity)
         {
             // 表名
-            entity.ToTable("WHOLE_PURCHASE");
+            entity.ToTable("WHOLEPURCHASE");
 
             // 主键：ReaderId + NovelId 复合主键
             entity.HasKey(e => new { e.ReaderId, e.NovelId });

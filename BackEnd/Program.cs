@@ -22,7 +22,10 @@ var builder = WebApplication.CreateBuilder(args);
 // 1️⃣ 配置数据库连接（Oracle + EF Core）
 // ========================================
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseOracle(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    options.UseOracle(builder.Configuration.GetConnectionString("DefaultConnection"))
+           .LogTo(Console.WriteLine, LogLevel.Information);  // 这里开启 SQL 日志输出
+});
 
 // ========================================
 // 2️⃣ 注册仓储和服务依赖注入
@@ -89,7 +92,7 @@ builder.Services.AddScoped<CommentManagementService>();
 builder.Services.AddScoped<ReportManagementService>();
 builder.Services.AddScoped<ChapterManagementService>();
 
-
+builder.Services.AddScoped<WholePurchaseService>();
 // 注册OSS储配置
 builder.Services.Configure<OssConfig>(builder.Configuration.GetSection("OssConfig"));
 builder.Services.AddSingleton<IOssService, OssService>();
