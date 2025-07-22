@@ -17,9 +17,14 @@
     "pinia": "^3.0.3",
     "pinia-plugin-persistedstate": "^4.4.1",
     "vue": "^3.2.13",
+<<<<<<< HEAD
     "vue-pagination-2": "^3.1.0",
     "vue-router": "^4.5.1",
     "vue3-pagination": "^1.0.16"
+=======
+    "vue-router": "^4.5.1",
+    "vue3-toastify": "^0.2.8"
+>>>>>>> fb09c3639dca65d0f8cddf61e3a627613969ca72
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
