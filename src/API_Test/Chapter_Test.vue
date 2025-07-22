@@ -41,8 +41,10 @@
         </select>
         <input v-model="publishTime4" placeholder="输入发布时间" type="datetime-local" />
         <select v-model="status4">
-            <option value="通过">通过</option>
+            <option value="已发布">已发布</option>
+            <option value="审核中">审核中</option>
             <option value="封禁">封禁</option>
+            <option value="草稿">草稿</option>
         </select>
         <button @click="function4">创建章节</button>
         <div v-if="apiResponse4">
@@ -64,8 +66,10 @@
         </select>
         <input v-model="publishTime5" placeholder="输入发布时间" type="datetime-local" />
         <select v-model="status5">
-            <option value="通过">通过</option>
+            <option value="已发布">已发布</option>
+            <option value="审核中">审核中</option>
             <option value="封禁">封禁</option>
+            <option value="草稿">草稿</option>
         </select>
         <button @click="function5">更新章节</button>
         <div v-if="apiResponse5">
@@ -86,8 +90,10 @@
         <input v-model="novelId7" placeholder="输入小说ID" />
         <input v-model="chapterId7" placeholder="输入章节ID" />
         <select v-model="newStatus7">
-            <option value="通过">通过</option>
+            <option value="已发布">已发布</option>
+            <option value="审核中">审核中</option>
             <option value="封禁">封禁</option>
+            <option value="草稿">草稿</option>
         </select>
         <button @click="function7">提交审核</button>
         <div v-if="apiResponse7">
