@@ -62,36 +62,27 @@ export const readerState = defineStore('reader', {
                 return prefix + state.avatarUrl;
             }
             return prefix + 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg';  // 默认头像
-        },
-        isLoggedIn: (state) => state.readerId > 0,
-        hasPhone: (state) => !!state.phone,
-        hasGender: (state) => !!state.gender,
-        formattedBalance: (state) => `¥${state.balance.toLocaleString()}`,
-        // 获取最近阅读的5本书
-        recentBooks: (state) => state.readHistory.slice(0, 5),
-        // 获取收藏数量
-        favoriteCount: (state) => state.favoriteBooks.length
+        }
     },
     actions: {
-        initializeReader(id, name, password, phone, gender, balance, avatarUrl, backgroundUrl, isCollectVisible, isRecommendVisible,favoriteBooks, recommendBooks) {
+        initializeReader(id, name, password, phone, gender, balance, avatarUrl, backgroundUrl, isCollectVisible, isRecommendVisible, favoriteBooks, recommendBooks) {
             this.readerId = id || 0;
             this.readerName = name || "";
             this.password = password || "";
-            this.phone = phone || "110";
-            this.gender = gender || "男";
+            this.phone = phone || "";
+            this.gender = gender || "";
             this.balance = balance || 0;
             this.avatarUrl = avatarUrl || "";
             this.backgroundUrl = backgroundUrl || "";
             this.isCollectVisible = isCollectVisible || null;
             this.isRecommendVisible = isRecommendVisible || null;
-            
+
             this.favoriteBooks = favoriteBooks || []; // 初始化收藏书籍
             this.recommendBooks = recommendBooks || []; // 初始化推荐书籍
             this.readHistory = []; // 初始化阅读历史
             this.isloggedin = true;
             this.lastLoginTime = new Date().toISOString(); // 设置最近登录时间
         },
-
         // 登出时重置读者信息
         resetReaderInfo() {
             this.readerId = 0;
@@ -109,6 +100,12 @@ export const readerState = defineStore('reader', {
             this.readHistory = [];
             this.favoriteBooks = [];
             this.recommendBooks = [];
+        },
+        isFavorite(novelId) {
+            return this.favoriteBooks.some(item =>
+                item.novelId === novelId ||
+                (item.novel && item.novel.novelId === novelId)
+            );
         }
     }
 })
@@ -127,12 +124,23 @@ export const SelectNovel_State = defineStore('select_novel', {
         recommendCount: 0,
         collectedCount: 0,
         status: "",
-        selectedChapter: null, // 当前选中的章节
+
         selectedComment: null, // 当前选中的评论
 
-        authorName: "",      
-        authorPhone: "",     
-        authorAvatarUrl: "",
+        authorName: "",      // 作者名称
+        authorPhone: "",     // 作者电话
+        authorAvatarUrl: "", // 作者头像URL,头像不用这个，用下面的formattedauthorAvatarUrl,加了前缀
+
+        //章节
+        chapterId: 1,
+        cha_title: "",
+        cha_content: "",
+        cha_wordCount: 0,
+        cha_pricePerKilo: 0,
+        cha_calculatedPrice: 0,
+        cha_isCharged: "",
+        cha_publishTime: "",
+        cha_status: ""
     }),
     persist: true,  
     getters: {
@@ -161,12 +169,18 @@ export const SelectNovel_State = defineStore('select_novel', {
             this.authorName = authorName || "";
             this.authorPhone = authorPhone || "";
             this.authorAvatarUrl = authorAvatarUrl || "";
-            this.selectedChapter = null;  // Reset chapter when novel is reset
             this.selectedComment = null;
         },
-        // 设置选中的章节
-        setSelectedChapter(chapter) {
-            this.selectedChapter = chapter;  // 通过这个方法来更新 selectedChapter
+        resetChapter(chapterId, cha_title, cha_content, cha_wordCount, cha_pricePerKilo, cha_calculatedPrice, cha_isCharged, cha_publishTime, cha_status) {
+            this.chapterId = chapterId || 1;
+            this.cha_title = cha_title || "";
+            this.cha_content = cha_content || "";
+            this.cha_wordCount = cha_wordCount || 0;
+            this.cha_pricePerKilo = cha_pricePerKilo || 0;
+            this.cha_calculatedPrice = cha_calculatedPrice || 0;
+            this.cha_isCharged = cha_isCharged || "";
+            this.cha_publishTime = cha_publishTime || "";
+            this.cha_status = cha_status || "";
         }
     }
 });
