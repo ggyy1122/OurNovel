@@ -131,10 +131,11 @@ import { getCategoriesByNovel } from '@/API/NovelCategory_API';
 import { addOrUpdateCollect, deleteCollect } from '@/API/Collect_API';
 import { getNovelWordCount, getNovelRecommendCount, getNovelCollectCount } from '@/API/Novel_API';
 import { getAuthorNovelCount, getAuthorTotalWordCount, getAuthorRegisterDays } from '@/API/Author_API';
+import { getChapter } from '@/API/Chapter_API';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
-import { getChapter } from '@/API/Chapter_API';
-const selectNovelState = SelectNovel_State();      //小说对象
+
+const selectNovelState = SelectNovel_State();      //当前选择的小说对象
 const ReaderState = readerState();                   //当前读者对象
 const categories = ref([]);                          //分类数组
 const isLoadingCategories = ref(false);            //是否在加载
@@ -192,7 +193,6 @@ const fetchCategories = async () => {
   }
 }
 // 获取字数的函数
-
 const fetchWordCount = async () => {
   try {
     const response = await getNovelWordCount(selectNovelState.novelId)
@@ -203,7 +203,6 @@ const fetchWordCount = async () => {
     novelWordCount.value = 0
   }
 }
-
 // 获取推荐数的函数
 const fetchRecommendCount = async () => {
   try {
@@ -214,6 +213,7 @@ const fetchRecommendCount = async () => {
     console.error('获取推荐数失败:', error)
     recommendCount.value = 0
   }
+
 }
 // 获取收藏数的函数
 const fetchCollectedCount = async () => {
@@ -281,6 +281,7 @@ watch(
   },
   { immediate: true } // 替代 onMounted，首次加载时自动执行
 )
+// 如果novelId可能变化，添加监听
 /*收藏逻辑*/
 const toggleCollect = async () => {
   const currentNovelId = selectNovelState.novelId;
@@ -292,13 +293,11 @@ const toggleCollect = async () => {
       ReaderState.favoriteBooks = ReaderState.favoriteBooks.filter(item =>
         item.novel?.novelId !== currentNovelId &&
         item.novelId !== currentNovelId
-
       );
       toast("取消收藏", {
         "type": "success",
         "dangerouslyHTMLString": true
       })
-
     } else {
       // 添加收藏
       await addOrUpdateCollect(currentNovelId, ReaderState.readerId, 'no');
@@ -313,7 +312,6 @@ const toggleCollect = async () => {
         "type": "success",
         "dangerouslyHTMLString": true
       })
-
     }
   } catch (error) {
     console.error('收藏操作失败:', error);
