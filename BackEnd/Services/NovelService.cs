@@ -33,20 +33,30 @@ namespace OurNovel.Services
             if (novel == null)
                 return false;
 
-            novel.Status = newStatus;
-            await _repository.UpdateAsync(novel);
-            await _novelManagementService.RecordManagementAsync(managerId, result, novelId);
+            if (novel.OriginalNovelId != -1 && newStatus == "连载")
+            {
+                var original = await _repository.GetByIdAsync(novel.OriginalNovelId);
+                if (original != null)
+                {
+                    original.NovelName = novel.NovelName;
+                    original.Introduction = novel.Introduction;
+                    original.CoverUrl = novel.CoverUrl;
+                    original.CreateTime = novel.CreateTime;
+
+                    await _repository.UpdateAsync(original);
+                    await _repository.DeleteAsync(novel.NovelId); // 删除临时稿
+                }
+            }
+            else {
+                novel.Status = newStatus;
+                await _repository.UpdateAsync(novel);
+                await _novelManagementService.RecordManagementAsync(managerId, result, novelId);
+            }
+            
 
             return true;
         }
-        /// <summary>
-        /// 上传小说封面，并更新封面地址ַ
-        /// </summary>
-        /// <param name="novelId">小说ID</param>
-        /// <param name="coverFile">封面文件</param>
-        /// <returns>封面URL</returns>
-        /// 
-
+        
         /// <summary>
         /// 获取收藏榜单
         /// </summary>
@@ -77,7 +87,41 @@ namespace OurNovel.Services
             return await _novelRepository.GetTopScoredNovelsAsync(topN);
         }
 
+        public async Task<int> SubmitNovelEditAsync(int originalNovelId, Novel edited)
+        {
+            var original = await _repository.GetByIdAsync(originalNovelId);
+            if (original == null)
+                return -1;
 
+            var newNovel = new Novel
+            {
+                AuthorId = original.AuthorId,
+                NovelName = edited.NovelName ?? original.NovelName,
+                Introduction = edited.Introduction ?? original.Introduction,
+                CoverUrl = edited.CoverUrl ?? original.CoverUrl,
+                TotalWordCount = edited.TotalWordCount ?? original.TotalWordCount,
+                // 其他字段...
+                Status = "待审核",
+                CreateTime = DateTime.Now,
+                OriginalNovelId = originalNovelId,
+                Score = 0,
+                CollectedCount = 0,
+                RecommendCount = 0,
+                TotalPrice = 0
+            };
+
+            await _repository.AddAsync(newNovel);
+            return newNovel.NovelId;
+        }
+
+
+        /// <summary>
+        /// 上传小说封面，并更新封面地址ַ
+        /// </summary>
+        /// <param name="novelId">小说ID</param>
+        /// <param name="coverFile">封面文件</param>
+        /// <returns>封面URL</returns>
+        /// 
         /*
         public async Task<string> UploadCoverAsync(int novelId, IFormFile coverFile)
         {

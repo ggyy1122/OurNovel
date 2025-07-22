@@ -71,6 +71,16 @@ namespace OurNovel.Controllers
         }
 
 
+        /// <summary>
+        /// 修改小说信息
+        /// </summary>
+        [HttpPost("submit-edit")]
+        public async Task<IActionResult> SubmitEdit(int originalNovelId, [FromBody] Novel edited)
+        {
+            var novelId = await _novelService.SubmitNovelEditAsync(originalNovelId, edited);
+            if (novelId == -1) return NotFound("原小说不存在");
+            return Ok(new { message = "提交修改成功，等待审核", newNovelId = novelId });
+        }
 
     }
 }
