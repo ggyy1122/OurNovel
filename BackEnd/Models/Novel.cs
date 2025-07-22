@@ -22,19 +22,19 @@ namespace OurNovel.Models
 
         public string? CoverUrl { get; set; }              // CoverUrl 可空
 
-        public double? Score { get; set; }                    // Score 可空
+        public double? Score { get; set; }                 // Score 可空
 
-        public long? TotalWordCount { get; set; }          // TotalWordCount 可空
+        public long? TotalWordCount { get; set; } = 0;     // TotalWordCount，默认0
 
-        public int? RecommendCount { get; set; }           // RecommendCount 可空
+        public int? RecommendCount { get; set; } = 0;      // RecommendCount，默认0
 
-        public int? CollectedCount { get; set; }           // CollectedCount 可空
+        public int? CollectedCount { get; set; } = 0;      // CollectedCount，默认0
 
         public string? Status { get; set; } = "待审核";    // Status "待审核"/"连载"/"完结"/"封禁"
 
         public int OriginalNovelId { get; set; } = -1;     // OriginalNovelId，默认-1
 
-        public decimal? TotalPrice { get; set; } = 0;      //TotalPrice，默认0
+        public decimal? TotalPrice { get; set; } = 0;      // TotalPrice，默认0
 
         // public ICollection<Chapter> Chapters { get; set; } = new List<Chapter>();  // 维护反向Chapter导航
 

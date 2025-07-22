@@ -32,10 +32,10 @@ namespace OurNovel.Controllers
         /// 审核小说
         /// </summary>
         [HttpPut("{id}/review")]
-        public async Task<IActionResult> ReviewNovel(int id, [FromQuery] string newStatus, [FromQuery] int managerId)
+        public async Task<IActionResult> ReviewNovel(int id, [FromQuery] string newStatus, [FromQuery] int managerId, [FromQuery] string result)
         {
             // 调用审核并写入日志
-            var success = await (_service as NovelService)?.ReviewNovelAsync(id, newStatus, managerId)!;
+            var success = await (_service as NovelService)?.ReviewNovelAsync(id, newStatus, managerId, result)!;
 
             if (!success)
                 return BadRequest("审核失败，可能是ID不存在或状态非法（必须为‘连载’或‘完结’）");
@@ -71,6 +71,17 @@ namespace OurNovel.Controllers
         }
 
         /// <summary>
+        /// 修改小说信息
+        /// </summary>
+        [HttpPost("submit-edit")]
+        public async Task<IActionResult> SubmitEdit(int originalNovelId, [FromBody] Novel edited)
+        {
+            var novelId = await _novelService.SubmitNovelEditAsync(originalNovelId, edited);
+            if (novelId == -1) return NotFound("原小说不存在");
+            return Ok(new { message = "提交修改成功，等待审核", newNovelId = novelId });
+        }
+
+        /// <summary>
         /// 返回小说总字数
         /// </summary>
         [HttpGet("wordcount/{novelId}")]
@@ -87,6 +98,8 @@ namespace OurNovel.Controllers
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
+
+  
 
         /// <summary>
         /// 返回小说推荐数

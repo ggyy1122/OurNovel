@@ -27,11 +27,11 @@ namespace OurNovel.Controllers
         /// <param name="status">目标状态</param>
         /// <returns>操作结果</returns>
         [HttpPost("Status")]
-        public async Task<IActionResult> SetStatus([FromQuery] int commentId, [FromQuery] string status, [FromQuery] int managerId)
+        public async Task<IActionResult> SetStatus([FromQuery] int commentId, [FromQuery] string status, [FromQuery] int managerId, [FromQuery] string result)
         {
             try
             {
-                await _commentsService.SetCommentStatusAsync(commentId, status,managerId);
+                await _commentsService.SetCommentStatusAsync(commentId, status, managerId, result);
                 return Ok(new { success = true, message = $"状态已修改为：{status}" });
             }
             catch (Exception ex)
@@ -85,6 +85,7 @@ namespace OurNovel.Controllers
             }
         }
 
+        /*
         /// <summary>
         /// 审核评论
         /// </summary>
@@ -98,6 +99,7 @@ namespace OurNovel.Controllers
 
             return Ok(new { success = true, message = "评论状态已更新" });
         }
+        */
 
         /// <summary>
         /// 获取小说所有章节的第一级评论
