@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.Http;
 using OurNovel.Models;
 using OurNovel.Models.Dto;
@@ -47,7 +48,6 @@ namespace OurNovel.Services
         /// <param name="novelId">小说ID</param>
         /// <param name="coverFile">封面文件</param>
         /// <returns>封面URL</returns>
-        /// 
 
         /// <summary>
         /// 获取收藏榜单
@@ -79,6 +79,23 @@ namespace OurNovel.Services
             return await _novelRepository.GetTopScoredNovelsAsync(topN);
         }
 
+        /// <summary>
+        /// 根据小说ID获取指定的字符串类型属性值
+        /// </summary>
+        /// <param name="novelId">要查询的小说ID</param>
+        /// <param name="propertySelector">属性选择器，指定要获取的字符串类型属性</param>
+        public async Task<TResult> GetNovelPropertyAsync<TResult>(int novelId, Expression<Func<Novel, TResult>> propertySelector, TResult defaultValue = default)
+        {
+            try
+            {
+                var result = await _novelRepository.GetNovelPropertyAsync(novelId, propertySelector);
+                return EqualityComparer<TResult>.Default.Equals(result, default(TResult)) ? defaultValue : result;
+            }
+            catch
+            {
+                return defaultValue;
+            }
+        }
 
         /*
         public async Task<string> UploadCoverAsync(int novelId, IFormFile coverFile)
