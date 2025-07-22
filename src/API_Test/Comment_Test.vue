@@ -99,6 +99,23 @@
             <pre>{{ apiResponse10 }}</pre>
         </div>
 
+        <h1>11:获取小说顶级评论</h1>
+        <input v-model="novelId11" placeholder="输入小说ID" />
+        <button @click="function11">获取评论</button>
+        <div v-if="apiResponse11">
+            <h3>响应数据：</h3>
+            <pre>{{ apiResponse11 }}</pre>
+        </div>
+
+        <h1>12:获取点赞最多的评论</h1>
+        <input v-model="novelId12" placeholder="输入小说ID" />
+        <input v-model="topN12" placeholder="输入前N名" />
+        <button @click="function12">获取评论</button>
+        <div v-if="apiResponse12">
+            <h3>响应数据：</h3>
+            <pre>{{ apiResponse12 }}</pre>
+        </div>
+
     </div>
 </template>
 
@@ -114,7 +131,9 @@ import {
     getCommentsByChapter,
     getCommentsByNovel,
     deleteCommentRecursive,
-    reviewComment
+    reviewComment,
+    getTopLevelComments,
+    getTopLikedComments
 } from '@/API/Comment_API'
 
 import { useRouter } from 'vue-router'
@@ -295,6 +314,35 @@ async function fuction10() {
     } catch (error) {
         console.error('审核评论请求错误:', error)
         apiResponse10.value = { error: error.message }
+    }
+}
+
+// 11:获取小说顶级评论
+const novelId11 = ref('')
+const apiResponse11 = ref(null)
+async function function11() {
+    try {
+        const response = await getTopLevelComments(novelId11.value)
+        apiResponse11.value = response
+        console.log('顶级评论响应:', response)
+    } catch (error) {
+        console.error('获取顶级评论请求错误:', error)
+        apiResponse11.value = { error: error.message }
+    }
+}
+
+// 12:获取点赞最多的评论
+const novelId12 = ref('')
+const topN12 = ref('')
+const apiResponse12 = ref(null)
+async function function12() {
+    try {
+        const response = await getTopLikedComments(novelId12.value, topN12.value)
+        apiResponse12.value = response
+        console.log('点赞最多评论响应:', response)
+    } catch (error) {
+        console.error('获取点赞最多评论请求错误:', error)
+        apiResponse12.value = { error: error.message }
     }
 }
 </script>

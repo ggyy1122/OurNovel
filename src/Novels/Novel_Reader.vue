@@ -129,7 +129,9 @@ import { useRouter } from 'vue-router';
 import { ref, computed } from 'vue';
 import { onMounted, onUnmounted } from 'vue';
 import { getChapter } from '@/API/Chapter_API';
-import { addOrUpdateCollect, getCollectsByReader } from '@/API/Collect_API'
+import { addOrUpdateCollect } from '@/API/Collect_API'
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
 const showSettings = ref(false);
 const fontSize = ref(18);
@@ -191,13 +193,26 @@ const router = useRouter();
 const isFavorite = ref(reader_state.isFavorite(selectNovelState.novelId));
 async function handleAddShelf() {
     if (isFavorite.value) return;
-    const response = await addOrUpdateCollect(selectNovelState.novelId, reader_state.readerId, 'yes');
+    const readerId = reader_state.readerId;
+    const response = await addOrUpdateCollect(selectNovelState.novelId, readerId, 'yes');
     if (response) {
         isFavorite.value = true;
-        reader_state.favoriteBooks = await getCollectsByReader(reader_state.readerId);
-        alert('加入书架成功！');
+        reader_state.favoriteBooks.push({
+            novelId: selectNovelState.novelId,
+            novel: selectNovelState, // 保存完整作品信息
+            readerId,
+            isPublic: "yes",
+            collectTime: new Date().toISOString()
+        });
+        toast("加入书架成功！", {
+            "type": "success",
+            "dangerouslyHTMLString": true
+        })
     } else {
-        alert('加入书架失败：' + response.message);
+        toast("加入书架失败：" + response.message, {
+            "type": "error",
+            "dangerouslyHTMLString": true
+        })
     }
 }
 async function changeChapter(num) {
@@ -216,7 +231,10 @@ async function changeChapter(num) {
         );
         router.push('/Novels/reader');
     } catch (error) {
-        alert('章节加载失败：该章节不存在!');
+        toast("章节加载失败：该章节不存在!", {
+            "type": "warning",
+            "dangerouslyHTMLString": true
+        })
     }
 }
 const handleKeyDown = (e) => {
