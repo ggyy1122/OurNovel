@@ -124,18 +124,22 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue';
-import { useRouter } from 'vue-router';
-import { SelectNovel_State, readerState } from '@/stores/index';
-import { getCategoriesByNovel } from '@/API/NovelCategory_API';
-import { addOrUpdateCollect, deleteCollect } from '@/API/Collect_API';
+import {ref, onMounted ,watch,computed} from 'vue';
+import { useRouter} from 'vue-router';
+import { SelectNovel_State,readerState } from '@/stores/index';
+import { getCategoriesByNovel} from '@/API/NovelCategory_API';
+import {addOrUpdateCollect,deleteCollect} from '@/API/Collect_API';
+import {getNovelWordCount, getNovelRecommendCount,getNovelCollectCount} from '@/API/Novel_API';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
-import { getChapter } from '@/API/Chapter_API';
-const selectNovelState = SelectNovel_State();      //小说对象
-const ReaderState = readerState();                   //当前读者对象
-const categories = ref([]);                          //分类数组
+
+const selectNovelState = SelectNovel_State();      //当前选择的小说对象
+const ReaderState=readerState();                   //当前读者对象
+const categories=ref([]);                          //分类数组
 const isLoadingCategories = ref(false);            //是否在加载
+const novelWordCount=ref(0);                       //当前小说的字数
+const collectedCount=ref(0);                       //当前小说的被收藏数
+const recommendCount=ref(0);                       //当前小说的被推荐数
 
 //是否被收藏
 const isCollected = computed(() => {
@@ -183,9 +187,52 @@ const fetchCategories = async () => {
     isLoadingCategories.value = false
   }
 }
+// 获取字数的函数
+const fetchWordCount = async () => {
+  try {
+    const response = await getNovelWordCount(selectNovelState.novelId)
+    console.log('完整响应:', response) // 调试查看完整响应结构
+    novelWordCount.value = response.data?.totalWords || response?.totalWords || 0
+    console.log('最终字数:', novelWordCount.value) // 调试
+  } catch (error) {
+    console.error('获取字数失败:', error)
+    novelWordCount.value = 0
+  }
+}
+// 获取推荐数的函数
+const fetchRecommendCount = async ()=>{
+  try {
+    const response = await getNovelRecommendCount(selectNovelState.novelId)
+    console.log('完整响应:', response) // 调试查看完整响应结构
+    recommendCount.value = response.data?.recommendCount || response?.recommendCount || 0
+    console.log('最终推荐数:', recommendCount.value) // 调试
+  } catch (error) {
+    console.error('获取推荐数失败:', error)
+    recommendCount.value = 0
+  }
+
+}
+// 获取收藏数的函数
+const fetchCollectedCount = async ()=>{
+  try {
+    const response = await getNovelCollectCount(selectNovelState.novelId)
+    console.log('完整响应:', response) // 调试查看完整响应结构
+    collectedCount.value = response.data?.collectCount || response?.collectCount || 0
+    console.log('最终收藏数:', collectedCount.value) // 调试
+  } catch (error) {
+    console.error('获取收藏数失败:', error)
+    collectedCount.value = 0
+  }
+
+}
+// 获取收藏数的函数
+
 // 组件挂载时获取数据
 onMounted(() => {
-  fetchCategories()
+  fetchCategories();    //挂载时获取当前小说的分类数据
+  fetchWordCount();     //挂载时获取当前小说的字数
+  fetchRecommendCount();//挂载时获取当前小说的推荐数
+  fetchCollectedCount();//挂载时获取当前小说的收藏数
 })
 
 // 如果novelId可能变化，添加监听
@@ -235,6 +282,7 @@ const toggleCollect = async () => {
   }
 };
 //开始阅读
+/*
 async function handleRead() {
   try {
     const response = await getChapter(selectNovelState.novelId, 1);
@@ -257,6 +305,7 @@ async function handleRead() {
     })
   }
 }
+  */
 </script>
 
 <style scoped>
