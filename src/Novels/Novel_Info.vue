@@ -23,7 +23,6 @@
           <!-- 分数显示（与标题同行） -->
           <div class="score-badge" v-if="selectNovelState.score > 0">
             {{ selectNovelState.score.toFixed(1) }} ★ <!-- 假设分数是数字，保留1位小数 -->
-
           </div>
           <div :class="['status-badge', getStatusClass(selectNovelState.status)]">
             <div class="status-dot"></div>
@@ -56,7 +55,6 @@
         </div>
         <!-- 最新章节信息 -->
         <h1 class="newest-chapter">最新章节第....章 2025年xx月xx日</h1>
-
         <!-- 新增的蓝色按钮组 -->
         <div class="action-buttons">
           <button class="blue-border-btn" @click="handleRead">
@@ -96,10 +94,7 @@
         </div>
       </div>
     </div>
-
   </div>
-
-
   <!-- 导航栏展示 -->
   <div class="novel-container">
     <nav class="nav-menu" ref="mainNav">
@@ -121,7 +116,6 @@
         </li>
       </ul>
     </nav>
-
     <main class="main-content">
       <router-view></router-view>
     </main>
