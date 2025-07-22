@@ -117,11 +117,11 @@ export const readerState = defineStore('reader', {
 export const SelectNovel_State = defineStore('select_novel', {
     state: () => ({
         novelId: 0,
-        authorId: 0,    // 作者ID
+        authorId: 0,    
         novelName: "",
         introduction: "",
         createTime: "",
-        coverUrl: "",    //封面不用这个，用下面的formattedcoverUrl,加了前缀
+        coverUrl: "",
         score: 0,
         totalWordCount: 0,
         recommendCount: 0,
@@ -130,25 +130,19 @@ export const SelectNovel_State = defineStore('select_novel', {
         selectedChapter: null, // 当前选中的章节
         selectedComment: null, // 当前选中的评论
 
-        authorName: "",      // 作者名称
-        authorPhone: "",     // 作者电话
-        authorAvatarUrl: "", // 作者头像URL,头像不用这个，用下面的formattedauthorAvatarUrl,加了前缀
+        authorName: "",      
+        authorPhone: "",     
+        authorAvatarUrl: "",
     }),
-    persist: true,  //持久化存储
+    persist: true,  
     getters: {
         formattedcoverUrl: (state) => {
-            const prefix = 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/';  //前缀
-            if (state.coverUrl) {
-                return prefix + state.coverUrl;
-            }
-            return prefix + 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg';  // 默认头像
+            const prefix = 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/';
+            return state.coverUrl ? prefix + state.coverUrl : prefix + 'default_cover.jpg';
         },
         formattedauthorAvatarUrl: (state) => {
-            const prefix = 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/';  //前缀
-            if (state.authorAvatarUrl) {
-                return prefix + state.authorAvatarUrl;
-            }
-            return prefix + 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg';  // 默认头像
+            const prefix = 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/';
+            return state.authorAvatarUrl ? prefix + state.authorAvatarUrl : prefix + 'default_avatar.jpg';
         }
     },
     actions: {
@@ -167,8 +161,12 @@ export const SelectNovel_State = defineStore('select_novel', {
             this.authorName = authorName || "";
             this.authorPhone = authorPhone || "";
             this.authorAvatarUrl = authorAvatarUrl || "";
-            this.selectedChapter = null;
+            this.selectedChapter = null;  // Reset chapter when novel is reset
             this.selectedComment = null;
+        },
+        // 设置选中的章节
+        setSelectedChapter(chapter) {
+            this.selectedChapter = chapter;  // 通过这个方法来更新 selectedChapter
         }
     }
 });
