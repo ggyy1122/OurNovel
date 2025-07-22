@@ -48,7 +48,8 @@ namespace OurNovel.Services
                 Password = hashedPassword,  // 存储加密后的密码
                 Earning = 0,
                 Phone = null,
-                AvatarUrl = null
+                AvatarUrl = null,
+                RegisterTime = DateTime.Now
             };
 
             _context.Authors.Add(author);
@@ -102,6 +103,7 @@ namespace OurNovel.Services
                 .CountAsync(n => n.AuthorId == authorId);
         }
 
+
         /// <summary>
         /// 按作者id统计其字数总数
         /// </summary>
@@ -110,6 +112,20 @@ namespace OurNovel.Services
             return await _context.Novels
                 .Where(n => n.AuthorId == authorId)
                 .SumAsync(n => (long?)n.TotalWordCount) ?? 0;
+        }
+        /// <summary>
+        /// 计算作者注册总天数
+        /// </summary>
+        public async Task<int?> GetAuthorRegisterDaysAsync(int authorId)
+        {
+            var author = await _context.Authors.FindAsync(authorId);
+            if (author == null) return null;
+
+            // 默认将 null 当作今天注册
+            DateTime regTime = author.RegisterTime ?? DateTime.Now;
+           int days = (int)((DateTime.Now.Date - regTime.Date).TotalDays);
+
+            return days;
         }
     }
 }
