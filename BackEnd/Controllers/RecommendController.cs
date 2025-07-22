@@ -29,6 +29,7 @@ public class RecommendController : ControllerBase
     public async Task<IActionResult> Add(int novelId, int readerId, string? reason)
     {
         await _service.AddAsync(novelId, readerId, reason);
+        await _service.UpdateRecommendCountAsync(novelId);
         return Ok("推荐成功");
     }
 
@@ -42,6 +43,7 @@ public class RecommendController : ControllerBase
     public async Task<IActionResult> Delete(int novelId, int readerId)
     {
         await _service.DeleteAsync(novelId, readerId);
+        await _service.UpdateRecommendCountAsync(novelId);
         return Ok("取消推荐成功");
     }
 

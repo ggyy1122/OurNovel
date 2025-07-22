@@ -28,6 +28,7 @@ public class CollectController : ControllerBase
     public async Task<IActionResult> AddOrUpdate(int novelId, int readerId, string? isPublic)
     {
         await _service.AddOrUpdateAsync(novelId, readerId, isPublic);
+        await _service.UpdateCollectCountAsync(novelId);
         return Ok("收藏成功");
     }
 
@@ -42,6 +43,7 @@ public class CollectController : ControllerBase
     public async Task<IActionResult> Delete(int novelId, int readerId)
     {
         await _service.DeleteAsync(novelId, readerId);
+        await _service.UpdateCollectCountAsync(novelId);
         return Ok("取消收藏");
     }
 
