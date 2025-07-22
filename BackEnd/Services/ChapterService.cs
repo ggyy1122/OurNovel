@@ -54,6 +54,25 @@ namespace OurNovel.Services
             }
         }
 
+        private async Task UpdateNovelTotalPriceAsync(int novelId)
+        {
+            var chapters = await _chapterRepository.GetByNovelIdAsync(novelId);
+
+            decimal totalPrice = chapters
+                .Where(c => c.Content != null)
+                .Sum(c => Math.Round((c.WordCount / 1000m) * c.PricePerKilo, 2));
+
+            // 获取 Novel 实体
+            var novel = await _chapterRepository.GetNovelByIdAsync(novelId);
+            if (novel != null)
+            {
+                novel.TotalPrice = totalPrice;
+
+                await _chapterRepository.UpdateNovelAsync(novel);
+            }
+        }
+
+
         public async Task<IEnumerable<Chapter>> GetByNovelIdAsync(int novelId)
         {
             return await _chapterRepository.GetByNovelIdAsync(novelId);
@@ -91,6 +110,7 @@ namespace OurNovel.Services
 
             await _chapterRepository.AddAsync(chapter);
             await UpdateNovelTotalWordCountAsync(chapter.NovelId);
+            await UpdateNovelTotalPriceAsync(chapter.NovelId);
         }
 
         public async Task UpdateAsync(Chapter chapter)
@@ -109,6 +129,7 @@ namespace OurNovel.Services
 
             await _chapterRepository.UpdateAsync(chapter);
             await UpdateNovelTotalWordCountAsync(chapter.NovelId);
+            await UpdateNovelTotalPriceAsync(chapter.NovelId);
         }
         public async Task<IEnumerable<Chapter>> GetAllAsync()
         {
@@ -120,6 +141,7 @@ namespace OurNovel.Services
         {
             await _chapterRepository.DeleteAsync(novelId, chapterId);
             await UpdateNovelTotalWordCountAsync(novelId);
+            await UpdateNovelTotalPriceAsync(novelId);
         }
 
         /// <summary>

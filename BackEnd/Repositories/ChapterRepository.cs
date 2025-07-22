@@ -52,5 +52,16 @@ namespace OurNovel.Repositories
         {
             return await _context.Chapters.ToListAsync();
         }
+
+        public async Task<Novel?> GetNovelByIdAsync(int novelId)
+        {
+            return await _context.Novels.FindAsync(novelId);
+        }
+
+        public async Task UpdateNovelAsync(Novel novel)
+        {
+            _context.Novels.Update(novel);
+            await _context.SaveChangesAsync();
+        }
     }
 }

@@ -10,6 +10,8 @@ namespace OurNovel.Repositories
         Task AddAsync(Chapter chapter);
         Task UpdateAsync(Chapter chapter);
         Task DeleteAsync(int novelId, int chapterId);
-        Task<IEnumerable<Chapter>> GetAllAsync();  
+        Task<IEnumerable<Chapter>> GetAllAsync();
+        Task<Novel?> GetNovelByIdAsync(int novelId);
+        Task UpdateNovelAsync(Novel novel);
     }
 }

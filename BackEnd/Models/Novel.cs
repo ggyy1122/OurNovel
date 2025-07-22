@@ -32,7 +32,9 @@ namespace OurNovel.Models
 
         public string? Status { get; set; } = "待审核";    // Status "待审核"/"连载"/"完结"/"封禁"
 
-        public int OriginalNovelId { get; set; } = -1;     // OriginalNovelId 非空
+        public int OriginalNovelId { get; set; } = -1;     // OriginalNovelId，默认-1
+
+        public decimal? TotalPrice { get; set; } = 0;      //TotalPrice，默认0
 
         // public ICollection<Chapter> Chapters { get; set; } = new List<Chapter>();  // 维护反向Chapter导航
 

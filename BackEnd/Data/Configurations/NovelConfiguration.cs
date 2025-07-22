@@ -39,6 +39,9 @@ namespace OurNovel.Data.Configurations
             entity.Property(e => e.OriginalNovelId)
                   .HasColumnName("ORIGINAL_NOVEL_ID")
                   .HasDefaultValue(-1);
+            entity.Property(e => e.TotalPrice)
+                  .HasColumnName("TOTAL_PRICE")
+                  .HasDefaultValue(0m);
         }
     }
 }
