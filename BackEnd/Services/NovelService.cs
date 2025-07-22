@@ -23,7 +23,7 @@ namespace OurNovel.Services
         /// <summary>
         /// 审核小说，修改状态为“连载”或“封禁”
         /// </summary>
-        public async Task<bool> ReviewNovelAsync(int novelId, string newStatus,int managerId)
+        public async Task<bool> ReviewNovelAsync(int novelId, string newStatus,int managerId, string result)
         {
             // 合法性检查（业务约束）
             if (newStatus != "连载" && newStatus != "封禁")
@@ -35,8 +35,6 @@ namespace OurNovel.Services
 
             novel.Status = newStatus;
             await _repository.UpdateAsync(novel);
-
-            var result = $"审核结束，状态修改为 {newStatus}";
             await _novelManagementService.RecordManagementAsync(managerId, result, novelId);
 
             return true;

@@ -26,7 +26,7 @@ namespace OurNovel.Services
         /// <param name="commentId">评论ID</param>
         /// <param name="status">状态（通过/封禁）</param>
         /// <param name="managerId">操作管理员ID</param>
-        public async Task SetCommentStatusAsync(int commentId, string status, int managerId)
+        public async Task SetCommentStatusAsync(int commentId, string status, int managerId, string result)
         {
             if (status != "通过" && status != "封禁")
                 throw new Exception("非法的评论状态，应为“通过”或“封禁”");
@@ -38,7 +38,6 @@ namespace OurNovel.Services
             comment.Status = status;
             await _repository.UpdateAsync(comment);
 
-            var result = $"审核评论完成，状态修改为 {status}";
             await _commentManagementService.RecordManagementAsync(managerId, result, commentId);
         }
       
@@ -93,7 +92,7 @@ namespace OurNovel.Services
                 }
             }
         }
-
+        /*
         /// <summary>
         /// 审核评论，修改状态为“通过”或“封禁”
         /// </summary>
@@ -111,6 +110,7 @@ namespace OurNovel.Services
             await _repository.UpdateAsync(comment);
             return true;
         }
+        */
 
         /// <summary>
         /// 获取指定小说所有章节的第一级评论（即不作为回复的评论）

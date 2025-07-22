@@ -147,7 +147,7 @@ namespace OurNovel.Services
         /// <summary>
         /// 审核章节，修改状态为“已发布”或“封禁”
         /// </summary>
-        public async Task<bool> ReviewChapterAsync(int novelId, int chapterId, string newStatus, int managerId)
+        public async Task<bool> ReviewChapterAsync(int novelId, int chapterId, string newStatus, int managerId, string result)
         {
             // 状态值合法性校验
             if (newStatus != "已发布" && newStatus != "封禁")
@@ -166,7 +166,6 @@ namespace OurNovel.Services
             await UpdateNovelTotalWordCountAsync(novelId);
             await UpdateNovelTotalPriceAsync(novelId);
 
-            var result = $"审核章节完成，状态变更为 {newStatus}";
             await _chapterManagementService.RecordManagementAsync(managerId, result, chapter.NovelId, chapter.ChapterId);
 
             return true;
