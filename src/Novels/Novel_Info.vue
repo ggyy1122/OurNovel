@@ -131,6 +131,7 @@ import { getCategoriesByNovel} from '@/API/NovelCategory_API';
 import {addOrUpdateCollect,deleteCollect} from '@/API/Collect_API';
 import {getNovelWordCount, getNovelRecommendCount,getNovelCollectCount} from '@/API/Novel_API';
 import {  getAuthorNovelCount,getAuthorTotalWordCount,getAuthorRegisterDays}  from '@/API/Author_API';
+import { getChapter } from '@/API/Chapter_API';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
@@ -327,7 +328,6 @@ const toggleCollect = async () => {
   }
 };
 //开始阅读
-/*
 async function handleRead() {
   try {
     const response = await getChapter(selectNovelState.novelId, 1);
@@ -350,7 +350,6 @@ async function handleRead() {
     })
   }
 }
-  */
 </script>
 
 <style scoped>
