@@ -1,79 +1,88 @@
 <template>
-  <button @click="goback" class="back-button">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="m15 18-6-6 6-6" />
-    </svg>
-    返回
-  </button>
-  <!-- 美观的书籍信息展示 -->
-  <div class="book-display-card">
-    <div class="book-content">
-      <!-- 左侧图片区域 -->
-      <div class="book-image-section">
-        <div class="image-wrapper">
-          <img :src="selectNovelState.formattedcoverUrl || defaultCoverImage" :alt="selectNovelState.novelName"
-            class="book-cover" @error="handleImageError" />
-        </div>
-      </div>
-      <!-- 中间信息区域 -->
-      <div class="book-info-section">
-        <!-- 标题 -->
-        <h1 class="book-title">{{ selectNovelState.novelName }}</h1>
-        <div class="tag-row"> <!-- 新增的包裹容器 -->
-          <!-- 分数显示（与标题同行） -->
-          <div class="score-badge" v-if="selectNovelState.score > 0">
-            {{ selectNovelState.score.toFixed(1) }} ★ <!-- 假设分数是数字，保留1位小数 -->
+       <button @click="goback" class="back-button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m15 18-6-6 6-6"/>
+            </svg>
+            返回
+        </button>
+     <!-- 美观的书籍信息展示 -->
+     <div class="book-display-card">
+         <div class="book-content">
+                  <!-- 左侧图片区域 -->
+                <div class="book-image-section">
+                     <div class="image-wrapper">
+                          <img 
+                            :src="selectNovelState.formattedcoverUrl || defaultCoverImage" 
+                            :alt="selectNovelState.novelName"
+                            class="book-cover"
+                            @error="handleImageError"
+                        />
+                     </div>
+                </div>
+                  <!-- 中间信息区域 -->
+                <div class="book-info-section">
+                             <!-- 标题 -->
+                          <h1 class="book-title">{{ selectNovelState.novelName }}</h1> 
+                           <div class="tag-row"> <!-- 新增的包裹容器 -->
+                             <!-- 分数显示（与标题同行） -->
+                         <div class="score-badge" v-if ="selectNovelState.score>0" >
+                     {{ selectNovelState.score.toFixed(1) }} ★ <!-- 假设分数是数字，保留1位小数 -->
 
-          </div>
-          <div :class="['status-badge', getStatusClass(selectNovelState.status)]">
-            <div class="status-dot"></div>
-            {{ selectNovelState.status }}
-          </div>
-          <!-- 分类徽章（每个分类独立徽章） -->
-          <template v-if="categories.length > 0">
-            <div v-for="category in categories" :key="category" class="category-badge">
-              {{ category }}
-            </div>
-          </template>
-        </div>
-        <!-- 作者信息 -->
-        <div class="author-name" v-if="selectNovelState.authorName">
-          作者：{{ selectNovelState.authorName }}</div>
-        <!-- 统计信息 -->
-        <div class="stats-row">
-          <span class="stat-item">
-            <span class="stat-value">{{ selectNovelState.totalWordCount }}</span>
-            <span class="stat-unit">字</span>
-          </span>
-          <span class="stat-item">
-            <span class="stat-value">{{ selectNovelState.recommendCount }}</span>
-            <span class="stat-unit">推荐</span>
-          </span>
-          <span class="stat-item">
-            <span class="stat-value">{{ selectNovelState.collectedCount }}</span>
-            <span class="stat-unit">收藏</span>
-          </span>
-        </div>
-        <!-- 最新章节信息 -->
-        <h1 class="newest-chapter">最新章节第....章 2025年xx月xx日</h1>
+                         </div>
+                         <div :class="['status-badge', getStatusClass(selectNovelState.status)]">
+                        <div class="status-dot"></div>
+                        {{ selectNovelState.status }}
+                       </div>
+                       <!-- 分类徽章（每个分类独立徽章） -->
+                       <template v-if="categories.length > 0">
+                            <div 
+                                    v-for="category in categories" 
+                                    :key="category"
+                                       class="category-badge"
+                                          >
+                                     {{ category }}
+                           </div>
+                          </template>
+                        </div>
+                       <!-- 作者信息 -->
+                        <div class="author-name" v-if="selectNovelState.authorName">
+                            作者：{{ selectNovelState.authorName }}</div>
+                       <!-- 统计信息 -->
+                           <div class="stats-row">
+                             <span class="stat-item">
+                                 <span class="stat-value">{{ novelWordCount }}</span>
+                                 <span class="stat-unit">字</span>
+                               </span>
+                             <span class="stat-item">
+                                <span class="stat-value">{{  recommendCount }}</span>
+                                <span class="stat-unit">推荐</span>
+                                 </span>
+                             <span class="stat-item">
+                             <span class="stat-value">{{ collectedCount }}</span>
+                             <span class="stat-unit">收藏</span>
+                                  </span>
+                           </div>
+                        <!-- 最新章节信息 -->
+                           <h1 class="newest-chapter">最新章节第....章  2025年xx月xx日</h1> 
 
-        <!-- 新增的蓝色按钮组 -->
-        <div class="action-buttons">
-          <button class="blue-border-btn" @click="handleRead">
-            开始阅读
-          </button>
-          <button class="blue-border-btn" :class="{ 'is-collected': isCollected }" @click="toggleCollect">
-            {{ isCollected ? '已收藏' : '收藏作品' }}
-          </button>
-          <button class="blue-border-btn">
-            推荐作品
-          </button>
-          <button class="blue-border-btn">
-            打赏作品
-          </button>
-        </div>
-      </div>
-      <!-- 右侧作者卡片区域 -->
+                         <!-- 新增的蓝色按钮组 -->
+                             <div class="action-buttons">
+                              <button class="blue-border-btn">
+                                开始阅读
+                                  </button>
+                              <button class="blue-border-btn" :class="{ 'is-collected': isCollected }"
+      @click="toggleCollect">
+                                {{ isCollected ? '已收藏' : '收藏作品' }}
+                                  </button>
+                             <button class="blue-border-btn">
+                                  推荐作品
+                                  </button>
+                              <button class="blue-border-btn">
+                                  打赏作品
+                                  </button>
+                             </div>
+                </div>
+                <!-- 右侧作者卡片区域 -->
       <div class="author-card-section">
         <div class="author-card">
           <img :src="selectNovelState.formattedauthorAvatarUrl || defaultAuthorAvatar" class="author-avatar" />
@@ -130,18 +139,22 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue';
-import { useRouter } from 'vue-router';
-import { SelectNovel_State, readerState } from '@/stores/index';
-import { getCategoriesByNovel } from '@/API/NovelCategory_API';
-import { addOrUpdateCollect, deleteCollect } from '@/API/Collect_API';
+import {ref, onMounted ,watch,computed} from 'vue';
+import { useRouter} from 'vue-router';
+import { SelectNovel_State,readerState } from '@/stores/index';
+import { getCategoriesByNovel} from '@/API/NovelCategory_API';
+import {addOrUpdateCollect,deleteCollect} from '@/API/Collect_API';
+import {getNovelWordCount, getNovelRecommendCount,getNovelCollectCount} from '@/API/Novel_API';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
-import { getChapter } from '@/API/Chapter_API';
-const selectNovelState = SelectNovel_State();      //小说对象
-const ReaderState = readerState();                   //当前读者对象
-const categories = ref([]);                          //分类数组
+
+const selectNovelState = SelectNovel_State();      //当前选择的小说对象
+const ReaderState=readerState();                   //当前读者对象
+const categories=ref([]);                          //分类数组
 const isLoadingCategories = ref(false);            //是否在加载
+const novelWordCount=ref(0);                       //当前小说的字数
+const collectedCount=ref(0);                       //当前小说的被收藏数
+const recommendCount=ref(0);                       //当前小说的被推荐数
 
 //是否被收藏
 const isCollected = computed(() => {
@@ -189,9 +202,52 @@ const fetchCategories = async () => {
     isLoadingCategories.value = false
   }
 }
+// 获取字数的函数
+const fetchWordCount = async () => {
+  try {
+    const response = await getNovelWordCount(selectNovelState.novelId)
+    console.log('完整响应:', response) // 调试查看完整响应结构
+    novelWordCount.value = response.data?.totalWords || response?.totalWords || 0
+    console.log('最终字数:', novelWordCount.value) // 调试
+  } catch (error) {
+    console.error('获取字数失败:', error)
+    novelWordCount.value = 0
+  }
+}
+// 获取推荐数的函数
+const fetchRecommendCount = async ()=>{
+  try {
+    const response = await getNovelRecommendCount(selectNovelState.novelId)
+    console.log('完整响应:', response) // 调试查看完整响应结构
+    recommendCount.value = response.data?.recommendCount || response?.recommendCount || 0
+    console.log('最终推荐数:', recommendCount.value) // 调试
+  } catch (error) {
+    console.error('获取推荐数失败:', error)
+    recommendCount.value = 0
+  }
+
+}
+// 获取收藏数的函数
+const fetchCollectedCount = async ()=>{
+  try {
+    const response = await getNovelCollectCount(selectNovelState.novelId)
+    console.log('完整响应:', response) // 调试查看完整响应结构
+    collectedCount.value = response.data?.collectCount || response?.collectCount || 0
+    console.log('最终收藏数:', collectedCount.value) // 调试
+  } catch (error) {
+    console.error('获取收藏数失败:', error)
+    collectedCount.value = 0
+  }
+
+}
+// 获取收藏数的函数
+
 // 组件挂载时获取数据
 onMounted(() => {
-  fetchCategories()
+  fetchCategories();    //挂载时获取当前小说的分类数据
+  fetchWordCount();     //挂载时获取当前小说的字数
+  fetchRecommendCount();//挂载时获取当前小说的推荐数
+  fetchCollectedCount();//挂载时获取当前小说的收藏数
 })
 
 // 如果novelId可能变化，添加监听
