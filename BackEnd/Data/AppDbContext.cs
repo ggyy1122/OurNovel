@@ -49,6 +49,7 @@ namespace OurNovel.Data
         public DbSet<AuthorIncome> AuthorIncomes { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Purchase> Purchases { get; set; }
+        public DbSet<Purchase> WholePurchases { get; set; }
 
         /// <summary>
         /// 配置实体和数据库表结构映射关系的方法
@@ -87,7 +88,7 @@ namespace OurNovel.Data
             modelBuilder.ApplyConfiguration(new CommentManagementConfiguration());
             modelBuilder.ApplyConfiguration(new NovelManagementConfiguration());
             modelBuilder.ApplyConfiguration(new ChapterManagementConfiguration());
-
+            modelBuilder.ApplyConfiguration(new WholePurchaseConfiguration());
 
             // ⚠️ 后续其他表的配置也在这里调用，例如：
             // modelBuilder.ApplyConfiguration(new NovelConfiguration());
