@@ -43,7 +43,7 @@ namespace OurNovel.Services
         private async Task UpdateNovelTotalWordCountAsync(int novelId)
         {
             var total = await _context.Chapters
-                .Where(c => c.NovelId == novelId)
+                .Where(c => c.NovelId == novelId && c.Status == "已发布")
                 .SumAsync(c => (long?)c.WordCount) ?? 0;
 
             var novel = await _context.Novels.FindAsync(novelId);
@@ -59,7 +59,7 @@ namespace OurNovel.Services
             var chapters = await _chapterRepository.GetByNovelIdAsync(novelId);
 
             decimal totalPrice = chapters
-                .Where(c => c.Content != null)
+                .Where(c => c.Status == "已发布" && c.Content != null)
                 .Sum(c => Math.Round((c.WordCount / 1000m) * c.PricePerKilo, 2));
 
             // 获取 Novel 实体
@@ -161,6 +161,11 @@ namespace OurNovel.Services
             // 修改状态
             chapter.Status = newStatus;
             await _chapterRepository.UpdateAsync(chapter);
+
+            // 更新小说总字数与总价格
+            await UpdateNovelTotalWordCountAsync(novelId);
+            await UpdateNovelTotalPriceAsync(novelId);
+
             var result = $"审核章节完成，状态变更为 {newStatus}";
             await _chapterManagementService.RecordManagementAsync(managerId, result, chapter.NovelId, chapter.ChapterId);
 
