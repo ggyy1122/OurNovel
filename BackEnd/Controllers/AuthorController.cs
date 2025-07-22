@@ -56,5 +56,25 @@ namespace OurNovel.Controllers
         }
 
         // 可继续扩展作者特殊业务接口，如作品统计、收入查询等
+
+        /// <summary>
+        /// 小说统计
+        /// </summary>
+        [HttpGet("{authorId}/novel-count")]
+        public async Task<IActionResult> GetNovelCount(int authorId)
+        {
+            var count = await _authorService.GetNovelCountByAuthorIdAsync(authorId);
+            return Ok(new { novelCount = count });
+        }
+
+        /// <summary>
+        /// 字数统计
+        /// </summary>
+        [HttpGet("{authorId}/total-wordcount")]
+        public async Task<IActionResult> GetTotalWordCount(int authorId)
+        {
+            var total = await _authorService.GetTotalWordCountByAuthorIdAsync(authorId);
+            return Ok(new { totalWordCount = total });
+        }
     }
 }
