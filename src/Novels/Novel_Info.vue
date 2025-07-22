@@ -79,15 +79,15 @@
           <p class="author-brief">{{ '作者简介:暂无作者简介' }}</p>
           <div class="author-data-cards">
             <div class="data-card">
-              <div class="data-value">5</div>
+              <div class="data-value">{{ authorNovelCount }}</div>
               <div class="data-label">作品总数</div>
             </div>
             <div class="data-card">
-              <div class="data-value">1777</div>
+              <div class="data-value">{{ authorWordCount }}</div>
               <div class="data-label">累计字数</div>
             </div>
             <div class="data-card">
-              <div class="data-value">3465</div>
+              <div class="data-value">{{  authorRegisterDays }}</div>
               <div class="data-label">创作天数</div>
             </div>
           </div>
@@ -124,12 +124,13 @@
 </template>
 
 <script setup>
-import {ref, onMounted ,watch,computed} from 'vue';
+import {ref, watch,computed} from 'vue';
 import { useRouter} from 'vue-router';
 import { SelectNovel_State,readerState } from '@/stores/index';
 import { getCategoriesByNovel} from '@/API/NovelCategory_API';
 import {addOrUpdateCollect,deleteCollect} from '@/API/Collect_API';
 import {getNovelWordCount, getNovelRecommendCount,getNovelCollectCount} from '@/API/Novel_API';
+import {  getAuthorNovelCount,getAuthorTotalWordCount,getAuthorRegisterDays}  from '@/API/Author_API';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
@@ -140,6 +141,9 @@ const isLoadingCategories = ref(false);            //是否在加载
 const novelWordCount=ref(0);                       //当前小说的字数
 const collectedCount=ref(0);                       //当前小说的被收藏数
 const recommendCount=ref(0);                       //当前小说的被推荐数
+const authorNovelCount=ref(0);                      //当前作者的创作小说数
+const authorWordCount=ref(0);                      //当前作者的创作总字数
+const authorRegisterDays=ref(0);                   //当前作者的创作天数
 
 //是否被收藏
 const isCollected = computed(() => {
@@ -191,9 +195,8 @@ const fetchCategories = async () => {
 const fetchWordCount = async () => {
   try {
     const response = await getNovelWordCount(selectNovelState.novelId)
-    console.log('完整响应:', response) // 调试查看完整响应结构
     novelWordCount.value = response.data?.totalWords || response?.totalWords || 0
-    console.log('最终字数:', novelWordCount.value) // 调试
+     console.log('最终字数:',  novelWordCount.value) // 调试
   } catch (error) {
     console.error('获取字数失败:', error)
     novelWordCount.value = 0
@@ -203,9 +206,8 @@ const fetchWordCount = async () => {
 const fetchRecommendCount = async ()=>{
   try {
     const response = await getNovelRecommendCount(selectNovelState.novelId)
-    console.log('完整响应:', response) // 调试查看完整响应结构
     recommendCount.value = response.data?.recommendCount || response?.recommendCount || 0
-    console.log('最终推荐数:', recommendCount.value) // 调试
+        console.log('最终推荐数:',  recommendCount.value) // 调试
   } catch (error) {
     console.error('获取推荐数失败:', error)
     recommendCount.value = 0
@@ -216,29 +218,72 @@ const fetchRecommendCount = async ()=>{
 const fetchCollectedCount = async ()=>{
   try {
     const response = await getNovelCollectCount(selectNovelState.novelId)
-    console.log('完整响应:', response) // 调试查看完整响应结构
     collectedCount.value = response.data?.collectCount || response?.collectCount || 0
-    console.log('最终收藏数:', collectedCount.value) // 调试
+      console.log('最终收藏数:',  collectedCount.value) // 调试
   } catch (error) {
     console.error('获取收藏数失败:', error)
     collectedCount.value = 0
   }
 
 }
-// 获取收藏数的函数
+// 获取作者创作书籍数的函数
+const fetchAuthorNovelCount = async ()=>{
+  try {
+    const response = await getAuthorNovelCount(selectNovelState.authorId)
+    authorNovelCount.value = response.data?.novelCount || response?.novelCount|| 0
+      console.log('最终作者创作数:',  authorNovelCount.value) // 调试
+  } catch (error) {
+    console.error('获取作者作品数失败:', error)
+    collectedCount.value = 0
+  }
 
-// 组件挂载时获取数据
-onMounted(() => {
-  fetchCategories();    //挂载时获取当前小说的分类数据
-  fetchWordCount();     //挂载时获取当前小说的字数
-  fetchRecommendCount();//挂载时获取当前小说的推荐数
-  fetchCollectedCount();//挂载时获取当前小说的收藏数
-})
+}
+//获取作者创作总字数的函数
+const fetchAuthorWordCount  =async ()=>{
+    try {
+    const response = await getAuthorTotalWordCount(selectNovelState.authorId)
+    authorWordCount.value = response.data?.totalWordCount || response?.totalWordCount|| 0
+  } catch (error) {
+    console.error('获取作者创作字数失败:', error)
+     authorWordCount.value = 0
+  }
+}
+//获取作者创作天数
+const fetchAuthorRegisterDays =async ()=>{
+    try {
+    const response = await getAuthorRegisterDays(selectNovelState.authorId)
+   authorRegisterDays.value = response.data?.registerDays || response?.registerDays|| 0
+   console.log('获取作者创作天数:', authorRegisterDays.value)
+  } catch (error) {
+    console.error('获取作者创作天数失败:', error)
+     authorRegisterDays.value = 0
+  }
+}
 
+// 仅监听 novelId 变化,变化时加载数据
+watch(
+  () => selectNovelState.novelId,
+  async (newNovelId) => {
+    if (newNovelId) {
+      try {
+        await Promise.all([
+          fetchCategories(),
+          fetchWordCount(),
+          fetchRecommendCount(),
+          fetchCollectedCount(),
+          fetchAuthorNovelCount(),
+          fetchAuthorWordCount(),
+          fetchAuthorRegisterDays()
+        ])
+        console.log('小说详情页数据更新完成！')
+      } catch (error) {
+        console.error('数据加载失败:', error)
+      }
+    }
+  },
+  { immediate: true } // 替代 onMounted，首次加载时自动执行
+)
 // 如果novelId可能变化，添加监听
-watch(() => selectNovelState.novelId, (newVal) => {
-  if (newVal) fetchCategories()
-})
 /*收藏逻辑*/
 const toggleCollect = async () => {
   const currentNovelId = selectNovelState.novelId;
