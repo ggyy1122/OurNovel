@@ -91,9 +91,20 @@ function changePage(page) {
 
 // 选中章节的逻辑
 function selectChapter(chapter) {
-  selectNovelState.setSelectedChapter(chapter); 
-  console.log('已选择章节：', chapter);
+  selectNovelState.resetChapter(
+    chapter.chapterId,
+    chapter.title,
+    chapter.content,
+    chapter.wordCount,
+    chapter.pricePerKilo,
+    chapter.calculatedPrice,
+    chapter.isCharged,
+    chapter.publishTime,
+    chapter.status
+  );  // 使用 resetChapter 方法更新章节信息
+  console.log('已选择章节：', chapter);  // 打印选中的章节信息
 }
+
 </script>
 
 <style scoped>
