@@ -22,7 +22,7 @@ namespace OurNovel.Models
 
         public string? CoverUrl { get; set; }              // CoverUrl 可空
 
-        public int? Score { get; set; }                    // Score 可空
+        public double? Score { get; set; }                    // Score 可空
 
         public long? TotalWordCount { get; set; }          // TotalWordCount 可空
 

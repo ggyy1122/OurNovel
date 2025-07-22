@@ -70,7 +70,58 @@ namespace OurNovel.Controllers
             }
         }
 
+        /// <summary>
+        /// 返回小说总字数
+        /// </summary>
+        [HttpGet("wordcount/{novelId}")]
+        public async Task<IActionResult> GetTotalWordCount(int novelId)
+        {
+            try
+            {
+                var wordCount = await _novelService.GetNovelPropertyAsync(novelId, n => n.TotalWordCount, 0L);
 
+                return Ok(new { novelId, totalWords = wordCount });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
 
+        /// <summary>
+        /// 返回小说推荐数
+        /// </summary>
+        [HttpGet("recommendcount/{novelId}")]
+        public async Task<IActionResult> GetRecommendCount(int novelId)
+        {
+            try
+            {
+                var recommendCount = await _novelService.GetNovelPropertyAsync(novelId, n => n.RecommendCount, 0);
+
+                return Ok(new { novelId, RecommendCount = recommendCount });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// 返回小说收藏数
+        /// </summary>
+        [HttpGet("collectcount/{novelId}")]
+        public async Task<IActionResult> GetCollectCount(int novelId)
+        {
+            try
+            {
+                var collectCount = await _novelService.GetNovelPropertyAsync(novelId, n => n.CollectedCount, 0);
+
+                return Ok(new { novelId, CollectCount = collectCount });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
     }
 }

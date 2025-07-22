@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using OurNovel.Data;
 using OurNovel.Models;
 using OurNovel.Models.Dto;
@@ -114,5 +115,15 @@ public class NovelRepository : Repository<Novel, int>, INovelRepository
         return result;
     }
 
+    /// <summary>
+    /// 根据小说ID获取小说某个属性
+    /// </summary>
+    public async Task<TResult> GetNovelPropertyAsync<TResult>(int novelId, Expression<Func<Novel, TResult>> propertySelector)
+    {
+        return await _context.Novels
+            .Where(n => n.NovelId == novelId)
+            .Select(propertySelector)
+            .FirstOrDefaultAsync();
+    }
 
 }
