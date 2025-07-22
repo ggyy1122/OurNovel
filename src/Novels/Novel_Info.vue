@@ -297,6 +297,7 @@ const toggleCollect = async () => {
   }
 };
 //开始阅读
+/*
 async function handleRead() {
   try {
     const response = await getChapter(selectNovelState.novelId, 1);
@@ -319,6 +320,7 @@ async function handleRead() {
     })
   }
 }
+  */
 </script>
 
 <style scoped>
