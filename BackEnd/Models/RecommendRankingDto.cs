@@ -16,7 +16,7 @@ namespace OurNovel.Models.Dto
         public string? Status { get; set; }
         public DateTime? CreateTime { get; set; }
 
-        public int? Score { get; set; }
+        public double? Score { get; set; }
         public int CollectedCount { get; set; }  
 
         public long? TotalWordCount { get; set; }

@@ -123,15 +123,14 @@ namespace OurNovel.Services
                 NovelName = edited.NovelName ?? original.NovelName,
                 Introduction = edited.Introduction ?? original.Introduction,
                 CoverUrl = edited.CoverUrl ?? original.CoverUrl,
+                Score = edited.Score ?? original.Score,
                 TotalWordCount = edited.TotalWordCount ?? original.TotalWordCount,
-                // 其他字段...
+                RecommendCount = edited.RecommendCount ?? original.RecommendCount,
+                CollectedCount = edited.CollectedCount ?? original.CollectedCount,
                 Status = "待审核",
                 CreateTime = DateTime.Now,
                 OriginalNovelId = originalNovelId,
-                Score = 0,
-                CollectedCount = 0,
-                RecommendCount = 0,
-                TotalPrice = 0
+                TotalPrice = edited.TotalPrice ?? original.TotalPrice
             };
 
             await _repository.AddAsync(newNovel);
