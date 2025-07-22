@@ -88,10 +88,6 @@
                     :style="{ fontSize: fontSize + 'px', fontFamily: fontFamily, color: textColor }">
                     {{ selectNovelState.cha_content }}
                 </div>
-                <div class="chapter-nav-buttons">
-                    <button class="nav-button prev" @click="changeChapter(-1)">上一章</button>
-                    <button class="nav-button next" @click="changeChapter(1)">下一章</button>
-                </div>
             </div>
             <div class="right-menu">
                 <div class="menu-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24"
@@ -440,10 +436,8 @@ onUnmounted(() => {
 
 .chapter-divider {
     height: 1px;
-    background: transparent;
-    margin: 16px 0;
-    border-bottom: 1px dashed currentColor;
-    opacity: 0.6;
+    background: #eee;
+    margin: 16px 0 0 0;
 }
 
 .novel-content {
@@ -659,59 +653,6 @@ button.active {
 
 .menu-item:disabled {
     opacity: 1;
-}
-
-.chapter-nav-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 160px;
-    margin: 40px auto 20px;
-    width: 100%;
-    max-width: 600px;
-}
-
-.nav-button {
-    padding: 10px 30px;
-    border: 1px solid #000;
-    border-radius: 6px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.2s;
-    flex: 0 0 auto;
-}
-
-.nav-button.prev {
-    background-color: #f5f5f5;
-    color: #333;
-    border-color: #000;
-}
-
-.nav-button.next {
-    background-color: #ffd100;
-    color: #222;
-    border-color: #000;
-}
-
-.nav-button.prev:hover {
-    background-color: #e0e0e0;
-    border-color: #000;
-}
-
-.nav-button.next:hover {
-    background-color: #f0c000;
-    border-color: #000;
-}
-
-@media (max-width: 768px) {
-    .chapter-nav-buttons {
-        gap: 20px;
-        margin: 30px auto 15px;
-    }
-
-    .nav-button {
-        padding: 8px 20px;
-        font-size: 14px;
-    }
 }
 
 @media (max-width: 1200px) {
