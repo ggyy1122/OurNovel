@@ -37,8 +37,10 @@ import { defineProps, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { SelectNovel_State, readerState } from '@/stores/index';
 import { getAuthor } from '@/API/Author_API'
-import { addOrUpdateCollect, getCollectsByReader } from '@/API/Collect_API'
+import { addOrUpdateCollect } from '@/API/Collect_API'
 import { getChapter } from '@/API/Chapter_API';
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 const selectNovelState = SelectNovel_State();
 const reader_state = readerState();
 const props = defineProps({
@@ -55,13 +57,26 @@ const isFavorite = ref(reader_state.isFavorite(props.novel.novelId));
 //加入书架
 async function handleAddShelf() {
     if (isFavorite.value) return;
-    const response = await addOrUpdateCollect(props.novel.novelId, reader_state.readerId, 'yes');
+    const readerId = reader_state.readerId;
+    const response = await addOrUpdateCollect(props.novel.novelId, readerId, 'yes');
     if (response) {
         isFavorite.value = true;
-        reader_state.favoriteBooks = await getCollectsByReader(reader_state.readerId);
-        alert('加入书架成功！');
+        reader_state.favoriteBooks.push({
+            novelId: props.novel.novelId,
+            novel: selectNovelState, // 保存完整作品信息
+            readerId,
+            isPublic: "yes",
+            collectTime: new Date().toISOString()
+        });
+        toast("加入书架成功！", {
+            "type": "success",
+            "dangerouslyHTMLString": true
+        })
     } else {
-        alert('加入书架失败：' + response.message);
+        toast("加入书架失败：" + response.message, {
+            "type": "error",
+            "dangerouslyHTMLString": true
+        })
     }
 }
 async function handle() {
@@ -87,7 +102,10 @@ async function handleRead() {
         );
         router.push('/Novels/reader');
     } catch (error) {
-        alert('章节加载失败：该章节不存在!');
+        toast("章节加载失败：该章节不存在！", {
+            "type": "warning",
+            "dangerouslyHTMLString": true
+        })
     }
 }
 //作品主页
