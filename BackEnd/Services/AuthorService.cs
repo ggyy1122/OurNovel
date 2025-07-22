@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using OurNovel.Data;
 using OurNovel.Models;
 using OurNovel.Repositories;
@@ -90,6 +91,25 @@ namespace OurNovel.Services
         public Author? GetByAuthorName(string authorName)
         {
             return _context.Authors.FirstOrDefault(a => a.AuthorName == authorName);
+        }
+
+        /// <summary>
+        /// 按作者id统计其小说总数
+        /// </summary>
+        public async Task<int> GetNovelCountByAuthorIdAsync(int authorId)
+        {
+            return await _context.Novels
+                .CountAsync(n => n.AuthorId == authorId);
+        }
+
+        /// <summary>
+        /// 按作者id统计其字数总数
+        /// </summary>
+        public async Task<long> GetTotalWordCountByAuthorIdAsync(int authorId)
+        {
+            return await _context.Novels
+                .Where(n => n.AuthorId == authorId)
+                .SumAsync(n => (long?)n.TotalWordCount) ?? 0;
         }
     }
 }
