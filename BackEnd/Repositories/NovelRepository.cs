@@ -39,9 +39,9 @@ public class NovelRepository : Repository<Novel, int>, INovelRepository
                 AuthorName = n.Author?.AuthorName ?? "未知作者",
                 CoverUrl = n.CoverUrl ?? string.Empty,
                 Introduction = n.Introduction ?? string.Empty,
-                CollectCount = c.CollectCount
+                CollectedCount = c.CollectCount
             })
-            .OrderByDescending(x => x.CollectCount) 
+            .OrderByDescending(x => x.CollectedCount) 
             .ToList();
 
         return result;
@@ -63,7 +63,7 @@ public class NovelRepository : Repository<Novel, int>, INovelRepository
             AuthorName = n.Author?.AuthorName ?? "未知作者",
             CoverUrl = n.CoverUrl ?? string.Empty,
             Introduction = n.Introduction ?? string.Empty,
-            RecommendCount = n.RecommendCount ?? 0
+            RecommendedCount = n.RecommendCount ?? 0
         }).ToList();
 
         return result;

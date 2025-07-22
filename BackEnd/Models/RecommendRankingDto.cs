@@ -10,6 +10,6 @@ namespace OurNovel.Models.Dto
         public string AuthorName { get; set; } = null!;
         public string CoverUrl { get; set; } = null!;
         public string Introduction { get; set; } = null!;
-        public int RecommendCount { get; set; }  // 推荐数量
+        public int RecommendedCount { get; set; }  // 推荐数量
     }
 }
