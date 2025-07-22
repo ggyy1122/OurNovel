@@ -1,4 +1,4 @@
-﻿/*2353238关云兮*/
+﻿
 namespace OurNovel.Models
 {
     public class Author : IEntity<int>
@@ -19,6 +19,8 @@ namespace OurNovel.Models
         public string? Phone { get; set; }              // PHONE 可空
 
         public string? AvatarUrl { get; set; }          // AVATAR_URL 可空
+        public DateTime ? RegisterTime { get; set; }
+
 
     }
 }

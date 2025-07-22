@@ -46,6 +46,12 @@ namespace OurNovel.Data.Configurations
             entity.Property(e => e.AvatarUrl)
                 .HasColumnName("AVATAR_URL")
                 .HasMaxLength(255);
+
+            entity.Property(e => e.RegisterTime)
+                  .HasColumnName("REGISTER_TIME")
+                  .HasColumnType("DATE")
+                  .IsRequired(false); 
+
         }
     }
 }

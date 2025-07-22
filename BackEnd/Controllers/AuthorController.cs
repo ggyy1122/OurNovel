@@ -76,5 +76,19 @@ namespace OurNovel.Controllers
             var total = await _authorService.GetTotalWordCountByAuthorIdAsync(authorId);
             return Ok(new { totalWordCount = total });
         }
+
+
+        /// <summary>
+        // 新增：获取注册天数
+        /// </summary>
+        [HttpGet("{authorId}/register-days")]
+        public async Task<IActionResult> GetRegisterDays(int authorId)
+        {
+            var days = await _authorService.GetAuthorRegisterDaysAsync(authorId);
+            if (days == null)
+                return NotFound(new { success = false, message = "作者不存在" });
+
+            return Ok(new { success = true, registerDays = days });
+        }
     }
 }
