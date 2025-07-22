@@ -28,14 +28,12 @@
         </button>
       </div>
     </div>
+
     <div class="novel-list">
       <div v-if="loading" class="loading">加载中...</div>
       <div v-else-if="!filteredNovels || filteredNovels.length === 0" class="no-data">暂无数据</div>
       <template v-else>
-        <template v-for="(novel, index) in filteredNovels" :key="novel.novelId">
-          <Novel_Card :novel="novel" :rank="index + 1" />
-          <hr v-if="index < filteredNovels.length - 1" class="novel-divider" />
-        </template>
+        <Novel_Card v-for="(novel, index) in filteredNovels" :key="novel.novelId" :novel="novel" :rank="index + 1" />
       </template>
     </div>
   </div>
@@ -243,10 +241,5 @@ watch(novels, applyFilters)
   padding: 50px;
   font-size: 16px;
   color: #888;
-}
-.novel-divider {
-    border: none;
-    border-top: 1px solid #b2b6bb;
-    margin: 0.1rem 0;
 }
 </style>
