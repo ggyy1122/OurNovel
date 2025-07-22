@@ -55,6 +55,7 @@ builder.Services.AddScoped<CommentsService>();
 
 builder.Services.AddScoped<ILikesService,LikesService>();
 
+builder.Services.AddScoped<CommentRepository>();
 builder.Services.AddScoped<ICommentReplyRepository, CommentReplyRepository>();
 builder.Services.AddScoped<ICommentReplyService, CommentReplyService>();
 builder.Services.AddScoped<INovelCategoryRepository, NovelCategoryRepository>();
@@ -146,32 +147,6 @@ builder.Services.AddSwaggerGen(c =>
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     c.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
 
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Description = "请输入Bearer格式的JWT，例如: Bearer eyJhbGciOiJIUzI1NiIs...",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
-    });
-
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                },
-                Scheme = "oauth2",
-                Name = "Bearer",
-                In = ParameterLocation.Header
-            },
-            new List<string>()
-        }
-    });
 });
 
 // ========================================

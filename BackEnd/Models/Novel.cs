@@ -11,7 +11,7 @@ namespace OurNovel.Models
         }
 
         public int AuthorId { get; set; }                  // 外键，对应 AuthorId
-
+        [JsonIgnore]
         public Author? Author { get; set; }                // 导航属性     
 
         public string? NovelName { get; set; } = null!;    // Novel_NAME 可空
@@ -30,7 +30,9 @@ namespace OurNovel.Models
 
         public int? CollectedCount { get; set; }           // CollectedCount 可空
 
-        public string? Status { get; set; } = "待审核";    // Status "待审核"/"连载"/"完结"
+        public string? Status { get; set; } = "待审核";    // Status "待审核"/"连载"/"完结"/"封禁"
+
+        public int OriginalNovelId { get; set; } = -1;     // OriginalNovelId 非空
 
         // public ICollection<Chapter> Chapters { get; set; } = new List<Chapter>();  // 维护反向Chapter导航
 

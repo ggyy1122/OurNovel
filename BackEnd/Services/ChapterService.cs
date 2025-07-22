@@ -123,12 +123,12 @@ namespace OurNovel.Services
         }
 
         /// <summary>
-        /// 审核章节，修改状态为“通过”或“封禁”
+        /// 审核章节，修改状态为“已发布”或“封禁”
         /// </summary>
         public async Task<bool> ReviewChapterAsync(int novelId, int chapterId, string newStatus, int managerId)
         {
             // 状态值合法性校验
-            if (newStatus != "通过" && newStatus != "封禁")
+            if (newStatus != "已发布" && newStatus != "封禁")
                 return false;
 
             // 复合主键查找章节

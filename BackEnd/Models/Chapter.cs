@@ -48,7 +48,7 @@ namespace OurNovel.Models
         /// 发布时间
         public DateTime? PublishTime { get; set; }
 
-        /// 状态：通过 / 封禁（默认通过）
-        public string Status { get; set; } = "通过";
+        /// 状态：草稿/审核中/已发布/封禁（默认草稿）
+        public string Status { get; set; } = "草稿";
     }
 }
