@@ -175,3 +175,28 @@ export function reviewComment(id, newStatus) {
         }
     })
 }
+
+/**
+ * 获取小说顶级评论
+ * @param {number} novelId - 小说ID
+ * @returns {Promise<Array<Comment>>}
+ */
+export function getTopLevelComments(novelId) {
+    return request({
+        url: `/api/Comments/novel/${novelId}/top-level-comments`,
+        method: 'get'
+    })
+}
+
+/**
+ * 获取小说前n个点赞最多的评论
+ * @param {number} novelId - 小说ID
+ * @param {number} topN - 前N名
+ * @returns {Promise<Array<Comment>>}
+ */
+export function getTopLikedComments(novelId, topN) {
+    return request({
+        url: `/api/Comments/novel/${novelId}/top-liked-comments/${topN}`,
+        method: 'get'
+    })
+}
