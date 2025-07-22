@@ -1,8 +1,8 @@
-<template>  
-    <div class="introduction-section">
+<template>
+  <div class="introduction-section">
     <strong class="intro-label">简介：</strong>
-    <p>{{selectNovelState.introduction}} </p>
-    </div>
+    <p>{{ selectNovelState.introduction }} </p>
+  </div>
 </template>
 
 <script setup>
@@ -17,14 +17,18 @@ const selectNovelState = SelectNovel_State();      //小说对象
 }
 
 .intro-label {
-  font-weight: 600; /* 加粗 */
-   font-size: 25px;
-  color: #1e293b; /* 深灰色 */
+  font-weight: 600;
+  /* 加粗 */
+  font-size: 25px;
+  color: #1e293b;
+  /* 深灰色 */
 }
 
 .intro-content {
-  display: inline; /* 让文本与标签同行 */
+  display: inline;
+  /* 让文本与标签同行 */
   margin-left: 4px;
-  color: #475569; /* 中灰色 */
+  color: #475569;
+  /* 中灰色 */
 }
 </style>
