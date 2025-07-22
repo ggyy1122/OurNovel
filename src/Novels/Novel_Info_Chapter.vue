@@ -1,20 +1,23 @@
 <template>
   <div class="chapter-list">
     <h2>章节目录</h2>
-    <p>当前小说ID：{{ selectNovelState.novelId }}</p>
 
     <!-- 章节列表 -->
-    <ul v-if="chapterList.length > 0">
+    <ul v-if="paginatedChapters.length > 0">
       <transition-group name="chapter-fade" tag="ul">
         <li
-          v-for="(chapter, index) in paginatedChapters"
+          v-for="chapter in paginatedChapters"
           :key="chapter.chapterId"
-          @click="selectChapter(chapter)"
-          class="chapter-item"
+          @click="!isDisabled(chapter) && selectChapter(chapter)"
+          :class="['chapter-item', { banned: isDisabled(chapter) }]"
         >
           <div class="chapter-info">
-            <span class="chapter-number">第{{ index + 1 }}章</span>
-            <span class="chapter-title">{{ chapter.title }}</span>
+            <span class="chapter-number">第{{ chapter.chapterId }}章</span>
+            <span class="chapter-title">
+              {{ chapter.title }}
+              <span v-if="chapter.status === '封禁'" class="banned-tag">【封禁中】</span>
+              <span v-else-if="chapter.status === '审核中'" class="banned-tag">【审核中】</span>
+            </span>
             <span v-if="chapter.isCharged === '是'" class="charged">（收费）</span>
             <span v-else class="free">（免费）</span>
           </div>
@@ -22,11 +25,11 @@
       </transition-group>
     </ul>
 
-    <!-- 如果章节列表为空，显示提示信息 -->
+    <!-- 如果章节为空 -->
     <p v-else>作者还在努力敲字中，感谢您的关注~</p>
 
     <!-- 分页组件 -->
-    <div v-if="chapterList.length > 0" class="pagination-container">
+    <div v-if="paginatedChapters.length > 0" class="pagination-container">
       <button 
         class="prev"
         @click="changePage(currentPage - 1)"
@@ -58,16 +61,21 @@ const chapterList = ref([]);
 const currentPage = ref(1);
 const itemsPerPage = ref(5);  // 每页显示5个章节
 
+// 显示除草稿以外的所有章节
+const visibleChapters = computed(() =>
+  chapterList.value.filter(ch => ch.status !== '草稿')
+);
+
 // 计算分页后的章节
 const paginatedChapters = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value;
   const end = currentPage.value * itemsPerPage.value;
-  return chapterList.value.slice(start, end);
+  return visibleChapters.value.slice(start, end);
 });
 
 // 计算总页数
 const totalPages = computed(() => {
-  return Math.ceil(chapterList.value.length / itemsPerPage.value);
+  return Math.ceil(visibleChapters.value.length / itemsPerPage.value) || 1;
 });
 
 // 页面加载时获取章节数据
@@ -76,7 +84,6 @@ onMounted(async () => {
     const novelId = selectNovelState.novelId;  
     const response = await getChaptersByNovel(novelId);  
     chapterList.value = response || [];  
-    console.log('章节数据:', response);  
   } catch (error) {
     console.error('获取章节失败:', error);
     chapterList.value = [];  
@@ -85,11 +92,16 @@ onMounted(async () => {
 
 // 页码变更
 function changePage(page) {
-  if (page < 1 || page > totalPages.value) return;  // 确保页码在有效范围内
+  if (page < 1 || page > totalPages.value) return;
   currentPage.value = page;
 }
 
-// 选中章节的逻辑
+// 是否为不可点击章节（封禁或审核中）
+function isDisabled(chapter) {
+  return chapter.status === '封禁' || chapter.status === '审核中';
+}
+
+// 选中章节
 function selectChapter(chapter) {
   selectNovelState.resetChapter(
     chapter.chapterId,
@@ -101,10 +113,8 @@ function selectChapter(chapter) {
     chapter.isCharged,
     chapter.publishTime,
     chapter.status
-  );  // 使用 resetChapter 方法更新章节信息
-  console.log('已选择章节：', chapter);  // 打印选中的章节信息
+  );
 }
-
 </script>
 
 <style scoped>
@@ -127,6 +137,12 @@ function selectChapter(chapter) {
 
 .chapter-item:hover {
   background-color: #f0f0f0;
+}
+
+/* 封禁/审核中样式 */
+.chapter-item.banned {
+  background-color: #e0e0e0;
+  cursor: not-allowed;
 }
 
 .chapter-info {
@@ -158,17 +174,17 @@ function selectChapter(chapter) {
   font-size: 14px;
 }
 
+.banned-tag {
+  color: #ff6600;
+  margin-left: 10px;
+  font-weight: bold;
+}
+
 p {
   font-size: 16px;
   color: #888;
   text-align: center;
   margin-top: 30px;
-}
-
-h3 {
-  font-size: 18px;
-  color: #333;
-  margin-top: 20px;
 }
 
 .page-info {
