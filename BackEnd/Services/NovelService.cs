@@ -34,11 +34,11 @@ namespace OurNovel.Services
             if (novel == null)
                 return false;
 
-            if (novel.OriginalNovelId != -1 && newStatus == "连载")
+            if (novel.OriginalNovelId != -1)
             {
-                var original = await _repository.GetByIdAsync(novel.OriginalNovelId);
-                if (original != null)
+                if (newStatus == "连载")
                 {
+                    var original = await _repository.GetByIdAsync(novel.OriginalNovelId);
                     original.NovelName = novel.NovelName;
                     original.Introduction = novel.Introduction;
                     original.CoverUrl = novel.CoverUrl;
@@ -46,6 +46,13 @@ namespace OurNovel.Services
 
                     await _repository.UpdateAsync(original);
                     await _repository.DeleteAsync(novel.NovelId); // 删除临时稿
+
+                    await _novelManagementService.RecordManagementAsync(managerId, result, original.NovelId);
+                }
+                else
+                {
+                    await _repository.DeleteAsync(novel.NovelId); // 删除临时稿
+                    await _novelManagementService.RecordManagementAsync(managerId, result, novel.OriginalNovelId);
                 }
             }
             else {
@@ -53,8 +60,6 @@ namespace OurNovel.Services
                 await _repository.UpdateAsync(novel);
                 await _novelManagementService.RecordManagementAsync(managerId, result, novelId);
             }
-            
-
             return true;
         }
 
