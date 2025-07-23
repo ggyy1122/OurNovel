@@ -163,3 +163,37 @@ export function reviewNovel(novelId, newStatus) {
         }
     })
 }
+
+/**
+ * 获取单个小说总字数
+ * @param {number} novelId - 小说ID
+ * @returns {Promise<{novelId: number, wordCount: number}>} 返回包含小说ID和字数的对象
+ */
+export function getNovelWordCount(novelId) {
+    return request({
+        url: `/api/Novel/wordcount/${novelId}`,
+        method: 'get'
+    })
+}
+/**
+ * 获取小说推荐数
+ * @param {number} novelId - 小说ID
+ * @returns {Promise<{novelId: number, recommendCount: number}>} 返回包含小说ID和推荐数的对象
+ */
+export function getNovelRecommendCount(novelId) {
+    return request({
+        url: `/api/Novel/recommendcount/${novelId}`,
+        method: 'get'
+    })
+}
+/**
+ * 获取小说收藏数
+ * @param {number} novelId - 小说ID
+ * @returns {Promise<{novelId: number, collectCount: number}>} 返回包含小说ID和收藏数的对象
+ */
+export function getNovelCollectCount(novelId) {
+    return request({
+        url: `/api/Novel/collectcount/${novelId}`,
+        method: 'get'
+    })
+}

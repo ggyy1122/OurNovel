@@ -87,6 +87,7 @@
               <div class="data-label">累计字数</div>
             </div>
             <div class="data-card">
+
               <div class="data-value">{{  authorRegisterDays }}</div>
               <div class="data-label">创作天数</div>
             </div>
@@ -159,6 +160,7 @@
 </template>
 
 <script setup>
+
 import {ref, watch,computed} from 'vue';
 import { useRouter} from 'vue-router';
 import { SelectNovel_State,readerState } from '@/stores/index';
@@ -186,6 +188,7 @@ const authorRegisterDays=ref(0);                   //当前作者的创作天数
 const router = useRouter();
 const defaultCoverImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E书籍封面%3C/text%3E%3C/svg%3E";// 默认封面图片
 const defaultAuthorAvatar = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E作者头像%3C/text%3E%3C/svg%3E";// 默认作者头像
+
 
 //是否被收藏
 const isCollected = computed(() => {
@@ -250,6 +253,7 @@ const fetchWordCount = async () => {
   try {
     const response = await getNovelWordCount(selectNovelState.novelId)
     novelWordCount.value = response.data?.totalWords || response?.totalWords || 0
+
      console.log('最终字数:',  novelWordCount.value) // 调试
   } catch (error) {
     console.error('获取字数失败:', error)
@@ -257,6 +261,7 @@ const fetchWordCount = async () => {
   }
 }
 // 获取推荐数的函数
+
 const fetchRecommendCount = async ()=>{
   try {
     const response = await getNovelRecommendCount(selectNovelState.novelId)
@@ -315,6 +320,7 @@ const fetchAuthorRegisterDays =async ()=>{
 }
 
 
+
 // 仅监听 novelId 变化,变化时加载数据
 watch(
   () => selectNovelState.novelId,
@@ -340,12 +346,14 @@ watch(
 )
 
 
+
 /*按钮逻辑部分*/
 //返回按钮
 function goback() {
   router.push('/Novels/Novel_Layout/category');
 }
 //收藏按钮的逻辑
+
 const toggleCollect = async () => {
   const currentNovelId = selectNovelState.novelId;
   const currentReaderId = ReaderState.readerId;
@@ -356,13 +364,11 @@ const toggleCollect = async () => {
       ReaderState.favoriteBooks = ReaderState.favoriteBooks.filter(item =>
         item.novel?.novelId !== currentNovelId &&
         item.novelId !== currentNovelId
-
       );
       toast("取消收藏", {
         "type": "success",
         "dangerouslyHTMLString": true
       })
-
     } else {
       // 添加收藏
       await addOrUpdateCollect(currentNovelId, ReaderState.readerId, 'no');
@@ -377,7 +383,6 @@ const toggleCollect = async () => {
         "type": "success",
         "dangerouslyHTMLString": true
       })
-
     }
   } catch (error) {
     console.error('收藏操作失败:', error);
