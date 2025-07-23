@@ -52,5 +52,15 @@ namespace OurNovel.Controllers
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
+
+        /// <summary>
+        /// 获取读者余额
+        /// </summary>
+        /// <param name="readerId">读者ID</param>
+        [HttpGet("{readerId}/balance")]
+        public async Task<IActionResult> GetBalance(int readerId)
+        {
+            return await _readerService.GetBalanceById(readerId);
+        }
     }
 }
