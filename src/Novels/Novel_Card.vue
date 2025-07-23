@@ -10,7 +10,7 @@
                 <span class="badge">评分★：{{ novel.score || 0 }}分</span>
             </div>
             <div class="meta">
-                <span>作者: {{ author_name }}</span> |
+                <span>作者ID: {{ novel.authorId }}</span> |
                 <span>字数: {{ novel.totalWordCount || 0 }}字</span>
             </div>
             <div class="desc">{{ novel.introduction || '暂无简介' }}</div>
@@ -79,35 +79,10 @@ async function handleAddShelf() {
         })
     }
 }
-const author_name = ref('');
-const responsePromise = getAuthor(props.novel.authorId);
-responsePromise.then(response => {
-    author_name.value = response.authorName;
-}).catch(error => {
-    console.error('获取作者信息失败:', error);
-});
 async function handle() {
-    try {
-        const response = await responsePromise;
-        selectNovelState.resetNovel(
-            props.novel.novelId,
-            props.novel.authorId,
-            props.novel.novelName,
-            props.novel.introduction,
-            props.novel.createTime,
-            props.novel.coverUrl,
-            props.novel.score,
-            props.novel.totalWordCount,
-            props.novel.recommendCount,
-            props.novel.collectedCount,
-            props.novel.status,
-            response.authorName,
-            response.phone,
-            response.avatarUrl
-        );
-    } catch (error) {
-        console.error('处理失败:', error);
-    }
+    const response = await getAuthor(props.novel.authorId);
+    selectNovelState.resetNovel(props.novel.novelId, props.novel.authorId, props.novel.novelName, props.novel.introduction, props.novel.createTime, props.novel.coverUrl, props.novel.score, props.novel.totalWordCount, props.novel.recommendCount, props.novel.collectedCount, props.novel.status,
+        response.authorName, response.phone, response.avatarUrl);
 }
 //立即阅读
 async function handleRead() {
