@@ -62,5 +62,18 @@ namespace OurNovel.Services
 
         public Reader? GetByReaderName(string name) =>
             _context.Readers.FirstOrDefault(r => r.ReaderName == name);
+
+        /// <summary>
+        /// 根据读者ID获取余额（精确到decimal）
+        /// </summary>
+        public async Task<IActionResult> GetBalanceById(int readerId)
+        {
+            var reader = await _context.Readers.FindAsync(readerId);
+            if (reader == null)
+            {
+                return new NotFoundObjectResult("用户不存在");
+            }
+            return new OkObjectResult(new { Balance = reader.Balance });
+        }
     }
 }
