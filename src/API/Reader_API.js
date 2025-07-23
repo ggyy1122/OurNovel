@@ -130,3 +130,15 @@ export function uploadReaderAvatar(readerId, avatarFile) {
         data: formData
     })
 }
+
+/** 
+ * 获取读者余额
+ * @param {number} readerId - 读者ID
+ * @returns {Promise<{ Balance: number, Currency: string }>}
+ */
+export function getReaderBalance(readerId) {
+    return request({
+        url: `/api/Reader/${readerId}/balance`,
+        method: 'get'
+    })
+}
