@@ -63,10 +63,10 @@
           <button class="blue-border-btn" :class="{ 'is-collected': isCollected }" @click="toggleCollect">
             {{ isCollected ? '已收藏' : '收藏作品' }}
           </button>
-          <button class="blue-border-btn">
-            推荐作品
+          <button class="blue-border-btn" :class="{ 'is-recommended': isRecommended }" @click="handleRecommend">
+            {{ isRecommended ? '已推荐' : '推荐作品' }}
           </button>
-          <button class="blue-border-btn">
+          <button class="blue-border-btn" @click="showRewardDialog = true">
             打赏作品
           </button>
         </div>
@@ -120,7 +120,57 @@
       <router-view></router-view>
     </main>
   </div>
-
+  <!-- 改成 div 弹窗（样式上模拟 dialog 就行） -->
+  <div v-if="showRecommendDialog" class="recommend-dialog-overlay">
+    <div class="recommend-dialog">
+      <div class="dialog-content">
+        <h3>{{ isRecommended ? '推荐状态' : '推荐原因' }}</h3>
+        <template v-if="!isRecommended">
+          <textarea v-model="recommendReason" placeholder="这本小说太棒了，快来推荐一下吧!(可选)" class="recommend-textarea"></textarea>
+        </template>
+        <template v-else>
+          <p class="already-recommended">您已推荐</p>
+        </template>
+        <div class="dialog-actions">
+          <button class="cancel-btn" @click="showRecommendDialog = false">退出</button>
+          <button v-if="!isRecommended" @click="submitRecommend" class="confirm-btn">
+            确认推荐
+          </button>
+          <button v-if="isRecommended" @click="cancelRecommend" class="cancel-recommend-btn">
+            取消推荐
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 打赏弹窗 -->
+  <div v-if="showRewardDialog" class="reward-dialog-overlay">
+    <div class="reward-dialog">
+      <div class="dialog-header"
+        style="display: flex; justify-content: center; align-items: center; position: relative;">
+        <h3 style="margin: 0;">打赏</h3>
+        <button class="close-btn " @click="showRewardDialog = false"
+          style="position: absolute; right: 20px;">&times;</button>
+      </div>
+      <div class="reward-options">
+        <div v-for="option in rewardOptions" :key="option.value"
+          :class="['reward-option', { 'selected': selectedReward === option.value }]"
+          @click="selectReward(option.value)">
+          <span>{{ option.label }}</span>
+          <svg v-if="selectedReward === option.value" class="check-icon" viewBox="0 0 24 24">
+            <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" fill="none" />
+          </svg>
+        </div>
+      </div>
+      <div class="balance-info">
+        <span>账户余额 {{ accountBalance }} 起点币</span>
+        <span>本次打赏 {{ selectedReward }} 起点币</span>
+      </div>
+      <button class="confirm-reward-btn" @click="confirmReward">
+        确认打赏
+      </button>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -132,6 +182,9 @@ import { addOrUpdateCollect, deleteCollect } from '@/API/Collect_API';
 import { getNovelWordCount, getNovelRecommendCount, getNovelCollectCount } from '@/API/Novel_API';
 import { getAuthorNovelCount, getAuthorTotalWordCount, getAuthorRegisterDays } from '@/API/Author_API';
 import { getChapter } from '@/API/Chapter_API';
+import { addRecommend, deleteRecommend } from '@/API/Recommend_API';
+import { getReaderBalance } from '@/API/Reader_API';
+import { rewardNovel } from '@/API/Reward_API';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
@@ -145,6 +198,25 @@ const recommendCount = ref(0);                       //当前小说的被推荐�
 const authorNovelCount = ref(0);                      //当前作者的创作小说数
 const authorWordCount = ref(0);                      //当前作者的创作总字数
 const authorRegisterDays = ref(0);                   //当前作者的创作天数
+const router = useRouter();
+const showRecommendDialog = ref(false);               // 是否显示推荐弹窗
+const recommendReason = ref('');                     // 用户输入的推荐理由
+const showRewardDialog = ref(false);                  // 是否显示打赏弹窗
+const accountBalance = ref(0);                        // 账号余额
+const selectedReward = ref(100);                      // 默认选中100点打赏金额
+const defaultCoverImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E书籍封面%3C/text%3E%3C/svg%3E";// 默认封面图片
+const defaultAuthorAvatar = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E作者头像%3C/text%3E%3C/svg%3E";// 默认作者头像
+const rewardOptions = [
+  { value: 10, label: '10点' },
+  { value: 100, label: '100点' },
+  { value: 500, label: '500点' },
+  { value: 1000, label: '1000点' },
+  { value: 2000, label: '2000点' },
+  { value: 10000, label: '1万点' },
+  { value: 50000, label: '5万点' },
+  { value: 100000, label: '10万点' }
+];
+
 
 //是否被收藏
 const isCollected = computed(() => {
@@ -156,17 +228,23 @@ const isCollected = computed(() => {
     item.novelId === currentNovelId
   )
 })
-const router = useRouter();
-const defaultCoverImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E书籍封面%3C/text%3E%3C/svg%3E";// 默认封面图片
-const defaultAuthorAvatar = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E作者头像%3C/text%3E%3C/svg%3E";// 默认作者头像
-//返回
-function goback() {
-  router.push('/Novels/Novel_Layout/category');
-}
+//是否被推荐
+const isRecommended = computed(() => {
+  //当前小说ID
+  const currentNovelId = selectNovelState.novelId;
+  // 检查是否存在于收藏列表
+  return ReaderState.recommendBooks.some(item =>
+    item.novel?.novelId === currentNovelId ||
+    item.novelId === currentNovelId
+  )
+})
+
+
 //处理图片错误
 function handleImageError(event) {
   event.target.src = defaultCoverImage;
 }
+//获取小说状态样式
 function getStatusClass(status) {
   switch (status) {
     case '连载': return 'status-running';
@@ -175,6 +253,9 @@ function getStatusClass(status) {
   }
 
 }
+
+
+/*数据获取部分 */
 // 获取分类数据
 const fetchCategories = async () => {
   try {
@@ -197,6 +278,7 @@ const fetchWordCount = async () => {
   try {
     const response = await getNovelWordCount(selectNovelState.novelId)
     novelWordCount.value = response.data?.totalWords || response?.totalWords || 0
+
     console.log('最终字数:', novelWordCount.value) // 调试
   } catch (error) {
     console.error('获取字数失败:', error)
@@ -204,6 +286,7 @@ const fetchWordCount = async () => {
   }
 }
 // 获取推荐数的函数
+
 const fetchRecommendCount = async () => {
   try {
     const response = await getNovelRecommendCount(selectNovelState.novelId)
@@ -225,6 +308,7 @@ const fetchCollectedCount = async () => {
     console.error('获取收藏数失败:', error)
     collectedCount.value = 0
   }
+
 }
 // 获取作者创作书籍数的函数
 const fetchAuthorNovelCount = async () => {
@@ -236,6 +320,7 @@ const fetchAuthorNovelCount = async () => {
     console.error('获取作者作品数失败:', error)
     collectedCount.value = 0
   }
+
 }
 //获取作者创作总字数的函数
 const fetchAuthorWordCount = async () => {
@@ -258,7 +343,20 @@ const fetchAuthorRegisterDays = async () => {
     authorRegisterDays.value = 0
   }
 }
-// 仅监听 novelId 变化,变化时加载数据
+//获取账号余额的函数
+const fetchReaderBalance = async () => {
+  try {
+    const response = await getReaderBalance(ReaderState.readerId)
+    accountBalance.value = response.data?.balance || response?.balance || 0
+    console.log('获取用户余额:', accountBalance.value)
+  } catch (error) {
+    console.error('获取用户余额失败:', error)
+    accountBalance.value = 0
+  }
+}
+
+
+// 1.监听 novelId 变化,变化时加载数据
 watch(
   () => selectNovelState.novelId,
   async (newNovelId) => {
@@ -281,8 +379,28 @@ watch(
   },
   { immediate: true } // 替代 onMounted，首次加载时自动执行
 )
-// 如果novelId可能变化，添加监听
-/*收藏逻辑*/
+// 2. 单独监听弹窗（精确控制余额刷新）
+watch(
+  () => showRewardDialog.value,
+  async (isOpen) => {
+    if (isOpen) {
+      try {
+        await fetchReaderBalance()
+      } catch (error) {
+        console.error('刷新余额失败:', error)
+      }
+    }
+  }
+)
+
+
+/*按钮逻辑部分*/
+//返回按钮
+function goback() {
+  router.push('/Novels/Novel_Layout/category');
+}
+//收藏按钮的逻辑
+
 const toggleCollect = async () => {
   const currentNovelId = selectNovelState.novelId;
   const currentReaderId = ReaderState.readerId;
@@ -321,7 +439,7 @@ const toggleCollect = async () => {
     })
   }
 };
-//开始阅读
+//开始阅读按钮的逻辑
 async function handleRead() {
   try {
     const response = await getChapter(selectNovelState.novelId, 1);
@@ -344,7 +462,138 @@ async function handleRead() {
     })
   }
 }
+
+//推荐按钮的逻辑
+const handleRecommend = async () => {
+  console.log('成功点击推荐按钮');
+  if (isRecommended.value) {
+    // 已推荐 → 显示提示
+
+    showRecommendDialog.value = true
+  } else {
+    // 未推荐 → 弹出输入框
+    showRecommendDialog.value = true
+
+  }
+}
+//提交推荐内容
+const submitRecommend = async () => {
+  const currentNovelId = selectNovelState.novelId;
+  const currentReaderId = ReaderState.readerId;
+  const currentReason = recommendReason.value;
+  try {
+    // 调用推荐 API
+    const response = await addRecommend(currentNovelId, currentReaderId, currentReason)
+    console.log('添加推荐响应:', response)
+
+    // 更新本地状态
+    isRecommended.value = true
+    showRecommendDialog.value = false
+
+    // 存储推荐数据（可选）
+    ReaderState.recommendBooks.push({
+      novelId: selectNovelState.novelId,
+      novel: selectNovelState, // 保存完整作品信息
+      readerId: ReaderState.readerId,
+      reason: recommendReason.value,
+      recommendTime: new Date().toISOString()
+    })
+
+    // 提示成功
+    toast("推荐成功！", {
+      type: "success",
+      dangerouslyHTMLString: true
+    })
+    recommendReason.value = '';
+
+  } catch (error) {
+    console.error('推荐失败:', error)
+    toast("推荐失败，请重试", {
+      type: "error",
+      dangerouslyHTMLString: true
+    })
+  }
+}
+//取消推荐
+const cancelRecommend = async () => {
+  const currentNovelId = selectNovelState.novelId;
+  const currentReaderId = ReaderState.readerId;
+  try {
+    // 取消推荐
+    await deleteRecommend(currentNovelId, currentReaderId);
+    ReaderState.recommendBooks = ReaderState.recommendBooks.filter(item =>
+      item.novel?.novelId !== currentNovelId &&
+      item.novelId !== currentNovelId
+
+    );
+    toast("取消推荐", {
+      "type": "success",
+      "dangerouslyHTMLString": true
+    })
+    showRecommendDialog.value = false;
+  }
+  catch (error) {
+    console.error('推荐操作失败:', error);
+    toast("推荐失败", {
+      "type": "error",
+      "dangerouslyHTMLString": true
+    })
+  }
+}
+//选择打赏金额
+const selectReward = (value) => { selectedReward.value = value; }
+//确认打赏按钮
+// 确认打赏按钮逻辑
+const confirmReward = async () => {
+  const currentNovelId = selectNovelState.novelId;
+  const currentReaderId = ReaderState.readerId;
+  const currentvalue = selectedReward.value;
+  try {
+    // 1. 检查余额是否充足
+    if (accountBalance.value < selectedReward.value) {
+      toast("余额不足，请先充值", {
+        "type": "error",
+        "dangerouslyHTMLString": true
+      })
+      return;
+    }
+
+    // 2. 调用打赏API
+    const response = await rewardNovel({
+      readerId: currentReaderId,    // 当前用户ID
+      novelId: currentNovelId, // 被打赏小说ID
+      amount: currentvalue    // 打赏金额
+    });
+
+    // 3. 处理成功结果
+    toast(`成功打赏 ${currentvalue} 起点币`, {
+      type: "success", // 改为 success 类型
+      dangerouslyHTMLString: true
+    });
+    console.log('打赏结果:', response.data);
+
+    // 4. 刷新余额
+    await fetchReaderBalance();
+
+    // 5. 关闭弹窗
+    //showRewardDialog.value = false;
+
+
+  } catch (error) {
+    // 错误处理
+    console.error('打赏失败:', error);
+    toast(`打赏失败: ${error.message}`, {
+      type: "error",
+      dangerouslyHTMLString: true
+    });
+    // 失败时重新获取最新余额
+    await fetchReaderBalance();
+  }
+};
+
 </script>
+
+
 
 <style scoped>
 /* 返回按钮样式 */
@@ -642,6 +891,19 @@ async function handleRead() {
   color: #595959;
 }
 
+/* 新增的已推荐状态 */
+.blue-border-btn.is-recommended {
+  border-color: #d9d9d9;
+  color: #8c8c8c;
+  background: #f5f5f5;
+}
+
+.blue-border-btn.is-recommended:hover {
+  background: #f0f0f0;
+  border-color: #bfbfbf;
+  color: #595959;
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   .action-buttons {
@@ -812,5 +1074,260 @@ async function handleRead() {
 
 .main-content {
   padding: 20px 0;
+}
+
+
+
+.recommend-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.recommend-dialog {
+  background: #fff;
+  padding: 32px 28px 26px 28px;
+  border-radius: 16px;
+  min-width: 320px;
+  max-width: 90vw;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, .18);
+  animation: popup-fade-in 0.22s cubic-bezier(.4, 0, .2, 1);
+}
+
+@keyframes popup-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+h3 {
+  margin: 0 0 18px 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-align: center;
+  color: #23292f;
+}
+
+.recommend-textarea {
+  width: 100%;
+  min-height: 70px;
+  box-sizing: border-box;
+  border-radius: 6px;
+  border: 1px solid #e1e4e8;
+  padding: 10px;
+  font-size: 1rem;
+  margin-bottom: 18px;
+  resize: vertical;
+  background: #f9fafb;
+  transition: border-color 0.2s;
+}
+
+.recommend-textarea:focus {
+  border-color: #409eff;
+  outline: none;
+  background: #fff;
+}
+
+.already-recommended {
+  margin: 20px 0;
+  color: #909399;
+  text-align: center;
+  font-size: 1.07rem;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: center;
+  /* 居中所有按钮 */
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.cancel-btn,
+.confirm-btn {
+  padding: 7px 22px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  min-width: 100px;
+  transition: background 0.17s, color 0.17s;
+}
+
+.cancel-btn {
+  background: #f5f6fa;
+  color: #909399;
+}
+
+.cancel-btn:hover {
+  background: #e5e8ef;
+  color: #606266;
+}
+
+.confirm-btn {
+  background: #409eff;
+  color: #fff;
+  font-weight: 500;
+}
+
+.confirm-btn:hover {
+  background: #2979ff;
+}
+
+.cancel-recommend-btn {
+  background: #ffeded;
+  color: #e74c3c;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 22px;
+  font-size: 1rem;
+  min-width: 100px;
+  cursor: pointer;
+  margin-left: 0;
+  transition: background 0.18s, color 0.18s;
+}
+
+.cancel-recommend-btn:hover {
+  background: #ffcccc;
+  color: #c0392b;
+}
+
+.reward-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.reward-dialog {
+  background-color: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.dialog-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #999;
+}
+
+.reward-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.reward-option {
+  position: relative;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.reward-option:hover {
+  border-color: #ff6b6b;
+}
+
+.reward-option.selected {
+  background-color: #fff0f0;
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+}
+
+.monthly-ticket {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.reward-option.selected .monthly-ticket {
+  color: #ff6b6b;
+}
+
+.check-icon {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 16px;
+  height: 16px;
+  color: #ff6b6b;
+}
+
+.balance-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #666;
+}
+
+.confirm-reward-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+
+  &:hover {
+    background-color: #ff5252;
+  }
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
 }
 </style>
