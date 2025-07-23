@@ -7,7 +7,7 @@
             <div class="title-row">
                 <span class="title" @click="handle_NovelInfro">{{ novel.novelName }}</span>
                 <span class="badge">{{ novel.status }}</span>
-                <span class="badge">评分：{{ novel.score || 0 }}分</span>
+                <span class="badge">评分★：{{ novel.score || 0 }}分</span>
             </div>
             <div class="meta">
                 <span>作者: {{ author_name }}</span> |
@@ -127,7 +127,7 @@ async function handleRead() {
         );
         router.push('/Novels/reader');
     } catch (error) {
-        toast("章节加载失败：该章节不存在！", {
+        toast("该小说还没有章节！", {
             "type": "warning",
             "dangerouslyHTMLString": true
         })

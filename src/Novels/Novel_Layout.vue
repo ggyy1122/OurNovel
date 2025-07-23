@@ -8,7 +8,7 @@
                 <p>匠心打磨好作品</p>
             </div>
             <div class="search-bar">
-                <input type="text" placeholder="请输入书名/作者/主角" v-model="searchQuery" />
+                <input type="text" placeholder="输入小说名/作者名/读者名" v-model="searchQuery" @keyup.enter="handleSearch"/>
                 <button @click="handleSearch">搜索</button>
             </div>
             <div class="user-actions">
@@ -76,7 +76,7 @@
                     </li>
                 </ul>
                 <div class="search-bar">
-                    <input type="text" placeholder="请输入书名/作者/主角" v-model="searchQuery" />
+                    <input type="text" placeholder="输入小说名/作者名/读者名" v-model="searchQuery" @keyup.enter="handleSearch"/>
                     <button @click="handleSearch">搜索</button>
                 </div>
                 <div class="user-actions">
@@ -130,7 +130,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { current_state,readerState } from '@/stores/index'
+import { current_state, readerState } from '@/stores/index'
 const state = current_state()
 const reader_state = readerState()
 
@@ -164,7 +164,15 @@ function logout() {
     router.push('/L_R/login');
 }
 const handleSearch = () => {
-    console.log('搜索关键词:', searchQuery.value)
+    if (searchQuery.value.trim()) {
+        router.push({
+            path: '/Novels/Search',
+            query: {
+                q: searchQuery.value,
+                type: 'novel' 
+            }
+        })
+    }
 }
 
 // 监听滚动，显示悬浮导航栏

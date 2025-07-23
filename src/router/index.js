@@ -6,6 +6,7 @@ import Home from '@/views/Home_test.vue'
 import Novel_Layout from '@/Novels/Novel_Layout.vue'
 import Novel_Home from '@/Novels/Novel_Home.vue'
 import Novel_Category from '@/Novels/Novel_Category.vue'
+import Novel_Search from '@/Novels/Novel_Search.vue'
 import Novel_Rank from '@/Novels/Novel_Rank.vue'
 import LoginForm from '@/Login_Register/LoginForm.vue'
 import RegisterForm from '@/Login_Register/RegisterForm.vue'
@@ -220,6 +221,15 @@ const routes = [
                 component: Novel_Rank
             }
         ]
+    },
+    {
+        path: '/Novels/Search',
+        name: 'Search',
+        component: Novel_Search,
+        props: (route) => ({
+            query: route.query.q,
+            filter: route.query.type || 'novel'
+        })
     },
     {
         path: '/Novels/reader',
