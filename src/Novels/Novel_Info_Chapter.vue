@@ -5,12 +5,9 @@
     <!-- 章节列表 -->
     <ul v-if="paginatedChapters.length > 0">
       <transition-group name="chapter-fade" tag="ul">
-        <li
-          v-for="chapter in paginatedChapters"
-          :key="chapter.chapterId"
+        <li v-for="chapter in paginatedChapters" :key="chapter.chapterId"
           @click="!isDisabled(chapter) && selectChapter(chapter)"
-          :class="['chapter-item', { banned: isDisabled(chapter) }]"
-        >
+          :class="['chapter-item', { banned: isDisabled(chapter) }]">
           <div class="chapter-info">
             <span class="chapter-number">第{{ chapter.chapterId }}章</span>
             <span class="chapter-title">
@@ -30,21 +27,13 @@
 
     <!-- 分页组件 -->
     <div v-if="paginatedChapters.length > 0" class="pagination-container">
-      <button 
-        class="prev"
-        @click="changePage(currentPage - 1)"
-        :disabled="currentPage === 1"
-      >
+      <button class="prev" @click="changePage(currentPage - 1)" :disabled="currentPage === 1">
         🡄
       </button>
 
       <span class="page-info">当前：{{ currentPage }}页 / 共{{ totalPages }}页</span>
 
-      <button 
-        class="next"
-        @click="changePage(currentPage + 1)"
-        :disabled="currentPage === totalPages"
-      >
+      <button class="next" @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">
         🡆
       </button>
     </div>
@@ -53,10 +42,10 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { SelectNovel_State } from '@/stores/index';  
-import { getChaptersByNovel } from '@/API/Chapter_API'; 
+import { SelectNovel_State } from '@/stores/index';
+import { getChaptersByNovel } from '@/API/Chapter_API';
 
-const selectNovelState = SelectNovel_State();  
+const selectNovelState = SelectNovel_State();
 const chapterList = ref([]);
 const currentPage = ref(1);
 const itemsPerPage = ref(5);  // 每页显示5个章节
@@ -81,12 +70,12 @@ const totalPages = computed(() => {
 // 页面加载时获取章节数据
 onMounted(async () => {
   try {
-    const novelId = selectNovelState.novelId;  
-    const response = await getChaptersByNovel(novelId);  
-    chapterList.value = response || [];  
+    const novelId = selectNovelState.novelId;
+    const response = await getChaptersByNovel(novelId);
+    chapterList.value = response || [];
   } catch (error) {
     console.error('获取章节失败:', error);
-    chapterList.value = [];  
+    chapterList.value = [];
   }
 });
 
