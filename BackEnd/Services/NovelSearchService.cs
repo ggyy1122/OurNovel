@@ -26,7 +26,9 @@ public class NovelSearchService
 
 
             string query = $@"
-            SELECT novel_id, novel_name, introduction 
+            SELECT novel_id, novel_name, introduction, author_id, create_time, 
+             cover_url, score, total_word_count, recommend_count, 
+             collected_count, status, original_novel_id, total_price
             FROM novel 
             WHERE CONTAINS(novel_name, '({sanitizedKeyword})', 1) > 0
                OR LOWER(novel_name) LIKE :plain_keyword";
@@ -43,7 +45,17 @@ public class NovelSearchService
                         {
                             NovelId = reader.GetInt32(0),
                             NovelName = reader.GetString(1),
-                            Introduction = reader.GetString(2)
+                            Introduction = reader.GetString(2),
+                            AuthorId = reader.GetInt32(3),
+                            CreateTime = reader.IsDBNull(4) ? null : reader.GetDateTime(4),
+                            CoverUrl = reader.IsDBNull(5) ? null : reader.GetString(5),
+                            Score = reader.IsDBNull(6) ? null : (double?)Convert.ToDouble(reader.GetDecimal(6)),
+                            TotalWordCount = reader.IsDBNull(7) ? 0 : reader.GetInt64(7),
+                            RecommendCount = reader.IsDBNull(8) ? 0 : reader.GetInt32(8),
+                            CollectedCount = reader.IsDBNull(9) ? 0 : reader.GetInt32(9),
+                            Status = reader.IsDBNull(10) ? null : reader.GetString(10),
+                            OriginalNovelId = reader.IsDBNull(11) ? -1 : reader.GetInt32(11),
+                            TotalPrice = reader.IsDBNull(12) ? null : reader.GetDecimal(12)
                         });
                     }
                 }
