@@ -80,7 +80,7 @@
                         <h1>TJ小说网</h1>
                     </div>
                     <div class="search-bar">
-                        <input type="text" placeholder="输入小说名/作者名/读者名" v-model="searchQuery" />
+                        <input type="text" placeholder="输入小说名/作者名/读者名" v-model="searchQuery" @keyup.enter="handleSearch"/>
                         <button @click="handleSearch">搜索</button>
                     </div>
                     <div class="user-actions">
