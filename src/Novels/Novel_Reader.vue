@@ -74,6 +74,46 @@
                 </button>
             </div>
             <div class="reader-card" :style="{ backgroundColor: cardBgColor }">
+                <header class="header" ref="mainHeader" :style="{ backgroundColor: cardBgColor }">
+                    <div class="logo">
+                        <img src="@/assets/logo.png" alt="TJ小说网" />
+                        <h1>TJ小说网</h1>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" placeholder="输入小说名/作者名/读者名" v-model="searchQuery" @keyup.enter="handleSearch"/>
+                        <button @click="handleSearch">搜索</button>
+                    </div>
+                    <div class="user-actions">
+                        <!-- 未登录状态 -->
+                        <button v-if="!state.isloggedin" class="login-btn" @click="goToLogin">
+                            <span class="login-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <circle cx="12" cy="8" r="4" stroke="#222" stroke-width="2" />
+                                    <ellipse cx="12" cy="17" rx="7" ry="4" stroke="#222" stroke-width="2" />
+                                </svg>
+                            </span>
+                            立即登录
+                        </button>
+                        <!-- 已登录状态 -->
+                        <div v-else class="user-dropdown" @mouseenter="showDropdown = true"
+                            @mouseleave="showDropdown = false">
+                            <img :src="reader_state.formattedAvatarUrl" alt="用户头像" class="user-avatar" />
+                            <div v-if="showDropdown" class="dropdown-menu">
+                                <div class="user-info">
+                                    <p>用户名：{{ reader_state.readerName }}</p>
+                                    <p>Lv1</p>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <a href="#" @click.prevent="goToInf" class="dropdown-item">
+                                    <i class="fa fa-book mr-2"></i> 我的书架
+                                </a>
+                                <a href="#" @click.prevent="logout" class="dropdown-item">
+                                    <i class="fa fa-sign-out mr-2"></i> 退出
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </header>
                 <div class="chapter-header" :style="{ color: textColor }">
                     <h2 class="chapter-title">第{{ selectNovelState.chapterId }}章 {{ selectNovelState.cha_title }}</h2>
                     <div class="meta-row">
@@ -124,7 +164,7 @@
 </template>
 
 <script setup>
-import { SelectNovel_State, readerState } from '@/stores/index';
+import { SelectNovel_State, readerState, current_state } from '@/stores/index';
 import { useRouter } from 'vue-router';
 import { ref, computed } from 'vue';
 import { onMounted, onUnmounted } from 'vue';
@@ -132,7 +172,40 @@ import { getChapter } from '@/API/Chapter_API';
 import { addOrUpdateCollect } from '@/API/Collect_API'
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
+const state = current_state();
+const searchQuery = ref('');
+const showDropdown = ref(false);
 
+function goToLogin() {
+    router.push('/L_R/login');
+}
+
+function goToInf() {
+    router.push('/Novels/ReaderInfomation');
+}
+
+function logout() {
+    state.clearUserInfo();
+    localStorage.removeItem('token');
+    localStorage.removeItem('name');
+    localStorage.removeItem('id');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('name');
+    sessionStorage.removeItem('id');
+    router.push('/L_R/login');
+}
+
+const handleSearch = () => {
+    if (searchQuery.value.trim()) {
+        router.push({
+            path: '/Novels/Search',
+            query: {
+                q: searchQuery.value,
+                type: 'novel'
+            }
+        })
+    }
+};
 const showSettings = ref(false);
 const fontSize = ref(18);
 const fontFamily = ref('system');
@@ -653,6 +726,219 @@ button.active {
 
 .menu-item:disabled {
     opacity: 1;
+}
+
+
+.chapter-nav-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 160px;
+    margin: 40px auto 20px;
+    width: 100%;
+    max-width: 600px;
+}
+
+.nav-button {
+    padding: 10px 30px;
+    border: 1px solid #000;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex: 0 0 auto;
+}
+
+.nav-button.prev {
+    background-color: #f5f5f5;
+    color: #333;
+    border-color: #000;
+}
+
+.nav-button.next {
+    background-color: #ffd100;
+    color: #222;
+    border-color: #000;
+}
+
+.nav-button.prev:hover {
+    background-color: #e0e0e0;
+    border-color: #000;
+}
+
+.nav-button.next:hover {
+    background-color: #f0c000;
+    border-color: #000;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    z-index: 10;
+    margin-bottom: 80px;
+    padding-bottom: 10px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo img {
+    width: 36px;
+    height: 36px;
+    margin-right: 10px;
+}
+
+.logo h1 {
+    font-size: 20px;
+    margin: 0;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    height: 40px;
+}
+
+.search-bar input {
+    flex: 1;
+    padding: 0 18px;
+    height: 36px;
+    border: 2px solid #ffd100;
+    border-right: none;
+    border-radius: 24px 0 0 24px;
+    outline: none;
+    font-size: 18px;
+    background: #fff;
+}
+
+.search-bar button {
+    height: 40px;
+    padding: 0 32px;
+    background-color: #ffd100;
+    color: #222;
+    font-weight: bold;
+    border: none;
+    border-radius: 0 24px 24px 0;
+    cursor: pointer;
+    font-size: 18px;
+    box-shadow: none;
+    transition: background 0.2s;
+}
+
+.search-bar button:hover {
+    background-color: #ffea80;
+}
+
+.user-actions .login-btn {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    padding: 8px 24px;
+    border: 2px solid #ffd100;
+    border-radius: 999px;
+    background: #fff;
+    color: #222;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    outline: none;
+}
+
+.user-actions .login-btn:hover {
+    border-color: #ffea80;
+    color: #e09c13;
+}
+
+.login-icon {
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+}
+
+.user-dropdown {
+    position: relative;
+    cursor: pointer;
+}
+
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ffd100;
+}
+
+.dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    width: 180px;
+    background: linear-gradient(to bottom, #f4dfa5 0%, #f3f3f0 100%);
+    border-radius: 8px;
+    z-index: 100;
+    padding: 10px 0;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.user-info {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.user-info p:first-child {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #000;
+}
+
+.user-info p:last-child {
+    font-size: 12px;
+    color: #888;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: #eee;
+    margin: 5px 0;
+}
+
+.dropdown-item {
+    display: block;
+    padding: 8px 15px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.dropdown-item:hover {
+    background: #f5f5f5;
+    color: #f7b604;
+}
+
+.dropdown-item i {
+    width: 20px;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .chapter-nav-buttons {
+        gap: 20px;
+        margin: 30px auto 15px;
+    }
+
+    .nav-button {
+        padding: 8px 20px;
+        font-size: 14px;
+    }
 }
 
 @media (max-width: 1200px) {

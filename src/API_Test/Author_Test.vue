@@ -56,13 +56,40 @@
             <pre>{{ apiResponse5 }}</pre>
         </div>
 
+        <h1>6: 获取作者作品数量</h1>
+        <input v-model="authorId6" placeholder="输入作者ID" type="number" />
+        <button @click="function6" :disabled="!authorId6">获取作品数量</button>
+        <div v-if="apiResponse6">
+            <h3>响应数据：</h3>
+            <pre>{{ apiResponse6 }}</pre>
+        </div>
+
+        <h1>7: 获取作者作品总字数</h1>
+        <input v-model="authorId7" placeholder="输入作者ID" type="number" />
+        <button @click="function7" :disabled="!authorId7">获取总字数</button>
+        <div v-if="apiResponse7">
+            <h3>响应数据：</h3>
+            <pre>{{ apiResponse7 }}</pre>
+        </div>
+
+        <h1>8: 获取作者注册天数</h1>
+        <input v-model="authorId8" placeholder="输入作者ID" type="number" />
+        <button @click="function8" :disabled="!authorId8">获取注册天数</button>
+        <div v-if="apiResponse8">
+            <h3>响应数据：</h3>
+            <pre>{{ apiResponse8 }}</pre>
+        </div>
 
     </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { getAllAuthors, getAuthor, createAuthor, updateAuthor, deleteAuthor } from '@/API/Author_API'
+import {
+    getAllAuthors, getAuthor, createAuthor, updateAuthor, deleteAuthor, getAuthorNovelCount,
+    getAuthorTotalWordCount,
+    getAuthorRegisterDays
+} from '@/API/Author_API'
 
 import { useRouter } from 'vue-router'
 const router = useRouter()
@@ -164,6 +191,45 @@ async function fuction5() {
     } catch (error) {
         console.error('删除作者请求错误:', error)
         apiResponse5.value = { error: error.message }
+    }
+}
+
+// 6: 获取作者作品数量
+const authorId6 = ref('')
+const apiResponse6 = ref(null)
+async function function6() {
+    try {
+        const response = await getAuthorNovelCount(authorId6.value)
+        apiResponse6.value = response
+    } catch (error) {
+        console.error('API 请求错误:', error)
+        apiResponse6.value = { error: error.message }
+    }
+}
+
+// 7: 获取作者作品总字数
+const authorId7 = ref('')
+const apiResponse7 = ref(null)
+async function function7() {
+    try {
+        const response = await getAuthorTotalWordCount(authorId7.value)
+        apiResponse7.value = response
+    } catch (error) {
+        console.error('API 请求错误:', error)
+        apiResponse7.value = { error: error.message }
+    }
+}
+
+// 8: 获取作者注册天数
+const authorId8 = ref('')
+const apiResponse8 = ref(null)
+async function function8() {
+    try {
+        const response = await getAuthorRegisterDays(authorId8.value)
+        apiResponse8.value = response
+    } catch (error) {
+        console.error('API 请求错误:', error)
+        apiResponse8.value = { error: error.message }
     }
 }
 
