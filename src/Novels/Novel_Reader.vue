@@ -128,10 +128,6 @@
                     :style="{ fontSize: fontSize + 'px', fontFamily: fontFamily, color: textColor }">
                     {{ selectNovelState.cha_content }}
                 </div>
-                <div class="chapter-nav-buttons">
-                    <button class="nav-button prev" @click="changeChapter(-1)">上一章</button>
-                    <button class="nav-button next" @click="changeChapter(1)">下一章</button>
-                </div>
             </div>
             <div class="right-menu">
                 <div class="menu-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24"
@@ -513,10 +509,8 @@ onUnmounted(() => {
 
 .chapter-divider {
     height: 1px;
-    background: transparent;
-    margin: 16px 0;
-    border-bottom: 1px dashed currentColor;
-    opacity: 0.6;
+    background: #eee;
+    margin: 16px 0 0 0;
 }
 
 .novel-content {
@@ -733,6 +727,7 @@ button.active {
 .menu-item:disabled {
     opacity: 1;
 }
+
 
 .chapter-nav-buttons {
     display: flex;
