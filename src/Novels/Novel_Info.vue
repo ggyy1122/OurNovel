@@ -63,8 +63,8 @@
           <button class="blue-border-btn" :class="{ 'is-collected': isCollected }" @click="toggleCollect">
             {{ isCollected ? '已收藏' : '收藏作品' }}
           </button>
-          <button class="blue-border-btn">
-            推荐作品
+          <button class="blue-border-btn"  :class="{ 'is-recommended': isRecommended }"  @click="handleRecommend">
+            {{ isRecommended ? '已推荐' : '推荐作品' }}
           </button>
           <button class="blue-border-btn">
             打赏作品
@@ -87,7 +87,8 @@
               <div class="data-label">累计字数</div>
             </div>
             <div class="data-card">
-              <div class="data-value">{{ authorRegisterDays }}</div>
+
+              <div class="data-value">{{  authorRegisterDays }}</div>
               <div class="data-label">创作天数</div>
             </div>
           </div>
@@ -120,31 +121,74 @@
       <router-view></router-view>
     </main>
   </div>
+  <!-- 改成 div 弹窗（样式上模拟 dialog 就行） -->
+ <div v-if="showRecommendDialog" class="recommend-dialog-overlay">
+    <div class="recommend-dialog">
+      <div class="dialog-content">
+        <h3>{{ isRecommended ? '推荐状态' : '推荐原因' }}</h3>
+        <template v-if="!isRecommended">
+          <textarea
+            v-model="recommendReason"
+            placeholder="这本小说太棒了，快来推荐一下吧!(可选)"
+            class="recommend-textarea"
+          ></textarea>
+        </template>
+        <template v-else>
+          <p class="already-recommended">您已推荐</p>
+        </template>
+        <div class="dialog-actions">
+          <button class="cancel-btn" @click="showRecommendDialog = false">退出</button>
+          <button
+            v-if="!isRecommended"
+            @click="submitRecommend"
+            class="confirm-btn"
+          >
+            确认推荐
+          </button>
+           <button
+          v-if="isRecommended"
+          @click="cancelRecommend"
+          class="cancel-recommend-btn"
+        >
+          取消推荐
+        </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue';
-import { useRouter } from 'vue-router';
-import { SelectNovel_State, readerState } from '@/stores/index';
-import { getCategoriesByNovel } from '@/API/NovelCategory_API';
-import { addOrUpdateCollect, deleteCollect } from '@/API/Collect_API';
-import { getNovelWordCount, getNovelRecommendCount, getNovelCollectCount } from '@/API/Novel_API';
-import { getAuthorNovelCount, getAuthorTotalWordCount, getAuthorRegisterDays } from '@/API/Author_API';
+
+import {ref, watch,computed} from 'vue';
+import { useRouter} from 'vue-router';
+import { SelectNovel_State,readerState } from '@/stores/index';
+import { getCategoriesByNovel} from '@/API/NovelCategory_API';
+import {addOrUpdateCollect,deleteCollect} from '@/API/Collect_API';
+import {getNovelWordCount, getNovelRecommendCount,getNovelCollectCount} from '@/API/Novel_API';
+import {  getAuthorNovelCount,getAuthorTotalWordCount,getAuthorRegisterDays}  from '@/API/Author_API';
 import { getChapter } from '@/API/Chapter_API';
+import {addRecommend,deleteRecommend} from '@/API/Recommend_API';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
+
+
 const selectNovelState = SelectNovel_State();      //当前选择的小说对象
-const ReaderState = readerState();                   //当前读者对象
-const categories = ref([]);                          //分类数组
+const ReaderState=readerState();                   //当前读者对象
+const categories=ref([]);                          //分类数组
 const isLoadingCategories = ref(false);            //是否在加载
-const novelWordCount = ref(0);                       //当前小说的字数
-const collectedCount = ref(0);                       //当前小说的被收藏数
-const recommendCount = ref(0);                       //当前小说的被推荐数
-const authorNovelCount = ref(0);                      //当前作者的创作小说数
-const authorWordCount = ref(0);                      //当前作者的创作总字数
-const authorRegisterDays = ref(0);                   //当前作者的创作天数
+const novelWordCount=ref(0);                       //当前小说的字数
+const collectedCount=ref(0);                       //当前小说的被收藏数
+const recommendCount=ref(0);                       //当前小说的被推荐数
+const authorNovelCount=ref(0);                      //当前作者的创作小说数
+const authorWordCount=ref(0);                      //当前作者的创作总字数
+const authorRegisterDays=ref(0);                   //当前作者的创作天数
+const router = useRouter();
+const defaultCoverImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E书籍封面%3C/text%3E%3C/svg%3E";// 默认封面图片
+const defaultAuthorAvatar = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E作者头像%3C/text%3E%3C/svg%3E";// 默认作者头像
+
 
 //是否被收藏
 const isCollected = computed(() => {
@@ -155,18 +199,27 @@ const isCollected = computed(() => {
     item.novel?.novelId === currentNovelId ||
     item.novelId === currentNovelId
   )
-})
-const router = useRouter();
-const defaultCoverImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E书籍封面%3C/text%3E%3C/svg%3E";// 默认封面图片
-const defaultAuthorAvatar = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E作者头像%3C/text%3E%3C/svg%3E";// 默认作者头像
-//返回
-function goback() {
-  router.push('/Novels/Novel_Layout/category');
-}
+}) 
+//是否被推荐
+const isRecommended = computed(() => {
+  //当前小说ID
+  const currentNovelId = selectNovelState.novelId;
+  // 检查是否存在于收藏列表
+  return ReaderState.recommendBooks.some(item =>
+    item.novel?.novelId === currentNovelId ||
+    item.novelId === currentNovelId
+  )
+}) 
+// 是否显示弹窗
+const showRecommendDialog = ref(false) 
+// 用户输入的推荐理由
+const recommendReason = ref('') 
+
 //处理图片错误
 function handleImageError(event) {
   event.target.src = defaultCoverImage;
 }
+//获取小说状态样式
 function getStatusClass(status) {
   switch (status) {
     case '连载': return 'status-running';
@@ -175,6 +228,9 @@ function getStatusClass(status) {
   }
 
 }
+
+
+/*数据获取部分 */
 // 获取分类数据
 const fetchCategories = async () => {
   try {
@@ -197,18 +253,20 @@ const fetchWordCount = async () => {
   try {
     const response = await getNovelWordCount(selectNovelState.novelId)
     novelWordCount.value = response.data?.totalWords || response?.totalWords || 0
-    console.log('最终字数:', novelWordCount.value) // 调试
+
+     console.log('最终字数:',  novelWordCount.value) // 调试
   } catch (error) {
     console.error('获取字数失败:', error)
     novelWordCount.value = 0
   }
 }
 // 获取推荐数的函数
-const fetchRecommendCount = async () => {
+
+const fetchRecommendCount = async ()=>{
   try {
     const response = await getNovelRecommendCount(selectNovelState.novelId)
     recommendCount.value = response.data?.recommendCount || response?.recommendCount || 0
-    console.log('最终推荐数:', recommendCount.value) // 调试
+        console.log('最终推荐数:',  recommendCount.value) // 调试
   } catch (error) {
     console.error('获取推荐数失败:', error)
     recommendCount.value = 0
@@ -216,48 +274,53 @@ const fetchRecommendCount = async () => {
 
 }
 // 获取收藏数的函数
-const fetchCollectedCount = async () => {
+const fetchCollectedCount = async ()=>{
   try {
     const response = await getNovelCollectCount(selectNovelState.novelId)
     collectedCount.value = response.data?.collectCount || response?.collectCount || 0
-    console.log('最终收藏数:', collectedCount.value) // 调试
+      console.log('最终收藏数:',  collectedCount.value) // 调试
   } catch (error) {
     console.error('获取收藏数失败:', error)
     collectedCount.value = 0
   }
+
 }
 // 获取作者创作书籍数的函数
-const fetchAuthorNovelCount = async () => {
+const fetchAuthorNovelCount = async ()=>{
   try {
     const response = await getAuthorNovelCount(selectNovelState.authorId)
-    authorNovelCount.value = response.data?.novelCount || response?.novelCount || 0
-    console.log('最终作者创作数:', authorNovelCount.value) // 调试
+    authorNovelCount.value = response.data?.novelCount || response?.novelCount|| 0
+      console.log('最终作者创作数:',  authorNovelCount.value) // 调试
   } catch (error) {
     console.error('获取作者作品数失败:', error)
     collectedCount.value = 0
   }
+
 }
 //获取作者创作总字数的函数
-const fetchAuthorWordCount = async () => {
-  try {
+const fetchAuthorWordCount  =async ()=>{
+    try {
     const response = await getAuthorTotalWordCount(selectNovelState.authorId)
-    authorWordCount.value = response.data?.totalWordCount || response?.totalWordCount || 0
+    authorWordCount.value = response.data?.totalWordCount || response?.totalWordCount|| 0
   } catch (error) {
     console.error('获取作者创作字数失败:', error)
-    authorWordCount.value = 0
+     authorWordCount.value = 0
   }
 }
 //获取作者创作天数
-const fetchAuthorRegisterDays = async () => {
-  try {
+const fetchAuthorRegisterDays =async ()=>{
+    try {
     const response = await getAuthorRegisterDays(selectNovelState.authorId)
-    authorRegisterDays.value = response.data?.registerDays || response?.registerDays || 0
-    console.log('获取作者创作天数:', authorRegisterDays.value)
+   authorRegisterDays.value = response.data?.registerDays || response?.registerDays|| 0
+   console.log('获取作者创作天数:', authorRegisterDays.value)
   } catch (error) {
     console.error('获取作者创作天数失败:', error)
-    authorRegisterDays.value = 0
+     authorRegisterDays.value = 0
   }
 }
+
+
+
 // 仅监听 novelId 变化,变化时加载数据
 watch(
   () => selectNovelState.novelId,
@@ -281,8 +344,16 @@ watch(
   },
   { immediate: true } // 替代 onMounted，首次加载时自动执行
 )
-// 如果novelId可能变化，添加监听
-/*收藏逻辑*/
+
+
+
+/*按钮逻辑部分*/
+//返回按钮
+function goback() {
+  router.push('/Novels/Novel_Layout/category');
+}
+//收藏按钮的逻辑
+
 const toggleCollect = async () => {
   const currentNovelId = selectNovelState.novelId;
   const currentReaderId = ReaderState.readerId;
@@ -321,7 +392,7 @@ const toggleCollect = async () => {
     })
   }
 };
-//开始阅读
+//开始阅读按钮的逻辑
 async function handleRead() {
   try {
     const response = await getChapter(selectNovelState.novelId, 1);
@@ -344,7 +415,91 @@ async function handleRead() {
     })
   }
 }
+
+//推荐按钮的逻辑
+const handleRecommend = async () => {
+  console.log('成功点击推荐按钮');
+  if (isRecommended.value) {
+    // 已推荐 → 显示提示
+
+    showRecommendDialog.value = true
+  } else {
+    // 未推荐 → 弹出输入框
+    showRecommendDialog.value = true
+    
+  }
+}
+//提交推荐内容
+const submitRecommend = async () => {
+    const currentNovelId = selectNovelState.novelId;
+    const currentReaderId = ReaderState.readerId;
+     const currentReason = recommendReason.value;
+     console.log(' currentNovelId', currentNovelId)
+     console.log(' currentReaderId ',  currentReaderId )
+     console.log(' currentReason ', currentReason )
+  try {
+    // 调用推荐 API
+   const response = await addRecommend(currentNovelId, currentReaderId, currentReason)
+        console.log('添加推荐响应:', response)
+
+    // 更新本地状态
+    isRecommended.value = true
+    showRecommendDialog.value = false
+
+    // 存储推荐数据（可选）
+    ReaderState.recommendBooks.push({
+      novelId: selectNovelState.novelId,
+      novel: selectNovelState, // 保存完整作品信息
+      readerId: ReaderState.readerId,
+      reason: recommendReason.value,
+      recommendTime: new Date().toISOString()
+    })
+
+    // 提示成功
+    toast("推荐成功！", {
+      type: "success",
+      dangerouslyHTMLString: true
+    })
+    recommendReason.value = '';
+
+  } catch (error) {
+    console.error('推荐失败:', error)
+    toast("推荐失败，请重试", { 
+      type: "error",
+      dangerouslyHTMLString: true
+    })
+  }
+}
+//取消推荐
+const cancelRecommend=async()=>{
+    const currentNovelId = selectNovelState.novelId;
+    const currentReaderId = ReaderState.readerId;
+ try{
+      // 取消推荐
+      await deleteRecommend(currentNovelId, currentReaderId);
+      ReaderState.recommendBooks = ReaderState.recommendBooks.filter(item =>
+        item.novel?.novelId !== currentNovelId &&
+        item.novelId !== currentNovelId
+
+      );
+      toast("取消推荐", {
+        "type": "success",
+        "dangerouslyHTMLString": true
+      })
+      showRecommendDialog.value = false;
+ }
+ catch(error){
+ console.error('推荐操作失败:', error);
+    toast("推荐失败", {
+      "type": "error",
+      "dangerouslyHTMLString": true
+    })
+ }
+}
+
 </script>
+
+
 
 <style scoped>
 /* 返回按钮样式 */
@@ -641,6 +796,18 @@ async function handleRead() {
   border-color: #bfbfbf;
   color: #595959;
 }
+/* 新增的已推荐状态 */
+.blue-border-btn.is-recommended {
+  border-color: #d9d9d9;
+  color: #8c8c8c;
+  background: #f5f5f5;
+}
+
+.blue-border-btn.is-recommended:hover {
+  background: #f0f0f0;
+  border-color: #bfbfbf;
+  color: #595959;
+}
 
 /* 响应式设计 */
 @media (max-width: 768px) {
@@ -812,5 +979,127 @@ async function handleRead() {
 
 .main-content {
   padding: 20px 0;
+}
+
+
+
+.recommend-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.recommend-dialog {
+  background: #fff;
+  padding: 32px 28px 26px 28px;
+  border-radius: 16px;
+  min-width: 320px;
+  max-width: 90vw;
+  box-shadow: 0 8px 32px rgba(0,0,0,.18);
+  animation: popup-fade-in 0.22s cubic-bezier(.4,0,.2,1);
+}
+
+@keyframes popup-fade-in {
+  from { opacity: 0; transform: scale(0.95);}
+  to { opacity: 1; transform: scale(1);}
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+h3 {
+  margin: 0 0 18px 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-align: center;
+  color: #23292f;
+}
+
+.recommend-textarea {
+  width: 100%;
+  min-height: 70px;
+   box-sizing: border-box;
+  border-radius: 6px;
+  border: 1px solid #e1e4e8;
+  padding: 10px;
+  font-size: 1rem;
+  margin-bottom: 18px;
+  resize: vertical;
+  background: #f9fafb;
+  transition: border-color 0.2s;
+}
+.recommend-textarea:focus {
+  border-color: #409eff;
+  outline: none;
+  background: #fff;
+}
+
+.already-recommended {
+  margin: 20px 0;
+  color: #909399;
+  text-align: center;
+  font-size: 1.07rem;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: center;   /* 居中所有按钮 */
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.cancel-btn,
+.confirm-btn {
+  padding: 7px 22px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  min-width: 100px;
+  transition: background 0.17s, color 0.17s;
+}
+
+.cancel-btn {
+  background: #f5f6fa;
+  color: #909399;
+}
+.cancel-btn:hover {
+  background: #e5e8ef;
+  color: #606266;
+}
+
+.confirm-btn {
+  background: #409eff;
+  color: #fff;
+  font-weight: 500;
+}
+.confirm-btn:hover {
+  background: #2979ff;
+}
+.cancel-recommend-btn {
+  background: #ffeded;
+  color: #e74c3c;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 22px;
+  font-size: 1rem;
+  min-width: 100px;
+  cursor: pointer;
+  margin-left: 0;
+  transition: background 0.18s, color 0.18s;
+}
+.cancel-recommend-btn:hover {
+  background: #ffcccc;
+  color: #c0392b;
 }
 </style>
