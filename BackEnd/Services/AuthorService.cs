@@ -127,5 +127,16 @@ namespace OurNovel.Services
 
             return days;
         }
+
+        /// <summary>
+        /// 根据作者 ID 获取该作者的所有小说
+        /// </summary>
+        public async Task<List<Novel>> GetNovelsByAuthorIdAsync(int authorId)
+        {
+            return await _context.Novels
+                .Where(n => n.AuthorId == authorId)
+                .OrderBy(n => n.NovelId)
+                .ToListAsync();
+        }
     }
 }

@@ -90,5 +90,15 @@ namespace OurNovel.Controllers
 
             return Ok(new { success = true, registerDays = days });
         }
+
+        /// <summary>
+        /// 根据作者 ID 获取该作者的所有小说
+        /// </summary>
+        [HttpGet("{authorId}/novels")]
+        public async Task<IActionResult> GetAuthorNovels(int authorId)
+        {
+            var novels = await _authorService.GetNovelsByAuthorIdAsync(authorId);
+            return Ok(novels);
+        }
     }
 }
