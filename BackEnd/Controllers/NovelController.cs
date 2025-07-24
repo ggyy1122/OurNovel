@@ -136,5 +136,18 @@ namespace OurNovel.Controllers
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
+
+        /// <summary>
+        /// 获取小说最新已发布章节的ID和发布时间
+        /// </summary>
+        [HttpGet("{novelId}/latest-published-chapter")]
+        public async Task<IActionResult> GetLatestPublishedChapter(int novelId)
+        {
+            var latestChapter = await _novelService.GetLatestPublishedChapterInfoAsync(novelId);
+            if (latestChapter == null)
+                return NotFound("该小说还没有发布的章节");
+
+            return Ok(latestChapter);
+        }
     }
 }

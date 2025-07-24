@@ -1,8 +1,11 @@
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Http;
+using OurNovel.Data;
+using OurNovel.DTOs;
 using OurNovel.Models;
 using OurNovel.Models.Dto;
 using OurNovel.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace OurNovel.Services
 {
@@ -13,12 +16,17 @@ namespace OurNovel.Services
     {
         private readonly INovelRepository _novelRepository;
         private readonly NovelManagementService _novelManagementService;
+        private readonly AppDbContext _context;
 
-        public NovelService(IRepository<Novel, int> repository, INovelRepository novelRepository, NovelManagementService novelManagementService)
+        public NovelService(IRepository<Novel, int> repository, 
+                            INovelRepository novelRepository, 
+                            NovelManagementService novelManagementService,
+                            AppDbContext context)
             : base(repository)
         {
             _novelRepository = novelRepository;
             _novelManagementService = novelManagementService;
+            _context = context;
         }
 
         /// <summary>
@@ -142,6 +150,21 @@ namespace OurNovel.Services
             return newNovel.NovelId;
         }
 
+        /// <summary>
+        /// 小说最新章节
+        /// </summary>
+        public async Task<LatestPublishedChapterDto?> GetLatestPublishedChapterInfoAsync(int novelId)
+        {
+            return await _context.Chapters
+                .Where(c => c.NovelId == novelId && c.Status == "已发布")
+                .OrderByDescending(c => c.ChapterId)
+                .Select(c => new LatestPublishedChapterDto
+                {
+                    ChapterId = c.ChapterId,
+                    PublishTime = c.PublishTime
+                })
+                .FirstOrDefaultAsync();
+        }
 
         /// <summary>
         /// 上传小说封面，并更新封面地址ַ
