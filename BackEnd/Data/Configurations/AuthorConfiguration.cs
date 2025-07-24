@@ -50,8 +50,10 @@ namespace OurNovel.Data.Configurations
             entity.Property(e => e.RegisterTime)
                   .HasColumnName("REGISTER_TIME")
                   .HasColumnType("DATE")
-                  .IsRequired(false); 
+                  .IsRequired(false);
 
+            entity.Property(e => e.Introduction)
+                  .HasColumnName("INTRODUCTION");
         }
     }
 }

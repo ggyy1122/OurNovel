@@ -21,6 +21,6 @@ namespace OurNovel.Models
         public string? AvatarUrl { get; set; }          // AVATAR_URL 可空
         public DateTime ? RegisterTime { get; set; }
 
-
+        public string? Introduction { get; set; } = null!; // Introduction 可空
     }
 }
