@@ -90,3 +90,25 @@ export function deleteTransaction(transactionId) {
         method: 'delete'
     })
 }
+
+
+/**
+ * 整本小说买断接口
+ * @param {Object} dto - 买断请求数据
+ * @param {number} dto.readerId - 读者ID
+ * @param {number} dto.novelId - 小说ID
+ * @returns {Promise<Object>} 返回 { success: number, message: string }
+ */
+export function purchaseWholeNovel(dto) {
+    return request({
+        url: '/api/WholePurchase',
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        data: {
+            readerId: dto.readerId,
+            novelId: dto.novelId
+        }
+    });
+}

@@ -54,6 +54,15 @@
             <h3>响应数据：</h3>
             <pre>{{ apiResponse5 }}</pre>
         </div>
+        
+        <h1>6:整本小说买断</h1>
+        <input v-model="readerId6" placeholder="输入读者ID" />
+        <input v-model="novelId6" placeholder="输入小说ID" />
+        <button @click="function6">执行买断</button>
+        <div v-if="apiResponse6">
+             <h3>响应数据：</h3>
+             <pre>{{ apiResponse6 }}</pre>
+        </div>
 
     </div>
 </template>
@@ -160,4 +169,26 @@ async function function5() {
         apiResponse5.value = { error: error.message }
     }
 }
+
+import { purchaseWholeNovel } from '@/API/Transaction_API'
+
+const readerId6 = ref('')
+const novelId6 = ref('')
+const apiResponse6 = ref(null)
+
+async function function6() {
+  try {
+    const dto = {
+      readerId: parseInt(readerId6.value),
+      novelId: parseInt(novelId6.value)
+    }
+    const response = await purchaseWholeNovel(dto)
+    apiResponse6.value = response
+    console.log('买断响应:', response)
+  } catch (error) {
+    console.error('整本买断请求错误:', error)
+    apiResponse6.value = { error: error.message }
+  }
+}
+
 </script>
