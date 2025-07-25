@@ -81,7 +81,8 @@ async function handleAddShelf() {
 }
 async function handle() {
     const response = await getAuthor(props.novel.authorId);
-    selectNovelState.resetNovel(props.novel.novelId, props.novel.authorId, props.novel.novelName, props.novel.introduction, props.novel.createTime, props.novel.coverUrl, props.novel.score, props.novel.totalWordCount, props.novel.recommendCount, props.novel.collectedCount, props.novel.status,
+      console.log('📌 props.novel.totalPrice =', props.novel.totalPrice);  // 看看是不是 DORA
+    selectNovelState.resetNovel(props.novel.novelId, props.novel.authorId, props.novel.novelName, props.novel.introduction, props.novel.createTime, props.novel.coverUrl, props.novel.score, props.novel.totalWordCount, props.novel.recommendCount, props.novel.collectedCount, props.novel.status, props.novel.totalPrice,
         response.authorName, response.phone, response.avatarUrl);
 }
 //立即阅读

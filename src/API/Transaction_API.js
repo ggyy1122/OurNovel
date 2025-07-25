@@ -112,3 +112,22 @@ export function purchaseWholeNovel(dto) {
         }
     });
 }
+
+
+/**
+ * 查询是否已整本买断该小说
+ * @param {number} readerId - 读者ID
+ * @param {number} novelId - 小说ID
+ * @returns {Promise<Object>} 返回 { hasPurchased: boolean }
+ */
+export function getWholePurchaseStatus(readerId, novelId) {
+    return request({
+        url: '/api/WholePurchase/status',
+        method: 'get',
+        params: {
+            readerId,
+            novelId
+        }
+    });
+}
+

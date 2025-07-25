@@ -54,7 +54,7 @@
             <h3>响应数据：</h3>
             <pre>{{ apiResponse5 }}</pre>
         </div>
-        
+
         <h1>6:整本小说买断</h1>
         <input v-model="readerId6" placeholder="输入读者ID" />
         <input v-model="novelId6" placeholder="输入小说ID" />
@@ -63,7 +63,8 @@
              <h3>响应数据：</h3>
              <pre>{{ apiResponse6 }}</pre>
         </div>
-
+       
+       
     </div>
 </template>
 
@@ -190,5 +191,7 @@ async function function6() {
     apiResponse6.value = { error: error.message }
   }
 }
+
+
 
 </script>
