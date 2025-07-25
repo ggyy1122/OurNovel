@@ -13,6 +13,15 @@ namespace OurNovel.Services
         {
             _context = context;
         }
+        
+        public bool HasPurchased(int readerId, int novelId)
+       {
+         var record = _context.WholePurchase
+        .FirstOrDefault(p => p.ReaderId == readerId && p.NovelId == novelId);
+
+         return record != null && record.IsBought == "是";
+        }
+
 
         /// <summary>
         /// 整本小说买断方法

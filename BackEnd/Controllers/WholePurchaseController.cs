@@ -33,5 +33,18 @@ namespace OurNovel.Controllers
             else
                 return BadRequest(result);
         }
+
+        /// <summary>
+        /// 查询读者是否已整本买断某小说
+        /// </summary>
+        /// <param name="readerId">读者ID</param>
+        /// <param name="novelId">小说ID</param>
+        /// <returns>是否买断结果</returns>
+        [HttpGet("status")]
+        public IActionResult CheckWholePurchaseStatus(int readerId, int novelId)
+        {
+            bool hasPurchased = _wholePurchaseService.HasPurchased(readerId, novelId);
+            return Ok(new { hasPurchased });
+        }
     }
 }
