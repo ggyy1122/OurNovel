@@ -7,6 +7,7 @@
                 <h3>{{ author.authorName }}</h3>
                 <p class="meta">已创作 {{ authorRegisterDays.registerDays }} 天</p>
                 <p class="meta">联系方式 : {{ maskedPhone }}</p>
+                <p class="meta">简介 : {{ author.introduction || '暂无简历' }}</p>
             </div>
         </div>
         <div class="stats">

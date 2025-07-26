@@ -19,7 +19,7 @@
         <div class="side">
             <div class="hot">
                 <span>推荐数:{{ novel.recommendCount || 0 }}</span>
-                <span>收藏数:{{ novel.collectedCount || 0 }}</span>
+                <span>收藏数:{{ collectedcount }}</span>
             </div>
             <div class="actions">
                 <button class="add-shelf" @click="handleAddShelf" :class="{ 'in-shelf': isFavorite }"
@@ -47,6 +47,7 @@ const props = defineProps({
     novel: Object,
     rank: Number
 })
+const collectedcount = ref(props.novel.collectedCount || 0);
 const router = useRouter();
 const formatDate = (dateString) => {
     if (!dateString) return '未知时间'
@@ -68,6 +69,7 @@ async function handleAddShelf() {
             isPublic: "yes",
             collectTime: new Date().toISOString()
         });
+        collectedcount.value += 1; // 更新收藏数
         toast("加入书架成功！", {
             "type": "success",
             "dangerouslyHTMLString": true

@@ -180,7 +180,6 @@ export function getNovelCollectCount(novelId) {
     })
 }
 
-
 /**
  * 上传小说封面
  * @param {number} novelId - 小说ID

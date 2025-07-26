@@ -38,12 +38,12 @@ export const readerState = defineStore('reader', {
         //读者10个属性
         readerId: 0,
         readerName: "",
-        // password: "",
+        password: "",
         phone: "",
         gender: "",
         balance: 0,
         avatarUrl: "",      //头像不用这个，用下面的formattedAvatarUrl,加了前缀
-        backgroundUrl: "",
+        backgroundUrl: "",  //背景图不用这个，用下面的formattedBackgroundUrl,加了前缀
         isCollectVisible: null,
         isRecommendVisible: null,
         //扩展属性
@@ -62,6 +62,13 @@ export const readerState = defineStore('reader', {
                 return prefix + state.avatarUrl;
             }
             return prefix + 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg';  // 默认头像
+        },
+        formattedBackgroundUrl: (state) => {
+            const prefix = 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/';  //前缀
+            if (state.backgroundUrl) {
+                return prefix + state.backgroundUrl;
+            }
+            return prefix + 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg';  // 默认背景图
         }
     },
     actions: {
@@ -87,7 +94,7 @@ export const readerState = defineStore('reader', {
         resetReaderInfo() {
             this.readerId = 0;
             this.readerName = "";
-            // this.password = "";
+            this.password = "";
             this.phone = "";
             this.gender = "";
             this.balance = 0;
