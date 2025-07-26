@@ -142,3 +142,15 @@ export function getReaderBalance(readerId) {
         method: 'get'
     })
 }
+
+/**
+ * 获取指定读者的举报及管理日志
+ * @param {number} readerId 
+ * @returns {Promise<any>}
+ */
+export function getReportsWithLogsByReader(readerId) {
+    return request({
+        url: `/api/ReportManagement/reader/${readerId}/reports-with-logs`,
+        method: 'get'
+    })
+}
