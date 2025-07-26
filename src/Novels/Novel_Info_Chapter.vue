@@ -44,6 +44,8 @@
 import { ref, onMounted, computed } from 'vue';
 import { SelectNovel_State } from '@/stores/index';
 import { getChaptersByNovel } from '@/API/Chapter_API';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 const selectNovelState = SelectNovel_State();
 const chapterList = ref([]);
@@ -103,6 +105,7 @@ function selectChapter(chapter) {
     chapter.publishTime,
     chapter.status
   );
+  router.push('/Novels/reader');
 }
 </script>
 

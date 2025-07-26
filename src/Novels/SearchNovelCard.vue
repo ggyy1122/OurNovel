@@ -19,7 +19,7 @@
                     <span class="stat-value">{{ novel.totalWordCount }}字</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-value">{{ novel.collectedCount }}收藏</span>
+                    <span class="stat-value">{{ collectedcount }}收藏</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-value">{{ novel.recommendCount }}推荐</span>
@@ -48,18 +48,17 @@ import { addOrUpdateCollect } from '@/API/Collect_API';
 import { getChapter } from '@/API/Chapter_API';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
-
-const selectNovelState = SelectNovel_State();
-const reader_state = readerState();
 const props = defineProps({
     novel: {
         type: Object,
         required: true
     }
 });
+const selectNovelState = SelectNovel_State();
+const reader_state = readerState();
 const router = useRouter();
-
 const isFavorite = ref(reader_state.isFavorite(props.novel.novelId));
+const collectedcount=ref(props.novel.collectedCount || 0);
 
 // 加入书架/收藏
 async function handleAddShelf() {
@@ -75,6 +74,7 @@ async function handleAddShelf() {
             isPublic: "yes",
             collectTime: new Date().toISOString()
         });
+        collectedcount.value += 1; // 更新收藏数
         toast("收藏成功！", {
             "type": "success",
             "dangerouslyHTMLString": true
