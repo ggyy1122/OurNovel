@@ -2,18 +2,21 @@
   <div>
     <!-- 主内容块：章节列表 + 整本购买按钮 -->
     <div class="chapter-list">
-      <h2>章节目录</h2>
+     <!-- 标题和按钮并排对齐 -->
+<div class="chapter-header-bar">
+  <h2 class="chapter-title">章节目录</h2>
+  <div v-if="selectNovelState.status === '完结'">
+    <button 
+      :disabled="hasPurchased"
+      class="whole-puy-btn"
+      @click="showPurchaseModal = true"
+    >
+      {{ hasPurchased ? '已买断' : '整本购买' }}
+    </button>
+  </div>
+</div>
 
-      <!-- 整本小说买断按钮 -->
-      <div class="whole-purchase-container">
-        <button 
-          :disabled="hasPurchased"
-          class="whole-puy-btn"
-          @click="showPurchaseModal = true"
-        >
-          {{ hasPurchased ? '已买断' : '整本购买' }}
-        </button>
-      </div>
+
 
       <!-- 章节列表 -->
       <ul v-if="displayedChapters.length > 0">
@@ -114,6 +117,7 @@ const totalPages = computed(() =>
   Math.ceil(visibleChapters.value.length / itemsPerPage) || 1
 );
 
+
 // 初始化加载章节
 onMounted(async () => {
   try {
@@ -152,20 +156,45 @@ async function updateDisplayedChapters() {
 }
 
 async function confirmPurchase() {
- 
   try {
-    
     const res = await purchaseWholeNovel({ readerId, novelId })
+
     if (res.success === 1) {
       hasPurchased.value = true
       showPurchaseModal.value = false
-      toast.success('✅ 购买成功！', { autoClose: 2000 }) // 🎉 成功提示
+      toast.success('购买成功！', { autoClose: 2000 })
     } else {
-      toast.warning(res.message || '购买失败，请重试', { autoClose: 2000 }) // ⚠️ 后端提示
+      handleBalanceCheckAndError(res.message)
     }
+
   } catch (err) {
     console.error('购买失败:', err)
-    toast.error('❌ 发生错误，请稍后再试', { autoClose: 2000 }) // ❌ 错误提示
+
+    // 优先检查后端返回的错误信息
+    const backendMsg = err?.response?.data?.message || ''
+    if (backendMsg.includes('余额不足')) {
+      const balance = readerStore.balance ?? 0
+     // const price = selectNovelState.totalPrice ?? 0
+      toast.warning(`余额不足，当前余额 ¥${balance.toFixed(2)}`, {
+        autoClose: 3000
+      })
+    } else {
+      toast.error('❌ 发生错误，请稍后再试', { autoClose: 2000 })
+    }
+  }
+}
+
+
+function handleBalanceCheckAndError(msg) {
+  const balance = readerStore.balance ?? 0
+  const price = selectNovelState.totalPrice ?? 0
+
+  if (balance < price || msg.includes('余额不足')) {
+    toast.warning(`❗ 余额不足，当前余额为 ¥${balance.toFixed(2)}，需要 ¥${price.toFixed(2)}`, {
+      autoClose: 3000
+    })
+  } else {
+    toast.warning(msg || '购买失败，请重试', { autoClose: 2000 })
   }
 }
 
@@ -309,25 +338,43 @@ p {
 
 
 
-.whole-purchase-container {
-  text-align: center;
-  margin-top: 20px;
+.chapter-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 0 10px;
+  flex-wrap: wrap; /* 响应式换行 */
 }
 
+
+
+
 .whole-puy-btn {
-  background-color: #3f83f8;
+  background: linear-gradient(135deg, #4a90e2, #357ABD); /* 渐变蓝色 */
   color: white;
-  padding: 10px 20px;
+  padding: 12px 24px;
   font-size: 16px;
+  font-weight: bold;
   border: none;
-  border-radius: 8px;
+  border-radius: 30px;
   cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.whole-puy-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
 }
 
 .whole-puy-btn:disabled {
-  background-color: #cccccc;
+  background: #cccccc;
+  color: #666;
   cursor: not-allowed;
+  box-shadow: none;
 }
+
 
 /* 弹窗样式 */
 .modal-overlay {
