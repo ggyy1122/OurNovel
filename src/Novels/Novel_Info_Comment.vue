@@ -36,6 +36,9 @@ import {
 
 import { SelectNovel_State, readerState } from '@/stores/index'
 
+import 'vue3-toastify/dist/index.css'
+import { toast } from 'vue3-toastify'
+
 const selectNovelState = SelectNovel_State()
 const readerStore = readerState()
 const readerId = readerStore.readerId
@@ -69,13 +72,16 @@ async function toggleLike(comment) {
       await likeComment(id, readerId)
       likedCommentIds.value.add(id)
       comment.likes += 1
+      toast.success('点赞成功 🎉')
     } else {
       await unlikeComment(id, readerId)
       likedCommentIds.value.delete(id)
       comment.likes -= 1
+      toast.info('取消点赞成功 🧹')
     }
   } catch (error) {
     console.error('点赞操作失败:', error)
+    toast.error('点赞操作失败，请稍后重试！')
   }
 }
 
