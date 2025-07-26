@@ -72,5 +72,17 @@ namespace OurNovel.Controllers
                 data = result
             });
         }
+        /// <summary>
+        /// 获取指定读者发布的所有举报及其管理处理进度
+        /// </summary>
+        /// <param name="readerId">读者ID</param>
+        /// <returns>举报列表及处理进度</returns>
+        [HttpGet("reader/{readerId}/reports-with-logs")]
+        public async Task<IActionResult> GetReportsWithLogsByReader(int readerId)
+        {
+            var data = await _reportManagementService.GetReportsWithManagementLogsByReaderIdAsync(readerId);
+
+            return Ok(new { success = true, data });
+        }
     }
 }

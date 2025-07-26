@@ -66,4 +66,53 @@ public class ReportManagementService
             .ToListAsync();
     }
 
+    public async Task<List<object>> GetReportsWithManagementLogsByReaderIdAsync(int readerId)
+    {
+        var query = from report in _context.Reports
+                    where report.ReaderId == readerId
+                    join rm in _context.ReportManagements on report.ReportId equals rm.ReportId into rmsGroup
+                    from rm in rmsGroup.DefaultIfEmpty()
+                    join management in _context.Managements on rm.ManagementId equals management.ManagementId into mGroup
+                    from management in mGroup.DefaultIfEmpty()
+                    join comment in _context.Comments on report.CommentId equals comment.CommentId into cGroup
+                    from comment in cGroup.DefaultIfEmpty()
+                    select new
+                    {
+                        report.ReportId,
+                        report.Reason,
+                        ReportTime = report.ReportTime,
+                        report.Progress,
+                        CommentId = comment != null ? comment.CommentId : (int?)null,
+                        CommentContent = comment != null ? comment.Content : null,
+                        ManagementId = management != null ? management.ManagementId : (int?)null,
+                        ManagerId = management != null ? management.ManagerId : (int?)null,
+                        Result = management != null ? management.Result : null,
+                        Time = management != null ? management.Time : (DateTime?)null
+                    };
+
+        var flatList = await query.ToListAsync();
+
+        var grouped = flatList.GroupBy(r => new { r.ReportId, r.Reason, r.ReportTime, r.Progress, r.CommentId, r.CommentContent })
+            .Select(g => new
+            {
+                g.Key.ReportId,
+                g.Key.Reason,
+                ReportTime = g.Key.ReportTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                g.Key.Progress,
+                CommentId = g.Key.CommentId,
+                CommentContent = g.Key.CommentContent,
+                ManagementLogs = g.Where(x => x.ManagementId != null)
+                                  .OrderByDescending(x => x.Time)
+                                  .Select(x => new
+                                  {
+                                      x.ManagementId,
+                                      x.ManagerId,
+                                      x.Result,
+                                      Time = x.Time?.ToString("yyyy-MM-dd HH:mm:ss")
+                                  }).ToList()
+            }).ToList();
+
+        return grouped.Cast<object>().ToList();
+    }
+
 }
