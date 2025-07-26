@@ -69,6 +69,8 @@ import { loginAuthor, loginManager, loginReader } from '@/API/Log_API';
 import { getReader } from '@/API/Reader_API';
 import { getCollectsByReader } from '@/API/Collect_API';
 import { getRecommendsByReader } from '@/API/Recommend_API';
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
 
 const state = current_state();
@@ -143,7 +145,10 @@ const handleLogin = async () => {
             console.log('登录成功', response.data);
         } catch (error) {
             console.error('登录失败:', error);
-            alert('登录失败，请检查用户名和密码');
+            toast("登录失败，请检查用户名和密码", {
+                "type": "error",
+                "dangerouslyHTMLString": true
+            })
         }
     }
 };

@@ -91,6 +91,8 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { current_state } from '@/stores/index';
 import { resetAuthorPassword, resetManagerPassword, resetReaderPassword } from '@/API/Log_API';
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
 const state = current_state();
 
@@ -128,11 +130,17 @@ const handleResetPassword = async () => {
             }
 
             console.log('密码重置成功', response.data);
-            alert('密码重置成功，请使用新密码登录');
+            toast("密码重置成功，请使用新密码登录", {
+                "type": "success",
+                "dangerouslyHTMLString": true
+            });
             router.push('/L_R/login');
         } catch (error) {
             console.error('密码重置失败:', error);
-            alert('密码重置失败，请检查用户名或联系管理员');
+            toast("密码重置失败，请检查用户名或联系管理员", {
+                "type": "error",
+                "dangerouslyHTMLString": true
+            });
         }
     }
 };

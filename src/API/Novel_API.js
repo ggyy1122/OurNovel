@@ -14,6 +14,8 @@ import request from '@/API/index'
  * @property {number} recommendCount - 推荐数
  * @property {number} collectedCount - 收藏数
  * @property {string} status - 状态（默认："待审核"）
+ * @property {number} originalNovelId - 原始小说ID
+ * @property {number} totalPrice - 总价格
  */
 
 /**
@@ -55,6 +57,8 @@ export function getNovel(novelId) {
  * @param {number} [novelData.recommendCount=0] - 推荐数
  * @param {number} [novelData.collectedCount=0] - 收藏数
  * @param {string} [novelData.status="待审核"] - 状态
+ * @param {number} [novelData.originalNovelId=-1] - 原始小说ID
+ * @param {number} [novelData.totalPrice=0] - 总价格
  * @returns {Promise<Novel>}
  */
 export function createNovel(novelData) {
@@ -73,7 +77,9 @@ export function createNovel(novelData) {
             totalWordCount: novelData.totalWordCount || 0,
             recommendCount: novelData.recommendCount || 0,
             collectedCount: novelData.collectedCount || 0,
-            status: novelData.status || "待审核"
+            status: novelData.status || "待审核",
+            originalNovelId: novelData.originalNovelId || -1,
+            totalPrice: novelData.totalPrice || 0
         }
     })
 }
@@ -91,6 +97,8 @@ export function createNovel(novelData) {
  * @param {number} [updateData.recommendCount] - 推荐数
  * @param {number} [updateData.collectedCount] - 收藏数
  * @param {string} [updateData.status] - 状态
+ * @param {number} [updateData.originalNovelId] - 原始小说ID
+ * @param {number} [updateData.totalPrice] - 总价格
  * @returns {Promise<Novel>}
  */
 export function updateNovel(novelId, updateData) {
@@ -120,14 +128,18 @@ export function deleteNovel(novelId) {
  * 审核小说
  * @param {number} novelId - 小说ID
  * @param {string} newStatus - 新状态（必须为"连载"或"完结"）
+ * @param {number} managerId - 管理员ID
+ * @param {string} result - 审核结果
  * @returns {Promise<{success: boolean, message: string}>}
  */
-export function reviewNovel(novelId, newStatus) {
+export function reviewNovel(novelId, newStatus, managerId, result) {
     return request({
         url: `/api/Novel/${novelId}/review`,
         method: 'put',
         params: {
-            newStatus: newStatus
+            newStatus: newStatus,
+            managerId: managerId,
+            result: result
         }
     })
 }
@@ -143,6 +155,7 @@ export function getNovelWordCount(novelId) {
         method: 'get'
     })
 }
+
 /**
  * 获取小说推荐数
  * @param {number} novelId - 小说ID
@@ -154,6 +167,7 @@ export function getNovelRecommendCount(novelId) {
         method: 'get'
     })
 }
+
 /**
  * 获取小说收藏数
  * @param {number} novelId - 小说ID
@@ -162,6 +176,57 @@ export function getNovelRecommendCount(novelId) {
 export function getNovelCollectCount(novelId) {
     return request({
         url: `/api/Novel/collectcount/${novelId}`,
+        method: 'get'
+    })
+}
+
+
+/**
+ * 上传小说封面
+ * @param {number} novelId - 小说ID
+ * @param {File} file - 封面文件
+ * @returns {Promise<{success: boolean, coverUrl: string}>}
+ */
+export function uploadNovelCover(novelId, file) {
+    const formData = new FormData();
+    formData.append('novelId', novelId);
+    formData.append('coverFile', file);
+
+    return request({
+        url: '/api/Novel/UploadAvatar',
+        method: 'post',
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        },
+        data: formData
+    })
+}
+
+/**
+ * 提交小说修改
+ * @param {number} originalNovelId - 原始小说ID
+ * @param {Novel} editedNovel - 修改后的小说数据
+ * @returns {Promise<{message: string, newNovelId: number}>}
+ */
+export function submitNovelEdit(originalNovelId, editedNovel) {
+    return request({
+        url: '/api/Novel/submit-edit',
+        method: 'post',
+        data: {
+            originalNovelId,
+            edited: editedNovel
+        }
+    })
+}
+
+/**
+ * 获取小说最新已发布章节信息
+ * @param {number} novelId - 小说ID
+ * @returns {Promise<{chapterId: number, publishTime: string}>}
+ */
+export function getLatestPublishedChapter(novelId) {
+    return request({
+        url: `/api/Novel/${novelId}/latest-published-chapter`,
         method: 'get'
     })
 }
