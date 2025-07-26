@@ -124,6 +124,8 @@ export const SelectNovel_State = defineStore('select_novel', {
         recommendCount: 0,
         collectedCount: 0,
         status: "",
+        
+        totalPrice: 0,
 
         selectedComment: null, // 当前选中的评论
 
@@ -160,7 +162,7 @@ export const SelectNovel_State = defineStore('select_novel', {
         }
     },
     actions: {
-        resetNovel(id, authorId, name, introduction, createTime, coverUrl, score, totalWordCount, recommendCount, collectedCount, status, authorName, authorPhone, authorAvatarUrl) {
+        resetNovel(id, authorId, name, introduction, createTime, coverUrl, score, totalWordCount, recommendCount, collectedCount, status,totalPrice, authorName, authorPhone, authorAvatarUrl) {
             this.novelId = id || 0;
             this.authorId = authorId || 0;
             this.novelName = name || "";
@@ -172,6 +174,9 @@ export const SelectNovel_State = defineStore('select_novel', {
             this.recommendCount = recommendCount || 0;
             this.collectedCount = collectedCount || 0;
             this.status = status || "";
+
+            this.totalPrice = totalPrice ?? 0; 
+
             this.authorName = authorName || "";
             this.authorPhone = authorPhone || "";
             this.authorAvatarUrl = authorAvatarUrl || "";
