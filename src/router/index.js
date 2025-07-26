@@ -6,6 +6,7 @@ import Home from '@/views/Home_test.vue'
 import Novel_Layout from '@/Novels/Novel_Layout.vue'
 import Novel_Home from '@/Novels/Novel_Home.vue'
 import Novel_Category from '@/Novels/Novel_Category.vue'
+import Novel_Search from '@/Novels/Novel_Search.vue'
 import Novel_Rank from '@/Novels/Novel_Rank.vue'
 import LoginForm from '@/Login_Register/LoginForm.vue'
 import RegisterForm from '@/Login_Register/RegisterForm.vue'
@@ -37,6 +38,7 @@ import Reward_api_test from '@/API_Test/Reward_Test.vue'
 import CommentReply_api_test from '@/API_Test/CommentReply_Test.vue'
 import Transaction_api_test from '@/API_Test/Transaction_Test.vue'
 import Recharge_api_test from '@/API_Test/Recharge_Test.vue'
+import Search_api_test from '@/API_Test/Search_Test.vue'
 //作者
 import AuthorLayout from '@/Author/AuthorLayout.vue'
 import NovelList from '@/Author/NovelList.vue'
@@ -156,6 +158,11 @@ const routes = [
         component: Recharge_api_test
     },
     {
+        path: '/Search_api_test',
+        name: 'Search_api_test',
+        component: Search_api_test
+    },
+    {
         path: '/L_R',
         component: L_R,
         meta: { requiresAuth: true },
@@ -214,6 +221,15 @@ const routes = [
                 component: Novel_Rank
             }
         ]
+    },
+    {
+        path: '/Novels/Search',
+        name: 'Search',
+        component: Novel_Search,
+        props: (route) => ({
+            query: route.query.q,
+            filter: route.query.type || 'novel'
+        })
     },
     {
         path: '/Novels/reader',

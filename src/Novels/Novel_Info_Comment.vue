@@ -1,13 +1,8 @@
 <template>
   <div class="comment-section">
     <h2 class="section-title">📌 精选评论</h2>
-
     <div v-if="comments.length > 0" class="comment-grid">
-      <div
-        v-for="comment in comments"
-        :key="comment.commentId"
-        class="comment-card"
-      >
+      <div v-for="comment in comments" :key="comment.commentId" class="comment-card">
         <div class="comment-header">
           <div class="avatar-placeholder">👤</div>
           <div class="comment-info">
@@ -17,19 +12,15 @@
             </p>
           </div>
           <div class="likes" @click="toggleLike(comment)">
-            <span
-              :class="['like-icon', { liked: likedCommentIds.has(comment.commentId) }]"
-            >
+            <span :class="['like-icon', { liked: likedCommentIds.has(comment.commentId) }]">
               {{ likedCommentIds.has(comment.commentId) ? '❤️' : '🤍' }}
             </span>
             {{ comment.likes }}
           </div>
         </div>
-
         <p class="comment-content">{{ comment.content || '（无正文）' }}</p>
       </div>
     </div>
-
     <p v-else class="no-comments">暂无精选评论~</p>
   </div>
 </template>
@@ -44,6 +35,9 @@ import {
 } from '@/API/Likes_API'
 
 import { SelectNovel_State, readerState } from '@/stores/index'
+
+import 'vue3-toastify/dist/index.css'
+import { toast } from 'vue3-toastify'
 
 const selectNovelState = SelectNovel_State()
 const readerStore = readerState()
@@ -78,13 +72,16 @@ async function toggleLike(comment) {
       await likeComment(id, readerId)
       likedCommentIds.value.add(id)
       comment.likes += 1
+      toast.success('点赞成功 🎉')
     } else {
       await unlikeComment(id, readerId)
       likedCommentIds.value.delete(id)
       comment.likes -= 1
+      toast.info('取消点赞成功 🧹')
     }
   } catch (error) {
     console.error('点赞操作失败:', error)
+    toast.error('点赞操作失败，请稍后重试！')
   }
 }
 

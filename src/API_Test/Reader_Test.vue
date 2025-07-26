@@ -92,6 +92,14 @@
             <pre>{{ apiResponse6 }}</pre>
         </div>
 
+        <h1>7:获取读者余额</h1>
+        <input v-model="readerId7" placeholder="输入读者ID" />
+        <button @click="function7">获取余额</button>
+        <div v-if="apiResponse7">
+            <h3>响应数据：</h3>
+            <pre>{{ apiResponse7 }}</pre>
+        </div>
+
     </div>
 </template>
 
@@ -103,7 +111,8 @@ import {
     createReader,
     updateReader,
     deleteReader,
-    uploadReaderAvatar
+    uploadReaderAvatar,
+    getReaderBalance
 } from '@/API/Reader_API'
 
 import { useRouter } from 'vue-router'
@@ -239,6 +248,20 @@ async function function6() {
     } catch (error) {
         console.error('上传头像请求错误:', error)
         apiResponse6.value = { error: error.message }
+    }
+}
+
+//7:获取读者余额
+const readerId7 = ref('')
+const apiResponse7 = ref(null)
+async function function7() {
+    try {
+        const response = await getReaderBalance(readerId7.value)
+        apiResponse7.value = response
+        console.log('获取余额响应:', response)
+    } catch (error) {
+        console.error('获取余额请求错误:', error)
+        apiResponse7.value = { error: error.message }
     }
 }
 </script>

@@ -68,6 +68,30 @@
             <pre>{{ apiResponse6 }}</pre>
         </div>
 
+        <h1>7:获取小说总字数</h1>
+        <input v-model="novelId7" placeholder="输入小说ID" />
+        <button @click="function7">获取字数</button>
+        <div v-if="apiResponse7">
+            <h3>响应数据：</h3>
+            <pre>{{ apiResponse7 }}</pre>
+        </div>
+
+        <h1>8:获取小说推荐数</h1>
+        <input v-model="novelId8" placeholder="输入小说ID" />
+        <button @click="function8">获取推荐数</button>
+        <div v-if="apiResponse8">
+            <h3>响应数据：</h3>
+            <pre>{{ apiResponse8 }}</pre>
+        </div>
+
+        <h1>9:获取小说收藏数</h1>
+        <input v-model="novelId9" placeholder="输入小说ID" />
+        <button @click="function9">获取收藏数</button>
+        <div v-if="apiResponse9">
+            <h3>响应数据：</h3>
+            <pre>{{ apiResponse9 }}</pre>
+        </div>
+
     </div>
 </template>
 
@@ -79,7 +103,10 @@ import {
     createNovel,
     updateNovel,
     deleteNovel,
-    reviewNovel
+    reviewNovel,
+    getNovelWordCount,
+    getNovelRecommendCount,
+    getNovelCollectCount
 } from '@/API/Novel_API'
 
 import { useRouter } from 'vue-router'
@@ -209,6 +236,45 @@ async function function6() {
     } catch (error) {
         console.error('审核小说请求错误:', error)
         apiResponse6.value = { error: error.message }
+    }
+}
+
+//7:获取小说总字数
+const novelId7 = ref('')
+const apiResponse7 = ref(null)
+async function function7() {
+    try {
+        const response = await getNovelWordCount(novelId7.value)
+        apiResponse7.value = response
+    } catch (error) {
+        console.error('API 请求错误:', error)
+        apiResponse7.value = { error: error.message }
+    }
+}
+
+//8:获取小说推荐数
+const novelId8 = ref('')
+const apiResponse8 = ref(null)
+async function function8() {
+    try {
+        const response = await getNovelRecommendCount(novelId8.value)
+        apiResponse8.value = response
+    } catch (error) {
+        console.error('API 请求错误:', error)
+        apiResponse8.value = { error: error.message }
+    }
+}
+
+//9:获取小说收藏数
+const novelId9 = ref('')
+const apiResponse9 = ref(null)
+async function function9() {
+    try {
+        const response = await getNovelCollectCount(novelId9.value)
+        apiResponse9.value = response
+    } catch (error) {
+        console.error('API 请求错误:', error)
+        apiResponse9.value = { error: error.message }
     }
 }
 </script>

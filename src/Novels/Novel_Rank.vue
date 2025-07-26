@@ -10,7 +10,7 @@
             <div class="sidebar">
                 <div class="sidebar-title">热门作品排行</div>
                 <button v-for="side in sideTabs" :key="side" :class="{ active: side === selectedSideTab }"
-                    @click="selectedSideTab = side">
+                    @click="selectRankingType(side)">
                     {{ side }}
                 </button>
             </div>
@@ -19,16 +19,24 @@
                     <span class="rank-title">{{ selectedSideTab }}</span>
                     <div class="sub-tabs">
                         <button v-for="t in rankType" :key="t" :class="{ active: t === selectedRankType }"
-                            @click="selectedRankType = t">
+                            @click="changeRankLimit(t)">
                             {{ t }}
                         </button>
                     </div>
                 </div>
                 <div class="novel-list">
-                    <!-- <template v-for="(novel, idx) in filteredNovels" :key="novel.id">
-                        <Novel_Card :novel="novel" :rank="idx + 1" />
-                        <hr v-if="idx < filteredNovels.length - 1" class="novel-divider" />
-                    </template> -->
+                    <template v-if="loading">
+                        <div class="loading">加载中...</div>
+                    </template>
+                    <template v-else-if="!rankedNovels || rankedNovels.length === 0">
+                        <div class="no-data">暂无数据</div>
+                    </template>
+                    <template v-else>
+                        <template v-for="(novel, index) in rankedNovels" :key="novel.novelId">
+                            <Novel_Card :novel="novel" :rank="index + 1" />
+                            <hr v-if="index < rankedNovels.length - 1" class="novel-divider" />
+                        </template>
+                    </template>
                 </div>
             </div>
         </div>
@@ -36,18 +44,67 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-// import { ref, computed } from 'vue'
-// import Novel_Card from './Novel_Card.vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import Novel_Card from './Novel_Card.vue'
+import { getCollectRanking, getRecommendRanking, getScoreRanking } from '@/API/Ranking_API'
 
-const tabs = ['男生榜', '女生榜', '出生榜']
-const sideTabs = ['大热榜', '新书榜', '完结榜', '收藏榜', '更新榜']
-const rankType = ['日榜', '月榜']
+const tabs = ['全部', '已完结', '连载中']
+const sideTabs = ['收藏榜', '推荐榜', '评分榜']
+const rankType = ['前10榜', '前20榜']
 
-const selectedTab = ref('女生榜')
-const selectedSideTab = ref('大热榜')
-const selectedRankType = ref('日榜')
+const selectedTab = ref('全部')
+const selectedSideTab = ref('收藏榜')
+const selectedRankType = ref('前10榜')
+const rankedNovels = ref([])
+const loading = ref(false)
 
+const rankLimit = computed(() => {
+    return selectedRankType.value === '前10榜' ? 10 : 20
+})
+
+// 获取排行榜数据
+async function fetchRankingData() {
+    try {
+        loading.value = true
+        let response
+        switch (selectedSideTab.value) {
+            case '收藏榜':
+                response = await getCollectRanking(rankLimit.value)
+                break
+            case '推荐榜':
+                response = await getRecommendRanking(rankLimit.value)
+                break
+            case '评分榜':
+                response = await getScoreRanking(rankLimit.value)
+                break
+            default:
+                response = await getCollectRanking(rankLimit.value)
+        }
+        rankedNovels.value = Array.isArray(response) ? response : []
+        if (selectedTab.value !== '全部') {
+            const statusFilter = selectedTab.value === '已完结' ? '完结' : '连载'
+            rankedNovels.value = rankedNovels.value.filter(novel => novel.status === statusFilter)
+        }
+    } catch (error) {
+        console.error('获取排行榜数据失败:', error)
+        rankedNovels.value = []
+    } finally {
+        loading.value = false
+    }
+}
+
+function selectRankingType(type) {
+    selectedSideTab.value = type
+}
+function changeRankLimit(type) {
+    selectedRankType.value = type
+}
+watch([selectedSideTab, selectedRankType, selectedTab], () => {
+    fetchRankingData()
+})
+onMounted(() => {
+    fetchRankingData()
+})
 </script>
 
 <style scoped>
@@ -191,6 +248,13 @@ const selectedRankType = ref('日榜')
 .novel-divider {
     border: none;
     border-top: 1px solid #b2b6bb;
-    margin: 1.5rem 0;
+    margin: 0.1rem 0;
+}
+
+.loading, .no-data {
+    text-align: center;
+    padding: 50px;
+    font-size: 16px;
+    color: #888;
 }
 </style>

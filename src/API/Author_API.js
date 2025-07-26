@@ -121,7 +121,7 @@ export function getAuthorTotalWordCount(authorId) {
     })
 }
 
-/*
+/** 
  * 获取作者注册天数
  * @param {number} authorId - 参数：作者ID
  * @returns {Promise<{authorId: number, registerDays: number}>} - 返回作者ID和注册天数
