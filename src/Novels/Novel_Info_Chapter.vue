@@ -18,14 +18,15 @@
 
 
 
+
       <!-- 章节列表 -->
       <ul v-if="displayedChapters.length > 0">
         <li
           v-for="chapter in displayedChapters"
           :key="chapter.chapterId"
+
           @click="!isDisabled(chapter) && selectChapter(chapter)"
-          :class="['chapter-item', { banned: isDisabled(chapter) }]"
-        >
+          :class="['chapter-item', { banned: isDisabled(chapter) }]">
           <div class="chapter-info">
             <span class="chapter-number">第{{ chapter.chapterId }}章</span>
             <span class="chapter-title">
@@ -37,6 +38,7 @@
             <span v-else class="free">（免费）</span>
           </div>
         </li>
+
       </ul>
 
       <!-- 如果章节为空 -->
@@ -60,6 +62,7 @@
           🡆
         </button>
       </div>
+
     </div>
 
     <!-- ✅ Teleport 到 body，必须在根元素外层并写在 template 内 -->
@@ -101,6 +104,7 @@ const displayedChapters = ref([])
 const currentPage = ref(1)
 const itemsPerPage = 5
 
+
 // 整本买断状态
 const showPurchaseModal = ref(false)
 const hasPurchased = ref(false)
@@ -124,6 +128,7 @@ onMounted(async () => {
     const novelId = selectNovelState.novelId;
     const response = await getChaptersByNovel(novelId);
     chapterList.value = response || [];
+
     await updateDisplayedChapters(); // 初始化第一页
   } catch (err) {
     console.error('获取章节失败:', err);

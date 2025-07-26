@@ -114,11 +114,11 @@ export const readerState = defineStore('reader', {
 export const SelectNovel_State = defineStore('select_novel', {
     state: () => ({
         novelId: 0,
-        authorId: 0,    
+        authorId: 0,    // 作者ID
         novelName: "",
         introduction: "",
         createTime: "",
-        coverUrl: "",
+        coverUrl: "",    //封面不用这个，用下面的formattedcoverUrl,加了前缀
         score: 0,
         totalWordCount: 0,
         recommendCount: 0,
@@ -144,15 +144,21 @@ export const SelectNovel_State = defineStore('select_novel', {
         cha_publishTime: "",
         cha_status: ""
     }),
-    persist: true,  
+    persist: true,  //持久化存储
     getters: {
         formattedcoverUrl: (state) => {
-            const prefix = 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/';
-            return state.coverUrl ? prefix + state.coverUrl : prefix + 'default_cover.jpg';
+            const prefix = 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/';  //前缀
+            if (state.coverUrl) {
+                return prefix + state.coverUrl;
+            }
+            return prefix + 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg';  // 默认头像
         },
         formattedauthorAvatarUrl: (state) => {
-            const prefix = 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/';
-            return state.authorAvatarUrl ? prefix + state.authorAvatarUrl : prefix + 'default_avatar.jpg';
+            const prefix = 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/';  //前缀
+            if (state.authorAvatarUrl) {
+                return prefix + state.authorAvatarUrl;
+            }
+            return prefix + 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg';  // 默认头像
         }
     },
     actions: {

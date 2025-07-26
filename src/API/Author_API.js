@@ -96,3 +96,39 @@ export function deleteAuthor(authorId) {
         method: 'delete'
     })
 }
+
+/** 
+ * 获取作者作品数量
+ * @param {number} authorId - 参数：作者ID
+ * @returns {Promise<{authorId: number, novelCount: number}>} - 返回作者ID和作品数量
+ */
+export function getAuthorNovelCount(authorId) {
+    return request({
+        url: `/api/Author/${authorId}/novel-count`,
+        method: 'get'
+    })
+}
+
+/** 
+ * 获取作者作品总字数
+ * @param {number} authorId - 参数：作者ID
+ * @returns {Promise<{authorId: number, totalWordCount: number}>} - 返回作者ID和总字数
+ */
+export function getAuthorTotalWordCount(authorId) {
+    return request({
+        url: `/api/Author/${authorId}/total-wordcount`,
+        method: 'get'
+    })
+}
+
+/** 
+ * 获取作者注册天数
+ * @param {number} authorId - 参数：作者ID
+ * @returns {Promise<{authorId: number, registerDays: number}>} - 返回作者ID和注册天数
+ */
+export function getAuthorRegisterDays(authorId) {
+    return request({
+        url: `/api/Author/${authorId}/register-days`,
+        method: 'get'
+    })
+}
