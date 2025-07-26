@@ -111,6 +111,7 @@ async function handle() {
         );
     } catch (error) {
         console.error('处理失败:', error);
+    }
 
 }
 //立即阅读
