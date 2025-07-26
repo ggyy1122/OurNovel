@@ -45,11 +45,11 @@
             <span class="stat-unit">字</span>
           </span>
           <span class="stat-item">
-            <span class="stat-value">{{ selectNovelState.recommendCount }}</span>
+            <span class="stat-value">{{ recommendCount }}</span>
             <span class="stat-unit">推荐</span>
           </span>
           <span class="stat-item">
-            <span class="stat-value">{{ selectNovelState.collectedCount }}</span>
+            <span class="stat-value">{{ collectedCount }}</span>
             <span class="stat-unit">收藏</span>
           </span>
         </div>
@@ -179,7 +179,6 @@ import { useRouter } from 'vue-router';
 import { SelectNovel_State, readerState } from '@/stores/index';
 import { getCategoriesByNovel } from '@/API/NovelCategory_API';
 import { addOrUpdateCollect, deleteCollect } from '@/API/Collect_API';
-import { getNovelWordCount, getNovelRecommendCount, getNovelCollectCount } from '@/API/Novel_API';
 import { getAuthorNovelCount, getAuthorTotalWordCount, getAuthorRegisterDays } from '@/API/Author_API';
 import { getChapter } from '@/API/Chapter_API';
 import { addRecommend, deleteRecommend } from '@/API/Recommend_API';
@@ -191,10 +190,9 @@ import "vue3-toastify/dist/index.css";
 const selectNovelState = SelectNovel_State();      //当前选择的小说对象
 const ReaderState = readerState();                   //当前读者对象
 const categories = ref([]);                          //分类数组
-const isLoadingCategories = ref(false);            //是否在加载
-const novelWordCount = ref(0);                       //当前小说的字数
-const collectedCount = ref(0);                       //当前小说的被收藏数
-const recommendCount = ref(0);                       //当前小说的被推荐数
+const isLoadingCategories = ref(false);            //是否在加载                  
+const collectedCount = ref(selectNovelState.collectedCount);                       //当前小说的被收藏数
+const recommendCount = ref(selectNovelState.recommendCount);                       //当前小说的被推荐数
 const authorNovelCount = ref(0);                      //当前作者的创作小说数
 const authorWordCount = ref(0);                      //当前作者的创作总字数
 const authorRegisterDays = ref(0);                   //当前作者的创作天数
@@ -273,43 +271,6 @@ const fetchCategories = async () => {
     isLoadingCategories.value = false
   }
 }
-// 获取字数的函数
-const fetchWordCount = async () => {
-  try {
-    const response = await getNovelWordCount(selectNovelState.novelId)
-    novelWordCount.value = response.data?.totalWords || response?.totalWords || 0
-
-    console.log('最终字数:', novelWordCount.value) // 调试
-  } catch (error) {
-    console.error('获取字数失败:', error)
-    novelWordCount.value = 0
-  }
-}
-// 获取推荐数的函数
-
-const fetchRecommendCount = async () => {
-  try {
-    const response = await getNovelRecommendCount(selectNovelState.novelId)
-    recommendCount.value = response.data?.recommendCount || response?.recommendCount || 0
-    console.log('最终推荐数:', recommendCount.value) // 调试
-  } catch (error) {
-    console.error('获取推荐数失败:', error)
-    recommendCount.value = 0
-  }
-
-}
-// 获取收藏数的函数
-const fetchCollectedCount = async () => {
-  try {
-    const response = await getNovelCollectCount(selectNovelState.novelId)
-    collectedCount.value = response.data?.collectCount || response?.collectCount || 0
-    console.log('最终收藏数:', collectedCount.value) // 调试
-  } catch (error) {
-    console.error('获取收藏数失败:', error)
-    collectedCount.value = 0
-  }
-
-}
 // 获取作者创作书籍数的函数
 const fetchAuthorNovelCount = async () => {
   try {
@@ -318,7 +279,6 @@ const fetchAuthorNovelCount = async () => {
     console.log('最终作者创作数:', authorNovelCount.value) // 调试
   } catch (error) {
     console.error('获取作者作品数失败:', error)
-    collectedCount.value = 0
   }
 
 }
@@ -364,9 +324,6 @@ watch(
       try {
         await Promise.all([
           fetchCategories(),
-          fetchWordCount(),
-          fetchRecommendCount(),
-          fetchCollectedCount(),
           fetchAuthorNovelCount(),
           fetchAuthorWordCount(),
           fetchAuthorRegisterDays()
@@ -393,11 +350,10 @@ watch(
   }
 )
 
-
 /*按钮逻辑部分*/
 //返回按钮
 function goback() {
-  router.push('/Novels/Novel_Layout/category');
+  router.back();
 }
 //收藏按钮的逻辑
 
@@ -412,6 +368,8 @@ const toggleCollect = async () => {
         item.novel?.novelId !== currentNovelId &&
         item.novelId !== currentNovelId
       );
+      collectedCount.value -= 1; // 更新收藏数
+      isCollected.value = false; // 更新状态
       toast("取消收藏", {
         "type": "success",
         "dangerouslyHTMLString": true
@@ -426,6 +384,8 @@ const toggleCollect = async () => {
         isPublic: "no",
         collectTime: new Date().toISOString()
       });
+      collectedCount.value += 1; // 更新收藏数
+      isCollected.value = true; // 更新状态
       toast("收藏成功", {
         "type": "success",
         "dangerouslyHTMLString": true
@@ -456,7 +416,7 @@ async function handleRead() {
     );
     router.push('/Novels/reader');
   } catch (error) {
-    toast("章节加载失败：该章节不存在！", {
+    toast("该小说还没有章节！", {
       "type": "warning",
       "dangerouslyHTMLString": true
     })
@@ -489,6 +449,7 @@ const submitRecommend = async () => {
     // 更新本地状态
     isRecommended.value = true
     showRecommendDialog.value = false
+    recommendCount.value += 1; // 更新推荐数
 
     // 存储推荐数据（可选）
     ReaderState.recommendBooks.push({
@@ -524,13 +485,13 @@ const cancelRecommend = async () => {
     ReaderState.recommendBooks = ReaderState.recommendBooks.filter(item =>
       item.novel?.novelId !== currentNovelId &&
       item.novelId !== currentNovelId
-
     );
     toast("取消推荐", {
       "type": "success",
       "dangerouslyHTMLString": true
     })
     showRecommendDialog.value = false;
+    recommendCount.value -= 1; // 更新推荐数
   }
   catch (error) {
     console.error('推荐操作失败:', error);

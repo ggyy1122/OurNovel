@@ -106,6 +106,8 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { current_state } from '@/stores/index';
 import { registerAuthor, registerManager, registerReader } from '@/API/Log_API';
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 const showModal = ref(false)
 const state = current_state();
 
@@ -134,7 +136,10 @@ function getCode() {
         codeCountdown.value--;
         if (codeCountdown.value <= 0) clearInterval(timer);
     }, 1000);
-    alert("验证码已发送到手机: " + phone.value);
+    toast("验证码已发送到手机: " + phone.value, {
+        "type": "success",
+        "dangerouslyHTMLString": true
+    })
 }
 
 const handleRegister = async () => {
@@ -143,7 +148,7 @@ const handleRegister = async () => {
     phoneError.value = !phone.value || phone.value.length !== 11;
     codeError.value = !code.value;
     passwordError.value = !password.value;
-    
+
     if (usernameError.value || phoneError.value || codeError.value || passwordError.value || !agree.value) {
         return;
     }
@@ -168,12 +173,18 @@ const handleRegister = async () => {
         }
 
         if (response) {
-            alert("注册成功！");
+            toast("注册成功！", {
+                "type": "success",
+                "dangerouslyHTMLString": true
+            })
             router.push('/L_R/login');
         }
     } catch (error) {
         console.error('注册失败:', error);
-        alert('注册失败，请稍后再试');
+        toast("注册失败，请稍后再试", {
+            "type": "error",
+            "dangerouslyHTMLString": true
+        })
     }
 }
 

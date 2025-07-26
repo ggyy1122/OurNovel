@@ -92,6 +92,8 @@ import { getWholePurchaseStatus, purchaseWholeNovel } from '@/API/Transaction_AP
 import { readerState, SelectNovel_State } from '@/stores/index'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css' 
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const readerStore = readerState()
 const selectNovelState = SelectNovel_State()
 
@@ -222,6 +224,7 @@ function selectChapter(chapter) {
     chapter.publishTime,
     chapter.status
   );
+  router.push('/Novels/reader');
 }
 </script>
 

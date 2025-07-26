@@ -5,12 +5,8 @@
       <button @click="goback">返回</button>
       <nav class="nav-menu">
         <ul>
-          <li
-            v-for="item in navItems"
-            :key="item.key"
-            :class="{ active: currentTab === item.key }"
-            @click="currentTab = item.key"
-          >
+          <li v-for="item in navItems" :key="item.key" :class="{ active: currentTab === item.key }"
+            @click="currentTab = item.key">
             {{ item.label }}
           </li>
         </ul>
@@ -20,10 +16,7 @@
     <!-- 右侧内容区 -->
     <div class="right-content">
       <!-- 根据 currentTab 动态加载对应组件 -->
-      <component
-        :is="currentComponent"
-        v-if="currentComponent"
-      />
+      <component :is="currentComponent" v-if="currentComponent" />
 
       <!-- 其他栏目提示 -->
       <div v-else>
@@ -90,7 +83,7 @@ const currentComponent = computed(() => {
 button {
   width: 100%;
   padding: 10px 0;
-  margin-top:20px;
+  margin-top: 20px;
   margin-bottom: 50px;
   background-color: #f8d302f5;
   border: none;
@@ -101,6 +94,7 @@ button {
   transition: background-color 0.3s;
   user-select: none;
 }
+
 button:hover {
   background-color: #feb47b;
 }
@@ -133,7 +127,7 @@ button:hover {
 }
 
 .nav-menu li.active {
-  background-color:  #f8d302f5;
+  background-color: #f8d302f5;
   color: white;
   font-weight: 700;
 }
@@ -142,8 +136,8 @@ button:hover {
 .right-content {
   flex: 1;
   padding: 30px;
-  max-height: 90vh;   /*滚动相关*/
+  max-height: 90vh;
+  /*滚动相关*/
   overflow-y: auto;
 }
-
 </style>

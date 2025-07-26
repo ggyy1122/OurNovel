@@ -1,6 +1,7 @@
 <template>
   <div class="comment-section">
     <h2 class="section-title">📌 精选评论</h2>
+
     <div v-if="comments.length > 0" class="comment-grid">
       <div v-for="comment in comments" :key="comment.commentId" class="comment-card">
         <div class="comment-header">
@@ -18,9 +19,11 @@
             {{ comment.likes }}
           </div>
         </div>
+
         <p class="comment-content">{{ comment.content || '（无正文）' }}</p>
       </div>
     </div>
+
     <p v-else class="no-comments">暂无精选评论~</p>
   </div>
 </template>
