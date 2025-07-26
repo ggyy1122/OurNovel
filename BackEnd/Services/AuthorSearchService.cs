@@ -24,7 +24,7 @@ public class AuthorSearchService
         await connection.OpenAsync();
 
         string query = $@"
-            SELECT author_id, author_name, password, earning, phone, avatar_url
+            SELECT author_id, author_name, password, earning, phone, avatar_url, register_time, introduction
             FROM author
             WHERE CONTAINS(author_name, '({sanitizedKeyword})', 1) > 0
                OR LOWER(author_name) LIKE :plain_keyword";
@@ -42,7 +42,9 @@ public class AuthorSearchService
                 Password = reader.GetString(2),
                 Earning = reader.IsDBNull(3) ? 0 : reader.GetDecimal(3),
                 Phone = reader.IsDBNull(4) ? null : reader.GetString(4),
-                AvatarUrl = reader.IsDBNull(5) ? null : reader.GetString(5)
+                AvatarUrl = reader.IsDBNull(5) ? null : reader.GetString(5),
+                RegisterTime = reader.IsDBNull(6) ? null : reader.GetDateTime(6),
+                Introduction = reader.IsDBNull(7) ? null : reader.GetString(7)
             });
         }
 
