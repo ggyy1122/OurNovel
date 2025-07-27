@@ -2,12 +2,12 @@
     <div class="author-card">
         <div class="author-info">
             <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + (author.avatarUrl || '07850080-e498-47a4-8d3a-fd94fb47e561.jpg')"
-                alt="作者头像" class="avatar" />
+                alt="作者头像" class="avatar" @click="goAuthorHome" />
             <div class="details">
-                <h3>{{ author.authorName }}</h3>
+                <h3 @click="goAuthorHome">{{ author.authorName }}</h3>
                 <p class="meta">已创作 {{ authorRegisterDays.registerDays }} 天</p>
                 <p class="meta">联系方式 : {{ maskedPhone }}</p>
-                <p class="meta">简介 : {{ author.introduction || '暂无简历' }}</p>
+                <p class="meta">简介 : {{ author.introduction || 'Ta还有点神秘哦~' }}</p>
             </div>
         </div>
         <div class="stats">
@@ -33,6 +33,8 @@ import { ref, onMounted, defineProps, computed } from 'vue';
 import { getAuthorNovelCount, getAuthorTotalWordCount, getAuthorRegisterDays } from '@/API/Author_API';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 const props = defineProps({
     author: {
@@ -68,6 +70,11 @@ async function handle_follow() {
         "dangerouslyHTMLString": true
     })
 }
+
+function goAuthorHome() {
+    router.push(`/author/${props.author.authorId}`);
+}
+
 onMounted(() => {
     fetchAuthorStats();
 });
@@ -100,12 +107,24 @@ onMounted(() => {
     object-fit: cover;
     margin-right: 15px;
     border: 2px solid #ffd100;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.avatar:hover {
+    transform: scale(1.1);
 }
 
 .details h3 {
     margin: 0 0 5px 0;
     font-size: 18px;
     color: #333;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.details h3:hover {
+    color: #f0940a;
 }
 
 .meta {
@@ -153,6 +172,7 @@ onMounted(() => {
 }
 
 .follow-btn:hover {
-    background: #ffea80;
+    background: #f3a806;
+    color: #1f1e1e;
 }
 </style>

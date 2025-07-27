@@ -40,9 +40,9 @@
                 :class="['card-bg-' + (idx % 3)]">
                 <div class="author-avatar">
                     <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + (author.avatarUrl || '07850080-e498-47a4-8d3a-fd94fb47e561.jpg')"
-                        :alt="author.authorName" class="avatar-img" />
+                        :alt="author.authorName" class="avatar-img" @click="goAuthorHome(author)"/>
                 </div>
-                <h3 class="author-name">{{ author.authorName }}</h3>
+                <h3 class="author-name" @click="goAuthorHome(author)">{{ author.authorName }}</h3>
                 <p class="author-join-date">{{ author.registerTime }}加入TJ</p>
                 <p class="author-bio">{{ author.introduction }}</p>
             </div>
@@ -157,8 +157,6 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const selectNovelState = SelectNovel_State()
 
-
-
 // Banner数据
 const carouselItems = ref([
     { image: require('@/assets/1.jpg'), title: '七猫中文网', description: '匠心打磨好作品' },
@@ -208,9 +206,12 @@ const handleNovelClick = async (novel) => {
             novel.recommendCount,
             novel.collectedCount,
             novel.status,
+            novel.totalPrice,
             response.authorName,
             response.phone,
-            response.avatarUrl
+            response.avatarUrl,
+            response.registerTime,
+            response.introduction
         )
         // 跳转到作品主页
         router.push('/Novels/Novel_Info/home')
@@ -218,6 +219,10 @@ const handleNovelClick = async (novel) => {
         console.error('处理失败:', error)
     }
 }
+
+const goAuthorHome = (author) => {
+    router.push(`/author/${author.authorId}`);
+};
 
 // 局中局设置
 const VISIBLE_COUNT = 7
@@ -453,6 +458,11 @@ watch(novelCurrent, startNovelAutoPlay)
     overflow: hidden;
     margin: 0 auto 15px;
     border: 3px solid #f0f0f0;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+.author-avatar:hover {
+    transform: scale(1.10);
 }
 
 .avatar-img {
@@ -465,6 +475,12 @@ watch(novelCurrent, startNovelAutoPlay)
     font-size: 1.5rem;
     margin-bottom: 10px;
     color: #333;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+.author-name:hover {
+    transform: scale(1.10);
+    color: #f0940a;
 }
 
 .author-join-date {

@@ -110,9 +110,12 @@ async function handle() {
             props.novel.recommendCount,
             props.novel.collectedCount,
             props.novel.status,
+            props.novel.totalPrice,
             response.authorName,
             response.phone,
-            response.avatarUrl
+            response.avatarUrl,
+            response.registerTime,
+            response.introduction
         );
     } catch (error) {
         console.error('处理失败:', error);

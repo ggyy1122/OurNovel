@@ -2,29 +2,18 @@
   <div>
     <!-- 主内容块：章节列表 + 整本购买按钮 -->
     <div class="chapter-list">
-     <!-- 标题和按钮并排对齐 -->
-<div class="chapter-header-bar">
-  <h2 class="chapter-title">章节目录</h2>
-  <div v-if="selectNovelState.status === '完结'">
-    <button 
-      :disabled="hasPurchased"
-      class="whole-puy-btn"
-      @click="showPurchaseModal = true"
-    >
-      {{ hasPurchased ? '已买断' : '整本购买' }}
-    </button>
-  </div>
-</div>
-
-
-
-
+      <!-- 标题和按钮并排对齐 -->
+      <div class="chapter-header-bar">
+        <h2 class="chapter-title">章节目录</h2>
+        <div v-if="selectNovelState.status === '完结'">
+          <button :disabled="hasPurchased" class="whole-puy-btn" @click="showPurchaseModal = true">
+            {{ hasPurchased ? '已买断' : '整本购买' }}
+          </button>
+        </div>
+      </div>
       <!-- 章节列表 -->
       <ul v-if="displayedChapters.length > 0">
-        <li
-          v-for="chapter in displayedChapters"
-          :key="chapter.chapterId"
-
+        <li v-for="chapter in displayedChapters" :key="chapter.chapterId"
           @click="!isDisabled(chapter) && selectChapter(chapter)"
           :class="['chapter-item', { banned: isDisabled(chapter) }]">
           <div class="chapter-info">
@@ -40,31 +29,19 @@
         </li>
 
       </ul>
-
       <!-- 如果章节为空 -->
       <p v-else>作者还在努力敲字中，感谢您的关注~</p>
-
       <!-- 分页组件 -->
       <div v-if="totalPages > 1" class="pagination-container">
-        <button 
-          class="prev"
-          @click="changePage(currentPage - 1)"
-          :disabled="currentPage === 1"
-        >
+        <button class="prev" @click="changePage(currentPage - 1)" :disabled="currentPage === 1">
           🡄
         </button>
         <span class="page-info">当前：{{ currentPage }}页 / 共{{ totalPages }}页</span>
-        <button 
-          class="next"
-          @click="changePage(currentPage + 1)"
-          :disabled="currentPage === totalPages"
-        >
+        <button class="next" @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">
           🡆
         </button>
       </div>
-
     </div>
-
     <!-- ✅ Teleport 到 body，必须在根元素外层并写在 template 内 -->
     <teleport to="body">
       <div v-if="showPurchaseModal" class="modal-overlay">
@@ -81,6 +58,25 @@
           </div>
         </div>
       </div>
+      <div v-if="showBalanceInsufficientDialog" class="insufficient-dialog-overlay">
+        <div class="insufficient-dialog">
+          <div class="dialog-header">
+            <h3>购买章节</h3>
+            <button class="re_close-btn" @click="showBalanceInsufficientDialog = false">&times;</button>
+          </div>
+          <div class="insufficient-content">
+            <p class="insufficient-message">账户余额不足</p>
+            <div class="amount-info">
+              <span>本次购买 {{ selectNovelState.totalPrice }} 起点币</span>
+              <span>账户余额 {{ readerStore.balance }} 起点币·还差 {{ selectNovelState.totalPrice - readerStore.balance }}
+                起点币</span>
+            </div>
+            <div class="quick-payment">
+              <button class="recharge-btn" @click="goToRecharge">去充值</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </teleport>
   </div>
 </template>
@@ -91,7 +87,7 @@ import { getChaptersByNovel } from '@/API/Chapter_API'
 import { getWholePurchaseStatus, purchaseWholeNovel } from '@/API/Transaction_API'
 import { readerState, SelectNovel_State } from '@/stores/index'
 import { toast } from 'vue3-toastify'
-import 'vue3-toastify/dist/index.css' 
+import 'vue3-toastify/dist/index.css'
 import { useRouter } from 'vue-router';
 const router = useRouter();
 const readerStore = readerState()
@@ -180,32 +176,32 @@ async function confirmPurchase() {
     // 优先检查后端返回的错误信息
     const backendMsg = err?.response?.data?.message || ''
     if (backendMsg.includes('余额不足')) {
-      const balance = readerStore.balance ?? 0
-     // const price = selectNovelState.totalPrice ?? 0
-      toast.warning(`余额不足，当前余额 ¥${balance.toFixed(2)}`, {
-        autoClose: 3000
-      })
+      // const balance = readerStore.balance ?? 0
+      // const price = selectNovelState.totalPrice ?? 0
+      showBalanceInsufficientDialog.value = true
     } else {
       toast.error('❌ 发生错误，请稍后再试', { autoClose: 2000 })
     }
   }
 }
 
-
+const showBalanceInsufficientDialog = ref(false);
 function handleBalanceCheckAndError(msg) {
   const balance = readerStore.balance ?? 0
   const price = selectNovelState.totalPrice ?? 0
 
   if (balance < price || msg.includes('余额不足')) {
-    toast.warning(`❗ 余额不足，当前余额为 ¥${balance.toFixed(2)}，需要 ¥${price.toFixed(2)}`, {
-      autoClose: 3000
-    })
+    showBalanceInsufficientDialog.value = true
   } else {
     toast.warning(msg || '购买失败，请重试', { autoClose: 2000 })
   }
 }
 
-
+const goToRecharge = () => {
+  showBalanceInsufficientDialog.value = false;
+  showPurchaseModal.value = false;
+  router.push('/Novels/Novel_Recharge'); // 充值页面路由
+};
 // 禁止点击的章节
 function isDisabled(chapter) {
   return chapter.status === '封禁' || chapter.status === '审核中';
@@ -266,13 +262,15 @@ function selectChapter(chapter) {
   font-size: 14px;
   color: #555;
 }
+
 .chapter-title {
   font-size: 16px;
   font-weight: bold;
   color: #333;
   margin-left: 10px;
-  display: inline; 
-  white-space: nowrap; /* 防止断行 */
+  display: inline;
+  white-space: nowrap;
+  /* 防止断行 */
 }
 
 .charged {
@@ -313,7 +311,8 @@ p {
   align-items: center;
   text-align: center;
   margin-top: 20px;
-  gap: 10px; /* 保持间距 */
+  gap: 10px;
+  /* 保持间距 */
 }
 
 .pagination-container button {
@@ -352,14 +351,16 @@ p {
   align-items: center;
   margin-bottom: 15px;
   padding: 0 10px;
-  flex-wrap: wrap; /* 响应式换行 */
+  flex-wrap: wrap;
+  /* 响应式换行 */
 }
 
 
 
 
 .whole-puy-btn {
-  background: linear-gradient(135deg, #4a90e2, #357ABD); /* 渐变蓝色 */
+  background: linear-gradient(135deg, #4a90e2, #357ABD);
+  /* 渐变蓝色 */
   color: white;
   padding: 12px 24px;
   font-size: 16px;
@@ -368,12 +369,12 @@ p {
   border-radius: 30px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .whole-puy-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .whole-puy-btn:disabled {
@@ -391,12 +392,14 @@ p {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0,0,0,0.5); /* 半透明遮罩 */
+  background-color: rgba(0, 0, 0, 0.5);
+  /* 半透明遮罩 */
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
+  z-index: 999;
 }
+
 .modal {
   background-color: #e7dbcb;
   border-radius: 10px;
@@ -424,8 +427,10 @@ p {
 }
 
 .close-btn:hover {
-  color: #d0021b; /* 红色高亮 */
-  transform: scale(1.2); /* 微微放大 */
+  color: #d0021b;
+  /* 红色高亮 */
+  transform: scale(1.2);
+  /* 微微放大 */
 }
 
 
@@ -444,4 +449,106 @@ p {
   cursor: pointer;
 }
 
+.insufficient-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  text-align: center;
+}
+
+.insufficient-dialog {
+  background-color: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.dialog-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+  margin-left: 0px;
+}
+
+.re_close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #999;
+  margin-left: auto;
+  margin-right: 0;
+  display: flex;
+  align-items: center;
+}
+
+.insufficient-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.insufficient-message {
+  color: #f56c6c;
+  font-size: 16px;
+  text-align: center;
+  margin: 10px 0;
+}
+
+.amount-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  color: #666;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.quick-payment {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  padding-top: 10px;
+}
+
+.quick-payment p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.recharge-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #f56c6c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.recharge-btn:hover {
+  background-color: #e65c5c;
+}
 </style>

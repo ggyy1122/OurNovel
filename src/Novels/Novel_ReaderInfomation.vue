@@ -38,7 +38,7 @@ import PersonalReport from './PersonalReport.vue'
 
 const router = useRouter()
 function goback() {
-  router.push('/Novels/Novel_Layout/home')
+  router.back()
 }
 
 const navItems = [

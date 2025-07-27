@@ -80,6 +80,14 @@
             <pre>{{ apiResponse8 }}</pre>
         </div>
 
+        <h1>9: 获取作者的所有小说</h1>
+        <input v-model="authorId9" placeholder="输入作者ID" type="number" />
+        <button @click="function9" :disabled="!authorId9">获取小说列表</button>
+        <div v-if="apiResponse9">
+            <h3>响应数据：</h3>
+            <pre>{{ apiResponse9 }}</pre>
+        </div>
+
     </div>
 </template>
 
@@ -87,8 +95,7 @@
 import { ref } from 'vue'
 import {
     getAllAuthors, getAuthor, createAuthor, updateAuthor, deleteAuthor, getAuthorNovelCount,
-    getAuthorTotalWordCount,
-    getAuthorRegisterDays
+    getAuthorTotalWordCount, getAuthorRegisterDays, getAuthorNovels
 } from '@/API/Author_API'
 
 import { useRouter } from 'vue-router'
@@ -230,6 +237,19 @@ async function function8() {
     } catch (error) {
         console.error('API 请求错误:', error)
         apiResponse8.value = { error: error.message }
+    }
+}
+
+// 9: 获取作者的所有小说
+const authorId9 = ref('')
+const apiResponse9 = ref(null)
+async function function9() {
+    try {
+        const response = await getAuthorNovels(authorId9.value)
+        apiResponse9.value = response
+    } catch (error) {
+        console.error('API 请求错误:', error)
+        apiResponse9.value = { error: error.message }
     }
 }
 

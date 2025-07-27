@@ -74,9 +74,10 @@
       <!-- 右侧作者卡片区域 -->
       <div class="author-card-section">
         <div class="author-card">
-          <img :src="selectNovelState.formattedauthorAvatarUrl || defaultAuthorAvatar" class="author-avatar" />
-          <h2>{{ selectNovelState.authorName }}</h2>
-          <p class="author-brief">{{ '作者简介:暂无作者简介' }}</p>
+          <img :src="selectNovelState.formattedauthorAvatarUrl || defaultAuthorAvatar" class="author-avatar"
+            @click.stop="goAuthorHome" />
+          <h2 @click.stop="goAuthorHome">{{ selectNovelState.authorName }}</h2>
+          <p class="author-brief">简介:{{ selectNovelState.a_introduction || '暂无作者简介' }}</p>
           <div class="author-data-cards">
             <div class="data-card">
               <div class="data-value">{{ authorNovelCount }}</div>
@@ -171,6 +172,24 @@
       </button>
     </div>
   </div>
+  <div v-if="showBalanceInsufficientDialog" class="insufficient-dialog-overlay">
+    <div class="insufficient-dialog">
+      <div class="dialog-header">
+        <h3>打赏</h3>
+        <button class="close-btn" @click="showBalanceInsufficientDialog = false">&times;</button>
+      </div>
+      <div class="insufficient-content">
+        <p class="insufficient-message">账户余额不足</p>
+        <div class="amount-info">
+          <span>本次打赏 {{ selectedReward }} 起点币</span>
+          <span>账户余额 {{ accountBalance }} 起点币·还差 {{ selectedReward - accountBalance }} 起点币</span>
+        </div>
+        <div class="quick-payment">
+          <button class="recharge-btn" @click="goToRecharge">去充值</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -252,7 +271,9 @@ function getStatusClass(status) {
 
 }
 
-
+const goAuthorHome = () => {
+  router.push(`/author/${selectNovelState.authorId}`);
+};
 /*数据获取部分 */
 // 获取分类数据
 const fetchCategories = async () => {
@@ -501,6 +522,8 @@ const cancelRecommend = async () => {
     })
   }
 }
+
+const showBalanceInsufficientDialog = ref(false);
 //选择打赏金额
 const selectReward = (value) => { selectedReward.value = value; }
 //确认打赏按钮
@@ -512,10 +535,7 @@ const confirmReward = async () => {
   try {
     // 1. 检查余额是否充足
     if (accountBalance.value < selectedReward.value) {
-      toast("余额不足，请先充值", {
-        "type": "error",
-        "dangerouslyHTMLString": true
-      })
+      showBalanceInsufficientDialog.value = true; // 显示余额不足弹窗
       return;
     }
 
@@ -525,7 +545,7 @@ const confirmReward = async () => {
       novelId: currentNovelId, // 被打赏小说ID
       amount: currentvalue    // 打赏金额
     });
-
+    readerState.balance -= currentvalue; // 更新余额
     // 3. 处理成功结果
     toast(`成功打赏 ${currentvalue} 起点币`, {
       type: "success", // 改为 success 类型
@@ -552,11 +572,117 @@ const confirmReward = async () => {
   }
 };
 
+const goToRecharge = () => {
+  showBalanceInsufficientDialog.value = false;
+  showRewardDialog.value = false;
+  router.push('/Novels/Novel_Recharge'); // 充值页面路由
+};
 </script>
 
 
 
 <style scoped>
+.insufficient-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  text-align: center;
+}
+
+.insufficient-dialog {
+  background-color: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+
+}
+
+.dialog-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #999;
+}
+
+.insufficient-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.insufficient-message {
+  color: #f56c6c;
+  font-size: 16px;
+  text-align: center;
+  margin: 10px 0;
+}
+
+.amount-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  color: #666;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.quick-payment {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  padding-top: 10px;
+}
+
+.quick-payment p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.recharge-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #f56c6c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.recharge-btn:hover {
+  background-color: #e65c5c;
+}
+
 /* 返回按钮样式 */
 .back-button {
   display: inline-flex;
@@ -894,6 +1020,7 @@ const confirmReward = async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  cursor: pointer;
 }
 
 .author-avatar {
@@ -906,13 +1033,22 @@ const confirmReward = async () => {
   border: 1px solid #e0e0e0;
 }
 
+.author-avatar:hover {
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
+}
+
 .author-card h2 {
   margin: 8px 0 0 0;
-  /* 调整标题边距 */
   font-size: 20px;
   font-weight: 600;
   color: #333;
   text-align: center;
+}
+
+.author-card h2:hover {
+  color: #f0940a;
+  transform: scale(1.10);
 }
 
 .author-name {
