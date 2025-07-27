@@ -132,3 +132,16 @@ export function getAuthorRegisterDays(authorId) {
         method: 'get'
     })
 }
+
+/** 
+ * 获取作者的所有小说
+ * @param {number} authorId - 参数：作者ID
+ * @returns {Promise<Array<Novel>>} - 返回作者的小说数组
+ * @typedef {Object} Novel - 小说对象
+ */
+export function getAuthorNovels(authorId) {
+    return request({
+        url: `/api/Author/${authorId}/novels`,
+        method: 'get'
+    })
+}

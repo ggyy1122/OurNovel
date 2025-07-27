@@ -39,6 +39,8 @@ import CommentReply_api_test from '@/API_Test/CommentReply_Test.vue'
 import Transaction_api_test from '@/API_Test/Transaction_Test.vue'
 import Recharge_api_test from '@/API_Test/Recharge_Test.vue'
 import Search_api_test from '@/API_Test/Search_Test.vue'
+import AuthorHome from '@/Novels/AuthorHome.vue'
+import Novel_Recharge from '@/Novels/Novel_Recharge.vue'
 //作者
 import AuthorLayout from '@/Author/AuthorLayout.vue'
 import NovelList from '@/Author/NovelList.vue'
@@ -223,6 +225,12 @@ const routes = [
         ]
     },
     {
+        path: '/author/:authorId',
+        name: 'AuthorHome',
+        component: AuthorHome,
+        props: true
+    },
+    {
         path: '/Novels/Search',
         name: 'Search',
         component: Novel_Search,
@@ -230,6 +238,11 @@ const routes = [
             query: route.query.q,
             filter: route.query.type || 'novel'
         })
+    },
+    {
+        path: '/Novels/Novel_Recharge',
+        name: 'Novel_Recharge',
+        component: Novel_Recharge
     },
     {
         path: '/Novels/reader',

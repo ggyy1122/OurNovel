@@ -131,7 +131,7 @@ export const SelectNovel_State = defineStore('select_novel', {
         recommendCount: 0,
         collectedCount: 0,
         status: "",
-        
+
         totalPrice: 0,
 
         selectedComment: null, // 当前选中的评论
@@ -139,6 +139,8 @@ export const SelectNovel_State = defineStore('select_novel', {
         authorName: "",      // 作者名称
         authorPhone: "",     // 作者电话
         authorAvatarUrl: "", // 作者头像URL,头像不用这个，用下面的formattedauthorAvatarUrl,加了前缀
+        registerTime: "", // 作者注册时间
+        a_introduction: "", // 作者简介
 
         //章节
         chapterId: 1,
@@ -169,7 +171,7 @@ export const SelectNovel_State = defineStore('select_novel', {
         }
     },
     actions: {
-        resetNovel(id, authorId, name, introduction, createTime, coverUrl, score, totalWordCount, recommendCount, collectedCount, status,totalPrice, authorName, authorPhone, authorAvatarUrl) {
+        resetNovel(id, authorId, name, introduction, createTime, coverUrl, score, totalWordCount, recommendCount, collectedCount, status, totalPrice, authorName, authorPhone, authorAvatarUrl,registerTime, a_introduction) {
             this.novelId = id || 0;
             this.authorId = authorId || 0;
             this.novelName = name || "";
@@ -182,11 +184,14 @@ export const SelectNovel_State = defineStore('select_novel', {
             this.collectedCount = collectedCount || 0;
             this.status = status || "";
 
-            this.totalPrice = totalPrice ?? 0; 
+            this.totalPrice = totalPrice || 0;
 
             this.authorName = authorName || "";
             this.authorPhone = authorPhone || "";
             this.authorAvatarUrl = authorAvatarUrl || "";
+            this.registerTime = registerTime || "";
+            this.a_introduction = a_introduction || "";
+
             this.selectedComment = null;
         },
         resetChapter(chapterId, cha_title, cha_content, cha_wordCount, cha_pricePerKilo, cha_calculatedPrice, cha_isCharged, cha_publishTime, cha_status) {

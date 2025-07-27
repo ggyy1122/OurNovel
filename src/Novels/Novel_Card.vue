@@ -89,10 +89,6 @@ responsePromise.then(response => {
     console.error('获取作者信息失败:', error);
 });
 async function handle() {
-    const response = await getAuthor(props.novel.authorId);
-    selectNovelState.resetNovel(props.novel.novelId, props.novel.authorId, props.novel.novelName, props.novel.introduction, props.novel.createTime, props.novel.coverUrl, props.novel.score, props.novel.totalWordCount, props.novel.recommendCount, props.novel.collectedCount, props.novel.status, props.novel.totalPrice,
-        response.authorName, response.phone, response.avatarUrl);
-
     try {
         const response = await responsePromise;
         selectNovelState.resetNovel(
@@ -107,9 +103,12 @@ async function handle() {
             props.novel.recommendCount,
             props.novel.collectedCount,
             props.novel.status,
+            props.novel.totalPrice,
             response.authorName,
             response.phone,
-            response.avatarUrl
+            response.avatarUrl,
+            response.registerTime,
+            response.introduction
         );
     } catch (error) {
         console.error('处理失败:', error);
