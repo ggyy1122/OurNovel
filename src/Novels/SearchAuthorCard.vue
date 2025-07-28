@@ -19,20 +19,14 @@
                 <span class="stat-value">{{ authorWordCount.totalWordCount }}</span>
                 <span class="stat-label">总字数</span>
             </div>
-            <div class="stat-item">
-                <span class="stat-value">¥{{ author.earning.toFixed(2) }}</span>
-                <span class="stat-label">总收入</span>
-            </div>
         </div>
-        <button class="follow-btn" @click="handle_follow">关注</button>
+        <button class="follow-btn" @click="goAuthorHome">进入主页</button>
     </div>
 </template>
 
 <script setup>
 import { ref, onMounted, defineProps, computed } from 'vue';
 import { getAuthorNovelCount, getAuthorTotalWordCount, getAuthorRegisterDays } from '@/API/Author_API';
-import { toast } from "vue3-toastify";
-import "vue3-toastify/dist/index.css";
 import { useRouter } from 'vue-router';
 const router = useRouter();
 
@@ -64,12 +58,6 @@ const maskedPhone = computed(() => {
     if (!props.author.phone) return '未公开';
     return props.author.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
 });
-async function handle_follow() {
-    toast("我是" + props.author.authorName + "，我不同意你关注！", {
-        "type": "error",
-        "dangerouslyHTMLString": true
-    })
-}
 
 function goAuthorHome() {
     router.push(`/author/${props.author.authorId}`);

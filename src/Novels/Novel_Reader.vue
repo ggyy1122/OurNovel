@@ -80,7 +80,8 @@
                         <h1>TJ小说网</h1>
                     </div>
                     <div class="search-bar">
-                        <input type="text" placeholder="输入小说名/作者名/读者名" v-model="searchQuery" @keyup.enter="handleSearch"/>
+                        <input type="text" placeholder="输入小说名/作者名/读者名" v-model="searchQuery"
+                            @keyup.enter="handleSearch" />
                         <button @click="handleSearch">搜索</button>
                     </div>
                     <div class="user-actions">
@@ -106,6 +107,9 @@
                                 <div class="dropdown-divider"></div>
                                 <a href="#" @click.prevent="goToInf" class="dropdown-item">
                                     <i class="fa fa-book mr-2"></i> 我的书架
+                                </a>
+                                <a href="#" @click.prevent="goToRecharge" class="dropdown-item">
+                                    <i class="fa fa-yen mr-2"></i> 去充值
                                 </a>
                                 <a href="#" @click.prevent="logout" class="dropdown-item">
                                     <i class="fa fa-sign-out mr-2"></i> 退出
@@ -134,12 +138,45 @@
                 </div>
             </div>
             <div class="right-menu">
-                <div class="menu-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24"
-                        height="24">
+                <div class="menu-item" @click="showCatalog = !showCatalog"><svg xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 1024 1024" width="24" height="24">
                         <path fill="currentColor"
                             d="M640 384v256H384V384zm64 0h192v256H704zm-64 512H384V704h256zm64 0V704h192v192zm-64-768v192H384V128zm64 0h192v192H704zM320 384v256H128V384zm0 512H128V704h192zm0-768v192H128V128z">
                         </path>
                     </svg> 目录</div>
+                <div class="menu-item" @click="handletonovel"><svg xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 1024 1024" width="24" height="24">
+                        <path fill="currentColor"
+                            d="M832 384H576V128H192v768h640zm-26.496-64L640 154.496V320zM160 64h480l256 256v608a32 32 0 0 1-32 32H160a32 32 0 0 1-32-32V96a32 32 0 0 1 32-32m160 448h384v64H320zm0-192h160v64H320zm0 384h384v64H320z">
+                        </path>
+                    </svg> 书详情</div>
+                <div class="menu-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24"
+                        height="24">
+                        <path fill="currentColor"
+                            d="m174.72 855.68 135.296-45.12 23.68 11.84C388.096 849.536 448.576 864 512 864c211.84 0 384-166.784 384-352S723.84 160 512 160 128 326.784 128 512c0 69.12 24.96 139.264 70.848 199.232l22.08 28.8-46.272 115.584zm-45.248 82.56A32 32 0 0 1 89.6 896l58.368-145.92C94.72 680.32 64 596.864 64 512 64 299.904 256 96 512 96s448 203.904 448 416-192 416-448 416a461.056 461.056 0 0 1-206.912-48.384l-175.616 58.56z">
+                        </path>
+                        <path fill="currentColor"
+                            d="M352 576h320q32 0 32 32t-32 32H352q-32 0-32-32t32-32m32-192h256q32 0 32 32t-32 32H384q-32 0-32-32t32-32">
+                        </path>
+                    </svg> 评论</div>
+                <div class="menu-item" @click="showRewardDialog = true"><svg xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 1024 1024" width="24" height="24">
+                        <path fill="currentColor"
+                            d="m161.92 580.736 29.888 58.88C171.328 659.776 160 681.728 160 704c0 82.304 155.328 160 352 160s352-77.696 352-160c0-22.272-11.392-44.16-31.808-64.32l30.464-58.432C903.936 615.808 928 657.664 928 704c0 129.728-188.544 224-416 224S96 833.728 96 704c0-46.592 24.32-88.576 65.92-123.264z">
+                        </path>
+                        <path fill="currentColor"
+                            d="m161.92 388.736 29.888 58.88C171.328 467.84 160 489.792 160 512c0 82.304 155.328 160 352 160s352-77.696 352-160c0-22.272-11.392-44.16-31.808-64.32l30.464-58.432C903.936 423.808 928 465.664 928 512c0 129.728-188.544 224-416 224S96 641.728 96 512c0-46.592 24.32-88.576 65.92-123.264z">
+                        </path>
+                        <path fill="currentColor"
+                            d="M512 544c-227.456 0-416-94.272-416-224S284.544 96 512 96s416 94.272 416 224-188.544 224-416 224m0-64c196.672 0 352-77.696 352-160S708.672 160 512 160s-352 77.696-352 160 155.328 160 352 160">
+                        </path>
+                    </svg> 打赏</div>
+                <div class="menu-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24"
+                        height="24">
+                        <path fill="currentColor"
+                            d="M896 529.152V512a384 384 0 1 0-768 0v17.152A128 128 0 0 1 320 640v128a128 128 0 1 1-256 0V512a448 448 0 1 1 896 0v256a128 128 0 1 1-256 0V640a128 128 0 0 1 192-110.848M896 640a64 64 0 0 0-128 0v128a64 64 0 0 0 128 0zm-768 0v128a64 64 0 0 0 128 0V640a64 64 0 1 0-128 0">
+                        </path>
+                    </svg> 听书</div>
                 <div class="menu-item" @click="showSettings = !showSettings"><svg xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 1024 1024" width="24" height="24">
                         <path fill="currentColor"
@@ -164,30 +201,158 @@
                     </svg> 回到顶部</div>
             </div>
         </div>
+        <div class="catalog-modal" v-if="showCatalog">
+            <div class="catalog-content" :style="{
+                backgroundColor: cardBgColor,
+                color: textColor,
+                border: `1px solid ${textColor}20`
+            }">
+                <div class="catalog-header">
+                    <div class="header-top">
+                        <h3>{{ selectNovelState.novelName }}</h3>
+                        <button class="ca_close-btn" @click="showCatalog = false">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="22" height="22">
+                                <path fill="currentColor"
+                                    d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z">
+                                </path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="header-meta">
+                        <span class="status-badge">{{ catalogStatus }}</span>
+                        <span class="chapter-count">共{{ chapters.length }}章</span>
+                        <button @click="toggleSortOrder" class="sort-btn">
+                            {{ sortAscending ? '正序 ↓' : '倒序 ↑' }}
+                        </button>
+                    </div>
+                </div>
+                <div class="catalog-grid">
+                    <div v-for="chapter in sortedChapters" :key="chapter.chapterId" class="chapter-card" :class="{
+                        'current': chapter.chapterId === selectNovelState.chapterId,
+                        'locked': chapter.isCharged === '是' && !hasPurchased,
+                        'vip': chapter.isCharged === '是'
+                    }" @click="goToChapter(chapter)">
+                        <div class="card-content">
+                            <span class="chapter-number">第{{ chapter.chapterId }}章</span>
+                            <span class="ca_chapter-title">{{ chapter.title }}</span>
+                            <span v-if="chapter.isCharged === '是'" class="vip-tag">VIP</span>
+                            <span v-if="chapter.chapterId === selectNovelState.chapterId"
+                                class="current-badge">正在阅读</span>
+                            <div v-if="chapter.isCharged === '是' && !hasPurchased" class="lock-overlay">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="20" height="20">
+                                    <path fill="currentColor"
+                                        d="M224 448a32 32 0 0 0-32 32v384a32 32 0 0 0 32 32h576a32 32 0 0 0 32-32V480a32 32 0 0 0-32-32zm0-64h576a96 96 0 0 1 96 96v384a96 96 0 0 1-96 96H224a96 96 0 0 1-96-96V480a96 96 0 0 1 96-96">
+                                    </path>
+                                    <path fill="currentColor"
+                                        d="M512 544a32 32 0 0 1 32 32v192a32 32 0 1 1-64 0V576a32 32 0 0 1 32-32m192-160v-64a192 192 0 1 0-384 0v64zM512 64a256 256 0 0 1 256 256v128H256V320A256 256 0 0 1 512 64">
+                                    </path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 打赏弹窗 -->
+        <div v-if="showRewardDialog" class="reward-dialog-overlay">
+            <div class="reward-dialog">
+                <div class="dialog-header"
+                    style="display: flex; justify-content: center; align-items: center; position: relative;">
+                    <h3 style="margin: 0;">打赏</h3>
+                    <button class="da_close-btn " @click="showRewardDialog = false"
+                        style="position: absolute; right: 20px;">&times;</button>
+                </div>
+                <div class="reward-options">
+                    <div v-for="option in rewardOptions" :key="option.value"
+                        :class="['reward-option', { 'selected': selectedReward === option.value }]"
+                        @click="selectReward(option.value)">
+                        <span>{{ option.label }}</span>
+                        <svg v-if="selectedReward === option.value" class="check-icon" viewBox="0 0 24 24">
+                            <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" fill="none" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="balance-info">
+                    <span>账户余额 {{ accountBalance }} 起点币</span>
+                    <span>本次打赏 {{ selectedReward }} 起点币</span>
+                </div>
+                <button class="confirm-reward-btn" @click="confirmReward">
+                    确认打赏
+                </button>
+            </div>
+        </div>
+        <div v-if="showBalanceInsufficientDialog" class="insufficient-dialog-overlay">
+            <div class="insufficient-dialog">
+                <div class="dialog-header">
+                    <h3>打赏</h3>
+                    <button class="da_close-btn" @click="showBalanceInsufficientDialog = false">&times;</button>
+                </div>
+                <div class="insufficient-content">
+                    <p class="insufficient-message">账户余额不足</p>
+                    <div class="amount-info">
+                        <span>本次打赏 {{ selectedReward }} 起点币</span>
+                        <span>账户余额 {{ accountBalance }} 起点币·还差 {{ selectedReward - accountBalance }} 起点币</span>
+                    </div>
+                    <div class="quick-payment">
+                        <button class="recharge-btn" @click="goToRecharge">去充值</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script setup>
 import { SelectNovel_State, readerState, current_state } from '@/stores/index';
 import { useRouter } from 'vue-router';
-import { ref, computed } from 'vue';
-import { onMounted, onUnmounted } from 'vue';
-import { getChapter } from '@/API/Chapter_API';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { getChapter, getChaptersByNovel } from '@/API/Chapter_API';
 import { addOrUpdateCollect } from '@/API/Collect_API'
+import { getWholePurchaseStatus } from '@/API/Transaction_API'
+import { getReaderBalance } from '@/API/Reader_API';
+import { rewardNovel } from '@/API/Reward_API';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
+const selectNovelState = SelectNovel_State();
+const reader_state = readerState();
+const router = useRouter();
 const state = current_state();
 const searchQuery = ref('');
 const showDropdown = ref(false);
+const showCatalog = ref(false);
+const chapters = ref([]);
+const sortAscending = ref(true);
+const catalogStatus = ref(selectNovelState.status === '连载' ? '连载中' : '已完结');
+const hasPurchased = ref(false)
+const showRewardDialog = ref(false);                  // 是否显示打赏弹窗
+// 打赏相关状态和函数
+const accountBalance = ref(0);                      // 账号余额
+const selectedReward = ref(100);                    // 默认选中100点打赏金额
+const showBalanceInsufficientDialog = ref(false);   // 是否显示余额不足弹窗
+
+const rewardOptions = [
+    { value: 10, label: '10点' },
+    { value: 100, label: '100点' },
+    { value: 500, label: '500点' },
+    { value: 1000, label: '1000点' },
+    { value: 2000, label: '2000点' },
+    { value: 10000, label: '1万点' },
+    { value: 50000, label: '5万点' },
+    { value: 100000, label: '10万点' }
+];
 
 function goToLogin() {
     router.push('/L_R/login');
 }
-
+function handletonovel() {
+    router.push('/Novels/Novel_Info/home');
+}
 function goToInf() {
     router.push('/Novels/ReaderInfomation');
 }
-
+function goToRecharge() {
+    router.push('/Novels/Novel_Recharge');
+}
 function logout() {
     state.clearUserInfo();
     localStorage.removeItem('token');
@@ -263,10 +428,6 @@ const showGuide = ref(false);
 const handleGuideClick = () => {
     showGuide.value = true;
 };
-
-const selectNovelState = SelectNovel_State();
-const reader_state = readerState();
-const router = useRouter();
 const isFavorite = ref(reader_state.isFavorite(selectNovelState.novelId));
 async function handleAddShelf() {
     if (isFavorite.value) return;
@@ -331,10 +492,142 @@ const handleBack = () => {
 const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
-onMounted(() => {
-    window.addEventListener('keydown', handleKeyDown);
+// 获取章节列表
+const fetchChapters = async () => {
+    try {
+        const response = await getChaptersByNovel(selectNovelState.novelId);
+        chapters.value = response.map(chapter => ({
+            ...chapter,
+            isPurchased: false // 这里应该根据用户购买状态设置，可以从API获取
+        }));
+    } catch (error) {
+        console.error('获取章节列表失败:', error);
+        toast("获取目录失败", {
+            "type": "error",
+            "dangerouslyHTMLString": true
+        });
+    }
+};
+
+// 计算排序后的章节
+const sortedChapters = computed(() => {
+    const sorted = [...chapters.value];
+    sorted.sort((a, b) => sortAscending.value
+        ? a.chapterId - b.chapterId
+        : b.chapterId - a.chapterId);
+    return sorted;
 });
 
+// 切换排序顺序
+const toggleSortOrder = () => {
+    sortAscending.value = !sortAscending.value;
+};
+
+// 跳转到指定章节
+const goToChapter = async (chapter) => {
+    // 如果是收费章节且未购买，不跳转
+    if (chapter.isCharged === '是' && !hasPurchased.value) {
+        toast("此章节需要购买后才能阅读", {
+            "type": "warning",
+            "dangerouslyHTMLString": true
+        });
+        return;
+    }
+    try {
+        const response = await getChapter(chapter.novelId, chapter.chapterId);
+        selectNovelState.resetChapter(
+            response.chapterId,
+            response.title,
+            response.content,
+            response.wordCount,
+            response.pricePerKilo,
+            response.calculatedPrice,
+            response.isCharged,
+            response.publishTime,
+            response.status
+        );
+        showCatalog.value = false;
+        scrollToTop();
+    } catch (error) {
+        console.error('加载章节失败:', error);
+        toast("章节加载失败", {
+            "type": "error",
+            "dangerouslyHTMLString": true
+        });
+    }
+};
+// 选择打赏金额
+const selectReward = (value) => {
+    selectedReward.value = value;
+}
+
+// 获取账号余额
+const fetchReaderBalance = async () => {
+    try {
+        const response = await getReaderBalance(reader_state.readerId);
+        accountBalance.value = response.data?.balance || response?.balance || 0;
+    } catch (error) {
+        console.error('获取用户余额失败:', error);
+        accountBalance.value = 0;
+    }
+};
+
+// 确认打赏按钮逻辑
+const confirmReward = async () => {
+    const currentNovelId = selectNovelState.novelId;
+    const currentReaderId = reader_state.readerId;
+    const currentvalue = selectedReward.value;
+    try {
+        // 1. 检查余额是否充足
+        if (accountBalance.value < selectedReward.value) {
+            showBalanceInsufficientDialog.value = true;
+            return;
+        }
+        // 2. 调用打赏API
+        const response = await rewardNovel({
+            readerId: currentReaderId,
+            novelId: currentNovelId,
+            amount: currentvalue
+        });
+        reader_state.balance -= currentvalue;
+        toast(`成功打赏 ${currentvalue} 起点币`, {
+            type: "success",
+            dangerouslyHTMLString: true
+        });
+        console.log('打赏结果:', response.data);
+        // 3. 刷新余额
+        await fetchReaderBalance();
+    } catch (error) {
+        console.error('打赏失败:', error);
+        toast(`打赏失败: ${error.message}`, {
+            type: "error",
+            dangerouslyHTMLString: true
+        });
+        await fetchReaderBalance();
+    }
+};
+
+// 监听弹窗打开时刷新余额
+watch(
+    () => showRewardDialog.value,
+    async (isOpen) => {
+        if (isOpen) {
+            await fetchReaderBalance();
+        }
+    }
+);
+onMounted(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    fetchChapters();
+});
+onMounted(async () => {
+    try {
+        const status = await getWholePurchaseStatus(reader_state.readerId, selectNovelState.novelId);
+        hasPurchased.value = status?.hasPurchased || false
+    } catch (err) {
+        console.error('查询买断状态失败', err)
+    }
+})
 onUnmounted(() => {
     window.removeEventListener('keydown', handleKeyDown);
 });
@@ -932,6 +1225,464 @@ button.active {
 .dropdown-item i {
     width: 20px;
     text-align: center;
+}
+
+/* 添加目录模态框样式 */
+.catalog-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(4px);
+}
+
+.catalog-content {
+    background: white;
+    border-radius: 16px;
+    width: 900px;
+    max-width: 90%;
+    max-height: 80vh;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.catalog-header {
+    padding: 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.header-top h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80%;
+}
+
+.ca_close-btn {
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.ca_close-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.ca_close-btn svg {
+    opacity: 0.7;
+}
+
+.header-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+}
+
+.status-badge {
+    background: #ffd100;
+    color: #222;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.chapter-count {
+    color: #666;
+}
+
+.sort-btn {
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: auto;
+}
+
+.sort-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.chapter-card {
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.chapter-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.chapter-card.current {
+    background: rgba(255, 209, 0, 0.15);
+    border: 1px solid rgba(255, 209, 0, 0.3);
+}
+
+.chapter-card.vip {
+    background: linear-gradient(135deg, rgba(255, 240, 230, 0.7) 0%, rgba(255, 248, 240, 0.7) 100%);
+    border: 1px solid rgba(255, 180, 0, 0.2);
+}
+
+.chapter-card.locked {
+    cursor: not-allowed;
+}
+
+.card-content {
+    display: flex;
+    position: relative;
+    z-index: 1;
+}
+
+.chapter-number {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 4px;
+}
+
+.ca_chapter-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-left: 15px;
+}
+
+.chapter-card.current .ca_chapter-title {
+    color: #ff9500;
+}
+
+.vip-tag {
+    position: absolute;
+    right: 12px;
+    background: linear-gradient(135deg, #ff9500, #ff5e00);
+    color: white;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.current-badge {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: #ffd100;
+    color: #222;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.lock-overlay {
+    position: absolute;
+    right: 80px;
+    bottom: 7px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #ff4d4f;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.lock-overlay svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* 暗黑模式适配 */
+.dark .catalog-content {
+    background: #2a2a2a;
+    border-color: #444;
+}
+
+.dark .catalog-header {
+    background: #333;
+    border-color: #444;
+}
+
+.dark .chapter-card {
+    background: #333;
+    border-color: #444;
+}
+
+.dark .chapter-card.current {
+    background: rgba(255, 209, 0, 0.2);
+    border-color: rgba(255, 209, 0, 0.4);
+}
+
+.dark .chapter-number {
+    color: #aaa;
+}
+
+.dark .lock-overlay {
+    background: rgba(50, 50, 50, 0.9);
+}
+
+/* 打赏弹窗样式 */
+.reward-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.reward-dialog {
+    background-color: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.dialog-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.da_close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+}
+
+.reward-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.reward-option {
+    position: relative;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.reward-option:hover {
+    border-color: #ff6b6b;
+}
+
+.reward-option.selected {
+    background-color: #fff0f0;
+    border-color: #ff6b6b;
+    color: #ff6b6b;
+}
+
+.check-icon {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 16px;
+    height: 16px;
+    color: #ff6b6b;
+}
+
+.balance-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #666;
+}
+
+.confirm-reward-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.confirm-reward-btn:hover {
+    background-color: #ff5252;
+}
+
+/* 余额不足弹窗 */
+.insufficient-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.insufficient-dialog {
+    background-color: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.insufficient-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.insufficient-message {
+    color: #f56c6c;
+    font-size: 16px;
+    text-align: center;
+    margin: 10px 0;
+}
+
+.amount-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 14px;
+    color: #666;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.recharge-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #f56c6c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.recharge-btn:hover {
+    background-color: #e65c5c;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .catalog-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .catalog-content {
+        width: 95%;
+        max-height: 85vh;
+    }
+
+    .header-top h3 {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-meta {
+        flex-wrap: wrap;
+        row-gap: 8px;
+    }
+
+    .chapter-card {
+        padding: 12px;
+    }
+
+    .chapter-number {
+        font-size: 13px;
+    }
+
+    .ca_chapter-title {
+        font-size: 15px;
+    }
 }
 
 @media (max-width: 768px) {

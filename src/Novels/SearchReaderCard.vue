@@ -2,9 +2,9 @@
     <div class="reader-card">
         <div class="reader-info">
             <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + (reader.avatarUrl || '07850080-e498-47a4-8d3a-fd94fb47e561.jpg')"
-                alt="读者头像" class="avatar" />
+                alt="读者头像" class="avatar" @click="goReaderHome"/>
             <div class="details">
-                <h3>{{ reader.readerName }}</h3>
+                <h3 @click="goReaderHome">{{ reader.readerName }}</h3>
                 <p class="meta">性别: {{ reader.gender || '未设置' }}</p>
                 <p class="meta">联系方式: {{ maskedPhone }}</p>
             </div>
@@ -18,19 +18,15 @@
                 <span class="stat-value">{{ reader.isRecommendVisible === '是' ? '公开' : '私密' }}</span>
                 <span class="stat-label">推荐状态</span>
             </div>
-            <div class="stat-item">
-                <span class="stat-value">¥{{ reader.balance.toFixed(2) }}</span>
-                <span class="stat-label">账户余额</span>
-            </div>
         </div>
-        <button class="follow-btn" @click="handle_follow">关注</button>
+        <button class="follow-btn" @click="goReaderHome">进入主页</button>
     </div>
 </template>
 
 <script setup>
 import { defineProps, computed } from 'vue';
-import { toast } from "vue3-toastify";
-import "vue3-toastify/dist/index.css";
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 const props = defineProps({
     reader: {
@@ -44,11 +40,8 @@ const maskedPhone = computed(() => {
     return props.reader.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
 });
 
-async function handle_follow() {
-    toast("我是" + props.reader.readerName + "，我不同意你关注！", {
-        "type": "error",
-        "dangerouslyHTMLString": true
-    })
+function goReaderHome() {
+    router.push(`/reader/${props.reader.readerId}`);
 }
 </script>
 

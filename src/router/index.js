@@ -41,6 +41,7 @@ import Recharge_api_test from '@/API_Test/Recharge_Test.vue'
 import Search_api_test from '@/API_Test/Search_Test.vue'
 import AuthorHome from '@/Novels/AuthorHome.vue'
 import Novel_Recharge from '@/Novels/Novel_Recharge.vue'
+import ReaderHome from '@/Novels/ReaderHome.vue'
 //作者
 import AuthorLayout from '@/Author/AuthorLayout.vue'
 import NovelList from '@/Author/NovelList.vue'
@@ -228,6 +229,12 @@ const routes = [
         path: '/author/:authorId',
         name: 'AuthorHome',
         component: AuthorHome,
+        props: true
+    },
+        {
+        path: '/reader/:readerId',
+        name: 'ReaderHome',
+        component: ReaderHome,
         props: true
     },
     {

@@ -33,6 +33,9 @@
                         <a href="#" @click.prevent="goToInf" class="dropdown-item">
                             <i class="fa fa-book mr-2"></i> 我的书架
                         </a>
+                        <a href="#" @click.prevent="goToRecharge" class="dropdown-item">
+                            <i class="fa fa-yen mr-2"></i> 去充值
+                        </a>
                         <a href="#" @click.prevent="logout" class="dropdown-item">
                             <i class="fa fa-sign-out mr-2"></i> 退出
                         </a>
@@ -107,6 +110,9 @@ function goToLogin() {
 function goToInf() {
     router.push('/Novels/ReaderInfomation');
 }
+function goToRecharge() {
+    router.push('/Novels/Novel_Recharge');
+}
 function handle_return() {
     router.push('/Novels/Novel_Layout/home');
 }
@@ -133,6 +139,7 @@ const changeFilter = (newFilter) => {
 
 const performSearch = async () => {
     if (!searchQuery.value.trim()) return
+    router.replace({ query: { ...route.query, q: searchQuery.value.trim() } })
     isLoading.value = true
     noResults.value = false
     novels.value = []
