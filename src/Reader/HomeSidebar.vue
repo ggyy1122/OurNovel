@@ -20,6 +20,12 @@
           <span class="menu-text">我的书评</span>
         </router-link>
       </li>
+      <li :class="{ active: activeItem === 'self-information' }">
+        <router-link to="/UserHome/self-information">
+          <span class="menu-icon information-icon"></span>
+          <span class="menu-text">个人信息</span>
+        </router-link>
+      </li>
     </ul>
   </aside>
 </template>
@@ -90,7 +96,9 @@ export default {
 .comment-icon {
   background-image: url('~@/assets/icons/comment.png');
 }
-
+.information-icon {
+  background-image: url('~@/assets/icons/information.png');
+}
 .sidebar li.active .home-icon {
   background-image: url('~@/assets/icons/home-red.png');
 }
@@ -99,5 +107,8 @@ export default {
 }
 .sidebar li.active .comment-icon {
   background-image: url('~@/assets/icons/comment-red.png');
+}
+.sidebar li.active .information-icon {
+  background-image: url('~@/assets/icons/information-red.png');
 }
 </style>

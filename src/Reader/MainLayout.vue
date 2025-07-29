@@ -91,9 +91,7 @@ export default {
 }
 
 .content-container {
-  background-color: white; /* 内容区白色背景 */
-  border-radius: 8px; /* 圆角 */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* 轻微阴影 */
+  background-color: #f2f2f2; /* 内容区白色背景 */
   padding: 20px; /* 内容区内边距 */
   margin-bottom: 20px; /* 底部留白 */
 }

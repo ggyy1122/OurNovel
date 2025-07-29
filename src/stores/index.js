@@ -69,7 +69,9 @@ export const readerState = defineStore('reader', {
                 return prefix + state.backgroundUrl;
             }
             return prefix + 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg';  // 默认背景图
-        }
+        },
+        recommendBooksCount: (state) => state.recommendBooks.length,
+        favoriteBooksCount: (state) => state.favoriteBooks.length
     },
     actions: {
         initializeReader(id, name, password, phone, gender, balance, avatarUrl, backgroundUrl, isCollectVisible, isRecommendVisible, favoriteBooks, recommendBooks) {
@@ -113,7 +115,41 @@ export const readerState = defineStore('reader', {
                 item.novelId === novelId ||
                 (item.novel && item.novel.novelId === novelId)
             );
+        },
+         // 修改余额时同步到其他标签页
+         updateBalance(newBalance) {
+        this.balance = newBalance
+        localStorage.setItem('reader_balance', newBalance) // 显式存储
+        window.dispatchEvent(new Event('storage')) // 触发事件
+         },
+         //同步推荐数组
+          updateRecommendBooks(newBooks) {
+         this.recommendBooks = newBooks
+         localStorage.setItem('reader_recommendBooks', JSON.stringify(newBooks))
+          window.dispatchEvent(new Event('storage')) // 触发同步
+         },
+         //同步收藏数组
+          updateFavoriteBooks(newBooks) {
+         this.favoriteBooks = newBooks
+         localStorage.setItem('reader_favoriteBooks', JSON.stringify(newBooks))
+          window.dispatchEvent(new Event('storage')) // 触发同步
+         },
+    
+    // 初始化时添加事件监听
+    initializeStore() {
+      window.addEventListener('storage', (event) => {
+        if (event.key === 'reader_balance') {
+          this.balance = Number(event.newValue) // 从其他标签页同步
         }
+         if (event.key === 'reader_recommendBooks') {
+          this.recommendBooks = JSON.parse(event.newValue) // 同步推荐书籍
+        }
+         if (event.key === 'reader_favoriteBooks') {
+          this.favoriteBooks = JSON.parse(event.newValue) // 同步推荐书籍
+        }
+        // 可以添加其他需要同步的字段...
+      })
+    }
     }
 })
 

@@ -449,10 +449,13 @@ const toggleCollect = async () => {
     if (isCollected.value) {
       // 取消收藏
       await deleteCollect(currentNovelId, currentReaderId);
-      ReaderState.favoriteBooks = ReaderState.favoriteBooks.filter(item =>
-        item.novel?.novelId !== currentNovelId &&
+      const newFavorites = ReaderState.favoriteBooks.filter(item =>
+       item.novel?.novelId !== currentNovelId && 
         item.novelId !== currentNovelId
-      );
+       )
+       ReaderState.updateFavoriteBooks(newFavorites) 
+
+
       toast("取消收藏", {
         "type": "success",
         "dangerouslyHTMLString": true
@@ -460,13 +463,21 @@ const toggleCollect = async () => {
     } else {
       // 添加收藏
       await addOrUpdateCollect(currentNovelId, ReaderState.readerId, 'no');
-      ReaderState.favoriteBooks.push({
+      //  更新推荐列表（安全方式）
+        const newFavoriteBooks = [
+       ...ReaderState.favoriteBooks, // 解构原有数组
+        {
         novelId: currentNovelId,
         novel: selectNovelState, // 保存完整作品信息
         currentReaderId,
         isPublic: "no",
         collectTime: new Date().toISOString()
-      });
+        }
+       ]
+  
+       //  通过 action 更新（触发同步）
+       ReaderState.updateFavoriteBooks(newFavoriteBooks)
+
       toast("收藏成功", {
         "type": "success",
         "dangerouslyHTMLString": true
@@ -530,15 +541,21 @@ const submitRecommend = async () => {
     // 更新本地状态
     isRecommended.value = true
     showRecommendDialog.value = false
-
-    // 存储推荐数据（可选）
-    ReaderState.recommendBooks.push({
+    
+     //  更新推荐列表（安全方式）
+  const newRecommendBooks = [
+    ...ReaderState.recommendBooks, // 解构原有数组
+    {
       novelId: selectNovelState.novelId,
       novel: selectNovelState, // 保存完整作品信息
       readerId: ReaderState.readerId,
       reason: recommendReason.value,
       recommendTime: new Date().toISOString()
-    })
+    }
+  ]
+  
+  // 通过 action 更新（触发同步）
+  ReaderState.updateRecommendBooks(newRecommendBooks)
 
     // 提示成功
     toast("推荐成功！", {
@@ -562,11 +579,12 @@ const cancelRecommend=async()=>{
  try{
       // 取消推荐
       await deleteRecommend(currentNovelId, currentReaderId);
-      ReaderState.recommendBooks = ReaderState.recommendBooks.filter(item =>
+      const newRecommendBooks = ReaderState.recommendBooks.filter(item =>
         item.novel?.novelId !== currentNovelId &&
         item.novelId !== currentNovelId
-
+         
       );
+      ReaderState.updateRecommendBooks(newRecommendBooks)
       toast("取消推荐", {
         "type": "success",
         "dangerouslyHTMLString": true
@@ -614,6 +632,12 @@ const confirmReward = async () => {
 
     // 4. 刷新余额
      await fetchReaderBalance();
+     if (typeof ReaderState.updateBalance === 'function') {
+  ReaderState.updateBalance(accountBalance.value)
+} else {
+  console.error('updateBalance is not a function!')
+}
+     console.log("余额",ReaderState.balance)
     
     // 5. 关闭弹窗
     //showRewardDialog.value = false;
