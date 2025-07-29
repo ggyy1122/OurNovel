@@ -126,5 +126,25 @@ namespace OurNovel.Controllers
             return Ok(comments);
         }
 
+        /// <summary>
+        /// 获取指定章节的第一级评论（不作为回复的评论）
+        /// </summary>
+        [HttpGet("novel/{novelId}/chapter/{chapterId}/top-level-comments")]
+        public async Task<IActionResult> GetTopLevelCommentsByChapter(int novelId, int chapterId)
+        {
+            var comments = await _commentsService.GetTopLevelCommentsByChapterAsync(novelId, chapterId);
+            return Ok(comments);
+        }
+
+        /// <summary>
+        /// 获取指定章节的第一级评论的点赞数排行
+        /// </summary>
+        [HttpGet("novel/{novelId}/chapter/{chapterId}/top-liked-comments/{topN}")]
+        public async Task<IActionResult> GetTopLikedTopLevelCommentsByChapter(int novelId, int chapterId, int topN)
+        {
+            var comments = await _commentsService.GetTopNTopLevelCommentsByLikesByChapterAsync(novelId, chapterId, topN);
+            return Ok(comments);
+        }
+
     }
 }

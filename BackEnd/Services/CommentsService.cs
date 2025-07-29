@@ -166,5 +166,49 @@ namespace OurNovel.Services
             return topNComments;
         }
 
+        /// <summary>
+        /// 获取指定章节的第一级评论
+        /// </summary>
+        public async Task<List<Comment>> GetTopLevelCommentsByChapterAsync(int novelId, int chapterId)
+        {
+            var allComments = (await _repository.GetAllAsync())
+                .Where(c => c.NovelId == novelId && c.ChapterId == chapterId)
+                .ToList();
+
+            var repliedCommentIds = (await _replyRepository.GetAllAsync())
+                .Select(r => r.CommentId)
+                .Distinct()
+                .ToHashSet();
+
+            var topLevelComments = allComments
+                .Where(c => !repliedCommentIds.Contains(c.CommentId))
+                .ToList();
+
+            return topLevelComments;
+        }
+
+        /// <summary>
+        /// 获取指定章节的第一级评论点赞数排行
+        /// </summary>
+        public async Task<List<Comment>> GetTopNTopLevelCommentsByLikesByChapterAsync(int novelId, int chapterId, int topN)
+        {
+            var allComments = (await _repository.GetAllAsync())
+                .Where(c => c.NovelId == novelId && c.ChapterId == chapterId)
+                .ToList();
+
+            var repliedCommentIds = (await _replyRepository.GetAllAsync())
+                .Select(r => r.CommentId)
+                .Distinct()
+                .ToHashSet();
+
+            var topLevelComments = allComments
+                .Where(c => !repliedCommentIds.Contains(c.CommentId))
+                .OrderByDescending(c => c.Likes)
+                .Take(topN)
+                .ToList();
+
+            return topLevelComments;
+        }
+
     }
 }
