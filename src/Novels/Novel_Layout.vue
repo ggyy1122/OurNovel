@@ -34,6 +34,9 @@
                         <a href="#" @click.prevent="goToInf" class="dropdown-item">
                             <i class="fa fa-book mr-2"></i> 我的书架
                         </a>
+                        <a href="#" @click.prevent="openMyHomePage" class="dropdown-item">
+                                <i class="fa fa-home mr-2"></i> 我的主页
+                        </a>
                         <a href="#" @click.prevent="logout" class="dropdown-item">
                             <i class="fa fa-sign-out mr-2"></i> 退出
                         </a>
@@ -103,6 +106,9 @@
                             <a href="#" @click.prevent="goToInf" class="dropdown-item">
                                 <i class="fa fa-book mr-2"></i> 我的书架
                             </a>
+                             <a href="#" @click.prevent="openMyHomePage" class="dropdown-item">
+                               <i class="fa fa-home mr-2"></i> 我的主页
+                             </a>
                             <a href="#" @click.prevent="logout" class="dropdown-item">
                                 <i class="fa fa-sign-out mr-2"></i> 退出
                             </a>
@@ -174,7 +180,11 @@ const handleSearch = () => {
         })
     }
 }
-
+//打开主页的方法
+function openMyHomePage() {
+    // 打开新窗口，跳转到用户主页
+    window.open(`/UserHome`, '_blank');
+}
 // 监听滚动，显示悬浮导航栏
 const handleScroll = () => {
     const headerHeight = mainHeader.value?.offsetHeight || 0

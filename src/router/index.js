@@ -50,6 +50,15 @@ import NovelEdit from '@/Author/NovelEdit.vue'
 import ChapterList from '@/Author/ChapterList.vue'
 import AuthorStats from '@/Author/AuthorStats.vue'
 import AuthorSettings from '@/Author/AuthorSettings.vue'
+//主页
+import MainLayout  from '@/Reader/MainLayout.vue'
+import HomeView  from '@/Reader/HomeView.vue'
+import FinanceView from '@/Reader/FinanceView.vue'
+import BookshelfView from '@/Reader/BookshelfView.vue'
+import CommentView from '@/Reader/CommentView.vue'
+import MessageCenterView from '@/Reader/MessageCenterView.vue'
+import RecommendView from '@/Reader/RecommendView.vue'
+import HistoryView from '@/Reader/HistoryView.vue'
 
 
 const routes = [
@@ -329,7 +338,73 @@ const routes = [
                 meta: { title: '账号设置' }
             }
         ]
-    }
+    },
+   // 首页路由组
+  {
+    path: '/UserHome',
+    component: MainLayout,
+    props: { sidebarType: 'home' },
+    children: [
+      {
+        path: '',
+        name: 'home',
+        component: HomeView,
+        meta: { sidebarItem: 'home' }
+      },
+      {
+        path: 'finance',
+        name: 'home-finance',
+        component: FinanceView,
+        meta: { sidebarItem: 'finance' }
+      },
+      {
+        path: 'comment',
+        name: 'home-comment',
+        component: CommentView,
+        meta: { sidebarItem: 'comment' }
+      },
+    ]
+  },
+  // 书架路由组
+  {
+    path: '/BookShelf',
+    component: MainLayout,
+    props: { sidebarType: 'bookshelf' },
+    children: [
+      {
+        path: '',
+        name: 'bookshelf',
+        component: BookshelfView,
+        meta: { sidebarItem: 'books' }
+      },
+      {
+        path: 'Recommend',
+        name: 'recommend',
+        component: RecommendView,
+        meta: { sidebarItem: 'recommend' }
+      },
+       {
+        path: 'History',
+        name: 'history',
+        component: HistoryView,
+        meta: { sidebarItem: 'history' }
+      }
+    ]
+  },
+  // 消息中心路由组
+   {
+    path: '/MessageCenter',
+    component: MainLayout,
+    props: { sidebarType: 'messagecenter' },
+    children: [
+      {
+        path: '',
+        name: 'messagecenter',
+        component: MessageCenterView,
+        meta: { sidebarItem: 'messagecenter' }
+      }
+    ]
+  }
 ]
 
 const router = createRouter({
