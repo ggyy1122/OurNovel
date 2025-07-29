@@ -93,6 +93,10 @@ builder.Services.AddScoped<ReportManagementService>();
 builder.Services.AddScoped<ChapterManagementService>();
 
 builder.Services.AddScoped<WholePurchaseService>();
+
+builder.Services.AddScoped<IRecentReadingsRepository, RecentReadingsRepository>();
+builder.Services.AddScoped<IRecentReadingsService, RecentReadingsService>();
+
 // 注册OSS储配置
 builder.Services.Configure<OssConfig>(builder.Configuration.GetSection("OssConfig"));
 builder.Services.AddSingleton<IOssService, OssService>();

@@ -52,6 +52,7 @@ namespace OurNovel.Data
         public DbSet<WholePurchase> WholePurchases { get; set; }
         public DbSet<WholePurchase> WholePurchase { get; set; }
 
+        public DbSet<RecentReadings> RecentReadings { get; set; }
         /// <summary>
         /// 配置实体和数据库表结构映射关系的方法
         /// </summary>
@@ -91,6 +92,7 @@ namespace OurNovel.Data
             modelBuilder.ApplyConfiguration(new ChapterManagementConfiguration());
             modelBuilder.ApplyConfiguration(new WholePurchaseConfiguration());
 
+            modelBuilder.ApplyConfiguration(new RecentReadingsConfiguration());
             // ⚠️ 后续其他表的配置也在这里调用，例如：
             // modelBuilder.ApplyConfiguration(new NovelConfiguration());
             // modelBuilder.ApplyConfiguration(new ChapterConfiguration());
