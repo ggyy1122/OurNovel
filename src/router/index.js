@@ -59,7 +59,7 @@ import CommentView from '@/Reader/CommentView.vue'
 import MessageCenterView from '@/Reader/MessageCenterView.vue'
 import RecommendView from '@/Reader/RecommendView.vue'
 import HistoryView from '@/Reader/HistoryView.vue'
-
+import InformationView from '@/Reader/InformationView.vue'
 
 const routes = [
     {
@@ -362,6 +362,12 @@ const routes = [
         name: 'home-comment',
         component: CommentView,
         meta: { sidebarItem: 'comment' }
+      },
+      {
+        path: 'self-information',
+        name: 'home-self-information',
+        component: InformationView,
+        meta: { sidebarItem: 'self-information' }
       },
     ]
   },
