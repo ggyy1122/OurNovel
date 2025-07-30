@@ -8,7 +8,7 @@
                 <p>匠心打磨好作品</p>
             </div>
             <div class="search-bar">
-                <input type="text" placeholder="输入小说名/作者名/读者名" v-model="searchQuery" @keyup.enter="handleSearch"/>
+                <input type="text" placeholder="输入小说名/作者名/读者名" v-model="searchQuery" @keyup.enter="handleSearch" />
                 <button @click="handleSearch">搜索</button>
             </div>
             <div class="user-actions">
@@ -35,7 +35,9 @@
                             <i class="fa fa-book mr-2"></i> 我的书架
                         </a>
                         <a href="#" @click.prevent="openMyHomePage" class="dropdown-item">
-                                <i class="fa fa-home mr-2"></i> 我的主页
+                            <i class="fa fa-home mr-2"></i> 我的主页</a>
+                        <a href="#" @click.prevent="goToRecharge" class="dropdown-item">
+                            <i class="fa fa-yen mr-2"></i> 去充值
                         </a>
                         <a href="#" @click.prevent="logout" class="dropdown-item">
                             <i class="fa fa-sign-out mr-2"></i> 退出
@@ -79,7 +81,7 @@
                     </li>
                 </ul>
                 <div class="search-bar">
-                    <input type="text" placeholder="输入小说名/作者名/读者名" v-model="searchQuery" @keyup.enter="handleSearch"/>
+                    <input type="text" placeholder="输入小说名/作者名/读者名" v-model="searchQuery" @keyup.enter="handleSearch" />
                     <button @click="handleSearch">搜索</button>
                 </div>
                 <div class="user-actions">
@@ -106,9 +108,12 @@
                             <a href="#" @click.prevent="goToInf" class="dropdown-item">
                                 <i class="fa fa-book mr-2"></i> 我的书架
                             </a>
-                             <a href="#" @click.prevent="openMyHomePage" class="dropdown-item">
-                               <i class="fa fa-home mr-2"></i> 我的主页
-                             </a>
+                            <a href="#" @click.prevent="openMyHomePage" class="dropdown-item">
+                                <i class="fa fa-home mr-2"></i> 我的主页
+                            </a>
+                            <a href="#" @click.prevent="goToRecharge" class="dropdown-item">
+                                <i class="fa fa-yen mr-2"></i> 去充值
+                            </a>
                             <a href="#" @click.prevent="logout" class="dropdown-item">
                                 <i class="fa fa-sign-out mr-2"></i> 退出
                             </a>
@@ -159,6 +164,9 @@ function goToLogin() {
 function goToInf() {
     router.push('/Novels/ReaderInfomation');
 }
+function goToRecharge() {
+    router.push('/Novels/Novel_Recharge');
+}
 function logout() {
     state.clearUserInfo();
     localStorage.removeItem('token');
@@ -175,7 +183,7 @@ const handleSearch = () => {
             path: '/Novels/Search',
             query: {
                 q: searchQuery.value,
-                type: 'novel' 
+                type: 'novel'
             }
         })
     }

@@ -58,7 +58,7 @@ const selectNovelState = SelectNovel_State();
 const reader_state = readerState();
 const router = useRouter();
 const isFavorite = ref(reader_state.isFavorite(props.novel.novelId));
-const collectedcount=ref(props.novel.collectedCount || 0);
+const collectedcount = ref(props.novel.collectedCount || 0);
 
 // 加入书架/收藏
 async function handleAddShelf() {
@@ -127,6 +127,13 @@ async function handleRead() {
     try {
         await handle();
         const response = await getChapter(props.novel.novelId, 1);
+        if (response.status !== '已发布') {
+            toast("章节未发布!", {
+                "type": "error",
+                "dangerouslyHTMLString": true
+            });
+            return;
+        }
         selectNovelState.resetChapter(
             response.chapterId,
             response.title,

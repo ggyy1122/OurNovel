@@ -33,6 +33,9 @@
                         <a href="#" @click.prevent="goToInf" class="dropdown-item">
                             <i class="fa fa-book mr-2"></i> 我的书架
                         </a>
+                        <a href="#" @click.prevent="goToRecharge" class="dropdown-item">
+                            <i class="fa fa-yen mr-2"></i> 去充值
+                        </a>
                         <a href="#" @click.prevent="logout" class="dropdown-item">
                             <i class="fa fa-sign-out mr-2"></i> 退出
                         </a>
@@ -168,6 +171,9 @@ function goToLogin() {
 function goToInf() {
     router.push('/Novels/ReaderInfomation');
 }
+function goToRecharge() {
+    router.push('/Novels/Novel_Recharge');
+}
 function handle_return() {
     router.back();
 }
@@ -183,7 +189,7 @@ function logout() {
 }
 onMounted(() => {
     fetchAuthorData(),
-    fetchNovels()
+        fetchNovels()
 })
 
 // 格式化手机号

@@ -495,6 +495,13 @@ const toggleCollect = async () => {
 async function handleRead() {
   try {
     const response = await getChapter(selectNovelState.novelId, 1);
+    if (response.status !== '已发布') {
+      toast("章节未发布!", {
+        "type": "error",
+        "dangerouslyHTMLString": true
+      });
+      return;
+    }
     selectNovelState.resetChapter(
       response.chapterId,
       response.title,

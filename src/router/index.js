@@ -41,6 +41,9 @@ import Recharge_api_test from '@/API_Test/Recharge_Test.vue'
 import Search_api_test from '@/API_Test/Search_Test.vue'
 import AuthorHome from '@/Novels/AuthorHome.vue'
 import Novel_Recharge from '@/Novels/Novel_Recharge.vue'
+import ReaderHome from '@/Novels/ReaderHome.vue'
+import ChapterComments from '@/Novels/ChapterComments.vue'
+import Comment_Report from '@/Novels/Comment_Report.vue'
 //作者
 import AuthorLayout from '@/Author/AuthorLayout.vue'
 import NovelList from '@/Author/NovelList.vue'
@@ -240,6 +243,12 @@ const routes = [
         props: true
     },
     {
+        path: '/reader/:readerId',
+        name: 'ReaderHome',
+        component: ReaderHome,
+        props: true
+    },
+    {
         path: '/Novels/Search',
         name: 'Search',
         component: Novel_Search,
@@ -247,6 +256,18 @@ const routes = [
             query: route.query.q,
             filter: route.query.type || 'novel'
         })
+    },
+    {
+        path: '/chapter-comments/:novelId/:chapterId',
+        name: 'ChapterComments',
+        component: ChapterComments,
+        props: true
+    },
+    {
+        path: '/comment-report/:readerId/:commentId',
+        name: 'CommentReport',
+        component: Comment_Report,
+        props: true
     },
     {
         path: '/Novels/Novel_Recharge',
