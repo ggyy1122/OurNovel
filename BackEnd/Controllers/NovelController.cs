@@ -3,6 +3,7 @@ using OurNovel.Services;
 using OurNovel.Models;
 using OurNovel.Services.Interfaces;
 using OurNovel.Repositories;
+using OurNovel.DTOs;
 
 namespace OurNovel.Controllers
 {
@@ -27,6 +28,25 @@ namespace OurNovel.Controllers
         }
 
         // 如果 Novel 有特殊的业务接口，可以在这里扩展
+
+        /// <summary>
+        /// 创建小说（简化字段）
+        /// </summary>
+        [HttpPost("/api/novel/create")]
+        public async Task<IActionResult> CreateNovel([FromQuery] int authorId, [FromQuery] string novelName,[FromQuery] string introduction)
+        {
+            try
+            {
+                var novelId = await (_service as NovelService)!.CreateNovelAsync(authorId, novelName, introduction);
+                return Ok(new { success = true, message = "小说创建成功，状态为待审核", novelId = novelId
+                });
+            }
+            catch (Exception ex)
+            {
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return BadRequest(new { success = false, message });
+            }
+        }
 
         /// <summary>
         /// 审核小说
@@ -74,12 +94,31 @@ namespace OurNovel.Controllers
         /// 修改小说信息
         /// </summary>
         [HttpPost("submit-edit")]
-        public async Task<IActionResult> SubmitEdit(int originalNovelId, [FromBody] Novel edited)
+        public async Task<IActionResult> SubmitEdit([FromQuery] int originalNovelId, [FromBody] NovelEditDto edited)
         {
-            var novelId = await _novelService.SubmitNovelEditAsync(originalNovelId, edited);
-            if (novelId == -1) return NotFound("原小说不存在");
-            return Ok(new { message = "提交修改成功，等待审核", newNovelId = novelId });
+            var original = await _novelService.GetByIdAsync(originalNovelId);
+            if (original == null) return NotFound("原小说不存在");
+
+            var newNovel = new Novel
+            {
+                AuthorId = original.AuthorId,
+                NovelName = edited.NovelName ?? original.NovelName,
+                Introduction = edited.Introduction ?? original.Introduction,
+                CoverUrl = edited.CoverUrl ?? original.CoverUrl,
+                Score = original.Score,
+                TotalWordCount = original.TotalWordCount,
+                RecommendCount = original.RecommendCount,
+                CollectedCount = original.CollectedCount,
+                Status = "待审核",
+                CreateTime = DateTime.Now,
+                OriginalNovelId = originalNovelId,
+                TotalPrice = original.TotalPrice
+            };
+
+            await _novelService.AddAsync(newNovel);
+            return Ok(new { message = "提交修改成功，等待审核", newNovelId = newNovel.NovelId });
         }
+
 
         /// <summary>
         /// 返回小说总字数

@@ -30,6 +30,31 @@ namespace OurNovel.Services
         }
 
         /// <summary>
+        /// 创建小说
+        /// </summary>
+        public async Task<int> CreateNovelAsync(int authorId, string novelName, string introduction)
+        {
+            var novel = new Novel
+            {
+                AuthorId = authorId,
+                NovelName = novelName,
+                Introduction = introduction,
+                CreateTime = DateTime.Now,
+                CoverUrl = null,
+                Score = 0,
+                TotalWordCount = 0,
+                RecommendCount = 0,
+                CollectedCount = 0,
+                Status = "待审核",
+                OriginalNovelId = -1,
+                TotalPrice = 0
+            };
+
+            await AddAsync(novel);
+            return novel.NovelId;
+        }
+
+        /// <summary>
         /// 审核小说，修改状态为“连载”或“封禁”
         /// </summary>
         public async Task<bool> ReviewNovelAsync(int novelId, string newStatus,int managerId, string result)
