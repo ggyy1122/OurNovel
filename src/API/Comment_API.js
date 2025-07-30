@@ -46,6 +46,7 @@ export function getComment(commentId) {
  * @param {string} [commentData.content] - 评论内容
  * @param {number} [commentData.likes=0] - 点赞数
  * @param {string} [commentData.status="通过"] - 状态
+ * @param {string} [commentData.createTime] - 创建时间
  * @returns {Promise<Comment>}
  */
 export function createComment(commentData) {
@@ -62,7 +63,8 @@ export function createComment(commentData) {
             title: commentData.title,
             content: commentData.content || '',
             likes: commentData.likes || 0,
-            status: commentData.status || "通过"
+            status: commentData.status || "通过",
+            createTime: commentData.createTime || new Date().toISOString()
         }
     })
 }
@@ -197,6 +199,33 @@ export function getTopLevelComments(novelId) {
 export function getTopLikedComments(novelId, topN) {
     return request({
         url: `/api/Comments/novel/${novelId}/top-liked-comments/${topN}`,
+        method: 'get'
+    })
+}
+
+/**
+ * 获取指定章节的顶级评论
+ * @param {number} novelId - 小说ID
+ * @param {number} chapterId - 章节ID
+ * @returns {Promise<Array<Comment>>}
+ */
+export function getTopLevelCommentsByChapter(novelId, chapterId) {
+    return request({
+        url: `/api/Comments/novel/${novelId}/chapter/${chapterId}/top-level-comments`,
+        method: 'get'
+    })
+}
+
+/**
+ * 获取指定章节前n个点赞最多的评论
+ * @param {number} novelId - 小说ID
+ * @param {number} chapterId - 章节ID
+ * @param {number} topN - 前N名
+ * @returns {Promise<Array<Comment>>}
+ */
+export function getTopLikedCommentsByChapter(novelId, chapterId, topN) {
+    return request({
+        url: `/api/Comments/novel/${novelId}/chapter/${chapterId}/top-liked-comments/${topN}`,
         method: 'get'
     })
 }

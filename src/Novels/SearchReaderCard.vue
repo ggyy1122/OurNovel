@@ -2,7 +2,7 @@
     <div class="reader-card">
         <div class="reader-info">
             <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + (reader.avatarUrl || '07850080-e498-47a4-8d3a-fd94fb47e561.jpg')"
-                alt="读者头像" class="avatar" @click="goReaderHome"/>
+                alt="读者头像" class="avatar" @click="goReaderHome" />
             <div class="details">
                 <h3 @click="goReaderHome">{{ reader.readerName }}</h3>
                 <p class="meta">性别: {{ reader.gender || '未设置' }}</p>
@@ -74,10 +74,18 @@ function goReaderHome() {
     border: 2px solid #ffd100;
 }
 
+.avatar:hover {
+    transform: scale(1.1);
+}
+
 .details h3 {
     margin: 0 0 5px 0;
     font-size: 18px;
     color: #333;
+}
+
+.details h3:hover {
+    color: #f0940a;
 }
 
 .meta {

@@ -116,6 +116,25 @@
             <pre>{{ apiResponse12 }}</pre>
         </div>
 
+        <h1>13:获取章节顶级评论</h1>
+        <input v-model="novelId13" placeholder="输入小说ID" />
+        <input v-model="chapterId13" placeholder="输入章节ID" />
+        <button @click="function13">获取评论</button>
+        <div v-if="apiResponse13">
+            <h3>响应数据：</h3>
+            <pre>{{ apiResponse13 }}</pre>
+        </div>
+
+        <h1>14:获取章节点赞最多的评论</h1>
+        <input v-model="novelId14" placeholder="输入小说ID" />
+        <input v-model="chapterId14" placeholder="输入章节ID" />
+        <input v-model="topN14" placeholder="输入前N名" />
+        <button @click="function14">获取评论</button>
+        <div v-if="apiResponse14">
+            <h3>响应数据：</h3>
+            <pre>{{ apiResponse14 }}</pre>
+        </div>
+
     </div>
 </template>
 
@@ -133,7 +152,9 @@ import {
     deleteCommentRecursive,
     reviewComment,
     getTopLevelComments,
-    getTopLikedComments
+    getTopLikedComments,
+    getTopLevelCommentsByChapter,
+    getTopLikedCommentsByChapter
 } from '@/API/Comment_API'
 
 import { useRouter } from 'vue-router'
@@ -343,6 +364,37 @@ async function function12() {
     } catch (error) {
         console.error('获取点赞最多评论请求错误:', error)
         apiResponse12.value = { error: error.message }
+    }
+}
+
+// 13:获取章节顶级评论
+const novelId13 = ref('')
+const chapterId13 = ref('')
+const apiResponse13 = ref(null)
+async function function13() {
+    try {
+        const response = await getTopLevelCommentsByChapter(novelId13.value, chapterId13.value)
+        apiResponse13.value = response
+        console.log('章节顶级评论响应:', response)
+    } catch (error) {
+        console.error('获取章节顶级评论请求错误:', error)
+        apiResponse13.value = { error: error.message }
+    }
+}
+
+// 14:获取章节点赞最多的评论
+const novelId14 = ref('')
+const chapterId14 = ref('')
+const topN14 = ref('')
+const apiResponse14 = ref(null)
+async function function14() {
+    try {
+        const response = await getTopLikedCommentsByChapter(novelId14.value, chapterId14.value, topN14.value)
+        apiResponse14.value = response
+        console.log('章节点赞最多评论响应:', response)
+    } catch (error) {
+        console.error('获取章节点赞最多评论请求错误:', error)
+        apiResponse14.value = { error: error.message }
     }
 }
 </script>

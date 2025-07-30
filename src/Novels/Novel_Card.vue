@@ -119,6 +119,13 @@ async function handleRead() {
     try {
         handle();
         const response = await getChapter(props.novel.novelId, 1);
+        if (response.status !== '已发布') {
+            toast("章节未发布!", {
+                "type": "error",
+                "dangerouslyHTMLString": true
+            });
+            return;
+        }
         selectNovelState.resetChapter(
             response.chapterId,
             response.title,

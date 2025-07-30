@@ -52,7 +52,9 @@
             </div>
         </div>
         <div class="reader-main">
-            <div class="left-menu">
+            <div class="left-menu" :style="{
+                left: showComments ? '-25px' : '156px'
+            }">
                 <button class="back-btn" @click="handleBack">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24" height="24">
                         <path fill="currentColor"
@@ -73,7 +75,8 @@
                     指南
                 </button>
             </div>
-            <div class="reader-card" :style="{ backgroundColor: cardBgColor }">
+            <div class="reader-card"
+                :style="{ backgroundColor: cardBgColor, marginRight: showComments ? '350px' : '110px', marginLeft: showComments ? '-20px' : '100px' }">
                 <header class="header" ref="mainHeader" :style="{ backgroundColor: cardBgColor }">
                     <div class="logo">
                         <img src="@/assets/logo.png" alt="TJ小说网" />
@@ -137,7 +140,116 @@
                     <button class="nav-button next" @click="changeChapter(1)">下一章</button>
                 </div>
             </div>
-            <div class="right-menu">
+            <!-- 可滑动评论区域 -->
+            <div class="comments-section" :style="{
+                backgroundColor: cardBgColor,
+                right: showComments ? '0' : '-300px'
+            }">
+                <div class="comments-header">
+                    <h3>热门评论 ({{ comments.length }})</h3>
+                    <button class="close-comments" @click="toggleComments">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor"
+                                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="comment-input">
+                    <img :src="reader_state.formattedAvatarUrl" alt="用户头像" class="user-avatar"
+                        v-if="state.isloggedin" />
+                    <input type="text" placeholder="写下你的想法..." v-model="newComment" @keyup.enter="submitComment"
+                        :disabled="!state.isloggedin" />
+                    <button @click="submitComment" :disabled="!state.isloggedin || !newComment.trim()">发送</button>
+                </div>
+                <div v-if="comments.length === 0" class="no-comments">暂无评论</div>
+                <div class="comments-list" v-if="comments.length > 0">
+                    <div v-for="comment in comments" :key="comment.commentId" class="comment-item">
+                        <div class="comment-header">
+                            <img :src="getReaderAvatar(comment.readerId)" alt="用户头像" class="comment-avatar"
+                                @error="handleAvatarError" @click="goReaderHome(comment.readerId)" />
+                            <div class="comment-info">
+                                <span class="comment-author" @click="goReaderHome(comment.readerId)">{{
+                                    getReaderName(comment.readerId) }}</span>
+                                <span class="comment-time">{{ formatTime(comment.createTime) }}</span>
+                            </div>
+                            <button class="like-btn" @click="toggleLike(comment)"
+                                :class="{ liked: isLikeds(comment.commentId) }">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
+                                    <path fill="currentColor"
+                                        d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1.91l-.01-.01L23 10z" />
+                                </svg>
+                                {{ comment.likes }}
+                            </button>
+                        </div>
+                        <div class="comment-content">{{ comment.content }}</div>
+                        <!-- 回复操作和回复数量 -->
+                        <div class="comment-actions">
+                            <button @click="showReplyInput(comment.commentId)" class="comment-actions-re">回复</button>
+                            <button v-if="comment.replies && comment.replies.length > 0"
+                                @click="toggleReplies(comment.commentId)" class="show-replies-btn">
+                                {{ expandedReplies.has(comment.commentId) ? '收起回复︿' : `展开${comment.replies.length}条回复﹀`
+                                }}
+                            </button>
+                            <span @click="showReportDialog(comment.commentId)" class="report-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 1024 1024"
+                                    width="16" height="16">
+                                    <path fill="currentColor"
+                                        d="M928.99 755.83 574.6 203.25c-12.89-20.16-36.76-32.58-62.6-32.58s-49.71 12.43-62.6 32.58L95.01 755.83c-12.91 20.12-12.9 44.91.01 65.03 12.92 20.12 36.78 32.51 62.59 32.49h708.78c25.82.01 49.68-12.37 62.59-32.49 12.91-20.12 12.92-44.91.01-65.03M554.67 768h-85.33v-85.33h85.33zm0-426.67v298.66h-85.33V341.32z">
+                                    </path>
+                                </svg>
+                                举报
+                            </span>
+                        </div>
+                        <!-- 回复输入框 -->
+                        <div class="reply-input" v-if="activeReplyCommentId === comment.commentId">
+                            <input type="text" placeholder="写下你的回复..." v-model="replyContent"
+                                @keyup.enter="submitReply(comment.commentId)" />
+                            <button @click="submitReply(comment.commentId)">发送</button>
+                            <button @click="cancelReply">取消</button>
+                        </div>
+                        <!-- 回复列表（默认隐藏，点击后展开） -->
+                        <div class="comment-replies"
+                            v-if="comment.replies && comment.replies.length > 0 && expandedReplies.has(comment.commentId)">
+                            <div v-for="reply in comment.replies" :key="reply.commentId" class="reply-item">
+                                <div class="reply-header">
+                                    <img :src="getReaderAvatar(reply.readerId)" alt="用户头像" class="reply-avatar"
+                                        @error="handleAvatarError" @click="goReaderHome(comment.readerId)" />
+                                    <div class="reply-info">
+                                        <span class="reply-author" @click="goReaderHome(comment.readerId)">{{
+                                            getReaderName(reply.readerId) }}</span>
+                                        <span class="reply-time">{{ formatTime(reply.createTime) }}</span>
+                                    </div>
+                                    <button class="like-btn" @click="toggleLike(reply)"
+                                        :class="{ liked: isLikeds(reply.commentId) }">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16"
+                                            height="16">
+                                            <path fill="currentColor"
+                                                d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1.91l-.01-.01L23 10z" />
+                                        </svg>
+                                        {{ reply.likes }}
+                                    </button>
+                                </div>
+                                <div class="reply-content">{{ reply.content }} <span
+                                        @click="showReportDialog(reply.commentId)" class="report-btn">
+                                        <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
+                                            viewBox="0 0 1024 1024" width="16" height="16">
+                                            <path fill="currentColor"
+                                                d="M928.99 755.83 574.6 203.25c-12.89-20.16-36.76-32.58-62.6-32.58s-49.71 12.43-62.6 32.58L95.01 755.83c-12.91 20.12-12.9 44.91.01 65.03 12.92 20.12 36.78 32.51 62.59 32.49h708.78c25.82.01 49.68-12.37 62.59-32.49 12.91-20.12 12.92-44.91.01-65.03M554.67 768h-85.33v-85.33h85.33zm0-426.67v298.66h-85.33V341.32z">
+                                            </path>
+                                        </svg>
+                                        举报
+                                    </span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="view-more-comments" v-if="comments.length > 0">
+                    <button @click="viewAllComments">查看更多评论></button>
+                </div>
+            </div>
+            <div class="right-menu" v-if="!showComments" :style="{
+                right: '166px'
+            }">
                 <div class="menu-item" @click="showCatalog = !showCatalog"><svg xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 1024 1024" width="24" height="24">
                         <path fill="currentColor"
@@ -150,8 +262,8 @@
                             d="M832 384H576V128H192v768h640zm-26.496-64L640 154.496V320zM160 64h480l256 256v608a32 32 0 0 1-32 32H160a32 32 0 0 1-32-32V96a32 32 0 0 1 32-32m160 448h384v64H320zm0-192h160v64H320zm0 384h384v64H320z">
                         </path>
                     </svg> 书详情</div>
-                <div class="menu-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24"
-                        height="24">
+                <div class="menu-item" @click="toggleComments"><svg xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 1024 1024" width="24" height="24">
                         <path fill="currentColor"
                             d="m174.72 855.68 135.296-45.12 23.68 11.84C388.096 849.536 448.576 864 512 864c211.84 0 384-166.784 384-352S723.84 160 512 160 128 326.784 128 512c0 69.12 24.96 139.264 70.848 199.232l22.08 28.8-46.272 115.584zm-45.248 82.56A32 32 0 0 1 89.6 896l58.368-145.92C94.72 680.32 64 596.864 64 512 64 299.904 256 96 512 96s448 203.904 448 416-192 416-448 416a461.056 461.056 0 0 1-206.912-48.384l-175.616 58.56z">
                         </path>
@@ -235,6 +347,7 @@
                         <div class="card-content">
                             <span class="chapter-number">第{{ chapter.chapterId }}章</span>
                             <span class="ca_chapter-title">{{ chapter.title }}</span>
+                            <span class="chapter-status">{{ chapter.status }}</span>
                             <span v-if="chapter.isCharged === '是'" class="vip-tag">VIP</span>
                             <span v-if="chapter.chapterId === selectNovelState.chapterId"
                                 class="current-badge">正在阅读</span>
@@ -309,8 +422,11 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { getChapter, getChaptersByNovel } from '@/API/Chapter_API';
 import { addOrUpdateCollect } from '@/API/Collect_API'
 import { getWholePurchaseStatus } from '@/API/Transaction_API'
-import { getReaderBalance } from '@/API/Reader_API';
+import { getReaderBalance, getReader } from '@/API/Reader_API';
 import { rewardNovel } from '@/API/Reward_API';
+import { getTopLikedCommentsByChapter, createComment, getComment } from '@/API/Comment_API';
+import { getRepliesByParentId, addCommentReply } from '@/API/CommentReply_API';
+import { likeComment, unlikeComment, isLiked } from '@/API/Likes_API';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 const selectNovelState = SelectNovel_State();
@@ -329,7 +445,15 @@ const showRewardDialog = ref(false);                  // 是否显示打赏弹�
 const accountBalance = ref(0);                      // 账号余额
 const selectedReward = ref(100);                    // 默认选中100点打赏金额
 const showBalanceInsufficientDialog = ref(false);   // 是否显示余额不足弹窗
-
+const showComments = ref(false);
+const comments = ref([]);
+const newComment = ref('');
+const replyContent = ref('');
+const activeReplyCommentId = ref(null);
+const readersCache = ref({}); // 缓存读者信息
+const likedComments = ref(new Set()); // 存储已点赞的评论ID
+const topN = ref(10); // 获取点赞数前10的评论
+const expandedReplies = ref(new Set());
 const rewardOptions = [
     { value: 10, label: '10点' },
     { value: 100, label: '100点' },
@@ -456,6 +580,20 @@ async function handleAddShelf() {
 async function changeChapter(num) {
     try {
         const response = await getChapter(selectNovelState.novelId, selectNovelState.chapterId + num);
+        if (response.status !== '已发布') {
+            toast("章节未发布!", {
+                "type": "error",
+                "dangerouslyHTMLString": true
+            });
+            return;
+        }
+        if (response.isCharged === '是' && !hasPurchased.value) {
+            toast("此章节需要购买后才能阅读", {
+                "type": "warning",
+                "dangerouslyHTMLString": true
+            });
+            return;
+        }
         selectNovelState.resetChapter(
             response.chapterId,
             response.title,
@@ -467,9 +605,11 @@ async function changeChapter(num) {
             response.publishTime,
             response.status
         );
+        comments.value = []; // 清空评论列表
+        showComments.value = false; // 切换章节时隐藏评论
         router.push('/Novels/reader');
     } catch (error) {
-        toast("章节加载失败：该章节不存在!", {
+        toast("章节加载失败", {
             "type": "warning",
             "dangerouslyHTMLString": true
         })
@@ -496,13 +636,13 @@ const scrollToTop = () => {
 const fetchChapters = async () => {
     try {
         const response = await getChaptersByNovel(selectNovelState.novelId);
-        chapters.value = response.map(chapter => ({
-            ...chapter,
-            isPurchased: false // 这里应该根据用户购买状态设置，可以从API获取
-        }));
+        chapters.value = response
+            .filter(chapter => chapter.status !== '草稿')  // 过滤掉状态为"草稿"的章节
+            .map(chapter => ({
+                ...chapter
+            }));
     } catch (error) {
-        console.error('获取章节列表失败:', error);
-        toast("获取目录失败", {
+        toast("获取目录失败!", {
             "type": "error",
             "dangerouslyHTMLString": true
         });
@@ -535,6 +675,13 @@ const goToChapter = async (chapter) => {
     }
     try {
         const response = await getChapter(chapter.novelId, chapter.chapterId);
+        if (response.status !== '已发布') {
+            toast("章节未发布!", {
+                "type": "error",
+                "dangerouslyHTMLString": true
+            });
+            return;
+        }
         selectNovelState.resetChapter(
             response.chapterId,
             response.title,
@@ -546,11 +693,12 @@ const goToChapter = async (chapter) => {
             response.publishTime,
             response.status
         );
+        comments.value = []; // 清空评论列表
+        showComments.value = false; // 切换章节时隐藏评论
         showCatalog.value = false;
         scrollToTop();
     } catch (error) {
-        console.error('加载章节失败:', error);
-        toast("章节加载失败", {
+        toast("章节加载失败!", {
             "type": "error",
             "dangerouslyHTMLString": true
         });
@@ -606,7 +754,257 @@ const confirmReward = async () => {
         await fetchReaderBalance();
     }
 };
+// 切换评论显示
+const toggleComments = () => {
+    showComments.value = !showComments.value;
+    if (showComments.value && comments.value.length === 0) {
+        fetchComments();
+    }
+};
 
+// 获取评论
+const fetchComments = async () => {
+    try {
+        // 获取顶级评论
+        const response = await getTopLikedCommentsByChapter(
+            selectNovelState.novelId,
+            selectNovelState.chapterId,
+            topN.value
+        );
+        // 为每个评论添加replies属性
+        const commentsWithReplies = await Promise.all(response.map(async comment => {
+            // 获取该评论的所有回复
+            const replies = await getRepliesByParentId(comment.commentId);
+            // 获取回复的完整内容
+            const fullReplies = await Promise.all(replies.map(async reply => {
+                const replyContent = await getComment(reply.commentId);
+                return {
+                    ...replyContent,
+                    commentLevel: reply.commentLevel
+                };
+            }));
+            // 预加载读者信息
+            await getReaderInfo(comment.readerId);
+            await Promise.all(fullReplies.map(reply => getReaderInfo(reply.readerId)));
+            // 检查点赞状态
+            if (state.isloggedin) {
+                const co_isLiked = await isLiked(comment.commentId, reader_state.readerId);
+                if (co_isLiked.liked) likedComments.value.add(comment.commentId);
+                await Promise.all(fullReplies.map(async reply => {
+                    const isReplyLiked = await isLiked(reply.commentId, reader_state.readerId);
+                    if (isReplyLiked.liked) likedComments.value.add(reply.commentId);
+                }));
+            }
+            return {
+                ...comment,
+                replies: fullReplies,
+                commentLevel: 1 // 顶级评论
+            };
+        }));
+        comments.value = commentsWithReplies;
+    } catch (error) {
+        console.error('获取评论失败:', error);
+        toast("获取评论失败", {
+            "type": "error",
+            "dangerouslyHTMLString": true
+        });
+    }
+};
+
+// 获取读者信息并缓存
+const getReaderInfo = async (readerId) => {
+    if (!readersCache.value[readerId]) {
+        try {
+            const reader = await getReader(readerId);
+            readersCache.value[readerId] = reader;
+        } catch (error) {
+            console.error('获取读者信息失败:', error);
+            readersCache.value[readerId] = {
+                readerName: '未知用户',
+                avatarUrl: null
+            };
+        }
+    }
+    return readersCache.value[readerId];
+};
+
+// 获取读者头像
+const getReaderAvatar = (readerId) => {
+    return 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + (readersCache.value[readerId]?.avatarUrl || 'a3dc347b-45dd-4d89-8b9d-65b75477ee3d.jpg')
+};
+
+// 获取读者名称
+const getReaderName = (readerId) => {
+    return readersCache.value[readerId]?.readerName || '未知用户';
+};
+
+// 格式化时间
+const formatTime = (timeStr) => {
+    if (!timeStr) return '';
+    const date = new Date(timeStr);
+    return date.toLocaleString();
+};
+
+// 头像加载失败处理
+const handleAvatarError = (e) => {
+    e.target.src = require('@/assets/logo.png');
+};
+
+// 检查是否已点赞
+const isLikeds = (commentId) => {
+    return likedComments.value.has(commentId);
+};
+
+// 点赞/取消点赞
+const toggleLike = async (comment) => {
+    if (!state.isloggedin) {
+        toast("请先登录", {
+            "type": "warning",
+            "dangerouslyHTMLString": true
+        });
+        return;
+    }
+    try {
+        if (isLikeds(comment.commentId)) {
+            await unlikeComment(comment.commentId, reader_state.readerId);
+            likedComments.value.delete(comment.commentId);
+            comment.likes--;
+            toast("成功取消点赞！", {
+                "type": "success",
+                "dangerouslyHTMLString": true
+            });
+        } else {
+            await likeComment(comment.commentId, reader_state.readerId);
+            likedComments.value.add(comment.commentId);
+            comment.likes++;
+            toast("点赞成功", {
+                "type": "success",
+                "dangerouslyHTMLString": true
+            });
+        }
+    } catch (error) {
+        console.error('操作失败:', error);
+        toast("操作失败", {
+            "type": "error",
+            "dangerouslyHTMLString": true
+        });
+    }
+};
+
+// 提交评论
+const submitComment = async () => {
+    if (!newComment.value.trim()) return;
+    try {
+        const response = await createComment({
+            readerId: reader_state.readerId,
+            novelId: selectNovelState.novelId,
+            chapterId: selectNovelState.chapterId,
+            title: '评论',
+            content: newComment.value,
+            likes: 0,
+            status: "通过",
+            createTime: new Date().toISOString()
+        });
+        // 添加到评论列表
+        comments.value.unshift(response);
+        newComment.value = '';
+        toast("评论成功", {
+            "type": "success",
+            "dangerouslyHTMLString": true
+        });
+    } catch (error) {
+        console.error('评论失败:', error);
+        toast("评论失败", {
+            "type": "error",
+            "dangerouslyHTMLString": true
+        });
+    }
+};
+
+// 显示回复输入框
+const showReplyInput = (commentId) => {
+    if (!state.isloggedin) {
+        toast.warning("请先登录");
+        return;
+    }
+    const isActive = activeReplyCommentId.value === commentId;
+    activeReplyCommentId.value = isActive ? null : commentId;
+    replyContent.value = '';
+};
+
+// 取消回复
+const cancelReply = () => {
+    activeReplyCommentId.value = null;
+    replyContent.value = '';
+};
+
+// 提交回复
+const submitReply = async (parentCommentId) => {
+    if (!replyContent.value.trim()) return;
+    try {
+        // 1. 创建评论
+        const commentResponse = await createComment({
+            readerId: reader_state.readerId,
+            novelId: selectNovelState.novelId,
+            chapterId: selectNovelState.chapterId,
+            title: '回复',
+            content: replyContent.value,
+            likes: 0,
+            status: "通过",
+            createTime: new Date().toISOString()
+        });
+        // 2. 创建回复关系
+        await addCommentReply({
+            commentId: commentResponse.commentId,
+            preComId: parentCommentId,
+            commentLevel: 2 // 二级评论
+        });
+        // 3. 获取完整的回复内容
+        const fullReply = await getComment(commentResponse.commentId);
+        // 4. 添加到回复列表
+        const parentComment = comments.value.find(c => c.commentId === parentCommentId);
+        if (parentComment) {
+            // 初始化replies数组如果不存在
+            if (!parentComment.replies) {
+                parentComment.replies = [];
+            }
+            // 添加回复
+            parentComment.replies.push({
+                ...fullReply,
+                commentLevel: 2
+            });
+        }
+        replyContent.value = '';
+        activeReplyCommentId.value = null;
+        toast("回复成功", {
+            "type": "success",
+            "dangerouslyHTMLString": true
+        });
+    } catch (error) {
+        console.error('回复失败:', error);
+        toast("回复失败", {
+            "type": "error",
+            "dangerouslyHTMLString": true
+        });
+    }
+};
+// 切换回复的展开状态
+const toggleReplies = (commentId) => {
+    if (expandedReplies.value.has(commentId)) {
+        expandedReplies.value.delete(commentId);
+    } else {
+        expandedReplies.value.add(commentId);
+    }
+};
+function goReaderHome(readerId) {
+    router.push(`/reader/${readerId}`);
+}
+const viewAllComments = () => {
+    router.push(`/chapter-comments/${selectNovelState.novelId}/${selectNovelState.chapterId}`);
+};
+function showReportDialog(commentId) {
+    router.push(`/comment-report/${reader_state.readerId}/${commentId}`);
+}
 // 监听弹窗打开时刷新余额
 watch(
     () => showRewardDialog.value,
@@ -724,14 +1122,16 @@ onUnmounted(() => {
 
 .left-menu {
     position: fixed;
-    left: 110px;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-end;
     width: 100px;
     z-index: 100;
+    left: 211px;
+    transition: left 0.3s ease;
+    padding-right: 10px;
 }
 
 .back-btn {
@@ -775,13 +1175,15 @@ onUnmounted(() => {
     border-radius: 12px;
     padding: 36px 48px;
     min-width: 600px;
-    max-width: 900px;
+    max-width: 820px;
     width: 100%;
     min-height: 700px;
     margin: 0 24px;
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    margin-left: 100px;
+    transition: margin-right 0.3s ease, margin-left 0.3s ease;
 }
 
 .chapter-header {
@@ -823,18 +1225,19 @@ onUnmounted(() => {
 
 .right-menu {
     position: fixed;
-    right: 90px;
-    top: 50%;
+    right: 0;
+    top: 55%;
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100px;
     z-index: 100;
+    transition: right 0.3s ease;
 }
 
 .menu-item {
-    background: #fff;
+    background: #f9f4f4;
     border-radius: 8px;
     color: #222;
     width: 100px;
@@ -857,7 +1260,7 @@ onUnmounted(() => {
 }
 
 .menu-item.to-top {
-    margin-top: 150px;
+    margin-top: 130px;
 }
 
 .iconfont {
@@ -1417,8 +1820,19 @@ button.active {
 .vip-tag {
     position: absolute;
     right: 12px;
-    background: linear-gradient(135deg, #ff9500, #ff5e00);
-    color: white;
+    background: linear-gradient(135deg, #f1a73f, #ff5e00);
+    color: #222;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.chapter-status {
+    position: absolute;
+    left: 215px;
+    background: rgba(141, 240, 54, 0.8);
+    color: #222;
     font-size: 11px;
     padding: 2px 8px;
     border-radius: 10px;
@@ -1427,8 +1841,7 @@ button.active {
 
 .current-badge {
     position: absolute;
-    bottom: 12px;
-    right: 12px;
+    right: 54px;
     background: #ffd100;
     color: #222;
     font-size: 11px;
@@ -1650,6 +2063,368 @@ button.active {
     background-color: #e65c5c;
 }
 
+/* 新增评论区域样式 */
+.no-comments {
+    text-align: center;
+    color: #aaa;
+    margin: 40px 0 20px;
+    font-size: 18px;
+}
+
+.comments-section {
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 405px;
+    height: 100vh;
+    background: white;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    overflow-y: auto;
+    z-index: 99;
+    transition: right 0.3s ease;
+}
+
+.comments-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 15px;
+}
+
+.close-comments {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+}
+
+.close-comments:hover {
+    color: #333;
+}
+
+.comment-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.comment-input input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    outline: none;
+}
+
+.comment-input button {
+    padding: 10px 20px;
+    background-color: #ffd100;
+    color: #222;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.comment-input button:disabled {
+    background-color: #eee;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-avatar:hover {
+    transform: scale(1.1);
+}
+
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.comment-item {
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.comment-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+.comment-avatar:hover {
+    transform: scale(1.1);
+}
+
+.comment-info {
+    flex: 1;
+}
+
+.comment-author {
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+}
+
+.comment-author:hover {
+    color: #f0940a;
+}
+
+.comment-time {
+    font-size: 12px;
+    color: #999;
+    margin-left: 10px;
+}
+
+.like-btn {
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #666;
+    cursor: pointer;
+    font-size: 12px;
+    margin-right: 30px;
+}
+
+.like-btn.liked {
+    color: #f56c6c;
+}
+
+.like-btn svg {
+    fill: currentColor;
+}
+
+.comment-content {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+    margin-left: 46px;
+}
+
+.comment-actions {
+    margin-left: 46px;
+    margin-top: 10px;
+}
+
+.comment-actions button {
+    background: none;
+    border: none;
+    color: #1890ff;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.reply-item {
+    margin-top: 15px;
+    padding-left: 15px;
+    border-left: 2px solid #eee;
+}
+
+.reply-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.reply-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 8px;
+}
+
+.reply-info {
+    flex: 1;
+}
+
+.reply-author {
+    font-weight: bold;
+    font-size: 13px;
+    color: #333;
+}
+
+.reply-time {
+    font-size: 11px;
+    color: #999;
+    margin-left: 8px;
+}
+
+.reply-content {
+    font-size: 13px;
+    line-height: 1.4;
+    color: #333;
+    margin-left: 36px;
+}
+
+.reply-input {
+    margin-top: 10px;
+    margin-left: 46px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.reply-input input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    outline: none;
+    font-size: 13px;
+}
+
+.reply-input button {
+    padding: 6px 12px;
+    font-size: 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.reply-input button:first-of-type {
+    background-color: #ffd100;
+    color: #222;
+}
+
+.reply-input button:last-of-type {
+    background-color: #f5f5f5;
+    color: #666;
+}
+
+.comment-actions {
+    display: flex;
+    gap: 50px;
+    margin-left: 46px;
+    margin-top: 10px;
+}
+
+.show-replies-btn {
+    color: #1890ff;
+    font-size: 12px;
+}
+
+.show-replies-btn:hover {
+    text-decoration: underline;
+}
+
+.reply-item {
+    margin-top: 15px;
+    padding-left: 15px;
+    border-left: 2px solid #eee;
+}
+
+.reply-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.reply-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 8px;
+}
+
+.reply-info {
+    flex: 1;
+}
+
+.reply-author {
+    font-weight: bold;
+    font-size: 13px;
+    color: #333;
+}
+
+.reply-time {
+    font-size: 11px;
+    color: #999;
+    margin-left: 8px;
+}
+
+.reply-content {
+    font-size: 13px;
+    line-height: 1.4;
+    color: #333;
+    margin-left: 36px;
+}
+
+.comment-actions-re {
+    background: none;
+    border: none;
+    color: #1890ff;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.comment-actions-re:hover {
+    text-decoration: underline;
+}
+
+.view-more-comments {
+    margin-top: 20px;
+    margin-bottom: 60px;
+    text-align: center;
+}
+
+.view-more-comments button {
+    padding: 8px 16px;
+    color: #5e5d5d;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s;
+}
+
+.view-more-comments button:hover {
+    text-decoration: underline;
+}
+
+.report-btn {
+    color: #f30505;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    position: absolute;
+    right: 0;
+    left: auto;
+    transform: translateX(-55px);
+}
+
+.report-btn:hover {
+    text-decoration: underline;
+}
+
 /* 响应式调整 */
 @media (max-width: 768px) {
     .catalog-grid {
@@ -1698,45 +2473,31 @@ button.active {
 }
 
 @media (max-width: 1200px) {
-    .reader-card {
-        min-width: 350px;
-        padding: 18px 8vw;
-    }
-
-    .reader-main {
-        margin-top: 16px;
-    }
-
-    .left-menu,
-    .right-menu {
-        width: 56px;
-    }
-
-    .menu-item,
-    .menu-item.guide {
-        width: 56px;
-        font-size: 13px;
-        padding: 7px 0;
+    .left-menu {
+        left: calc(50% - 400px) !important;
     }
 }
 
-@media (max-width: 900px) {
-    .reader-card {
-        padding: 12px 3vw;
-        min-width: 0;
-        max-width: 98vw;
+@media (max-width: 840px) {
+    .left-menu {
+        left: calc(50% - 350px) !important;
+        width: 60px;
     }
+}
 
-    .reader-main {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .left-menu,
-    .right-menu {
+@media (max-width: 600px) {
+    .left-menu {
         flex-direction: row;
-        margin: 0 0 12px 0;
+        bottom: 20px;
+        top: auto;
+        left: 50% !important;
+        transform: translateX(-50%);
         width: auto;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 30px;
+        border-radius: 30px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        align-items: center;
     }
 }
 </style>
