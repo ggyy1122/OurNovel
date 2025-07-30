@@ -100,7 +100,7 @@ const novelId = selectNovelState.novelId
 const chapterList = ref([])
 const displayedChapters = ref([])
 const currentPage = ref(1)
-const itemsPerPage = 5
+const itemsPerPage = 10
 
 
 // 整本买断状态
