@@ -51,8 +51,12 @@ namespace OurNovel.Data
         public DbSet<Purchase> Purchases { get; set; }
         public DbSet<WholePurchase> WholePurchases { get; set; }
         public DbSet<WholePurchase> WholePurchase { get; set; }
-
+        
         public DbSet<RecentReadings> RecentReadings { get; set; }
+
+        public DbSet<ReaderRewardRecord> ReaderRewardRecords { get; set; }
+        public DbSet<ReaderSubscriptionRecord> ReaderSubscriptionRecords { get; set; }
+        public DbSet<ReaderRechargeRecord> ReaderRechargeRecords { get; set; }
         /// <summary>
         /// 配置实体和数据库表结构映射关系的方法
         /// </summary>
@@ -91,8 +95,44 @@ namespace OurNovel.Data
             modelBuilder.ApplyConfiguration(new NovelManagementConfiguration());
             modelBuilder.ApplyConfiguration(new ChapterManagementConfiguration());
             modelBuilder.ApplyConfiguration(new WholePurchaseConfiguration());
-
+            
             modelBuilder.ApplyConfiguration(new RecentReadingsConfiguration());
+
+            modelBuilder.Entity<ReaderRewardRecord>(entity =>
+            {
+                entity.HasNoKey().ToView("V_READER_REWARD_RECORD");
+
+                entity.Property(e => e.ReaderId).HasColumnName("READER_ID");
+                entity.Property(e => e.TransactionId).HasColumnName("TRANSACTION_ID");
+                entity.Property(e => e.Amount).HasColumnName("AMOUNT");
+                entity.Property(e => e.RewardTime).HasColumnName("REWARD_TIME");
+                entity.Property(e => e.NovelId).HasColumnName("NOVEL_ID");
+                entity.Property(e => e.NovelTitle).HasColumnName("NOVEL_TITLE");
+                entity.Property(e => e.AuthorId).HasColumnName("AUTHOR_ID");
+                entity.Property(e => e.AuthorName).HasColumnName("AUTHOR_NAME");
+            });
+            modelBuilder.Entity<ReaderSubscriptionRecord>(entity =>
+            {
+                entity.HasNoKey().ToView("V_READER_SUBSCRIPTION_RECORD");
+
+                entity.Property(e => e.ReaderId).HasColumnName("READER_ID");
+                entity.Property(e => e.ChapterId).HasColumnName("CHAPTER_ID");
+                entity.Property(e => e.ChapterTitle).HasColumnName("CHAPTER_TITLE");
+                entity.Property(e => e.NovelId).HasColumnName("NOVEL_ID");
+                entity.Property(e => e.NovelTitle).HasColumnName("NOVEL_TITLE");
+                entity.Property(e => e.ConsumeAmount).HasColumnName("CONSUME_AMOUNT");
+                entity.Property(e => e.ConsumeTime).HasColumnName("CONSUME_TIME");
+            });
+            modelBuilder.Entity<ReaderRechargeRecord>(entity =>
+            {
+                entity.HasNoKey().ToView("V_READER_RECHARGE_RECORD");
+
+                entity.Property(e => e.ReaderId).HasColumnName("READER_ID");
+                entity.Property(e => e.RechargeAmount).HasColumnName("RECHARGE_AMOUNT");
+                entity.Property(e => e.VirtualCoin).HasColumnName("VIRTUAL_COIN");
+                entity.Property(e => e.RechargeTime).HasColumnName("RECHARGE_TIME");
+            });
+
             // ⚠️ 后续其他表的配置也在这里调用，例如：
             // modelBuilder.ApplyConfiguration(new NovelConfiguration());
             // modelBuilder.ApplyConfiguration(new ChapterConfiguration());

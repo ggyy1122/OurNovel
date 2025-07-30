@@ -16,5 +16,31 @@ namespace OurNovel.Controllers
         {
             _transactionService = transactionService;
         }
+
+        [HttpGet("reward/{readerId}")]
+        public async Task<IActionResult> GetRewardRecords(int readerId)
+        {
+            var result = await _transactionService.GetRewardRecordsAsync(readerId);
+            return Ok(result);
+        }
+
+        [HttpGet("subscription/{readerId}")]
+        public async Task<IActionResult> GetSubscriptionRecords(int readerId)
+        {
+            var result = await _transactionService.GetSubscriptionRecordsAsync(readerId);
+            return Ok(result);
+        }
+
+        [HttpGet("recharge/{readerId}")]
+        public async Task<IActionResult> GetRechargeRecords(int readerId)
+        {
+            var result = await _transactionService.GetRechargeRecordsAsync(readerId);
+            return Ok(result);
+        }
+
+
+
+
+
     }
 }
