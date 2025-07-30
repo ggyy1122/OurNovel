@@ -81,14 +81,24 @@ namespace OurNovel.Controllers
             });
         }
 
-        /// <summary>
-        /// 重置作者密码（提供用户名和新密码）
+         /// <summary>
+        /// 重置作者密码，不判断是否与原密码相同，类似忘记密码处理 提供用户名和新密码）
         /// </summary>
         [HttpPost("reset-author-password")]
         public async Task<IActionResult> ResetPassword([FromBody] AuthorRegisterDto dto)
         {
             return await _authorService.ResetPasswordAsync(dto.AuthorName, dto.Password);
         }
+
+        /// <summary>
+        /// 重置作者密码，判断是否与原密码相同（提供用户名和新密码）
+        /// </summary>
+        [HttpPost("change-author-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] AuthorChangePasswordDto dto)
+        {
+            return await _authorService.ChangePasswordAsync(dto.AuthorName, dto.OldPassword, dto.NewPassword);
+        }
+
 
 
         /// <summary>
