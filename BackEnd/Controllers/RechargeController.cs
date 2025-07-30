@@ -69,7 +69,7 @@ public class RechargeController : ControllerBase
             var result = await _rechargeService.RechargeAsync(new RechargeRequestDto
             {
                 ReaderId = userId,
-                Amount = amount
+                Amount = amount*100
             });
 
             return result ? Ok("success") : BadRequest("充值失败");
