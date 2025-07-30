@@ -110,7 +110,7 @@ namespace OurNovel.Controllers
                 RecommendCount = original.RecommendCount,
                 CollectedCount = original.CollectedCount,
                 Status = "´ýÉóºË",
-                CreateTime = DateTime.Now,
+                CreateTime = original.CreateTime,
                 OriginalNovelId = originalNovelId,
                 TotalPrice = original.TotalPrice
             };
