@@ -132,8 +132,8 @@
                     <div class="chapter-divider"></div>
                 </div>
                 <div class="novel-content"
-                    :style="{ fontSize: fontSize + 'px', fontFamily: fontFamily, color: textColor }">
-                    {{ selectNovelState.cha_content }}
+                    :style="{ fontSize: fontSize + 'px', fontFamily: fontFamily, color: textColor }"
+                    v-html="formatContent(selectNovelState.cha_content)">
                 </div>
                 <div class="chapter-nav-buttons">
                     <button class="nav-button prev" @click="changeChapter(-1)">上一章</button>
@@ -283,12 +283,12 @@
                             d="M512 544c-227.456 0-416-94.272-416-224S284.544 96 512 96s416 94.272 416 224-188.544 224-416 224m0-64c196.672 0 352-77.696 352-160S708.672 160 512 160s-352 77.696-352 160 155.328 160 352 160">
                         </path>
                     </svg> 打赏</div>
-                <div class="menu-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24"
-                        height="24">
+                <div class="menu-item" @click="toggleTextToSpeech"><svg xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 1024 1024" width="24" height="24">
                         <path fill="currentColor"
                             d="M896 529.152V512a384 384 0 1 0-768 0v17.152A128 128 0 0 1 320 640v128a128 128 0 1 1-256 0V512a448 448 0 1 1 896 0v256a128 128 0 1 1-256 0V640a128 128 0 0 1 192-110.848M896 640a64 64 0 0 0-128 0v128a64 64 0 0 0 128 0zm-768 0v128a64 64 0 0 0 128 0V640a64 64 0 1 0-128 0">
                         </path>
-                    </svg> 听书</div>
+                    </svg> {{ isSpeaking ? '停止听书' : '听书' }}</div>
                 <div class="menu-item" @click="showSettings = !showSettings"><svg xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 1024 1024" width="24" height="24">
                         <path fill="currentColor"
@@ -411,6 +411,24 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="tts-control-panel" v-if="showTtsControls">
+        <div class="tts-voice-select">
+            <label>语音:</label>
+            <select v-model="selectedVoice">
+                <option v-for="voice in availableVoices" :key="voice.name" :value="voice.name">{{ voice.name }}</option>
+            </select>
+        </div>
+        <div class="tts-rate-control">
+            <label>语速:</label>
+            <input type="range" min="0.5" max="2" step="0.1" v-model="speechRate">
+            <span>{{ speechRate }}x</span>
+        </div>
+        <div class="tts-pitch-control">
+            <label>音调:</label>
+            <input type="range" min="0.5" max="2" step="0.1" v-model="speechPitch">
+            <span>{{ speechPitch }}x</span>
         </div>
     </div>
 </template>
@@ -1005,6 +1023,112 @@ const viewAllComments = () => {
 function showReportDialog(commentId) {
     router.push(`/comment-report/${reader_state.readerId}/${commentId}`);
 }
+const isSpeaking = ref(false);
+const showTtsControls = ref(false);
+const selectedVoice = ref('');
+const availableVoices = ref([]);
+const speechRate = ref(1);
+const speechPitch = ref(1);
+const speechSynthesis = ref(null);
+const utterance = ref(null);
+
+// 初始化语音合成
+onMounted(() => {
+    if ('speechSynthesis' in window) {
+        speechSynthesis.value = window.speechSynthesis;
+        // 等待语音列表加载
+        speechSynthesis.value.onvoiceschanged = () => {
+            // 只保留中文语音
+            availableVoices.value = speechSynthesis.value.getVoices().filter(voice =>
+                voice.lang.includes('zh') || voice.lang.includes('cmn')
+            );
+            // 如果有中文语音，默认选择第一个
+            if (availableVoices.value.length > 0) {
+                selectedVoice.value = availableVoices.value[0].name;
+            } else {
+                toast("未找到中文语音引擎", { type: "warning" });
+            }
+        };
+        // 立即加载语音列表
+        availableVoices.value = speechSynthesis.value.getVoices().filter(voice =>
+            voice.lang.includes('zh') || voice.lang.includes('cmn')
+        );
+        // 如果有中文语音，默认选择第一个
+        if (availableVoices.value.length > 0) {
+            selectedVoice.value = availableVoices.value[0].name;
+        } else {
+            toast("未找到中文语音引擎", { type: "warning" });
+        }
+    } else {
+        toast("您的浏览器不支持语音合成功能", { type: "error" });
+    }
+});
+
+const toggleTextToSpeech = () => {
+    if (!speechSynthesis.value) {
+        toast("您的浏览器不支持语音合成功能", { type: "error" });
+        return;
+    }
+    if (isSpeaking.value) {
+        stopSpeaking();
+    } else {
+        startSpeaking();
+    }
+};
+
+const startSpeaking = () => {
+    if (isSpeaking.value) return;
+    const content = selectNovelState.cha_content;
+    if (!content) {
+        toast("没有可朗读的内容", { type: "warning" });
+        return;
+    }
+    // 创建新的语音合成实例
+    utterance.value = new SpeechSynthesisUtterance(content);
+    // 设置语音参数
+    const voice = availableVoices.value.find(v => v.name === selectedVoice.value);
+    if (voice) {
+        utterance.value.voice = voice;
+    }
+    utterance.value.rate = speechRate.value;
+    utterance.value.pitch = speechPitch.value;
+    utterance.value.lang = 'zh-CN'; // 设置为中文
+    // 事件监听
+    utterance.value.onstart = () => {
+        isSpeaking.value = true;
+        showTtsControls.value = true;
+    };
+    utterance.value.onend = () => {
+        isSpeaking.value = false;
+    };
+    utterance.value.onerror = (event) => {
+        console.error('语音合成错误:', event);
+        isSpeaking.value = false;
+        toast("已停止朗读。", { type: "success" });
+    };
+    // 开始朗读
+    speechSynthesis.value.speak(utterance.value);
+};
+
+const stopSpeaking = () => {
+    if (speechSynthesis.value && isSpeaking.value) {
+        speechSynthesis.value.cancel();
+        isSpeaking.value = false;
+        showTtsControls.value = false;
+    }
+};
+
+// 使用时可以指定空格数量，如：
+// formatContent(content, 4);  // 4个空格
+// formatContent(content, 6);  // 6个空格
+const formatContent = (content, spaceCount = 7) => {  // 默认7个空格，可自定义
+    if (!content) return '';
+    const paragraphs = content.split('\n');
+    // 根据spaceCount生成对应数量的空格
+    const spaces = '&nbsp;'.repeat(spaceCount);
+    return paragraphs.map(p => `${spaces}${p}`).join('<br>'.repeat(2));
+};
+
 // 监听弹窗打开时刷新余额
 watch(
     () => showRewardDialog.value,
@@ -1028,6 +1152,7 @@ onMounted(async () => {
 })
 onUnmounted(() => {
     window.removeEventListener('keydown', handleKeyDown);
+    stopSpeaking();
 });
 </script>
 
@@ -1036,6 +1161,44 @@ onUnmounted(() => {
     background: #e5e5e5;
     min-height: 100vh;
     width: 100vw;
+}
+
+.tts-control-panel {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    width: 250px;
+}
+
+.tts-voice-select,
+.tts-rate-control,
+.tts-pitch-control {
+    margin-bottom: 10px;
+}
+
+.tts-voice-select select {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.tts-rate-control input[type="range"],
+.tts-pitch-control input[type="range"] {
+    width: 60%;
+    margin: 0 10px;
+}
+
+.tts-rate-control span,
+.tts-pitch-control span {
+    display: inline-block;
+    width: 40px;
+    text-align: right;
 }
 
 .reader-header {
@@ -1217,10 +1380,9 @@ onUnmounted(() => {
 .novel-content {
     font-size: 18px;
     color: #222;
-    line-height: 2.1;
-    margin-top: 16px;
-    text-indent: 2em;
+    line-height: 1.7;
     white-space: pre-line !important;
+    word-break: break-word;
 }
 
 .right-menu {
