@@ -350,7 +350,7 @@ const fetchRechargeRecords = async () => {
 const fetchSubscribtionRecords = async () => {
   try {
     const response = await getReaderSubscribtion(reader_state.readerId)
-    rechargeRecords.value = Array.isArray(response) ? response : []
+    subscribtionRecords.value = Array.isArray(response) ? response : []
     currentPage.value = 1 // 重置到第一页
     console.log("订阅数据",subscribtionRecords.value)
   } catch (error) {
