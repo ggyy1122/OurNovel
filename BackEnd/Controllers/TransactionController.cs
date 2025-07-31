@@ -38,6 +38,13 @@ namespace OurNovel.Controllers
             return Ok(result);
         }
 
+        [HttpGet("transaction/{readerId}")]
+        public async Task<IActionResult> GetTransactionRecords(int readerId)
+        {
+            var result = await _transactionService.GetTransactionsByReaderAsync(readerId);
+            return Ok(result);
+        }
+
 
 
 

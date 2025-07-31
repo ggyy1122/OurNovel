@@ -36,6 +36,14 @@ namespace OurNovel.Services
                 .ToListAsync();
         }
 
+        public async Task<List<Transaction>> GetTransactionsByReaderAsync(int readerId)
+        {
+            return await _context.Transactions
+                .Where(t => t.ReaderId == readerId)
+                .OrderByDescending(t => t.Time) // 默认按时间倒序
+                .ToListAsync();
+        }
+
 
     }
 
