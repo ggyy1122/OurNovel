@@ -46,7 +46,7 @@
       <div class="card">
         <div class="card-content">
           <div class="card-title">账户余额</div>
-          <div class="card-value">{{reader_state.balance}}起点币</div>
+          <div class="card-value">{{reader_state.balance}}虚拟币</div>
           <button class="card-button">充值</button>
         </div>
       </div>
