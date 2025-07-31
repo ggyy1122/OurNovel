@@ -66,6 +66,7 @@ namespace OurNovel.Services
                 _context.AuthorIncomes.Add(new AuthorIncome
                 {
                     AuthorId = novel.AuthorId,
+                    NovelId =(int) dto.NovelId,
                     Amount = dto.Amount, // 注意：这里保留 decimal 类型，Income.Amount 可为 decimal
                     Type = "打赏",
                     CreateTime = DateTime.Now

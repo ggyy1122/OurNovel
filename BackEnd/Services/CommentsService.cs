@@ -209,6 +209,13 @@ namespace OurNovel.Services
 
             return topLevelComments;
         }
-
+        /// <summary>
+        /// 根据小说ID获取所有评论数量
+        /// </summary>
+        public async Task<int> GetCommentCountByNovelAsync(int novelId)
+        {
+            var allComments = await _repository.GetAllAsync();
+            return allComments.Count(c => c.NovelId == novelId);
+        }
     }
 }

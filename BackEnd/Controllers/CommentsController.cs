@@ -145,6 +145,15 @@ namespace OurNovel.Controllers
             var comments = await _commentsService.GetTopNTopLevelCommentsByLikesByChapterAsync(novelId, chapterId, topN);
             return Ok(comments);
         }
+        /// <summary>
+        /// 根据小说ID获取所有评论数量
+        /// </summary>
+        [HttpGet("count-by-novel/{novelId}")]
+        public async Task<IActionResult> GetCommentCountByNovel(int novelId)
+        {
+            var count = await _commentsService.GetCommentCountByNovelAsync(novelId);
+            return Ok(new { novelId, commentCount = count });
+        }
 
     }
 }

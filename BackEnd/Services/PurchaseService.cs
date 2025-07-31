@@ -105,6 +105,7 @@ namespace OurNovel.Services
                 _context.AuthorIncomes.Add(new AuthorIncome
                 {
                     AuthorId = author.AuthorId,
+                    NovelId = dto.NovelId,
                     Amount = finalPrice,
                     Type = "章节购买",
                     CreateTime = DateTime.Now

@@ -21,6 +21,9 @@ namespace OurNovel.Data.Configurations
             entity.Property(e => e.AuthorId)
                 .HasColumnName("AUTHOR_ID");
 
+            entity.Property(e => e.NovelId)
+              .HasColumnName("NOVEL_ID");
+
             entity.Property(e => e.Type)
                 .HasColumnName("TYPE")
                 .HasMaxLength(20);
