@@ -229,3 +229,5 @@ export function getLatestPublishedChapter(novelId) {
         method: 'get'
     })
 }
+
+
