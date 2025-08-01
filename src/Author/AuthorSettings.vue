@@ -1,27 +1,22 @@
 <template>
   <!-- 账号设置页面容器 -->
-  <div class="page-container">
-    <!-- 页面标题 -->
+  <div class="setting-page">
     <h2>账号设置</h2>
-    
     <!-- 设置表单 -->
     <form class="settings-form">
       <!-- 基本信息部分 -->
       <div class="form-section">
         <h3>基本信息</h3>
-        
-        <!-- 头像上传区域 -->
         <div class="form-group">
           <div class="form-row">
             <label>头像</label>
             <div class="avatar-upload">
-              <!-- 头像预览 -->
               <div class="avatar-preview">
                 <!-- 显示头像图片或占位符 -->
                 <img :src="author.currentAuthor.avatar_url" class="avatar-img" v-if="author.currentAuthor.avatar_url">
                 <div class="avatar-placeholder" v-else></div>
               </div>
-              <!-- 上传控制按钮 -->
+              <!-- 上传按钮 -->
               <div class="upload-controls">
                 <button 
                   type="button" 
@@ -32,7 +27,7 @@
                 >
                   更换头像
                 </button>
-                <!-- 隐藏的文件输入 -->
+                <!-- 文件输入 -->
                 <input type="file" accept="image/*" ref="fileInput" @change="handleAvatarChange">
               </div>
             </div>
@@ -53,7 +48,22 @@
             </div>
           </div>
         </div>
-        
+
+        <!-- 作者简介输入 -->
+        <div class="form-group">
+          <div class="form-row">
+            <label>作者简介</label>
+            <div class="input-wrapper">
+              <textarea 
+                v-model="author.currentAuthor.introduction" 
+                :disabled="!author.editMode"
+                :class="{ 'disabled-input': !author.editMode }"
+                rows="3"  
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
         <!-- 作者ID显示 -->
         <div class="form-group">
           <div class="form-row">
@@ -68,6 +78,22 @@
             </div>
           </div>
         </div>
+
+        <!-- 注册时间显示 -->
+         <div class="form-group">
+          <div class="form-row">
+            <label>注册时间</label>
+            <div class="input-wrapper">
+              <input 
+                type="text" 
+                v-model="author.currentAuthor.registertime" 
+                disabled
+                class="disabled-input"
+              >
+            </div>
+          </div>
+        </div>
+
       </div>
       
       <!-- 安全设置部分 -->
@@ -85,6 +111,9 @@
                 :disabled="!author.editMode"
                 :class="{ 'disabled-input': !author.editMode }"
               >
+              <span class="error-message" v-if="author.phoneError">
+                {{ author.phoneError }}
+              </span>
             </div>
           </div>
         </div>
@@ -108,13 +137,13 @@
       
       <!-- 表单操作按钮 -->
       <div class="form-actions">
-        <!-- 非编辑模式下的编辑按钮 -->
+        <!-- 非编辑模式 -->
         <template v-if="!author.editMode">
           <button type="button" class="edit-btn" @click="author.enterEditMode">
             修改信息
           </button>
         </template>
-        <!-- 编辑模式下的取消和保存按钮 -->
+        <!-- 编辑模式 -->
         <template v-if="author.editMode">
           <button type="button" class="cancel-btn" @click="author.cancelChanges">
             取消
@@ -125,7 +154,7 @@
         </template>
       </div>
       
-      <!-- 危险操作区域 -->
+      <!-- 注销区域 -->
       <div class="danger-zone">
         <h3>危险操作</h3>
         <div class="danger-content">
@@ -157,10 +186,8 @@
     <div class="password-dialog" v-if="author.showPasswordDialogFlag">
       <div class="dialog-content">
         <h3>修改密码</h3>
-        
         <!-- 密码修改表单 -->
         <div class="password-form">
-          <!-- 原密码输入 -->
           <div class="form-group">
             <label>原密码</label>
             <input 
@@ -169,7 +196,6 @@
               placeholder="请输入原密码"
               :class="{ 'error-input': author.passwordError.oldPassword }"
             >
-            <!-- 错误提示 -->
             <span class="error-message" v-if="author.passwordError.oldPassword">
               {{ author.passwordError.oldPassword }}
             </span>
@@ -184,7 +210,6 @@
               placeholder="请输入新密码"
               :class="{ 'error-input': author.passwordError.newPassword }"
             >
-            <!-- 错误提示 -->
             <span class="error-message" v-if="author.passwordError.newPassword">
               {{ author.passwordError.newPassword }}
             </span>
@@ -199,14 +224,16 @@
               placeholder="请再次输入新密码"
               :class="{ 'error-input': author.passwordError.confirmPassword }"
             >
-            <!-- 错误提示 -->
             <span class="error-message" v-if="author.passwordError.confirmPassword">
               {{ author.passwordError.confirmPassword }}
             </span>
           </div>
+          <span v-if="author.passwordChangeSuccess" class="success-message">
+              密码修改成功！
+          </span>
         </div>
         
-        <!-- 对话框操作按钮 -->
+        <!-- 操作按钮 -->
         <div class="dialog-actions">
           <button class="dialog-cancel" @click="author.hidePasswordDialog">取消</button>
           <button class="dialog-confirm" @click="author.submitPasswordChange">确认修改</button>
@@ -217,13 +244,10 @@
 </template>
 
 <script setup>
-// 导入Vue相关功能
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-// 导入作者状态管理
 import { authorStore as author } from '@/stores/CurrentAuthor'
 
-// 初始化路由和文件输入引用
 const router = useRouter()
 const fileInput = ref(null)
 
@@ -238,17 +262,31 @@ const handleAvatarChange = (e) => {
 }
 
 // 删除账号操作
-const deleteAccount = () => {
-  // 这里可以添加注销账号的API调用
-  alert('账号已注销')
-  author.hideConfirmDialog()
-  router.push('/L_R/Login')
+const deleteAccount = async () => {
+  try {
+    const confirmed = confirm('确定要永久删除账号吗？此操作不可撤销！');
+    if (!confirmed) return;
+
+    const success = await author.deleteAccount();
+    
+    if (success) {
+      alert('账号已成功注销');
+      router.push('/L_R/Login');
+    } else {
+      alert('注销失败：' + (author.error || '未知错误'));
+    }
+  } catch (error) {
+    console.error('注销出错:', error);
+    alert('注销过程中发生错误');
+  } finally {
+    author.hideConfirmDialog();
+  }
 }
 </script>
 
 <style scoped>
 /* 页面容器样式 */
-.page-container {
+.setting-page {
   padding: 30px;
   max-width: 1000px;
   margin: 0 auto;
@@ -276,7 +314,7 @@ h2 {
   border-bottom: 1px solid #f0f0f0;
 }
 
-/* 最后一个区块不需要下边框 */
+/* 最后一个区块 */
 .form-section:last-child {
   border-bottom: none;
 }
@@ -351,6 +389,16 @@ input:not(.disabled-input):focus {
   align-items: center;
   justify-content: center;
   border: 2px solid #eee;
+  overflow: hidden; /* 新增：确保图片不会超出容器 */
+  position: relative; /* 为绝对定位的图片做准备 */
+}
+
+/* 头像图片样式 */
+.avatar-img {
+  width: 100%;
+  height: 100%; 
+  object-fit: cover; 
+  object-position: center; 
 }
 
 /* 头像占位符 */
@@ -366,13 +414,12 @@ input:not(.disabled-input):focus {
   background: none;
   border: 1px solid #3498db;
   color: #3498db;
-  padding: 8px 15px;
+  padding: 10px 20px;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s;
 }
 
-/* 上传按钮悬停效果 */
 .upload-btn:hover:not(:disabled) {
   background-color: #3498db;
   color: white;
@@ -395,13 +442,12 @@ input:not(.disabled-input):focus {
   background: none;
   border: 1px solid #3498db;
   color: #3498db;
-  padding: 8px 15px;
+  padding: 10px 20px;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s;
 }
 
-/* 修改密码按钮悬停效果 */
 .change-password-btn:hover {
   background-color: #3498db;
   color: white;
@@ -427,7 +473,6 @@ input:not(.disabled-input):focus {
   transition: all 0.3s;
 }
 
-/* 编辑按钮悬停效果 */
 .edit-btn:hover {
   background-color: #2980b9;
 }
@@ -444,7 +489,6 @@ input:not(.disabled-input):focus {
   transition: all 0.3s;
 }
 
-/* 取消按钮悬停效果 */
 .cancel-btn:hover {
   background-color: #e0e0e0;
 }
@@ -461,11 +505,36 @@ input:not(.disabled-input):focus {
   transition: all 0.3s;
 }
 
-/* 提交按钮悬停效果 */
 .submit-btn:hover {
   background-color: #27ae60;
 }
 
+/* 简介区域 */
+textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  min-height: 80px; 
+  resize: vertical; 
+  font-family: inherit; 
+  line-height: 1.5; 
+}
+
+textarea:focus {
+  border-color: #3498db;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* 禁用状态的 textarea */
+textarea.disabled-input {
+  background: transparent;
+  border: none;
+  padding: 8px 0;
+  resize: none; 
+}
 /* 危险区域样式 */
 .danger-zone {
   margin-top: 40px;
@@ -475,20 +544,17 @@ input:not(.disabled-input):focus {
   border: 1px solid #ffdddd;
 }
 
-/* 危险区域标题 */
 .danger-zone h3 {
   color: #e74c3c;
   margin-bottom: 15px;
 }
 
-/* 危险区域内容布局 */
 .danger-content {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
-/* 危险区域文字说明 */
 .danger-content p {
   color: #7f8c8d;
   font-size: 14px;
@@ -506,7 +572,6 @@ input:not(.disabled-input):focus {
   transition: all 0.3s;
 }
 
-/* 删除账号按钮悬停效果 */
 .delete-btn:hover {
   background-color: #e74c3c;
   color: white;
@@ -573,7 +638,6 @@ input:not(.disabled-input):focus {
   border: none;
 }
 
-/* 对话框取消按钮悬停效果 */
 .dialog-cancel:hover {
   background-color: #e0e0e0;
 }
@@ -585,7 +649,6 @@ input:not(.disabled-input):focus {
   border: none;
 }
 
-/* 对话框确认按钮悬停效果 */
 .dialog-confirm:hover {
   background-color: #c0392b;
 }
@@ -636,4 +699,17 @@ input:not(.disabled-input):focus {
   margin-top: 5px;
   display: block;
 }
+
+/* 成功提示样式 */
+.success-message {
+  padding: 15px;
+  background: #f6ffed;
+  border: 1px solid #b7eb8f;
+  border-radius: 4px;
+  color: #52c41a;
+  text-align: center;
+  margin-bottom: 20px;
+  display: block;
+}
+
 </style>

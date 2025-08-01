@@ -1,12 +1,10 @@
 <template>
-  <!-- 页面容器 -->
-  <div class="page-container">
+  <div class="detail-page">
     <!-- 顶部操作按钮区域 -->
     <div class="top-actions">
-
-      <router-link to="/author/novels" class="btn back">
+      <button class="btn back" @click="$router.push('/author/novels')">
         返回列表
-      </router-link>
+      </button>
 
       <button class="btn delete" @click="confirmDelete">
         删除小说
@@ -26,12 +24,19 @@
         <!-- 小说元数据 -->
         <div class="novel-meta">
           <h2>{{ novel.novel_name }}</h2>  
-          <p class="status" :class="novel.status.toLowerCase()">{{ novel.status }}</p>
-          <p class="category">{{ novel.category }}</p>  
-          <p class="word-count">{{ novel.total_word_count }}字</p> 
-          <p class="intro">{{ novel.introduction }}</p> 
           
-          <!-- 操作按钮组 -->
+          <div class="categories">
+            <span v-for="(category, index) in novel.categories" :key="index" class="category-tag">
+              {{ category }}
+            </span>
+            <span v-if="novel.categories.length === 0" class="no-category">暂无分类</span>
+          </div>
+          <p class="status" :class="novel.status.toLowerCase()">{{ novel.status }}</p>
+          <p class="create-time"> 创建时间 ：{{ formatDateTime(novel.create_time) }}</p>
+          <p class="word-count">{{ novel.total_word_count }}字 </p> 
+          <p class="intro">作品简介：{{ novel.introduction }}</p> 
+          
+          <!-- 操作按钮 -->
           <div class="actions">
             
             <router-link 
@@ -53,26 +58,38 @@
       
       <!-- 小说统计数据 -->
       <div class="novel-stats">
-        <!-- 阅读量 -->
-        <div class="stat-card">
-          <h3>阅读量</h3>
-          <p class="stat-value">{{ novel.view_count }}</p>
-        </div>
+        <!-- 评论数 -->
+         <router-link 
+          :to="{ name: 'CommentList', params: { id: novel.novel_id } }" 
+          class="stat-card"
+        >
+          <h3>评论数</h3>
+          <p class="stat-value">{{ novel.comment_count }}</p>
+        </router-link>
         <!-- 收藏数 -->
-        <div class="stat-card">
+        <router-link 
+          :to="{ name: 'CollectList', params: { id: novel.novel_id } }" 
+          class="stat-card"
+        >
           <h3>收藏数</h3>
-          <p class="stat-value">{{ novel.collected_count }}</p>
-        </div>
+          <p class="stat-value">{{ novel.collected_count}}</p>
+        </router-link>
         <!-- 推荐数 -->
-        <div class="stat-card">
+        <router-link 
+          :to="{ name: 'RecomendList', params: { id: novel.novel_id } }" 
+          class="stat-card"
+        >
           <h3>推荐数</h3>
           <p class="stat-value">{{ novel.recommend_count }}</p>
-        </div>
+        </router-link>
         <!-- 评分 -->
-        <div class="stat-card">
+        <router-link 
+          :to="{ name: 'RatingList', params: { id: novel.novel_id } }" 
+          class="stat-card"
+        >
           <h3>评分</h3>
           <p class="stat-value">{{ novel.score }}</p>
-        </div>
+        </router-link>
       </div>
     </div>
 
@@ -91,23 +108,53 @@
 </template>
 
 <script setup>
-// 导入小说状态管理
+// 导入小说状态
 import { useNovel } from '@/stores/CurrentNovel'
+import { useChapters } from '@/stores/Chapters'
+import { onMounted } from 'vue'
 
-// 从store中解构需要的状态和方法
 const {
-  novel,              // 当前小说数据
-  showDeleteDialog,   // 删除对话框显示状态
-  handleImageError,   // 图片加载失败处理函数
-  confirmDelete,      // 显示删除确认对话框
-  cancelDelete,       // 取消删除操作
-  deleteNovel         // 执行删除操作
+  novel,             
+  showDeleteDialog,   
+  handleImageError,   
+  confirmDelete,      
+  cancelDelete,       
+  deleteNovel         
 } = useNovel()
+
+// 初始化章节store
+const chaptersStore = useChapters()
+
+// 组件挂载时获取章节
+onMounted(() => {
+  if (novel.value?.novel_id) {
+    chaptersStore.setNovelId(novel.value.novel_id)
+    chaptersStore.fetchChapters(novel.value.novel_id)
+  }
+})
+
+// 格式化时间
+const formatDateTime = (dateString) => {
+  try {
+    const date = new Date(dateString)
+    if (isNaN(date)) return '日期无效'
+    
+    const year = date.getFullYear()
+    const month = (date.getMonth() + 1).toString().padStart(2, '0')
+    const day = date.getDate().toString().padStart(2, '0')
+    const hours = date.getHours().toString().padStart(2, '0')
+    const minutes = date.getMinutes().toString().padStart(2, '0')
+    
+    return `${year}-${month}-${day} ${hours}:${minutes}`
+  } catch {
+    return '日期无效'
+  }
+}
 </script>
 
 <style scoped>
 /* 页面容器样式 */
-.page-container {
+.detail-page {
   max-width: 1200px;  
   margin: 0 auto;     
   padding: 20px;      
@@ -122,6 +169,7 @@ const {
 
 /* 基础按钮样式 */
 .btn {
+  cursor: pointer;
   padding: 8px 16px;
   border-radius: 4px;
   text-decoration: none;
@@ -182,22 +230,61 @@ const {
   font-weight: bold;
 }
 
-/* 连载中状态特殊样式 */
-.status.连载中 {
+.status.连载 {
   background-color: #3498db;
   color: white;
 }
 
-/* 已完结状态特殊样式 */
-.status.已完结 {
+.status.完结 {
   background-color: #2ecc71;
   color: white;
 }
 
+.status.待审核 {
+  background-color:#f39c12;
+  color: white;
+}
+
+.status.封禁 {
+  background-color: #e74c3c;
+  color: white;
+}
+
+/* 创建时间样式 */
+ .create-time {
+  color: #181c1c; 
+  margin: 5px 0;
+}
+
 /* 分类和字数样式 */
-.category, .word-count {
+ .word-count {
   color: #7f8c8d; 
   margin: 5px 0;
+}
+
+/* 分类标签样式 */
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.category-tag {
+  background-color: #e8f4ff;
+  color: #3498db;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+
+.no-category {
+  color: #999;
+  font-size: 14px;
 }
 
 /* 简介文本样式 */
@@ -224,27 +311,78 @@ const {
   grid-template-columns: repeat(4, 1fr);  
   gap: 20px; 
 }
-
-/* 单个统计卡片样式 */
-.stat-card {
+/* 统计卡片容器 */
+.novel-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 25px;
   margin-top: 40px;
-  background-color: #ecdcdc;
-  padding: 30px;
-  border-radius: 8px;
+}
+
+/* 单个统计卡片 */
+.stat-card {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
   text-align: center;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
 }
 
+/* 卡片悬停效果 */
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* 卡片标题 */
 .stat-card h3 {
-  margin: 0 0 10px;
-  color: #7f8c8d;
+  margin: 0 0 15px;
+  color: #6c757d;
   font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
 }
 
+/* 卡片数值 */
 .stat-value {
-  font-size: 24px;
-  font-weight: bold;
+  font-size: 32px;
+  font-weight: 700;
   margin: 0;
-  color: #2c3e50;
+  color: #4361ee;
+  position: relative;
+  display: inline-block;
+}
+
+/* 为不同统计项添加不同颜色 */
+.stat-card:nth-child(1) .stat-value {
+  color: #4361ee; /* 评论数 - 蓝色 */
+}
+
+.stat-card:nth-child(2) .stat-value {
+  color: #eb2f96; /* 收藏数 - 粉色 */
+}
+
+.stat-card:nth-child(3) .stat-value {
+  color: #52c41a; /* 推荐数 - 绿色 */
+}
+
+.stat-card:nth-child(4) .stat-value {
+  color: #f39c12; /* 评分 - 橙色 */
+}
+
+/* 评分特殊样式 */
+.stat-card:last-child .stat-value::after {
+  content: '分';
+  font-size: 16px;
+  margin-left: 3px;
+  color: #6c757d;
+  font-weight: normal;
 }
 
 /* 删除对话框样式 */

@@ -1,12 +1,16 @@
 <template>
-  <!-- 创建新书页面容器 -->
-  <div class="page-container">
-    <!-- 页面标题 -->
+  <div class="create-page">
+    <!-- 页面标题和返回按钮 -->
+    <div class="page-header">
+      <router-link to="/author/novels" class="back-btn">
+        <span>返回列表</span>
+      </router-link>
+    </div>
     <h2>创建新书</h2>
     
     <!-- 表单区域 -->
     <form class="book-form" @submit.prevent="submitForm">
-      <!-- 书名输入组 -->
+      <!-- 书名输入 -->
       <div class="form-group" :class="{ 'error': errors.novel_name }">
         <label>书名 <span class="required">*</span></label>
         <input 
@@ -15,41 +19,58 @@
           placeholder="请输入书名"
           @blur="validateField('novel_name')"
         >
-        <!-- 错误提示 -->
         <span class="error-message" v-if="errors.novel_name">{{ errors.novel_name }}</span>
       </div>
       
-      <!-- 分类选择组 -->
+      <!-- 分类选择 -->
       <div class="form-group" :class="{ 'error': errors.category }">
         <label>分类 <span class="required">*</span></label>
-        <select v-model="form.category" @change="validateField('category')">
-          <option value="">选择分类</option>
-          <!-- 分类选项循环 -->
-          <option v-for="category in categories" :key="category" :value="category">{{ category }}</option>
-        </select>
-        <!-- 错误提示 -->
-        <span class="error-message" v-if="errors.category">{{ errors.category }}</span>
+        <div class="multi-select-container">
+          <div class="selected-tags">
+            <span class="tag" v-for="(cat, index) in form.category" :key="index">
+              {{ cat }}
+              <button type="button" class="remove-tag" @click="removeCategory(index)">
+                <i class="fas fa-times"></i>
+              </button>
+            </span>
+          </div>
+          <select 
+            v-model="selectedCategory" 
+            @change="addCategory"
+            @blur="validateField('category')"
+            class="multi-select"
+          >
+            <option value="" disabled>请选择分类（可多选）</option>
+            <option 
+              v-for="category in availableCategories" 
+              :key="category" 
+              :value="category"
+              :disabled="form.category.includes(category)"
+            >
+              {{ category }}
+            </option>
+          </select>
+          <span class="error-message" v-if="errors.category">{{ errors.category }}</span>
+        </div>
       </div>
       
-      <!-- 简介输入组 -->
-      <div class="form-group" :class="{ 'error': errors.description }">
+      <!-- 简介输入 -->
+      <div class="form-group" :class="{ 'error': errors.introduction }">
         <label>简介 <span class="required">*</span></label>
         <textarea 
           rows="5" 
-          v-model="form.description" 
+          v-model="form.introduction" 
           placeholder="请输入作品简介"
-          @blur="validateField('description')"
+          @blur="validateField('introduction')"
         ></textarea>
-        <!-- 错误提示 -->
-        <span class="error-message" v-if="errors.description">{{ errors.description }}</span>
+        <span class="error-message" v-if="errors.introduction">{{ errors.introduction }}</span>
         <!-- 字数统计 -->
-        <div class="word-count">{{ form.description.length }}/500</div>
+        <div class="word-count">{{ form.introduction.length }}/500</div>
       </div>
       
       <!-- 封面上传组 -->
       <div class="form-group" :class="{ 'error': errors.cover }">
         <label>封面 <span class="required">*</span></label>
-        <!-- 上传容器 -->
         <div class="upload-container">
           <!-- 左侧上传区域 -->
           <div class="upload-left">
@@ -69,13 +90,12 @@
               <div v-else class="preview-container">
                 <div class="preview-wrapper">
                   <img :src="previewImage" alt="封面预览" class="preview-image">
-                  <!-- 删除按钮 -->
                   <button type="button" class="remove-btn" @click.stop="removeImage">
                     <i class="fas fa-times"></i>
                   </button>
                 </div>
               </div>
-              <!-- 隐藏的文件输入 -->
+              <!-- 文件输入 -->
               <input 
                 type="file" 
                 ref="fileInput"
@@ -99,15 +119,11 @@
             </div>
           </div>
         </div>
-        <!-- 错误提示 -->
         <span class="error-message" v-if="errors.cover">{{ errors.cover }}</span>
       </div>
       
       <!-- 表单操作按钮 -->
       <div class="form-actions">
-        <!-- 取消按钮 -->
-        <router-link to="/author/novels" class="cancel-btn">取消</router-link>
-        <!-- 提交按钮 -->
         <button type="submit" class="submit-btn" :disabled="isSubmitting">
           <span v-if="!isSubmitting">创建</span>
           <span v-else class="loading">提交中...</span>
@@ -118,68 +134,99 @@
 </template>
 
 <script>
+// 导入方法状态
+import { getAllCategories } from '@/API/Category_API'
+import { addNovelCategory} from '@/API/NovelCategory_API'
+import { AuthorcreateNovel } from '@/API/Novel_API'
+import { uploadNovelCover } from '@/API/Novel_Cover_API'
+import { authorStore } from '@/stores/CurrentAuthor'
+import { novelsStore} from '@/stores/Novels'
+
 export default {
   data() {
     return {
-      // 分类选项
-      categories: ['玄幻', '都市', '科幻', '武侠', '言情', '历史', '悬疑', '军事', '游戏', '体育'],
-      // 表单数据
+      categories: [],
+      selectedCategory: '',
       form: {
         novel_name: '',
-        category: '',
-        description: '',
+        category: [],
+        introduction: '',
         cover: null
       },
-      // 封面预览图
       previewImage: null,
-      // 错误信息
       errors: {
         novel_name: '',
         category: '',
-        description: '',
+        introduction: '',
         cover: ''
       },
-      // 提交状态
-      isSubmitting: false
+      isSubmitting: false,
+      loading: false
     }
   },
+  computed: {
+    // 计算可选的分类
+    availableCategories() {
+      return this.categories.filter(cat => !this.form.category.includes(cat))
+    }
+  },
+  async created() {
+    await this.fetchCategories()
+  },
   methods: {
-    // 触发文件选择
+    // 获取分类数据
+    async fetchCategories() {
+      this.loading = true
+      try {
+        const res = await getAllCategories()
+        this.categories = (res || [])
+          .map(item => item?.categoryName)
+          .filter(Boolean)
+        if (!this.categories.length) throw new Error('无分类数据')
+      } catch (e) {
+        this.categories = ['玄幻', '都市', '科幻']
+        console.error('获取分类失败:', e)
+      } finally {
+        this.loading = false
+      }
+    },
+    // 表单相关操作
+    addCategory() {
+      if (this.selectedCategory && !this.form.category.includes(this.selectedCategory)) {
+        this.form.category.push(this.selectedCategory)
+        this.selectedCategory = ''
+        this.errors.category = ''
+      }
+    },
+    removeCategory(index) {
+      this.form.category.splice(index, 1)
+      this.validateField('category')
+    },
     triggerFileInput() {
       this.$refs.fileInput.click()
     },
-    // 处理文件选择
     handleFileChange(e) {
       const file = e.target.files[0]
-      if (file) {
-        this.validateImage(file)
-      }
+      if (file) this.validateImage(file)
     },
-    // 处理拖放上传
     handleDrop(e) {
       e.preventDefault()
       const file = e.dataTransfer.files[0]
-      if (file) {
-        this.validateImage(file)
-      }
+      if (file) this.validateImage(file)
     },
-    // 验证图片
     validateImage(file) {
-      // 检查文件类型
       const validTypes = ['image/jpeg', 'image/png']
       if (!validTypes.includes(file.type)) {
         this.errors.cover = '只支持JPG/PNG格式图片'
         return
       }
       
-      // 检查文件大小 (5MB限制)
       const maxSize = 5 * 1024 * 1024
       if (file.size > maxSize) {
         this.errors.cover = '图片大小不能超过5MB'
         return
       }
       
-      // 创建预览
       const reader = new FileReader()
       reader.onload = (e) => {
         this.previewImage = e.target.result
@@ -188,13 +235,11 @@ export default {
       }
       reader.readAsDataURL(file)
     },
-    // 移除图片
     removeImage() {
       this.previewImage = null
       this.form.cover = null
       this.$refs.fileInput.value = ''
     },
-    // 验证字段
     validateField(field) {
       if (field === 'novel_name') {
         if (!this.form.novel_name.trim()) {
@@ -207,20 +252,20 @@ export default {
       }
       
       if (field === 'category') {
-        if (!this.form.category) {
-          this.errors.category = '请选择分类'
+        if (this.form.category.length === 0) {
+          this.errors.category = '请至少选择一个分类'
         } else {
           this.errors.category = ''
         }
       }
       
-      if (field === 'description') {
-        if (!this.form.description.trim()) {
-          this.errors.description = '简介不能为空'
-        } else if (this.form.description.length > 500) {
-          this.errors.description = '简介不能超过500字'
+      if (field === 'introduction') {
+        if (!this.form.introduction.trim()) {
+          this.errors.introduction = '简介不能为空'
+        } else if (this.form.introduction.length > 500) {
+          this.errors.introduction = '简介不能超过500字'
         } else {
-          this.errors.description = ''
+          this.errors.introduction = ''
         }
       }
       
@@ -232,46 +277,129 @@ export default {
         }
       }
     },
-    // 验证整个表单
+    // 验证表单
     validateForm() {
       this.validateField('novel_name')
       this.validateField('category')
-      this.validateField('description')
+      this.validateField('introduction')
       this.validateField('cover')
       
       return !Object.values(this.errors).some(error => error)
     },
-    // 提交表单
-    submitForm() {
+    // 提交表单  
+    async submitForm() {
       if (this.validateForm()) {
         this.isSubmitting = true
         
-        // 模拟API请求
-        setTimeout(() => {
-          console.log('提交表单:', this.form)
+        try {
+          const novelData = {
+            authorId: authorStore.currentAuthor?.author_id,
+            novelName: this.form.novel_name,
+            introduction: this.form.introduction,
+          }
+          console.log(novelData)
+
+          // 创建小说并获取小说ID
+          const createdNovel = await AuthorcreateNovel(novelData);
+          const novelId = createdNovel.novelId; 
+          
+          if (!novelId) {
+            throw new Error('未能获取小说ID');
+          }
+
+          if (this.form.category.length > 0) {
+            try {
+              // 添加分类API
+              await Promise.all(
+                this.form.category.map(categoryName => 
+                  addNovelCategory(novelId, categoryName)
+                )
+              );
+              console.log('分类添加成功');
+            } catch (categoryError) {
+              console.error('添加分类失败:', categoryError);
+              
+            }
+          }
+
+          if (this.form.cover) {
+            try {
+              const coverUrl = await this.uploadNovelCover(novelId);
+              console.log('封面上传成功:', coverUrl);
+            } catch (uploadError) {
+              console.error('封面上传失败:', uploadError);
+            }
+          }
+          await novelsStore.fetchNovels();
+          window.location.href = '/author/novels';
+          await novelsStore.fetchNovels();
+          alert('小说创建成功！')
+        } catch (error) {
+          console.error('创建小说失败:', error)
+          alert('创建小说失败: ' + (error.response?.data?.message || error.message || '请重试'))
+        } finally {
           this.isSubmitting = false
-          this.$router.push('/author/novels')
-        }, 1500)
+        }
       }
-    }
+    },
+    // 提交封面
+    async uploadNovelCover(novelId) {
+      if (!this.form.cover) {
+        throw new Error('请先上传封面图片');
+      }
+
+      if (!novelId) {
+        throw new Error('缺少小说ID');
+      }
+      
+      try {
+        const coverUrl = await uploadNovelCover(novelId, this.form.cover);
+        console.log("创建封面"+coverUrl)
+        return coverUrl;
+      } catch (error) {
+        console.error('封面上传失败:', error);
+        throw error;
+      }
+    },
+   
   }
 }
 </script>
 
 <style scoped>
-/* 导入字体图标库 */
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
 
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
 /* 页面容器样式 */
-.page-container {
-  padding: 30px;
+.create-page {
+  padding: 20px 30px;
   max-width: 1000px;
   margin: 0 auto;
 }
 
+/* 页面头部样式 */
+.page-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 25px;
+  position: relative;
+}
+
+/* 返回按钮样式 */
+.back-btn {
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s;  
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
 /* 页面标题样式 */
 h2 {
-  margin-bottom: 25px;
+  margin: 0;
   color: #2c3e50;
   font-size: 24px;
   font-weight: 600;
@@ -305,7 +433,7 @@ h2 {
   margin-left: 4px;
 }
 
-/* 输入框通用样式 */
+/* 输入框样式 */
 .form-group input,
 .form-group select,
 .form-group textarea {
@@ -317,7 +445,6 @@ h2 {
   transition: border-color 0.3s;
 }
 
-/* 输入框聚焦效果 */
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
@@ -334,7 +461,6 @@ h2 {
   border-color: #e74c3c;
 }
 
-/* 错误状态聚焦效果 */
 .form-group.error input:focus,
 .form-group.error select:focus,
 .form-group.error textarea:focus {
@@ -362,6 +488,7 @@ h2 {
   color: #95a5a6;
   margin-top: 5px;
 }
+
 /* 上传容器布局 */
 .upload-container {
   display: flex;
@@ -409,8 +536,8 @@ h2 {
   background-color: #f8f9fa;
   border-radius: 6px;
   padding: 20px;
-  height: 100%; /* 改为100%填充父容器 */
-  box-sizing: border-box; /* 确保padding不影响高度计算 */
+  height: 100%; 
+  box-sizing: border-box; 
 }
 
 /* 上传区域悬停效果 */
@@ -567,14 +694,12 @@ h2 {
 .form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 15px;
   margin-top: 30px;
   padding-top: 20px;
   border-top: 1px solid #eee;
 }
 
-/* 取消按钮样式 */
-.cancel-btn,
+/* 提交按钮样式 */
 .submit-btn {
   padding: 10px 25px;
   border-radius: 6px;
@@ -582,33 +707,15 @@ h2 {
   cursor: pointer;
   font-weight: 500;
   transition: all 0.2s;
-}
-
-/* 取消按钮样式 */
-.cancel-btn {
-  background-color: #f1f1f1;
-  color: #7f8c8d;
-  border: 1px solid #ddd;
-}
-
-/* 取消按钮悬停效果 */
-.cancel-btn:hover {
-  background-color: #e0e0e0;
-}
-
-/* 提交按钮样式 */
-.submit-btn {
   background-color: #2ecc71;
   color: white;
   border: none;
 }
 
-/* 提交按钮悬停效果 */
 .submit-btn:hover:not(:disabled) {
   background-color: #27ae60;
 }
 
-/* 禁用状态提交按钮 */
 .submit-btn:disabled {
   background-color: #95a5a6;
   cursor: not-allowed;
@@ -645,4 +752,48 @@ h2 {
   }
 }
 
+/* 多选分类容器样式 */
+.multi-select-container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 已选标签容器 */
+.selected-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+/* 标签样式 */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  background-color: #e8f4ff;
+  color: #3498db;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+}
+
+/* 移除标签按钮 */
+.remove-tag {
+  background: none;
+  border: none;
+  color: #3498db;
+  margin-left: 6px;
+  cursor: pointer;
+  padding: 0;
+  font-size: 12px;
+}
+
+.remove-tag:hover {
+  color: #e74c3c;
+}
+
+/* 多选下拉框样式 */
+.multi-select {
+  width: 100%;
+}
 </style>

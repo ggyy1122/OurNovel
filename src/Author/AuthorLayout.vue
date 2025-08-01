@@ -1,32 +1,36 @@
 <template>
   <!-- 主容器 -->
   <div class="author-container">
-    <!-- 头部 -->
+    <!-- 固定头部 -->
     <header class="author-header">
-      <h1 class="author-title">小说作者管理系统</h1>
+      <h1 class="author-title">TJ小说作者管理系统</h1>
     </header>
     
-    <!-- 主内容 -->
+    <!-- 内容 -->
     <div class="author-layout">
-      <!-- 侧边栏区域 -->
+      <!-- 侧边栏 -->
       <aside class="author-sidebar">
-        <!-- 作者个人信息展示区 -->
-        <div class="author-profile">      
-          <img :src="author.currentAuthor.avatar_url" class="user-avatar">
-          <span class="author-name">{{ author.currentAuthor.author_name }}</span>
+        <!-- 作者信息展示 -->
+        <div class="author-profile" v-if="author.currentAuthor">      
+          <img :src="author.currentAuthor.avatar_url || require('@/assets/default-avatar.jpeg')" class="user-avatar">
+          <span class="author-name">{{ author.currentAuthor.author_name || '未加载' }}</span>
         </div>
+        <div v-else class="loading-profile">加载中...</div>
+        
         <!-- 导航菜单 -->
         <nav class="sidebar-menu">
           <router-link to="/author/novels" class="menu-item">
             <i class="fas fa-book menu-icon"></i>
             <span>作品管理</span>
           </router-link>
-          
           <router-link to="/author/stats" class="menu-item">
             <i class="fas fa-chart-line menu-icon"></i>
             <span>数据统计</span>
           </router-link>
-          
+          <router-link to="/author/income" class="menu-item">
+            <i class="fas fa-coins menu-icon"></i>
+            <span>收益中心</span>
+          </router-link>
           <router-link to="/author/settings" class="menu-item">
             <i class="fas fa-cog menu-icon"></i>
             <span>个人设置</span>
@@ -48,21 +52,25 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { authorStore as author } from '@/stores/CurrentAuthor'
+import { current_state } from '@/stores/index'
 
 const router = useRouter()
 
+// 加载作者数据
+onMounted(async () => {
+  if (current_state().isloggedin) {
+    await author.fetchAuthorData()
+  }
+})
+
+//退出，清空信息
 const logout = () => {
   if (confirm('确定要退出登录吗？')) {
-    Object.assign(author.currentAuthor, { 
-      author_id: null,        
-      author_name: '未登录',  
-      avatar_url: '',         
-      phone: '',              
-      password: '',          
-      earnings: 0             
-    })
+    current_state().clearUserInfo()
+    author.currentAuthor = null
     router.push('/L_R/Login')
   }
 }
@@ -70,12 +78,15 @@ const logout = () => {
 
 <style scoped>
 
+/* 主容器设置 */
 .author-container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; 
+  height: 100vh;
+  overflow: hidden; 
 }
 
+/* 固定头部 */
 .author-header {
   background-color: #2c3e50;
   color: white;
@@ -84,6 +95,10 @@ const logout = () => {
   display: flex;
   align-items: center;
   padding: 0 30px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-shrink: 0; 
 }
 
 .author-title {
@@ -91,11 +106,14 @@ const logout = () => {
   font-weight: 500;
 }
 
+/* 主布局 */
 .author-layout {
   display: flex;
   flex: 1;  
+  overflow: hidden; 
 }
 
+/* 固定侧边栏 */
 .author-sidebar {
   width: 220px;
   background-color: white;
@@ -103,8 +121,11 @@ const logout = () => {
   display: flex;
   flex-direction: column;
   padding: 20px 0;
+  flex-shrink: 0; 
+  overflow-y: auto; 
 }
 
+/* 作者信息展示 */
 .author-profile {
   display: flex;
   flex-direction: column;
@@ -129,12 +150,14 @@ const logout = () => {
   color: #333;
 }
 
+/* 菜单栏样式 */
 .sidebar-menu {
   display: flex;
   flex-direction: column;
   padding: 0 15px;
 }
 
+/* 菜单项 */
 .menu-item {
   display: flex;
   align-items: center;
@@ -157,6 +180,7 @@ const logout = () => {
   font-weight: 500;
 }
 
+/* 图形 */
 .menu-icon {
   width: 24px;
   text-align: center;
@@ -164,6 +188,7 @@ const logout = () => {
   font-size: 16px;
 }
 
+/* 登出栏样式 */
 .logout-item {
   margin-top: 20px;
   border-top: 1px solid #eaeaea;
@@ -179,10 +204,17 @@ const logout = () => {
   color: #e74c3c;
 }
 
+/* 主内容区域 */
 .author-main {
   flex: 1;                       
   padding: 30px;
   background-color: #f5f7fa;
   overflow-y: auto;
+}
+
+.loading-profile {
+  padding: 20px;
+  text-align: center;
+  color: #999;
 }
 </style>
