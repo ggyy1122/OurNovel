@@ -1,8 +1,8 @@
 <template>
   <!-- 章节管理页面容器 -->
-  <div class="page-container">
-    <!-- 新增返回按钮 -->
-    <button type="button" class="back-btn top-back-btn" @click="goBack">
+  <div class="chapterlist-page">
+    <!-- 返回按钮 -->
+    <button type="button" class="back-btn" @click="goBack">
       返回书籍
     </button>
     
@@ -10,15 +10,14 @@
     <div class="page-header">
       <h2>{{ novel.novel_name }} - 章节管理</h2>
       <!-- 创建新章节按钮 -->
-      <button @click="createNewChapter" class="create-btn">
+      <button @click="createNewChapter(novel.novel_id)" class="create-btn">
         <span>+</span> 写新章节
       </button>
     </div>
     
     <!-- 加载状态显示 -->
-    <div v-if="isLoading" class="loading">加载中...</div>
-    <!-- 错误状态显示 -->
-    <div v-else-if="error" class="error">{{ error }}</div>
+    <div v-if="chaptersStore.isLoading" class="loading">加载中...</div>
+    <div v-else-if="chaptersStore.error" class="error">{{ chaptersStore.error }}</div>
     
     <!-- 主编辑区域 -->
     <div v-else class="editor-layout">
@@ -39,12 +38,11 @@
             v-for="chapter in filteredChapters" 
             :key="chapter.chapter_id" 
             class="chapter-item"
-            :class="{ active: activeChapterId === chapter.chapter_id }"
+            :class="{ active: chaptersStore.activeChapterId === chapter.chapter_id }"
             @click="selectChapter(chapter)"
           >
-            <!-- 章节标题 -->
+            <!-- 章节信息 -->
             <div class="chapter-title">{{ chapter.title }}</div>
-            <!-- 章节元信息 -->
             <div class="chapter-meta">
               <span class="word-count">{{ chapter.word_count }}字</span>
               <span class="status" :class="chapter.status">
@@ -72,7 +70,6 @@
         <div v-if="activeChapter" class="editor-container">
           <!-- 编辑头部 -->
           <div class="editor-header">
-            <!-- 章节标题输入 -->
             <input 
               type="text" 
               class="chapter-title-input" 
@@ -139,7 +136,7 @@
             </div>
           </div>
         </div>
-        <!-- 无选中章节时的提示 -->
+        <!-- 无选中章节 -->
         <div v-else class="empty-editor">
           <p>请从左侧选择章节或创建新章节</p>
         </div>
@@ -147,44 +144,48 @@
     </div>
 
     <!-- 删除确认对话框 -->
-    <ConfirmDialog
-      v-if="showDeleteConfirm"
-      title="确认删除章节"
-      :message="'确定要删除章节 ${chapterToDelete?.title}吗？此操作无法撤销。'"
-      @cancel="showDeleteConfirm = false"
-      @confirm="deleteChapter"
-    />
+    <div v-if="showDeleteConfirm" class="delete-dialog">
+      <div class="dialog-content">
+        <h3>确认删除章节？</h3>
+        <p>确定要删除章节 "{{ chapterToDelete?.title }}" 吗？此操作无法撤销。</p>
+        <div class="dialog-actions">
+          <button @click="showDeleteConfirm = false" class="dialog-btn cancel">取消</button>
+          <button @click="chaptersStore.deletethisChapter(chaptersStore.novelId, chapterToDelete.chapter_id)" class="dialog-btn confirm">确认删除</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-// 导入状态管理
+import { computed} from 'vue';
 import { useRouter } from 'vue-router'
 import { useNovel } from '@/stores/CurrentNovel'
 import { useChapters } from '@/stores/Chapters'
+import { storeToRefs } from 'pinia'
 
 // 获取小说和章节相关状态和方法
 const { novel } = useNovel()
-const {
-  activeChapterId,
-  searchQuery,
+const chaptersStore = useChapters(novel.value.novel_id)
+const { 
+  activeChapter,
   showDeleteConfirm,
   chapterToDelete,
-  isLoading,
-  error,
-  activeChapter,
-  filteredChapters,
+  searchQuery,
   canChangeStatus,
-  saveChapter,
+} = storeToRefs(chaptersStore);
+const filteredChapters = computed(() => chaptersStore.filteredChapters);
+
+const {
   createNewChapter,
   toggleChapterStatus,
-  deleteChapter,
   updateWordCount,
   updateCalculatedPrice,
   getStatusText,
   getStatusButtonText,
-  formatDate
-} = useChapters(novel.value.novel_id)
+  formatDate,
+  saveChapter
+} = chaptersStore
 
 // 返回上一级
 const router = useRouter()
@@ -194,19 +195,34 @@ const goBack = () => {
 
 // 选择章节
 const selectChapter = (chapter) => {
-  activeChapterId.value = chapter.chapter_id
+  console.log('点击章节:', chapter) 
+  chaptersStore.activeChapterId = chapter.chapter_id
 }
 
 // 确认删除章节
 const confirmDeleteChapter = (chapter) => {
-  chapterToDelete.value = chapter
-  showDeleteConfirm.value = true
-}
+  console.log("传入的 chapter 参数:", chapter);
+  
+  try {
+    if (!chapter?.chapter_id) {
+      throw new Error("无效章节数据: " + JSON.stringify(chapter));
+    }
+    // 设置待删除章节
+    chapterToDelete.value = chapter;
+    showDeleteConfirm.value = true;
+  } catch (error) {
+    console.error("删除准备失败:", error);
+  } finally {
+    console.groupEnd();
+  }
+  
+};
+
 </script>
 
 <style scoped>
 /* 页面容器样式 */
-.page-container {
+.chapterlist-page {
   padding: 20px;
   height: calc(100vh - 40px);
   display: flex;
@@ -214,24 +230,23 @@ const confirmDeleteChapter = (chapter) => {
   position: relative;
 }
 
-.top-back-btn {
+/* 返回按钮 */
+.back-btn {
   position: absolute;
   left: 20px;
   top: 20px;
-  padding: 8px 15px;
-  background-color: #f5f5f5; /* 改为灰色背景 */
-  color: #666; /* 改为深灰色文字 */
-  border: 1px solid #ddd; /* 改为浅灰色边框 */
-  border-radius: 6px;
+  padding: 8px 16px;
+  background-color: #f0f0f0; 
+  color: #333; 
+  text-decoration: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
   cursor: pointer;
   font-weight: 500;
   transition: all 0.3s;
   z-index: 1;
 }
 
-.top-back-btn:hover {
-  background-color: #e6f2ff;
-}
 
 /* 页面头部样式 */
 .page-header {
@@ -310,7 +325,7 @@ const confirmDeleteChapter = (chapter) => {
 
 /* 活动章节样式 */
 .chapter-item.active {
-  background-color: #e3f2fd;
+  background-color: #e3f2fd ;
   border-left: 3px solid #3498db;
 }
 
@@ -541,62 +556,63 @@ const confirmDeleteChapter = (chapter) => {
 .charge-setting select:disabled {
   background-color: #f5f5f5;
 }
-
-/* 删除确认对话框样式 */
-.confirm-dialog {
+/* 删除对话框样式 */
+.delete-dialog {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0,0,0,0.5);  
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 1000;  
 }
 
+/* 对话框内容区域 */
 .dialog-content {
   background-color: white;
-  padding: 20px;
+  padding: 25px;
   border-radius: 8px;
-  width: 400px;
-  max-width: 90%;
+  max-width: 500px;
+  width: 90%;
 }
 
 .dialog-content h3 {
-  margin-top: 0;
-  color: #333;
+  margin: 0 0 15px;
+}
+
+.dialog-content p {
+  margin: 0 0 20px;
+  color: #7f8c8d;
 }
 
 /* 对话框操作按钮区域 */
 .dialog-actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
+  justify-content: flex-end;  
+  gap: 10px;  
 }
 
-/* 对话框取消按钮样式 */
-.cancel-btn, .confirm-btn {
+/* 对话框按钮基础样式 */
+.dialog-btn {
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
 }
 
-.cancel-btn {
-  background-color: #f5f5f5;
+/* 取消按钮样式 */
+.dialog-btn.cancel {
+  background-color: #f0f0f0;
+  color: #333;
   border: 1px solid #ddd;
 }
 
-/* 对话框确认按钮样式 */
-.confirm-btn {
+/* 确认按钮样式 */
+.dialog-btn.confirm {
   background-color: #e74c3c;
   color: white;
   border: none;
-}
-
-.confirm-btn:hover {
-  background-color: #c0392b;
 }
 </style>

@@ -151,6 +151,18 @@ export function getCommentsByNovel(novelId) {
 }
 
 /**
+ * 获取指定小说的评论总数
+ * @param {number} novelId - 要查询的小说ID
+ * @returns {Promise<{ novelId: number, commentCount: number }>} 包含小说ID和评论数量的对象
+ */
+export function getCommentCountByNovel(novelId) {
+    return request({
+        url: `/api/Comments/count-by-novel/${novelId}`,
+        method: 'get'
+    });
+}
+
+/**
  * 递归删除评论
  * @param {number} commentId - 评论ID
  * @returns {Promise<void>}

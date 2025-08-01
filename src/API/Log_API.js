@@ -72,6 +72,28 @@ export function resetAuthorPassword(dto) {
         }
     })
 }
+
+
+/**
+ * 需要旧密码的作者重置密码接口
+ * @param {AuthorChangePasswordDto} dto - 包含作者名称、旧密码和新密码的对象
+ * @returns {Promise<{message: string}>} 操作结果
+ */
+export function changeAuthorPassword(dto) {
+    return request({
+        url: '/api/LogAuthor/change-author-password',
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        data: {
+            authorName: dto.authorName,
+            oldPassword: dto.oldPassword,
+            newPassword: dto.newPassword
+        }
+    });
+}
+
 /**
  * 登出接口（前端清除token即可）
  * @returns {Promise<{message: string}>} 操作结果
