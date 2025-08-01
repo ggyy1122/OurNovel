@@ -54,7 +54,9 @@
           </span>
         </div>
         <!-- 最新章节信息 -->
-        <h1 class="newest-chapter">最新章节第....章 2025年xx月xx日</h1>
+           <h1 class="newest-chapter" v-if="hasChapter">
+          最新章节第{{ chapterId }}章  {{ formattedDate }}
+              </h1>
         <!-- 新增的蓝色按钮组 -->
         <div class="action-buttons">
           <button class="blue-border-btn" @click="handleRead">
@@ -216,7 +218,7 @@ import { useRouter} from 'vue-router';
 import { SelectNovel_State,readerState } from '@/stores/index';
 import { getCategoriesByNovel} from '@/API/NovelCategory_API';
 import {addOrUpdateCollect,deleteCollect} from '@/API/Collect_API';
-import {getNovelWordCount, getNovelRecommendCount,getNovelCollectCount} from '@/API/Novel_API';
+import {getNovelWordCount, getNovelRecommendCount,getNovelCollectCount,getLatestPublishedChapter} from '@/API/Novel_API';
 import {  getAuthorNovelCount,getAuthorTotalWordCount,getAuthorRegisterDays}  from '@/API/Author_API';
 import { getChapter } from '@/API/Chapter_API';
 import {addRecommend,deleteRecommend} from '@/API/Recommend_API';
@@ -243,6 +245,10 @@ const recommendReason = ref('') ;                     // 用户输入的推荐�
 const showRewardDialog = ref(false);                  // 是否显示打赏弹窗
 const accountBalance = ref(0);                        // 账号余额
 const selectedReward = ref(100);                      // 默认选中100点打赏金额
+const chapterId = ref(null)
+const publishTime = ref(null)
+const hasChapter = ref(false)
+
 const defaultCoverImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E书籍封面%3C/text%3E%3C/svg%3E";// 默认封面图片
 const defaultAuthorAvatar = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E作者头像%3C/text%3E%3C/svg%3E";// 默认作者头像
 const rewardOptions = [
@@ -292,6 +298,12 @@ function getStatusClass(status) {
   }
 
 }
+const formattedDate = computed(() => {
+  if (!publishTime.value) return ''
+  
+  const date = new Date(publishTime.value)
+  return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`
+})
 
 const goAuthorHome = () => {
   router.push(`/author/${selectNovelState.authorId}`);
@@ -396,6 +408,21 @@ const fetchReaderBalance=async()=>{
   }
 }
 
+const fetchNewestChapter = async () => {
+  try {
+    const response = await getLatestPublishedChapter(selectNovelState.novelId)
+     chapterId.value = response?.chapterId||0
+     publishTime.value = response?.publishTime||''
+    hasChapter.value = true
+   console.log('response:', response)
+  }  catch (error) {
+    if (error.message !== 'Error: response') {
+      console.error('获取章节信息失败:', error)
+    }
+    hasChapter.value = false
+  }
+}
+
 
 // 1.监听 novelId 变化,变化时加载数据
 watch(
@@ -410,7 +437,8 @@ watch(
           fetchCollectedCount(),
           fetchAuthorNovelCount(),
           fetchAuthorWordCount(),
-          fetchAuthorRegisterDays()
+          fetchAuthorRegisterDays(),
+           fetchNewestChapter()
         ])
         console.log('小说详情页数据更新完成！')
       } catch (error) {
