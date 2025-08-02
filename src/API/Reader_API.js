@@ -154,3 +154,32 @@ export function getReportsWithLogsByReader(readerId) {
         method: 'get'
     })
 }
+
+/**
+ * 获取指定读者的最近阅读记录列表，按时间降序排列
+ * @param {number} readerId
+ * @returns {Promise<any>} 
+ */
+export function getRecentReadingsByReaderId(readerId) {
+  return request({
+    url: '/api/RecentReadings/list',
+    method: 'get',
+    params: { readerId }
+  })
+}
+/**
+ * 删除指定读者的某本小说的最近阅读记录
+ * @param {number} readerId - 读者 ID
+ * @param {number} novelId - 小说 ID
+ * @returns {Promise<any>}
+ */
+export function deleteRecentReading(readerId, novelId) {
+  return request({
+    url: '/api/RecentReadings/delete',
+    method: 'delete',
+    params: {
+      readerId,
+      novelId
+    }
+  });
+}

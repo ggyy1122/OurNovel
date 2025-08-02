@@ -13,6 +13,12 @@
           <span class="menu-text">我的推荐</span>
         </router-link>
       </li>
+       <li :class="{ active: activeItem === 'collect' }">
+        <router-link to="/BookShelf/Collect">
+          <span class="menu-icon collect-icon"></span>
+          <span class="menu-text">我的收藏</span>
+        </router-link>
+      </li>
       <li :class="{ active: activeItem === 'history' }">
         <router-link to="/BookShelf/History">
           <span class="menu-icon history-icon"></span>
@@ -87,6 +93,9 @@ export default {
 }
 .recommend-icon {
   background-image: url('~@/assets/icons/recommend.png');
+}
+.collect-icon {
+  background-image: url('~@/assets/icons/collect.png');
 }
 .history-icon {
   background-image: url('~@/assets/icons/history.png');

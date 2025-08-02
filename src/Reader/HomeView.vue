@@ -46,7 +46,7 @@
       <div class="card">
         <div class="card-content">
           <div class="card-title">账户余额</div>
-          <div class="card-value">{{reader_state.balance}}虚拟币</div>
+          <div class="card-value">{{reader_state.balance}}起点币</div>
           <button class="card-button">充值</button>
         </div>
       </div>
@@ -61,7 +61,7 @@
       
       <div class="card">
         <div class="card-content">
-          <div class="card-title">我的书架</div>
+          <div class="card-title">我的收藏</div>
           <div class="card-value">{{ reader_state.favoriteBooksCount }}本藏书</div>
           <button class="card-button">立即查看</button>
         </div>
@@ -70,7 +70,7 @@
       <div class="card">
         <div class="card-content">
           <div class="card-title">最近阅读</div>
-          <div class="card-value">0 本最近阅读</div>
+          <div class="card-value">{{  reader_state.readHistoryCount }}本最近阅读</div>
           <button class="card-button">立即查看</button>
         </div>
       </div>
@@ -253,7 +253,7 @@ watch(
 }
 
 .card {
-  background-color: white;
+  background-image: linear-gradient(135deg, #cfe0fa 0%, #ffffff 80%);
   border-radius: 8px;
   padding: 15px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);

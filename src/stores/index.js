@@ -71,8 +71,9 @@ export const readerState = defineStore('reader', {
             return prefix + 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg';  // 默认背景图
         },
         recommendBooksCount: (state) => state.recommendBooks.length,
-        favoriteBooksCount: (state) => state.favoriteBooks.length
-    },
+        favoriteBooksCount: (state) => state.favoriteBooks.length,
+        readHistoryCount: (state) => state.readHistory.length,
+        },
     actions: {
         initializeReader(id, name, password, phone, gender, balance, avatarUrl, backgroundUrl, isCollectVisible, isRecommendVisible, favoriteBooks, recommendBooks) {
             this.readerId = id || 0;
@@ -134,24 +135,31 @@ export const readerState = defineStore('reader', {
          localStorage.setItem('reader_favoriteBooks', JSON.stringify(newBooks))
           window.dispatchEvent(new Event('storage')) // 触发同步
          },
-    
+           // 同步历史记录数组
+        updateReadHistory(newHistory) {
+        this.readHistory = newHistory
+        localStorage.setItem('reader_readHistory', JSON.stringify(newHistory))
+        window.dispatchEvent(new Event('storage')) // 触发同步事件
+        },      
     // 初始化时添加事件监听
-    initializeStore() {
-      window.addEventListener('storage', (event) => {
-        if (event.key === 'reader_balance') {
-          this.balance = Number(event.newValue) // 从其他标签页同步
+        initializeStore() {
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'reader_balance') {
+            this.balance = Number(event.newValue) // 从其他标签页同步
+            }
+            if (event.key === 'reader_recommendBooks') {
+            this.recommendBooks = JSON.parse(event.newValue) // 同步推荐书籍
+            }
+            if (event.key === 'reader_favoriteBooks') {
+            this.favoriteBooks = JSON.parse(event.newValue) // 同步推荐书籍
+            }
+            if (event.key === 'reader_readHistory') {
+            this.readHistory = JSON.parse(event.newValue) || []
+            }
+        })
         }
-         if (event.key === 'reader_recommendBooks') {
-          this.recommendBooks = JSON.parse(event.newValue) // 同步推荐书籍
         }
-         if (event.key === 'reader_favoriteBooks') {
-          this.favoriteBooks = JSON.parse(event.newValue) // 同步推荐书籍
-        }
-        // 可以添加其他需要同步的字段...
-      })
-    }
-    }
-})
+    })
 
 
 export const SelectNovel_State = defineStore('select_novel', {
