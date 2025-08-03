@@ -131,3 +131,84 @@ export function getWholePurchaseStatus(readerId, novelId) {
     });
 }
 
+
+/** 
+ * 获取读者打赏记录接口
+ * @param {number} readerId - 读者ID
+ * @returns {Promise<Array<Object>>} 返回交易记录数组，包含以下字段：
+ *   - readerId: number - 读者ID
+ *   - transactionId: number - 交易ID
+ *   - amount: number - 交易金额
+ *   - rewardTime: string - 交易时间(ISO格式)
+ *   - novelId: number - 小说ID
+ *   - novelTitle: string - 小说标题
+ *   - authorId: number - 作者ID
+ *   - authorName: string - 作者名称
+ */
+export function getReaderReward(readerId) {
+    return request({
+        url: `/api/Transaction/reward/${readerId}`,
+        method: 'get',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+}
+
+
+/** 
+ * 获取读者交易记录
+ * @param {number} readerId - 读者ID
+ * @param {string} [transType] - 可选，交易类型（"充值"/"打赏"/"订阅"）
+ * @param {string} [timeRange] - 可选，时间范围（"all"/"year"/"month"/"week"）
+ * @returns {Promise<Array>} 返回交易记录数组，包含字段：
+ *   - readerId: number
+ *   - transactionId: number
+ *   - transType: string
+ *   - amount: number
+ *   - time: string(ISO格式)
+ */
+export function getReaderTransactions(readerId) {
+    return request({
+        url: `/api/Transaction/transaction/${readerId}`,
+        method: 'get',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+}
+
+/** 
+ * 获取读者充值记录
+ * @param {number} readerId - 读者ID
+ * @returns {Promise<Array>} 返回充值记录数组，
+ */
+export function getReaderRecharge(readerId) {
+    return request({
+        url: `/api/Transaction/recharge/${readerId}`,
+        method: 'get',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+}
+
+/** 
+ * 获取读者订阅记录
+ * @param {number} readerId - 读者ID
+ * @returns {Promise<Array>} 返回订阅记录数组，
+ */
+export function getReaderSubscribtion(readerId) {
+    return request({
+        url: `/api/Transaction/subscription/${readerId}`,
+        method: 'get',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+}
+
+
+
+
+

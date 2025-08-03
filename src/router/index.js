@@ -52,7 +52,12 @@ import NovelDetail from '@/Author/NovelDetail.vue'
 import NovelEdit from '@/Author/NovelEdit.vue'
 import ChapterList from '@/Author/ChapterList.vue'
 import AuthorStats from '@/Author/AuthorStats.vue'
+import AuthorIncome from '@/Author/AuthorIncome.vue'
 import AuthorSettings from '@/Author/AuthorSettings.vue'
+import RatingList from '@/Author/RatingList.vue'
+import RecomendList from '@/Author/RecomendList.vue'
+import CollectList from '@/Author/CollectList.vue'
+import CommentList from '@/Author/CommentList.vue'
 //主页
 import MainLayout  from '@/Reader/MainLayout.vue'
 import HomeView  from '@/Reader/HomeView.vue'
@@ -61,8 +66,12 @@ import BookshelfView from '@/Reader/BookshelfView.vue'
 import CommentView from '@/Reader/CommentView.vue'
 import MessageCenterView from '@/Reader/MessageCenterView.vue'
 import RecommendView from '@/Reader/RecommendView.vue'
+import CollectView from '@/Reader/CollectView.vue'
 import HistoryView from '@/Reader/HistoryView.vue'
 import InformationView from '@/Reader/InformationView.vue'
+
+//充值界面
+
 
 const routes = [
     {
@@ -347,17 +356,51 @@ const routes = [
                 meta: { title: '章节列表' }
             },
             {
+                path: 'novels/:id/ratinglist',
+                name: 'RatingList',
+                component: RatingList,
+                props: true,
+                meta: { title: '评分列表' }
+            },
+            {
+                path: 'novels/:id/recomendlist',
+                name: 'RecomendList',
+                component: RecomendList,
+                props: true,
+                meta: { title: '推荐列表' }
+            },
+            {
+                path: 'novels/:id/collectlist',
+                name: 'CollectList',
+                component: CollectList,
+                props: true,
+                meta: { title: '收藏列表' }
+            },
+            {
+                path: 'novels/:id/commentlist',
+                name: 'CommentList',
+                component: CommentList,
+                props: true,
+                meta: { title: '评论列表' }
+            },
+            {
                 path: 'stats',
                 name: 'AuthorStats',
                 component: AuthorStats,
                 meta: { title: '数据统计' }
             },
             {
+                path: 'income',
+                name: 'AuthorIncome',
+                component: AuthorIncome,
+                meta: { title: '作者收益' }
+            },
+            {
                 path: 'settings',
                 name: 'AuthorSettings',
                 component: AuthorSettings,
                 meta: { title: '账号设置' }
-            }
+            },
         ]
     },
    // 首页路由组
@@ -409,6 +452,12 @@ const routes = [
         name: 'recommend',
         component: RecommendView,
         meta: { sidebarItem: 'recommend' }
+      },
+       {
+        path: 'Collect',
+        name: 'collect',
+        component: CollectView,
+        meta: { sidebarItem: 'collect' }
       },
        {
         path: 'History',

@@ -1,12 +1,13 @@
 <template>
   <!-- 页面容器 -->
-  <div class="page-container">
+  <div class="novellist-page">
     <!-- 轮播器部分 -->
     <div class="carousel-container" @mouseenter="isHovering = true" @mouseleave="isHovering = false">
       <div class="carousel">
         <div class="carousel-inner" :style="{ transform: `translateX(-${currentSlide * 100}%)` }">
           <div class="carousel-item" v-for="(item, index) in carouselItems" :key="index"
             :class="{ active: currentSlide === index }">
+            <img :src="item.image" class="carousel-image" :alt="item.caption?.title">
             <div class="carousel-caption" v-if="item.caption">
               <h3>{{ item.caption.title }}</h3>
               <p>{{ item.caption.description }}</p>
@@ -25,64 +26,99 @@
     <!-- 小说列表部分 -->
     <div class="page-header">
       <h2>我的小说</h2>
-      <!-- 导航到创建小说界面 -->
       <router-link to="/author/novels/create" class="create-btn">
         <span>+</span> 创建小说
       </router-link>
     </div>
+    
+    <!-- 加载状态 -->
+    <div v-if="novelsStore.isLoading" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>加载中...</p>
+    </div>
+    
+    <!-- 错误状态 -->
+    <div v-else-if="novelsStore.error" class="error-state">
+      <p>加载失败: {{ novelsStore.error.message }}</p>
+      <button @click="novelsStore.fetchNovels()" class="retry-btn">重试</button>
+    </div>
+    
     <!-- 小说网格布局 -->
-    <div class="novel-grid">
+    <div v-else class="novel-grid">
       <!-- 每个小说卡片 -->
-      <div v-for="novel in novels" :key="novel.novel_id" class="novel-card">
+      <div v-for="novel in novelsStore.novels" :key="novel.novel_id" class="novel-card">
         <router-link :to="'/author/novels/' + novel.novel_id" class="novel-link">
           <div class="status-badge" :class="novel.status">{{ novel.status }}</div>
           <div class="novel-cover">
+            <img :src="novel.cover_url" class="cover-image" :alt="novel.novel_name">
           </div>
           <div class="novel-info">
             <h3 class="novel-title">{{ novel.novel_name }}</h3>
             <p class="meta">
               <span>{{ novel.total_word_count }}字</span>
-              <span>{{ novel.chapter_count }}章</span>
+              <span>♡{{ novel.collected_count }}</span>
             </p>
           </div>
         </router-link>
       </div>
+
+      <!-- 无小说提示 -->
+    <div v-if="novelsStore.novels.length === 0" class="empty-novels">
+      <h3>暂无小说作品,快去创建你的第一部小说</h3>
+    </div>
     </div>
   </div>
 </template>
 
 <script>
-// 导入轮播图逻辑hook
 import { useCarousel } from '@/utils/carousel'
-// 导入小说数据store
 import { novelsStore } from '@/stores/Novels'
-// 导入轮播图数据
 import { carouselItems } from '@/stores/CarouselData'
+import { onMounted, ref, watch } from 'vue' 
+import { useRoute } from 'vue-router' 
 
 export default {
   setup() {
-    // 使用轮播图hook获取相关状态和方法
-    const {
-      currentSlide,  // 当前幻灯片索引
-      isHovering,    // 是否悬停在轮播图上
-      prevSlide,     // 上一张方法
-      nextSlide,     // 下一张方法
-      goToSlide      // 跳转到指定幻灯片方法
-    } = useCarousel(carouselItems)
+    const isHovering = ref(false)
+    const route = useRoute() 
+    
+    // 初始化小说数据
+    onMounted(async () => {
+      await novelsStore.fetchNovels()
+    })
+
+    // 监听路由变化（当从创建页返回时刷新数据）
+    watch(
+      () => route.path, 
+      async (newPath, oldPath) => {
+        if (oldPath === '/author/novels/create' && newPath === '/author/novels') {
+          try {
+            await novelsStore.fetchNovels();
+          } catch (error) {
+            console.error('刷新小说列表失败:', error);
+          }
+        }
+      },
+      { immediate: true } 
+    );
+    
+    // 轮播图逻辑
+    const { currentSlide, prevSlide, nextSlide, goToSlide } = useCarousel(carouselItems)
 
     return {
-      carouselItems,  // 轮播图数据
-      currentSlide,   // 当前幻灯片索引
-      isHovering,     // 悬停状态
-      prevSlide,      // 上一张方法
-      nextSlide,      // 下一张方法
-      goToSlide,      // 跳转方法
-      novels: novelsStore.novels  // 小说列表数据
+      carouselItems,
+      currentSlide,
+      isHovering,
+      prevSlide,
+      nextSlide,
+      goToSlide,
+      novelsStore
     }
   }
 }
 </script>
 <style scoped>
+
 /* 轮播器样式 */
 .carousel-container {
   margin-bottom: 40px;
@@ -230,7 +266,7 @@ export default {
 }
 
 /* 页面基础样式 */
-.page-container {
+.novellist-page {
   padding: 30px;
   max-width: 1200px;
   margin: 0 auto;
@@ -312,40 +348,43 @@ export default {
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
 }
 
-/* 连载中状态样式 */
-.status-badge.连载中 {
+.status-badge.连载 {
   background-color: #3498db;
 }
 
-/* 已完结状态样式 */
-.status-badge.已完结 {
+.status-badge.完结 {
   background-color: #2ecc71;
 }
 
-/* 审核中状态样式 */
-.status-badge.审核中 {
+.status-badge.待审核 {
   background-color: #f39c12;
+}
+
+.status-badge.封禁 {
+  background-color: #e74c3c;
 }
 
 /* 小说封面样式 */
 .novel-cover {
   width: 100%;
-  height: 220px;
+  height: 0;
+  padding-bottom: 133.3%; /* 4:3 比例 */
   position: relative;
   overflow: hidden;
   border-radius: 6px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* 封面图片样式 */
 .cover-image {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s;
 }
 
-/* 封面图片悬停效果 */
 .novel-card:hover .cover-image {
   transform: scale(1.05);
 }
@@ -374,5 +413,24 @@ export default {
   justify-content: space-around;
   font-size: 13px;
   color: #7f8c8d;
+}
+
+.empty-novels {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+  font-family: 'Segoe UI', system-ui, sans-serif; /* 使用现代字体栈 */
+}
+
+.empty-novels h3 {
+  font-size: 1.5rem; /* 24px */
+  font-weight: 600;
+  color: #2c3e50;
+  letter-spacing: 0.5px; /* 轻微字距 */
+  line-height: 1.3;
+  margin-bottom: 12px;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.05); /* 微妙阴影 */
 }
 </style>

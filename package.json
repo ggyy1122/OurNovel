@@ -12,6 +12,7 @@
     "@hennge/vue3-pagination": "^1.0.17",
     "axios": "^1.10.0",
     "core-js": "^3.8.3",
+    "echarts": "^6.0.0",
     "element-plus": "^2.10.4",
     "font-awesome": "^4.7.0",
     "pinia": "^3.0.3",

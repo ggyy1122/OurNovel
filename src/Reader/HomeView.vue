@@ -34,7 +34,7 @@
             </div>
             <div class="stat-item">
               <span>余额</span>
-              <strong>{{reader_state.balance}}</strong>
+              <strong>{{accountBalance}}</strong>
             </div>
           </div>
         </div>
@@ -46,8 +46,8 @@
       <div class="card">
         <div class="card-content">
           <div class="card-title">账户余额</div>
-          <div class="card-value">{{reader_state.balance}}起点币</div>
-          <button class="card-button">充值</button>
+          <div class="card-value">{{accountBalance}}起点币</div>
+          <button class="card-button" @click="showRecharge">充值</button>
         </div>
       </div>
       
@@ -61,7 +61,7 @@
       
       <div class="card">
         <div class="card-content">
-          <div class="card-title">我的书架</div>
+          <div class="card-title">我的收藏</div>
           <div class="card-value">{{ reader_state.favoriteBooksCount }}本藏书</div>
           <button class="card-button">立即查看</button>
         </div>
@@ -70,7 +70,7 @@
       <div class="card">
         <div class="card-content">
           <div class="card-title">最近阅读</div>
-          <div class="card-value">0 本最近阅读</div>
+          <div class="card-value">{{  reader_state.readHistoryCount }}本最近阅读</div>
           <button class="card-button">立即查看</button>
         </div>
       </div>
@@ -80,15 +80,36 @@
 
 <script setup>
 import { readerState } from '@/stores/index'
-import { watch } from 'vue'
+import { watch,onMounted,ref  } from 'vue'
 import { useRouter } from 'vue-router'
+import {getReaderBalance} from '@/API/Reader_API';
 const reader_state = readerState();  //当前用户对象
 console.log(reader_state.balance)
 const router = useRouter()
+const accountBalance = ref(0);                        // 账号余额
 
-const goToSelfInformation = () => {
-  router.push('/UserHome/self-information') // 跳转到个人信息页
+const fetchReaderBalance=async()=>{
+  try {
+    const response = await getReaderBalance(reader_state.readerId)
+    accountBalance.value = response.data?.balance || response?.balance|| 0
+   console.log('获取用户余额:', accountBalance.value)
+  } catch (error) {
+    console.error('获取用户余额失败:', error)
+     accountBalance.value = 0
+  }
 }
+// 跳转到个人信息页
+const goToSelfInformation = () => {
+  router.push('/UserHome/self-information') 
+}
+// 显示充值界面
+const showRecharge = () => {
+const route = router.resolve({ path: '/Novels/Novel_Recharge' });
+  window.open(route.href, '_blank'); // 新窗口打开
+}
+ onMounted(() => {
+      fetchReaderBalance(); // 页面挂载后立即执行
+    });
 watch(
   () => reader_state.balance,
   (newVal) => {
@@ -253,7 +274,7 @@ watch(
 }
 
 .card {
-  background-color: white;
+  background-image: linear-gradient(135deg, #cfe0fa 0%, #ffffff 80%);
   border-radius: 8px;
   padding: 15px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);

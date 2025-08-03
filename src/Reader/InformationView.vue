@@ -1,18 +1,232 @@
 <template>
-  <div class="home-view">
-    <h2>个人信息概览</h2>
-    <p>欢迎来到个人！</p>
+  <div class="edit-container">
+    <h2>修改个人信息</h2>
+    <div class="avatar-upload">
+      <img
+        :src="avatarPreviewUrl.startsWith('blob:') ? avatarPreviewUrl : 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + avatarPreviewUrl"
+        alt="头像预览"
+        class="avatar-image"
+      />
+      <label class="upload-button">
+        选择头像
+        <input type="file" accept="image/*" @change="handleAvatarChange" hidden />
+      </label>
+    </div>
+    <form @submit.prevent="saveReaderChanges">
+      <div>
+        <label>姓名：</label>
+        <input v-model="readerName" type="text" required />
+      </div>
+
+      <div>
+        <label>电话：</label>
+        <input v-model="phone" type="text" />
+      </div>
+
+      <div>
+        <label>性别：</label>
+        <select v-model="gender">
+          <option value="男">男</option>
+          <option value="女">女</option>
+        </select>
+      </div>
+
+      <button type="submit">保存修改</button>
+    </form>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'InformationView'
+<script setup>
+import { ref, onMounted } from 'vue'
+import { readerState } from '@/stores/index'
+import { updateReader, uploadReaderAvatar } from '@/API/Reader_API'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
+
+const store = readerState()
+
+const readerName = ref('')
+const phone = ref('')
+const gender = ref('男')
+const avatarFile = ref(null)
+const avatarPreviewUrl = ref('')
+const apiResponseAvatar = ref(null)
+const prefix = 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/'
+const defaultAvatar = 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg'
+
+function getFormattedAvatarUrl(avatarUrl) {
+  if (!avatarUrl || avatarUrl.trim() === '') {
+    return prefix + defaultAvatar
+  }
+  if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
+    return avatarUrl
+  }
+  return avatarUrl
+}
+
+function handleAvatarChange(event) {
+  avatarFile.value = event.target.files[0]
+  if (avatarFile.value) {
+    avatarPreviewUrl.value = URL.createObjectURL(avatarFile.value)
+  } else {
+    avatarPreviewUrl.value = ''
+  }
+}
+
+async function uploadAvatar() {
+  try {
+    if (!avatarFile.value) throw new Error('请选择头像文件')
+    const response = await uploadReaderAvatar(store.readerId, avatarFile.value)
+    apiResponseAvatar.value = response
+    if (response.success && response.avatarUrl) {
+      const url = response.avatarUrl
+      const fileName = url.split('/').pop()
+      store.avatarUrl = fileName
+      avatarPreviewUrl.value = url
+      toast.success('头像上传成功')
+    } else {
+      toast.error('头像上传失败，接口返回异常')
+    }
+  } catch (error) {
+    toast.error('上传头像失败')
+  }
+}
+
+onMounted(() => {
+  readerName.value = store.readerName || ''
+  phone.value = store.phone || ''
+  gender.value = store.gender || '男'
+  avatarPreviewUrl.value = getFormattedAvatarUrl(store.avatarUrl)
+})
+
+async function saveReaderChanges() {
+  if (!store.readerId) {
+    toast.error('未检测到登录用户，请重新登录')
+    return
+  }
+  if (!store.password) {
+    toast.error('未检测到用户密码，无法修改')
+    return
+  }
+  if (avatarFile.value) {
+    await uploadAvatar()
+  }
+
+  const updateData = {
+    readerId: store.readerId,
+    readerName: readerName.value,
+    password: store.password,
+    phone: phone.value,
+    gender: gender.value,
+    balance: store.balance,
+    avatarUrl: store.avatarUrl,
+    backgroundUrl: store.backgroundUrl,
+  }
+
+  try {
+    await updateReader(store.readerId, updateData)
+    toast.success('修改成功')
+    Object.assign(store, updateData)
+    avatarPreviewUrl.value = getFormattedAvatarUrl(store.avatarUrl)
+  } catch (error) {
+    toast.error('修改失败，请稍后再试')
+  }
 }
 </script>
 
 <style scoped>
-.home-view {
-  padding: 20px;
+.edit-container {
+  background-image: linear-gradient(to top, #dfe9f3 0%, white 100%);
+  padding: 40px 30px;
+  max-width: 400px;
+  margin: 50px auto;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  font-family: "Segoe UI", sans-serif;
+}
+
+
+form div {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #555;
+}
+
+.upload-button {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color:  #ffd700;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s, transform 0.1s;
+  user-select: none;
+}
+
+.upload-button:hover {
+  background-color:#ff2e4d;
+}
+
+.upload-button:active {
+  transform: scale(0.98);
+}
+
+.avatar-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+  border: 2px solid   #ffd700;
+}
+
+input[type="text"],
+select {
+  width: 60%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1em;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input[type="text"]:focus,
+select:focus {
+  border-color:  #ffd700;
+  box-shadow: 0 0 5px rgba(247, 142, 72, 0.3);
+  outline: none;
+}
+
+input[type="checkbox"] {
+  transform: scale(1.2);
+  accent-color:  #ffd700;
+  cursor: pointer;
+}
+
+button[type="submit"] {
+  width: 100%;
+  padding: 12px 0;
+  background-color:  #ffd700;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 1.05em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+button[type="submit"]:hover {
+  background-color:#ff2e4d;
+}
+
+button[type="submit"]:active {
+  transform: scale(0.98);
 }
 </style>

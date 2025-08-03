@@ -46,6 +46,19 @@ export function getNovel(novelId) {
 
 
 /**
+ * 获取某作者小说详情
+ * @param {number} authorId - 小说ID
+ * @returns {Promise<Array<Novel>>} 返回小说数组
+ */
+export function getAuthorNovel(authorId) {
+    return request({
+        url: `/api/Author/${authorId}/novels`,
+        method: 'get'
+    })
+}
+
+
+/**
  * 创建小说
  * @param {Object} novelData - 小说数据
  * @param {string} novelData.novelName - 小说名称
@@ -83,6 +96,31 @@ export function createNovel(novelData) {
         }
     })
 }
+
+
+/**
+ * 创建小说
+ * @param {Object} novelData - 小说数据
+ * @param {string} novelData.novelName - 小说名称
+ * @param {number} novelData.authorId - 作者ID
+ * @param {string} [novelData.introduction] - 小说简介
+ * @returns {Promise<Novel>}
+ */
+
+export function AuthorcreateNovel(novelData) {
+    // 转换为查询参数
+    const params = new URLSearchParams();
+    params.append('authorId', novelData.authorId);
+    params.append('novelName', novelData.novelName);
+    params.append('introduction', novelData.introduction);
+
+    return request({
+        url: `/api/novel/create?${params.toString()}`, // 参数拼接到URL
+        method: 'post'
+        // 移除headers和data
+    })
+}
+
 
 /**
  * 更新小说
@@ -229,3 +267,5 @@ export function getLatestPublishedChapter(novelId) {
         method: 'get'
     })
 }
+
+

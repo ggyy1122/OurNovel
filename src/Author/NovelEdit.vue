@@ -1,8 +1,7 @@
 <template>
-  <!-- 页面容器 -->
-  <div class="page-container">
-    <!-- 返回按钮（新增在页面顶部） -->
-    <button type="button" class="back btn " @click="goBack">
+  <div class="edit-page">
+    <!-- 返回按钮 -->
+    <button type="button" class="back-btn " @click="goBack">
       返回书籍
     </button>
     
@@ -13,7 +12,7 @@
     <form class="settings-form">
       <!-- 第一表单区块 -->
       <div class="form-section">
-        <!-- 小说名输入组 -->
+        <!-- 小说名输入 -->
         <div class="form-group">
           <div class="form-row">
             <label>小说名</label>
@@ -28,14 +27,14 @@
           </div>
         </div>
         
-        <!-- 分类输入组 -->
+        <!-- 分类展示 -->
         <div class="form-group">
           <div class="form-row">
             <label>分类</label>
             <div class="input-wrapper">
               <input 
                 type="text" 
-                v-model="novel.category" 
+                v-model="novel.categories" 
                 disabled
                 class="disabled-input"
               >
@@ -43,13 +42,12 @@
           </div>
         </div>
         
-        <!-- 状态选择组 -->
+        <!-- 状态选择 -->
         <div class="form-group">
           <div class="form-row">
             <label>状态</label>
             <div class="status-options">
-              <!-- 遍历状态选项 -->
-              <label v-for="status in statusOptions" :key="status.value">
+              <label v-for="status in filteredStatusOptions" :key="status.value">
                 <input 
                   type="radio" 
                   v-model="novel.status" 
@@ -65,7 +63,7 @@
       
       <!-- 第二表单区块 -->
       <div class="form-section">
-        <!-- 简介输入组 -->
+        <!-- 简介输入 -->
         <div class="form-group">
           <div class="form-row">
             <label>简介</label>
@@ -91,12 +89,11 @@
             <!-- 左侧上传区域 -->
             <div class="upload-left">
               <div class="avatar-upload">
-                <!-- 封面预览 -->
                 <div class="avatar-preview">
                   <img :src="novel.cover_url" class="novel-cover" @error="handleImageError">
                 </div>
                 
-                <!-- 上传控制按钮 -->
+                <!-- 上传按钮 -->
                 <div class="upload-controls">
                   <button 
                     type="button" 
@@ -160,6 +157,7 @@
 
 <script setup>
 // 导入小说状态管理
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useNovel } from '@/stores/CurrentNovel'
 // 解构需要的状态和方法
@@ -180,28 +178,32 @@ const router = useRouter()  // 先获取实例
 const goBack = () => {
   router.go(-1)              // 再调用方法
 }
+
+// 只显示连载和完结两个状态选项
+const filteredStatusOptions = computed(() => {
+  return statusOptions.filter(option => 
+    option.value === '连载' || option.value === '完结'
+  )
+})
 </script>
 
 <style scoped>
 /* 页面容器样式 */
-.page-container {
+.edit-page {
   padding: 30px;
   max-width: 1000px;
   margin: 0 auto;
   position: relative;
 }
 
-/* 按钮样式 */
-.btn {
-  padding: 10px 20px;
+/* 按钮基础样式 */
+.back-btn {
+  cursor: pointer;
+  padding: 8px 16px;
   border-radius: 4px;
   text-decoration: none;
   font-weight: 500;
   transition: all 0.3s;  
-}
-
-/* 顶部返回按钮样式 */
-.back {
   background-color: #f0f0f0;
   color: #333;
   border: 1px solid #ddd;
@@ -256,6 +258,7 @@ h2 {
 
 /* 输入框容器 */
 .input-wrapper {
+  margin-top: 6px;
   flex: 1;
 }
 
