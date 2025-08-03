@@ -70,6 +70,9 @@ import CollectView from '@/Reader/CollectView.vue'
 import HistoryView from '@/Reader/HistoryView.vue'
 import InformationView from '@/Reader/InformationView.vue'
 
+//充值界面
+
+
 const routes = [
     {
         path: '/',

@@ -771,8 +771,14 @@ const confirmReward = async () => {
 const goToRecharge = () => {
   showBalanceInsufficientDialog.value = false;
   showRewardDialog.value = false;
-  router.push('/Novels/Novel_Recharge'); // 充值页面路由
+  const route = router.resolve({ path: '/Novels/Novel_Recharge' });
+  window.open(route.href, '_blank'); // 新窗口打开
 };
+const handleRecharge=()=>{
+const route = router.resolve({ path: '/Novels/Novel_Recharge' });
+  window.open(route.href, '_blank'); // 新窗口打开
+
+}
 
 
 // 处理评分按钮点击
