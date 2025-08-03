@@ -107,6 +107,9 @@ export default {
 .sidebar li.active .recommend-icon {
   background-image: url('~@/assets/icons/recommend-red.png');
 }
+.sidebar li.active .collect-icon {
+  background-image: url('~@/assets/icons/collect-red.png');
+}
 .sidebar li.active .history-icon {
   background-image: url('~@/assets/icons/history-red.png');
 }

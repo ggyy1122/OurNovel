@@ -66,6 +66,7 @@ import BookshelfView from '@/Reader/BookshelfView.vue'
 import CommentView from '@/Reader/CommentView.vue'
 import MessageCenterView from '@/Reader/MessageCenterView.vue'
 import RecommendView from '@/Reader/RecommendView.vue'
+import CollectView from '@/Reader/CollectView.vue'
 import HistoryView from '@/Reader/HistoryView.vue'
 import InformationView from '@/Reader/InformationView.vue'
 
@@ -448,6 +449,12 @@ const routes = [
         name: 'recommend',
         component: RecommendView,
         meta: { sidebarItem: 'recommend' }
+      },
+       {
+        path: 'Collect',
+        name: 'collect',
+        component: CollectView,
+        meta: { sidebarItem: 'collect' }
       },
        {
         path: 'History',
