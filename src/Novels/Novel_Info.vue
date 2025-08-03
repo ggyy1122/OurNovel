@@ -159,6 +159,63 @@
       </div>
     </div>
   </div>
+    <!-- 新增的固定位置按钮 -->
+<div class="fixed-buttons">
+  <!-- 充值按钮 -->
+  <div class="fixed-button" @click="handleRecharge">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+      <path fill="currentColor" d="M12 2a10 10 0 1 0 10 10 10 10 0 0 0-10-10zm1 14a1 1 0 0 1-2 0v-3h-2a1 1 0 0 1 0-2h3a1 1 0 0 1 1 1zm4.6-6.08a1 1 0 0 1-.2 1.4 7 7 0 0 1-9.93-1.4 1 1 0 1 1 1.6-1.2 5 5 0 0 0 7.13.8 1 1 0 0 1 1.4.2z"/>
+    </svg>
+    <span>充值</span>
+  </div>
+  
+  <!-- 评分按钮 -->
+<div class="fixed-button" @click="handleRatingClick">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+    <path :fill="hasRating ? '#1890ff' : 'currentColor'" 
+          d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"/>
+  </svg>
+  <span :style="{ color: hasRating ? '#1890ff' : '' }">
+    {{ hasRating ? '已评分' : '评分' }}
+  </span>
+</div>
+
+</div>
+ <!-- 评分弹窗 -->
+  <div v-if="showRatingDialog" class="rating-dialog-overlay">
+    <div class="rating-dialog">
+      <div class="dialog-header">
+        <h3>{{ hasRating ? '您的评分' : '为作品评分' }}</h3>
+        <button class="close-btn" @click="closeDialog">&times;</button>
+      </div>
+      
+      <div class="stars-container">
+        <div v-for="i in 10" :key="i" 
+             class="star" 
+             @click="selectRating(i)"
+             @mouseover="hoverRating = i"
+             @mouseleave="hoverRating = null">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28">
+            <path :fill="getStarColor(i)" 
+                  d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+          </svg>
+        </div>
+      </div>
+      
+      <div class="rating-value">
+        {{ currentRating || hoverRating || 0 }} 分
+      </div>
+      
+      <button v-if="!hasRating" 
+              class="submit-btn" 
+              @click="submitRating"
+              :disabled="!currentRating">
+        提交评分
+      </button>
+    </div>
+  </div>
+
+
   <!-- 打赏弹窗 -->
   <div v-if="showRewardDialog" class="reward-dialog-overlay">
     <div class="reward-dialog">
@@ -226,6 +283,7 @@ import {getReaderBalance} from '@/API/Reader_API';
 import {rewardNovel} from '@/API/Reward_API';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
+import {getRatesByReader,addRate} from '@/API/Rate_API';
 
 
 
@@ -248,6 +306,11 @@ const selectedReward = ref(100);                      // 默认选中100点打�
 const chapterId = ref(null)
 const publishTime = ref(null)
 const hasChapter = ref(false)
+const hasRating = ref(false);                           // 是否评分
+const currentRating=ref(0);                             //当前评分
+const showRatingDialog = ref(false);
+const hoverRating = ref(null);
+
 
 const defaultCoverImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E书籍封面%3C/text%3E%3C/svg%3E";// 默认封面图片
 const defaultAuthorAvatar = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E作者头像%3C/text%3E%3C/svg%3E";// 默认作者头像
@@ -407,7 +470,7 @@ const fetchReaderBalance=async()=>{
      accountBalance.value = 0
   }
 }
-
+//获取最新章节
 const fetchNewestChapter = async () => {
   try {
     const response = await getLatestPublishedChapter(selectNovelState.novelId)
@@ -422,8 +485,22 @@ const fetchNewestChapter = async () => {
     hasChapter.value = false
   }
 }
-
-
+// 获取评分状态
+const fetchRatingStatus = async () => {
+  try {
+    const ratings = await getRatesByReader(ReaderState.readerId) // 假设readerId是ref
+    const rating = ratings.find(r => r.novelId === selectNovelState.novelId)
+    hasRating.value = !!rating
+    currentRating.value = rating?.score || null
+    console.log('评分状态:', hasRating.value, '评分:', currentRating.value)
+  } catch (error) {
+    if (error.message !== 'Error: response') {
+      console.error('获取评分信息失败:', error)
+    }
+    hasRating.value = false
+    currentRating.value = null
+  }
+}
 // 1.监听 novelId 变化,变化时加载数据
 watch(
   () => selectNovelState.novelId,
@@ -438,7 +515,8 @@ watch(
           fetchAuthorNovelCount(),
           fetchAuthorWordCount(),
           fetchAuthorRegisterDays(),
-           fetchNewestChapter()
+           fetchNewestChapter(),
+           fetchRatingStatus()
         ])
         console.log('小说详情页数据更新完成！')
       } catch (error) {
@@ -688,6 +766,51 @@ const goToRecharge = () => {
   showRewardDialog.value = false;
   router.push('/Novels/Novel_Recharge'); // 充值页面路由
 };
+
+
+// 处理评分按钮点击
+const handleRatingClick = () => {
+  showRatingDialog.value = true;
+};
+
+// 关闭弹窗
+const closeDialog = () => {
+  showRatingDialog.value = false;
+  hoverRating.value = null;
+};
+
+// 选择评分
+const selectRating = (rating) => {
+  if (!hasRating.value) {
+    currentRating.value = rating;
+  }
+};
+
+// 获取星星颜色
+const getStarColor = (i) => {
+  if (hasRating.value) {
+    return i <= currentRating.value ? '#FFD700' : '#DDD';
+  }
+  return (hoverRating.value && i <= hoverRating.value) || 
+         (!hoverRating.value && currentRating.value && i <= currentRating.value) 
+         ? '#FFD700' : '#DDD';
+};
+
+// 提交评分
+const submitRating = async () => {
+  try {
+    // 这里调用API提交评分
+    await addRate(selectNovelState.novelId,ReaderState.readerId,currentRating.value);
+    hasRating.value = true;
+    closeDialog();
+  } catch (error) {
+    console.error('提交评分失败:', error);
+  }
+};
+
+
+
+
 </script>
 
 
@@ -1522,5 +1645,147 @@ h3 {
     transform: scale(0.98); 
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
   }
+}
+
+
+
+/* 新增的固定按钮样式 */
+.fixed-buttons {
+  position: fixed;
+  right: 20px;
+  bottom: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 999;
+}
+
+.fixed-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background-color: #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.fixed-button:hover {
+  background-color: #f5f5f5;
+  transform: translateY(-2px);
+}
+
+.fixed-button svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* 在较大屏幕上显示文字 */
+@media (min-width: 768px) {
+  .fixed-button {
+    width: auto;
+    padding: 0 16px;
+    border-radius: 24px;
+  }
+  
+  .fixed-button span {
+    margin-left: 8px;
+    font-size: 14px;
+  }
+}
+
+
+
+
+/* 评分弹窗样式 */
+.rating-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.rating-dialog {
+  background-color: white;
+  border-radius: 12px;
+  padding: 24px;
+  width: 320px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.dialog-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #999;
+}
+
+.stars-container {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 20px 0;
+}
+
+.star {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.star:hover {
+  transform: scale(1.2);
+}
+
+.rating-value {
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: #FFD700;
+  margin: 10px 0 20px;
+}
+
+.submit-btn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background-color: #1890ff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+  background-color: #40a9ff;
+}
+
+.submit-btn:disabled {
+  background-color: #DDD;
+  cursor: not-allowed;
 }
 </style>
