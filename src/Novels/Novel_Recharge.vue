@@ -28,7 +28,7 @@
                         </div>
                         <div class="detail-row">
                             <span class="detail-label">账号余额：</span>
-                            <span class="detail-value">{{ reader_state.balance }}</span>
+                            <span class="detail-value">{{ accountBalance }}</span>
                         </div>
                     </div>
                 </div>
@@ -88,16 +88,16 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed,onMounted } from 'vue'
 import { startRecharge } from '@/API/Recharge_API'
 import { readerState } from '@/stores/index'
 import { useRouter } from 'vue-router'
 import { toast } from "vue3-toastify"
 import "vue3-toastify/dist/index.css"
+import {getReaderBalance} from '@/API/Reader_API';
 
 const reader_state = readerState()
 const router = useRouter()
-
 const fixedAmounts = [
     { value: 10, points: 1000 },
     { value: 20, points: 2000 },
@@ -109,6 +109,7 @@ const selectedAmount = ref(fixedAmounts[0].value)
 const customAmount = ref('')
 const agreed = ref(false)
 const showAgreement = ref(false)
+const accountBalance = ref(0);                        // 账号余额
 
 const paymentAmount = computed(() => {
     if (selectedAmount.value === 'custom') {
@@ -127,7 +128,16 @@ function selectCustomAmount() {
 function handle_return() {
     router.back()
 }
-
+const fetchReaderBalance=async()=>{
+  try {
+    const response = await getReaderBalance(reader_state.readerId)
+    accountBalance.value = response.data?.balance || response?.balance|| 0
+   console.log('获取用户余额:', accountBalance.value)
+  } catch (error) {
+    console.error('获取用户余额失败:', error)
+     accountBalance.value = 0
+  }
+}
 async function handlePayment() {
     if (!agreed.value) {
         toast("请同意用户服务协议！", { type: "warning", dangerouslyHTMLString: true })
@@ -150,6 +160,11 @@ async function handlePayment() {
         toast("充值失败，请稍后重试！", { type: "error", dangerouslyHTMLString: true })
     }
 }
+ onMounted(() => {
+      fetchReaderBalance(); // 页面挂载后立即执行
+    });
+
+
 </script>
 
 <style scoped>

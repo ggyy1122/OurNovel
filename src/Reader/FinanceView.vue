@@ -6,9 +6,9 @@
       <div class="balance-card">
         <div class="balance-info">
           <div class="balance-title">账户余额（虚拟币）</div>
-          <div class="balance-amount">{{reader_state.balance}}</div>
+          <div class="balance-amount">{{accountBalance}}</div>
         </div>
-        <button class="recharge-btn" @click="showRechargePage">充值</button>
+        <button class="recharge-btn" @click="showRecharge">充值</button>
       </div>
     </div>
 
@@ -200,8 +200,11 @@
 <script setup>
 import { ref, computed , onMounted} from 'vue'
 import { readerState } from '@/stores/index'
+import { useRouter } from 'vue-router'
+import {getReaderBalance} from '@/API/Reader_API';
 import {getReaderReward,getReaderTransactions,getReaderRecharge,getReaderSubscribtion} from '@/API/Transaction_API'
 const reader_state = readerState();  //当前用户对象
+const accountBalance = ref(0);                        // 账号余额
 
 // 当前激活的标签页
 const activeTab = ref('consumption')
@@ -214,6 +217,7 @@ const rechargeRecords = ref([])
 const selectedTimeRange = ref('全部')
 //订阅记录数据
 const subscribtionRecords = ref([])
+const router = useRouter()
 
 // 分页相关状态
 const currentPage = ref(1)
@@ -358,6 +362,17 @@ const fetchSubscribtionRecords = async () => {
     subscribtionRecords.value = []
   }
 }
+//获得余额
+const fetchReaderBalance=async()=>{
+  try {
+    const response = await getReaderBalance(reader_state.readerId)
+    accountBalance.value = response.data?.balance || response?.balance|| 0
+   console.log('获取用户余额:', accountBalance.value)
+  } catch (error) {
+    console.error('获取用户余额失败:', error)
+     accountBalance.value = 0
+  }
+}
 
 
 // 根据时间范围筛选充值记录
@@ -367,8 +382,9 @@ const filteredRechargeRecords = computed(() => {
 })
 
 // 显示充值界面
-const showRechargePage = () => {
-
+const showRecharge = () => {
+const route = router.resolve({ path: '/Novels/Novel_Recharge' });
+  window.open(route.href, '_blank'); // 新窗口打开
 }
 
 //钩子函数
@@ -376,7 +392,8 @@ onMounted(() => {
   fetchRewardRecords(),
   fetchTransactionRecords(),
   fetchRechargeRecords(),
- fetchSubscribtionRecords()
+ fetchSubscribtionRecords(),
+ fetchReaderBalance()
 })
 
 </script>
@@ -458,6 +475,18 @@ onMounted(() => {
   border-radius: 4px;
   font-size: 14px;
   cursor: pointer;
+  transition: background 0.2s, transform 0.1s; /* 平滑过渡 */
+}
+
+/* 鼠标悬停效果 */
+.recharge-btn:hover {
+  background: #e05b5b; /* 稍微深一点的红色 */
+}
+
+/* 点击（按下）效果 */
+.recharge-btn:active {
+  background: #d44a4a; /* 更深的红色 */
+  transform: scale(0.98); /* 轻微缩小，模拟按下效果 */
 }
 
 /* 交易记录板块 */
