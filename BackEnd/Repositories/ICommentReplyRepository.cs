@@ -7,4 +7,7 @@ public interface ICommentReplyRepository
     Task<IEnumerable<CommentReply>> GetRepliesByParentIdAsync(int parentCommentId);
     Task<IEnumerable<CommentReply>> GetAllAsync();
     Task DeleteAsync(int commentId);
+
+    Task<List<int>> GetChildCommentIdsAsync(int parentCommentId);
+    Task<int?> GetParentCommentIdAsync(int commentId);
 }

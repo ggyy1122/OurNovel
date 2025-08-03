@@ -42,5 +42,22 @@ public class CommentReplyRepository : ICommentReplyRepository
             await _context.SaveChangesAsync();
         }
     }
+    public async Task<List<int>> GetChildCommentIdsAsync(int parentCommentId)
+    {
+        return await _context.CommentReplies
+            .Where(r => r.PreComId == parentCommentId)
+            .Select(r => r.CommentId)
+            .ToListAsync();
+    }
+
+    public async Task<int?> GetParentCommentIdAsync(int commentId)
+    {
+        return await _context.CommentReplies
+            .Where(r => r.CommentId == commentId)
+            .Select(r => r.PreComId)
+            .FirstOrDefaultAsync();
+    }
+
+
 
 }

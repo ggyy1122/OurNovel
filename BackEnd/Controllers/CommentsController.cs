@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using OurNovel.DTOs;
 using OurNovel.Models;
 using OurNovel.Services;
 
@@ -153,6 +154,20 @@ namespace OurNovel.Controllers
         {
             var count = await _commentsService.GetCommentCountByNovelAsync(novelId);
             return Ok(new { novelId, commentCount = count });
+        }
+        /// <summary>
+        /// 根据读者ID获取其发布的评论及父/子评论
+        /// </summary>
+        /// <param name="readerId">读者ID</param>
+        [HttpGet("reader/{readerId}")]
+        public async Task<ActionResult<List<CommentWithRepliesDto>>> GetCommentsByReaderId(int readerId)
+        {
+            var result = await _commentsService.GetCommentsByReaderIdAsync(readerId);
+
+            if (result == null || !result.Any())
+                return NotFound("该读者没有发布任何评论");
+
+            return Ok(result);
         }
 
     }

@@ -1,3 +1,4 @@
+using OurNovel.DTOs;
 using OurNovel.Models;
 using OurNovel.Repositories;
 using System;
@@ -217,5 +218,58 @@ namespace OurNovel.Services
             var allComments = await _repository.GetAllAsync();
             return allComments.Count(c => c.NovelId == novelId);
         }
+        public async Task<List<CommentWithRepliesDto>> GetCommentsByReaderIdAsync(int readerId)
+        {
+            // 1. 获取该读者发布的所有评论
+            var comments = await _repository
+                .GetAllAsync(); // 或者直接用 _context.Comments
+            var readerComments = comments.Where(c => c.ReaderId == readerId).ToList();
+
+            var result = new List<CommentWithRepliesDto>();
+
+            foreach (var comment in readerComments)
+            {
+                // 判断该评论是否是父评论
+                var childIds = await _replyRepository.GetChildCommentIdsAsync(comment.CommentId);
+
+                if (childIds.Any()) // 是父评论
+                {
+                    var childComments = comments.Where(c => childIds.Contains(c.CommentId)).ToList();
+                    result.Add(new CommentWithRepliesDto
+                    {
+                        ParentComment = comment,
+                        ChildComments = childComments
+                    });
+                }
+                else // 不是父评论 -> 查找其父评论
+                {
+                    var parentId = await _replyRepository.GetParentCommentIdAsync(comment.CommentId);
+                    if (parentId.HasValue)
+                    {
+                        var parentComment = comments.FirstOrDefault(c => c.CommentId == parentId.Value);
+                        if (parentComment != null)
+                        {
+                            result.Add(new CommentWithRepliesDto
+                            {
+                                ParentComment = parentComment,
+                                ChildComments = new List<Comment> { comment }
+                            });
+                        }
+                    }
+                    else
+                    {
+                        // 没有父评论也没有子评论，就作为独立评论
+                        result.Add(new CommentWithRepliesDto
+                        {
+                            ParentComment = comment,
+                            ChildComments = new List<Comment>()
+                        });
+                    }
+                }
+            }
+
+            return result;
+        }
+
     }
 }
