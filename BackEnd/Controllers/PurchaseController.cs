@@ -55,5 +55,29 @@ namespace OurNovel.Controllers
                 });
             }
         }
+
+
+        /// <summary>
+        /// 查询某个读者是否已购买指定小说章节
+        /// </summary>
+        /// <param name="readerId">读者ID</param>
+        /// <param name="novelId">小说ID</param>
+        /// <param name="chapterId">章节ID</param>
+        /// <returns>是否已购买</returns>
+        [HttpGet("check")]
+     
+        public async Task<IActionResult> CheckPurchase([FromQuery] int readerId, [FromQuery] int novelId, [FromQuery] int chapterId)
+        {
+            try
+            {
+                bool hasPurchased = await _purchaseService.HasPurchasedChapterAsync(readerId, novelId, chapterId);
+                return Ok(new { success = true, hasPurchased });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "服务器内部错误: " + ex.Message });
+            }
+        }
+
     }
 }

@@ -127,5 +127,31 @@ namespace OurNovel.Services
                 return new PurchaseResultDto { Success = 0, Message = "服务器异常：" + ex.Message };
             }
         }
+
+        public async Task<bool> HasPurchasedChapterAsync(int readerId, int novelId, int chapterId)
+        {
+            // 先判断是否整本买断
+            var wholePurchase = await _context.WholePurchase
+                .FirstOrDefaultAsync(wp => wp.ReaderId == readerId && wp.NovelId == novelId && wp.IsBought == "是");
+
+            if (wholePurchase != null)
+                return true; // 已整本买断，直接返回已购买
+
+            // 否则检查单章节购买记录
+            var purchaseCount = await (
+                from p in _context.Purchases
+                join t in _context.Transactions
+                    on p.TransactionId equals t.TransactionId
+                where p.NovelId == novelId
+                      && p.ChapterId == chapterId
+                      && t.ReaderId == readerId
+                select p
+            ).CountAsync();
+
+            return purchaseCount > 0;
+        }
+
+
+
     }
 }
