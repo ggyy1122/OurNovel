@@ -161,6 +161,13 @@
   </div>
     <!-- 新增的固定位置按钮 -->
 <div class="fixed-buttons">
+   <!-- 阅读按钮 -->
+  <div class="fixed-button" @click="handleRead">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+      <path fill="currentColor" d="M21.59 11.59h-1.34a1 1 0 0 0 0 2h1.34a1 1 0 0 0 0-2zm-18.18 0H2.07a1 1 0 0 0 0 2h1.34a1 1 0 0 0 0-2zm15.09-7h-1.34a1 1 0 0 0 0 2h1.34a1 1 0 0 0 0-2zm-12.73 0H2.07a1 1 0 0 0 0 2h1.34a1 1 0 0 0 0-2zm15.09 0h-1.34a1 1 0 0 0 0 2h1.34a1 1 0 0 0 0-2zm-12.73 0H2.07a1 1 0 0 0 0 2h1.34a1 1 0 0 0 0-2zm9.09 11H8.66a1 1 0 0 0 0 2h6.36a1 1 0 0 0 0-2zm0-7H8.66a1 1 0 0 0 0 2h6.36a1 1 0 0 0 0-2zm0-7H8.66a1 1 0 0 0 0 2h6.36a1 1 0 0 0 0-2z"/>
+    </svg>
+    <span>阅读</span>
+  </div>
   <!-- 充值按钮 -->
   <div class="fixed-button" @click="handleRecharge">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
