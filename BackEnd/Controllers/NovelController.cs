@@ -188,5 +188,18 @@ namespace OurNovel.Controllers
 
             return Ok(latestChapter);
         }
+
+        /// <summary>
+        /// 获取所有连载或完结的小说（分页，每页15条）
+        /// </summary>
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllNovels([FromQuery] int page = 1)
+        {
+            if (page < 1)
+                return BadRequest("页码必须大于等于1");
+
+            var novels = await _novelService.GetNovelsByPageAsync(page);
+            return Ok(novels);
+        }
     }
 }
