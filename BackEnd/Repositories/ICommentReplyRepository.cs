@@ -10,4 +10,5 @@ public interface ICommentReplyRepository
 
     Task<List<int>> GetChildCommentIdsAsync(int parentCommentId);
     Task<int?> GetParentCommentIdAsync(int commentId);
+    public Task<List<CommentReply>> GetRelatedRepliesAsync(List<int> commentIds);
 }

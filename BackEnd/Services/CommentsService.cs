@@ -220,50 +220,91 @@ namespace OurNovel.Services
         }
         public async Task<List<CommentWithRepliesDto>> GetCommentsByReaderIdAsync(int readerId)
         {
-            // 1. 获取该读者发布的所有评论
-            var comments = await _repository
-                .GetAllAsync(); // 或者直接用 _context.Comments
-            var readerComments = comments.Where(c => c.ReaderId == readerId).ToList();
+            var allComments = await _repository.GetAllAsync();
+            // 2. 获取该读者相关的评论（自己发的）
+            var readerComments = allComments.Where(c => c.ReaderId == readerId).ToList();
+            var readerCommentIds = readerComments.Select(c => c.CommentId).ToList();
 
+            // 3. 获取与读者评论相关的回复关系（包含父是我、我是子）
+            var relatedReplies = await _replyRepository.GetRelatedRepliesAsync(readerCommentIds);
+
+            // 4. 提取所有相关 commentId
+            var relatedCommentIds = relatedReplies
+                .SelectMany(r => new[] { r.CommentId, r.PreComId ?? 0 })
+                .Where(id => id != 0)
+                .Distinct()
+                .ToList();
+
+            // 5. 过滤出相关的评论（读者自己和与之有父子关系的）
+            var relatedComments = allComments
+                .Where(c => relatedCommentIds.Contains(c.CommentId) || readerCommentIds.Contains(c.CommentId))
+                .ToDictionary(c => c.CommentId);
+
+            // 6. 构建评论结构：parentId -> List<child>
+            var parentToChildren = new Dictionary<int, List<Comment>>();
+
+            foreach (var reply in relatedReplies)
+            {
+                if (reply.PreComId.HasValue && relatedComments.TryGetValue(reply.CommentId, out var child))
+                {
+                    var parentId = reply.PreComId.Value;
+                    if (!parentToChildren.ContainsKey(parentId))
+                        parentToChildren[parentId] = new List<Comment>();
+                    parentToChildren[parentId].Add(child);
+                }
+            }
+
+            // 7. 构建最终结果，避免重复 ParentComment
+            var visitedParentIds = new HashSet<int>();
             var result = new List<CommentWithRepliesDto>();
 
             foreach (var comment in readerComments)
             {
-                // 判断该评论是否是父评论
-                var childIds = await _replyRepository.GetChildCommentIdsAsync(comment.CommentId);
-
-                if (childIds.Any()) // 是父评论
+                // 如果是父评论
+                if (parentToChildren.ContainsKey(comment.CommentId))
                 {
-                    var childComments = comments.Where(c => childIds.Contains(c.CommentId)).ToList();
-                    result.Add(new CommentWithRepliesDto
+                    if (!visitedParentIds.Contains(comment.CommentId))
                     {
-                        ParentComment = comment,
-                        ChildComments = childComments
-                    });
+                        result.Add(new CommentWithRepliesDto
+                        {
+                            ParentComment = comment,
+                            ChildComments = parentToChildren[comment.CommentId]
+                        });
+                        visitedParentIds.Add(comment.CommentId);
+                    }
                 }
-                else // 不是父评论 -> 查找其父评论
+                else
                 {
-                    var parentId = await _replyRepository.GetParentCommentIdAsync(comment.CommentId);
-                    if (parentId.HasValue)
+                    // 如果是子评论，找到父评论
+                    var parentId = relatedReplies
+                        .FirstOrDefault(r => r.CommentId == comment.CommentId)?.PreComId;
+
+                    if (parentId.HasValue && relatedComments.TryGetValue(parentId.Value, out var parentComment))
                     {
-                        var parentComment = comments.FirstOrDefault(c => c.CommentId == parentId.Value);
-                        if (parentComment != null)
+                        if (!visitedParentIds.Contains(parentId.Value))
                         {
                             result.Add(new CommentWithRepliesDto
                             {
                                 ParentComment = parentComment,
-                                ChildComments = new List<Comment> { comment }
+                                ChildComments = parentToChildren.ContainsKey(parentId.Value)
+                                    ? parentToChildren[parentId.Value]
+                                    : new List<Comment>()
                             });
+                            visitedParentIds.Add(parentId.Value);
                         }
                     }
                     else
                     {
-                        // 没有父评论也没有子评论，就作为独立评论
-                        result.Add(new CommentWithRepliesDto
+                        // 既不是父也不是子，作为独立项
+                        if (!visitedParentIds.Contains(comment.CommentId))
                         {
-                            ParentComment = comment,
-                            ChildComments = new List<Comment>()
-                        });
+                            result.Add(new CommentWithRepliesDto
+                            {
+                                ParentComment = comment,
+                                ChildComments = new List<Comment>()
+                            });
+                            visitedParentIds.Add(comment.CommentId);
+                        }
                     }
                 }
             }
@@ -271,5 +312,9 @@ namespace OurNovel.Services
             return result;
         }
 
+
+
+
+
+        }
     }
-}

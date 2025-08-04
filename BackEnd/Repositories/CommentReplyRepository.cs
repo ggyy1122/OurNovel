@@ -58,6 +58,11 @@ public class CommentReplyRepository : ICommentReplyRepository
             .FirstOrDefaultAsync();
     }
 
-
+    public async Task<List<CommentReply>> GetRelatedRepliesAsync(List<int> commentIds)
+    {
+        return await _context.CommentReplies
+        .Where(r => commentIds.Contains(r.CommentId) || (r.PreComId.HasValue && commentIds.Contains(r.PreComId.Value)))
+        .ToListAsync();
+    }
 
 }
