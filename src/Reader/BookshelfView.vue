@@ -1,7 +1,7 @@
 <template>
   <div class="page-back-container">
   <section class="book-section">
-    <h3>我的收藏</h3>
+    <h2>我的收藏</h2>
     <div class="book-carousel">
       <button class="arrow left" @click="scrollLeft">‹</button>
       <div class="book-list" ref="carouselRef">
@@ -23,7 +23,7 @@
       <button class="arrow right" @click="scrollRight">›</button>
     </div>
 
-    <h3>我的推荐</h3>
+    <h2>我的推荐</h2>
     <div class="book-carousel">
       <button class="arrow left" @click="scrollLeftRecommend">‹</button>
       <div class="book-list" ref="recommendRef">
@@ -45,7 +45,7 @@
       <button class="arrow right" @click="scrollRightRecommend">›</button>
     </div>
 
-    <h3>我的阅读历史</h3>
+    <h2>我的阅读历史</h2>
     <div class="book-carousel">
       <button class="arrow left" @click="scrollLeftHistory">‹</button>
       <div class="book-list" ref="historyRef">
@@ -205,15 +205,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.page-back-container {
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  background-image: linear-gradient(to top, #dfe9f3 0%, white 100%);
-  padding: 20px;
-  box-sizing: border-box;
-}
 
 .book-section {
   margin-bottom: 30px;

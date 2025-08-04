@@ -241,3 +241,15 @@ export function getTopLikedCommentsByChapter(novelId, chapterId, topN) {
         method: 'get'
     })
 }
+
+/**
+ * 获取指定读者发布的评论及其父/子评论
+ * @param {number} readerId - 读者ID
+ * @returns {Promise<Array<CommentWithRepliesDto>>}
+ */
+export function getCommentsByReaderId(readerId) {
+    return request({
+        url: `/api/Comments/reader/${readerId}`,
+        method: 'get'
+    });
+}

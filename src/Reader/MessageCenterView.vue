@@ -69,7 +69,7 @@ onMounted(fetchReports)
 }
 
 .report-item {
-  background-image: linear-gradient(to top, #dfe9f3 0%, white 100%);
+  background-color: white ;
   border: 1px solid #ddd;
   border-radius: 6px;
   padding: 15px 20px;

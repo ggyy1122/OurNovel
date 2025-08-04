@@ -135,16 +135,6 @@ async function saveReaderChanges() {
 </script>
 
 <style scoped>
-.edit-container {
-  background-image: linear-gradient(to top, #dfe9f3 0%, white 100%);
-  padding: 40px 30px;
-  max-width: 400px;
-  margin: 50px auto;
-  border-radius: 8px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-  font-family: "Segoe UI", sans-serif;
-}
-
 
 form div {
   margin-bottom: 20px;
@@ -160,17 +150,18 @@ label {
 .upload-button {
   display: inline-block;
   padding: 8px 16px;
-  background-color:  #ffd700;
+  background-color:  #ed424b;
   color: white;
   border-radius: 8px;
   cursor: pointer;
-  font-weight: 600;
+    font-weight: 500; 
+  font-size: 18px;  
   transition: background-color 0.3s, transform 0.1s;
   user-select: none;
 }
 
 .upload-button:hover {
-  background-color:#ff2e4d;
+  background-color:#f05e74;
 }
 
 .upload-button:active {
@@ -183,7 +174,7 @@ label {
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 10px;
-  border: 2px solid   #ffd700;
+  border: 2px solid    #ed424b;
 }
 
 input[type="text"],
@@ -198,32 +189,32 @@ select {
 
 input[type="text"]:focus,
 select:focus {
-  border-color:  #ffd700;
+  border-color:   #ed424b;
   box-shadow: 0 0 5px rgba(247, 142, 72, 0.3);
   outline: none;
 }
 
 input[type="checkbox"] {
   transform: scale(1.2);
-  accent-color:  #ffd700;
+  accent-color:    #ed424b;
   cursor: pointer;
 }
 
 button[type="submit"] {
   width: 100%;
   padding: 12px 0;
-  background-color:  #ffd700;
+  background-color:  #ed424b;
   border: none;
   border-radius: 8px;
   color: white;
-  font-size: 1.05em;
-  font-weight: 600;
+  font-weight: 500; 
+  font-size: 18px;  
   cursor: pointer;
   transition: background-color 0.3s, transform 0.1s;
 }
 
 button[type="submit"]:hover {
-  background-color:#ff2e4d;
+  background-color:#f05e74;
 }
 
 button[type="submit"]:active {

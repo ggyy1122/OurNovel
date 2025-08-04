@@ -431,17 +431,11 @@ onMounted(() => {
   color: #666;
   font-size: 14px;
 }
-/* 我的资产板块 */
+/*  我的资产板块 */
 .asset-section {
   margin-bottom: 20px;
 }
-.section-title {
-  font-size: 18px;          
-  color: #333;             
-  font-weight: 500;        
-  margin-bottom: 15px;     
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* 系统默认字体 */
-}
+
 
 .balance-card {
   background: white;

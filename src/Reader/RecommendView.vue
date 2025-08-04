@@ -157,15 +157,6 @@ onBeforeUnmount(() => {
   padding: 0;
 }
 
-.page-back-container {
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  background-image: linear-gradient(to top, #dfe9f3 0%, white 100%);
-  padding: 20px;
-  box-sizing: border-box;
-}
 
 .collects-container {
   max-width: 900px;

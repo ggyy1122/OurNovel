@@ -1,64 +1,81 @@
 <template>
   <div class="user-comments">
-    <h2>我发布的评论</h2>
+    <h2>我发布的评论及回复</h2>
 
     <div v-if="loading" class="status-message">加载中...</div>
-    <div v-else-if="error" class="status-message error">错误{{ error }}</div>
+    <div v-else-if="error" class="status-message error">错误: {{ error }}</div>
     <div v-else-if="userComments.length === 0" class="no-comments">暂无评论</div>
 
     <div v-else>
       <div
-        v-for="comment in userComments"
-        :key="comment.commentId"
+        v-for="item in userComments"
+        :key="item.parentComment.commentId"
         class="comment-bubble"
       >
-        <div class="comment-header" @click="toggleReplies(comment.commentId)" style="cursor: pointer;">
+        <div class="comment-header" @click="toggleReplies(item.parentComment.commentId)" style="cursor: pointer;">
           <span class="novel-id">
-            小说 ID：{{ comment.novelId }}
-            <span v-if="comment.preComId"> | 回复：评论ID {{ comment.preComId }}</span>
+            小说 ID：{{ item.parentComment.novelId }}
+            <span v-if="item.parentComment.preComId"> | 回复：评论ID {{ item.parentComment.preComId }}</span>
             <span v-else> | 一级评论</span>
           </span>
-          <span class="comment-title">{{ comment.title }}</span>
+
+          <span class="comment-title">{{ item.parentComment.title }}</span>
+
+          <!-- 作者ID展示 -->
+         <span
+  v-if="item.parentComment.readerId !== readerId"
+  class="author-id"
+  title="该评论的作者ID"
+>
+  作者ID：{{ item.parentComment.readerId || '未知' }}
+</span>
+
+          <!-- 如果一级评论不是本人发布，显示红色提示文字 -->
+          <span
+            v-if="item.parentComment.readerId !== readerId"
+            class="other-user-indicator"
+            title="这是他人发布的一级评论，你的回复在这里"
+          >
+            【回复他人评论】
+          </span>
+
           <span class="toggle-replies-indicator">
-            {{ expandedCommentId === comment.commentId ? '收起回复 ▲' : '展开回复 ▼' }}
+            {{ expandedCommentId === item.parentComment.commentId ? '收起回复 ▲' : '展开回复 ▼' }}
           </span>
         </div>
 
         <div class="comment-content">
-          {{ comment.content || '无内容' }}
+          {{ item.parentComment.content || '无内容' }}
         </div>
 
         <div class="comment-meta">
-          <span>点赞：{{ comment.likes }}</span>
-          <span>状态：{{ comment.status }}</span>
-          <span>时间：{{ comment.createTime || '未知' }}</span>
+          <span>点赞：{{ item.parentComment.likes }}</span>
+          <span>状态：{{ item.parentComment.status }}</span>
+          <span>时间：{{ item.parentComment.createTime || '未知' }}</span>
         </div>
 
-        <div>
-          <button class="delete-btn" @click.stop="handleDelete(comment.commentId)">删除</button>
-        </div>
+        <button class="delete-btn" @click.stop="handleDelete(item.parentComment.commentId)">删除</button>
 
-        <!-- 回复区域 -->
-        <div v-if="expandedCommentId === comment.commentId" class="replies">
-          <div v-if="loadingReplies" class="loading">回复加载中...</div>
-          <div v-else>
-            <div v-if="!repliesMap[comment.commentId] || repliesMap[comment.commentId].length === 0" class="no-replies">暂无回复</div>
-            <ul>
-              <li v-for="reply in repliesMap[comment.commentId]" :key="reply.commentId" class="reply-item">
-                <div class="reply-header">
-                  <strong>用户：{{ reply.readerId || '无用户' }}</strong>（评论ID：{{ reply.commentId }}）
-                </div>
-                <div class="reply-title">{{ reply.title || '无标题' }}</div>
-                <div class="reply-content">{{ reply.content || '无内容' }}</div>
-                <div class="reply-meta">
-                  点赞：{{ reply.likes }} |
-                  时间：{{ reply.createTime ? new Date(reply.createTime).toLocaleString() : '未知时间' }}
-                </div>
-              </li>
-            </ul>
-          </div>
+        <div v-if="expandedCommentId === item.parentComment.commentId" class="replies">
+          <div v-if="!item.childComments || item.childComments.length === 0" class="no-replies">暂无回复</div>
+          <ul v-else>
+            <li
+              v-for="reply in item.childComments"
+              :key="reply.commentId"
+              class="reply-item"
+            >
+              <div class="reply-header">
+                <strong>用户ID：{{ reply.readerId || '无用户' }}</strong>（评论ID：{{ reply.commentId }}）
+              </div>
+              <div class="reply-title">{{ reply.title || '无标题' }}</div>
+              <div class="reply-content">{{ reply.content || '无内容' }}</div>
+              <div class="reply-meta">
+                点赞：{{ reply.likes }} |
+                时间：{{ reply.createTime ? new Date(reply.createTime).toLocaleString() : '未知时间' }}
+              </div>
+            </li>
+          </ul>
         </div>
-
       </div>
     </div>
   </div>
@@ -66,36 +83,22 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import { getAllComments, deleteCommentRecursive, getComment } from '@/API/Comment_API'
-import { getRepliesByParentId, getReplyByCommentId } from '@/API/CommentReply_API'
+import { getCommentsByReaderId, deleteCommentRecursive } from '@/API/Comment_API' // 你的新API
 import { readerState } from '@/stores/index'
 
 const store = readerState()
 const readerId = store.readerId
-const userComments = ref([])
+const userComments = ref([])  // 存放 {parentComment, childComments} 对象数组
 
 const loading = ref(true)
 const error = ref(null)
 
 const expandedCommentId = ref(null)
-const repliesMap = ref({})
-const loadingReplies = ref(false)
 
 onMounted(async () => {
   try {
-    const allComments = await getAllComments()
-    const filtered = allComments.filter(comment => comment.readerId === readerId)
-
-    for (const c of filtered) {
-      try {
-        const replyRelation = await getReplyByCommentId(c.commentId)
-        c.preComId = replyRelation.preComId || null
-      } catch {
-        c.preComId = null
-      }
-    }
-
-    userComments.value = filtered
+    const res = await getCommentsByReaderId(readerId)  // 新接口
+    userComments.value = res || []
   } catch (err) {
     error.value = '获取评论失败'
     console.error(err)
@@ -105,42 +108,20 @@ onMounted(async () => {
 })
 
 async function handleDelete(commentId) {
-  const confirmed = window.confirm('确定删除该评论吗？')
-  if (!confirmed) return
+  if (!window.confirm('确定删除该评论吗？')) return
 
   try {
     await deleteCommentRecursive(commentId)
-    userComments.value = userComments.value.filter(c => c.commentId !== commentId)
-    if (expandedCommentId.value === commentId) {
-      expandedCommentId.value = null
-    }
+    userComments.value = userComments.value.filter(c => c.parentComment.commentId !== commentId)
+    if (expandedCommentId.value === commentId) expandedCommentId.value = null
   } catch (err) {
     alert('删除失败，请稍后重试')
     console.error(err)
   }
 }
 
-async function toggleReplies(commentId) {
-  if (expandedCommentId.value === commentId) {
-    expandedCommentId.value = null
-  } else {
-    expandedCommentId.value = commentId
-    if (!repliesMap.value[commentId]) {
-      loadingReplies.value = true
-      try {
-        const replySummaries = await getRepliesByParentId(commentId)
-        const detailedReplies = await Promise.all(
-          replySummaries.map(reply => getComment(reply.commentId))
-        )
-        repliesMap.value[commentId] = detailedReplies
-      } catch (e) {
-        repliesMap.value[commentId] = []
-        console.error('获取回复失败', e)
-      } finally {
-        loadingReplies.value = false
-      }
-    }
-  }
+function toggleReplies(commentId) {
+  expandedCommentId.value = expandedCommentId.value === commentId ? null : commentId
 }
 </script>
 
@@ -157,7 +138,7 @@ async function toggleReplies(commentId) {
 }
 
 .comment-bubble {
-  background-image: linear-gradient(to top, #ffffff 0%, #f9faec 99%, #f2ebd7 100%);
+  background-color: #ffffff; 
   border-radius: 8px;
   padding: 16px 20px;
   margin-bottom: 16px;
@@ -174,20 +155,48 @@ async function toggleReplies(commentId) {
   align-items: baseline;
   gap: 10px;
   margin-bottom: 10px;
+  flex-wrap: wrap;
 }
 
 .novel-id {
   font-size: 15px;
-  color: #f5c021;
-  background-color: #f1eedb;
+  color: #ed424b;
+  background-color:  #fff0f0;
   padding: 2px 6px;
   border-radius: 10px;
+  white-space: nowrap;
 }
 
 .comment-title {
   font-weight: bold;
   font-size: 18px;
   color: #222;
+  white-space: nowrap;
+}
+
+/* 作者ID样式 */
+.author-id {
+  font-size: 14px;
+  color: #555;
+  background-color: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 6px;
+  margin-left: 8px;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* 回复他人评论提示 */
+.other-user-indicator {
+  color: #e55353;
+  font-weight: 600;
+  margin-left: 10px;
+  background-color: #ffe6e6;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 14px;
+  user-select: none;
+  white-space: nowrap;
 }
 
 .comment-content {
@@ -207,7 +216,7 @@ async function toggleReplies(commentId) {
 }
 
 .delete-btn {
-  background-color: #e7bc3c;
+  background-color:  #ed424b;
   border: none;
   color: white;
   padding: 6px 12px;
@@ -218,13 +227,13 @@ async function toggleReplies(commentId) {
 }
 
 .delete-btn:hover {
-  background-color: #c0ac2b;
+  background-color:  #c6575d;
 }
 
 .replies {
   margin-top: 12px;
   padding-left: 20px;
-  border-left: 2px solid #f5c021;
+  border-left: 2px solid  #ed424b;
 }
 
 .reply-item {
