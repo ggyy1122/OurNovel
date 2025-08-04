@@ -22,7 +22,6 @@ import Category_api_test from '@/API_Test/Category_Test.vue'
 import NovelCategory_api_test from '@/API_Test/NovelCategory_Test.vue'
 import Chapter_api_test from '@/API_Test/Chapter_Test.vue'
 import Reader_api_test from '@/API_Test/Reader_Test.vue'
-import Reader_imfromation from '@/Novels/Novel_ReaderInfomation.vue'
 import Novel_Info from '@/Novels/Novel_Info.vue'
 import Novel_Info_home from '@/Novels/Novel_Info_home.vue'
 import Novel_Info_Comment from '@/Novels/Novel_Info_Comment.vue'
@@ -287,11 +286,6 @@ const routes = [
         path: '/Novels/reader',
         name: 'NovelReader',
         component: Novel_Reader
-    },
-    {
-        path: '/Novels/ReaderInfomation',
-        name: 'ReaderInfomation',
-        component: Reader_imfromation,
     },
     {
         path: '/Novels/Novel_Info',

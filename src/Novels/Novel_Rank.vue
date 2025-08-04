@@ -32,11 +32,32 @@
                         <div class="no-data">暂无数据</div>
                     </template>
                     <template v-else>
-                        <template v-for="(novel, index) in rankedNovels" :key="novel.novelId">
-                            <Novel_Card :novel="novel" :rank="index + 1" />
-                            <hr v-if="index < rankedNovels.length - 1" class="novel-divider" />
+                        <template v-for="(novel, index) in paginatedNovels" :key="novel.novelId">
+                            <Novel_Card :novel="novel" :rank="(currentPage - 1) * pageSize + index + 1" />
+                            <hr v-if="index < paginatedNovels.length - 1" class="novel-divider" />
                         </template>
                     </template>
+                </div>
+                <!-- 分页控件 -->
+                <div v-if="rankedNovels.length > pageSize" class="pagination">
+                    <button :disabled="currentPage === 1" @click="changePage(currentPage - 1)" class="page-btn">
+                        上一页
+                    </button>
+                    <template v-for="page in visiblePages" :key="page">
+                        <button :class="['page-btn', currentPage === page ? 'active' : '']" @click="changePage(page)">
+                            {{ page }}
+                        </button>
+                    </template>
+                    <button :disabled="currentPage === totalPages" @click="changePage(currentPage + 1)"
+                        class="page-btn">
+                        下一页
+                    </button>
+                    <div class="page-jump">
+                        <span>跳转至</span>
+                        <input type="number" v-model.number="jumpPage" min="1" :max="totalPages"
+                            @keyup.enter="jumpToPage">
+                        <span>/ {{ totalPages }} 页</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -52,6 +73,11 @@ const tabs = ['全部', '已完结', '连载中']
 const sideTabs = ['收藏榜', '推荐榜', '评分榜']
 const rankType = ['前10榜', '前20榜']
 
+// 分页相关状态
+const currentPage = ref(1)
+const pageSize = ref(5) // 每页显示10条
+const jumpPage = ref(1)
+
 const selectedTab = ref('全部')
 const selectedSideTab = ref('收藏榜')
 const selectedRankType = ref('前10榜')
@@ -60,6 +86,26 @@ const loading = ref(false)
 
 const rankLimit = computed(() => {
     return selectedRankType.value === '前10榜' ? 10 : 20
+})
+
+// 计算属性
+const totalPages = computed(() => Math.ceil(rankedNovels.value.length / pageSize.value))
+const paginatedNovels = computed(() => {
+    const start = (currentPage.value - 1) * pageSize.value
+    const end = start + pageSize.value
+    return rankedNovels.value.slice(start, end)
+})
+const visiblePages = computed(() => {
+    const maxVisible = 5 // 最多显示5个页码
+    const half = Math.floor(maxVisible / 2)
+    let start = Math.max(1, currentPage.value - half)
+    let end = Math.min(totalPages.value, start + maxVisible - 1)
+
+    if (end - start + 1 < maxVisible) {
+        start = Math.max(1, end - maxVisible + 1)
+    }
+
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i)
 })
 
 // 获取排行榜数据
@@ -80,17 +126,36 @@ async function fetchRankingData() {
             default:
                 response = await getCollectRanking(rankLimit.value)
         }
-        rankedNovels.value = Array.isArray(response) ? response : []
+        // 过滤掉"待审核"和"封禁"状态的小说
+        rankedNovels.value = Array.isArray(response)
+            ? response.filter(novel => novel.status === '连载' || novel.status === '完结')
+            : []
         if (selectedTab.value !== '全部') {
             const statusFilter = selectedTab.value === '已完结' ? '完结' : '连载'
             rankedNovels.value = rankedNovels.value.filter(novel => novel.status === statusFilter)
         }
+        // 重置到第一页
+        currentPage.value = 1
+        jumpPage.value = 1
     } catch (error) {
         console.error('获取排行榜数据失败:', error)
         rankedNovels.value = []
     } finally {
         loading.value = false
     }
+}
+
+// 分页相关方法
+function changePage(page) {
+    if (page < 1 || page > totalPages.value) return
+    currentPage.value = page
+    jumpPage.value = page
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+function jumpToPage() {
+    const page = Math.max(1, Math.min(jumpPage.value, totalPages.value))
+    changePage(page)
 }
 
 function selectRankingType(type) {
@@ -251,10 +316,63 @@ onMounted(() => {
     margin: 0.1rem 0;
 }
 
-.loading, .no-data {
+.loading,
+.no-data {
     text-align: center;
     padding: 50px;
     font-size: 16px;
     color: #888;
+}
+
+/* 分页样式 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 45px;
+}
+
+.page-btn {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    background: #fff;
+    color: #333;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.page-btn:hover:not(:disabled) {
+    background: #f5f5f5;
+}
+
+.page-btn.active {
+    background: #ffe357;
+    color: #fff;
+    border-color: #ffe357;
+    font-weight: bold;
+}
+
+.page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-jump {
+    margin-left: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.page-jump input {
+    width: 50px;
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-align: center;
 }
 </style>

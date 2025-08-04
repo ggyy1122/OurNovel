@@ -40,7 +40,7 @@
                 :class="['card-bg-' + (idx % 3)]">
                 <div class="author-avatar">
                     <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + (author.avatarUrl || '07850080-e498-47a4-8d3a-fd94fb47e561.jpg')"
-                        :alt="author.authorName" class="avatar-img" @click="goAuthorHome(author)"/>
+                        :alt="author.authorName" class="avatar-img" @click="goAuthorHome(author)" />
                 </div>
                 <h3 class="author-name" @click="goAuthorHome(author)">{{ author.authorName }}</h3>
                 <p class="author-join-date">{{ author.registerTime }}加入TJ</p>
@@ -181,7 +181,7 @@ const fetchAuthors = async () => {
 
 const fetchNovels = async () => {
     try {
-        const novelIds = [166, 167, 168, 169, 170, 222, 181, 263, 183, 245, 281, 262]
+        const novelIds = [166, 167, 168, 169, 170, 222, 263, 183, 462]
         const novelPromises = novelIds.map(id => getNovel(id))
         novels.value = await Promise.all(novelPromises)
     } catch (error) {
@@ -461,6 +461,7 @@ watch(novelCurrent, startNovelAutoPlay)
     cursor: pointer;
     transition: transform 0.3s ease;
 }
+
 .author-avatar:hover {
     transform: scale(1.10);
 }
@@ -478,6 +479,7 @@ watch(novelCurrent, startNovelAutoPlay)
     cursor: pointer;
     transition: color 0.3s ease;
 }
+
 .author-name:hover {
     transform: scale(1.10);
     color: #f0940a;

@@ -26,7 +26,7 @@
             </main>
             <div class="login-right">
                 <div class="right-content">
-                    <h2 class="right-title">猎奇 · 言情 · 玄幻</h2>
+                    <h2 class="right-title">异世界 · 言情 · 玄幻</h2>
                     <div class="right-desc">尽在TJ</div>
                     <img src="@/assets/logo1.png" alt="背景图" class="right-img" />
                 </div>
@@ -141,7 +141,7 @@ function switchTo(num) {
 
 .login-right {
     flex: 2;
-    background: #f7b604;
+    background: #f9e094;
     position: relative;
     display: flex;
     align-items: center;
