@@ -138,7 +138,7 @@ namespace OurNovel.Controllers
             }
         }
 
-  
+
 
         /// <summary>
         /// 返回小说推荐数
@@ -190,7 +190,17 @@ namespace OurNovel.Controllers
         }
 
         /// <summary>
-        /// 获取所有连载或完结的小说（分页，每页15条）
+        /// 获取所有已发布的小说（Status == "连载" 或 "完结"）
+        /// </summary>
+        [HttpGet("published")]
+        public async Task<IActionResult> GetPublishedNovels()
+        {
+            var novels = await _novelService.GetPublishedNovelsAsync();
+            return Ok(novels);
+        }
+
+        /// <summary>
+        /// 获取所有连载或完结的小说（分页，每页3条）
         /// </summary>
         [HttpGet("all")]
         public async Task<IActionResult> GetAllNovels([FromQuery] int page = 1)

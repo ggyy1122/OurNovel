@@ -192,6 +192,18 @@ namespace OurNovel.Services
         }
 
         /// <summary>
+        /// 获取所有连载或完结的小说
+        /// </summary>
+        public async Task<List<Novel>> GetPublishedNovelsAsync()
+        {
+            return await _context.Novels
+                .Where(n => n.Status == "连载" || n.Status == "完结")
+                .OrderBy(n => n.NovelId) 
+                .ToListAsync();
+        }
+
+
+        /// <summary>
         /// 获取所有连载或完结的小说（分页，每页3条）
         /// </summary>
         public async Task<List<Novel>> GetNovelsByPageAsync(int page)
