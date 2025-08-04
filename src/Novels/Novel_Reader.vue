@@ -108,8 +108,8 @@
                                     <p>Lv1</p>
                                 </div>
                                 <div class="dropdown-divider"></div>
-                                <a href="#" @click.prevent="goToInf" class="dropdown-item">
-                                    <i class="fa fa-book mr-2"></i> 我的书架
+                                <a href="#" @click.prevent="openMyHomePage" class="dropdown-item">
+                                    <i class="fa fa-home mr-2"></i> 我的主页
                                 </a>
                                 <a href="#" @click.prevent="goToRecharge" class="dropdown-item">
                                     <i class="fa fa-yen mr-2"></i> 去充值
@@ -141,9 +141,8 @@
                 </div>
             </div>
             <!-- 可滑动评论区域 -->
-            <div class="comments-section" :style="{
-                backgroundColor: cardBgColor,
-                right: showComments ? '0' : '-300px'
+            <div class="comments-section" v-if="showComments" :style="{
+                backgroundColor: cardBgColor, right: '0px'
             }">
                 <div class="comments-header">
                     <h3>热门评论 ({{ comments.length }})</h3>
@@ -341,7 +340,7 @@
                 <div class="catalog-grid">
                     <div v-for="chapter in sortedChapters" :key="chapter.chapterId" class="chapter-card" :class="{
                         'current': chapter.chapterId === selectNovelState.chapterId,
-                        'locked': chapter.isCharged === '是' && !hasPurchased,
+                        'locked': chapter.isCharged === '是' && !chapter.hasPurchased,
                         'vip': chapter.isCharged === '是'
                     }" @click="goToChapter(chapter)">
                         <div class="card-content">
@@ -351,7 +350,7 @@
                             <span v-if="chapter.isCharged === '是'" class="vip-tag">VIP</span>
                             <span v-if="chapter.chapterId === selectNovelState.chapterId"
                                 class="current-badge">正在阅读</span>
-                            <div v-if="chapter.isCharged === '是' && !hasPurchased" class="lock-overlay">
+                            <div v-if="chapter.isCharged === '是' && !chapter.hasPurchased" class="lock-overlay">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="20" height="20">
                                     <path fill="currentColor"
                                         d="M224 448a32 32 0 0 0-32 32v384a32 32 0 0 0 32 32h576a32 32 0 0 0 32-32V480a32 32 0 0 0-32-32zm0-64h576a96 96 0 0 1 96 96v384a96 96 0 0 1-96 96H224a96 96 0 0 1-96-96V480a96 96 0 0 1 96-96">
@@ -431,6 +430,43 @@
             <span>{{ speechPitch }}x</span>
         </div>
     </div>
+    <!-- 添加购买弹窗 -->
+    <div v-if="showPurchaseDialog" class="purchase-dialog-overlay">
+        <div class="purchase-dialog">
+            <div class="dialog-header"
+                style="display: flex; justify-content: center; align-items: center; position: relative;">
+                <h3 style="margin: 0;">购买章节</h3>
+                <button class="da_close-btn" @click="showPurchaseDialog = false"
+                    style="position: absolute; right: 20px;">&times;</button>
+            </div>
+            <div class="purchase-content">
+                <p>本章节价格为 ￥{{ (selectedChapter.calculatedPrice / 100).toFixed(2) }}</p>
+            </div>
+            <button class="confirm-reward-btn" @click="purchase_Chapter">
+                确认购买
+            </button>
+        </div>
+    </div>
+    <!-- 购买弹窗后面的余额不足弹窗 -->
+    <div v-if="showPurchaseInsufficientDialog" class="purchase-insufficient-overlay">
+        <div class="purchase-insufficient-dialog">
+            <div class="purchase-dialog-header">
+                <h3>章节购买</h3>
+                <button class="purchase-close-btn" @click="showPurchaseInsufficientDialog = false">&times;</button>
+            </div>
+            <div class="purchase-insufficient-content">
+                <p class="purchase-insufficient-message">账户余额不足，无法购买本章节</p>
+                <div class="purchase-amount-info">
+                    <span>章节价格：{{ (selectedChapter.calculatedPrice / 100).toFixed(2) }}元</span>
+                    <span>当前余额：{{ (accountBalance / 100).toFixed(2) }}元</span>
+                </div>
+                <div class="purchase-action-buttons">
+                    <button class="purchase-recharge-btn" @click="goToRecharge">立即充值</button>
+                    <button class="purchase-cancel-btn" @click="showPurchaseInsufficientDialog = false">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script setup>
@@ -445,6 +481,7 @@ import { rewardNovel } from '@/API/Reward_API';
 import { getTopLikedCommentsByChapter, createComment, getComment } from '@/API/Comment_API';
 import { getRepliesByParentId, addCommentReply } from '@/API/CommentReply_API';
 import { likeComment, unlikeComment, isLiked } from '@/API/Likes_API';
+import { checkPurchase, purchaseChapter } from '@/API/Purchase_API';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 const selectNovelState = SelectNovel_State();
@@ -457,8 +494,11 @@ const showCatalog = ref(false);
 const chapters = ref([]);
 const sortAscending = ref(true);
 const catalogStatus = ref(selectNovelState.status === '连载' ? '连载中' : '已完结');
-const hasPurchased = ref(false)
+const wholehasPurchased = ref(false)
 const showRewardDialog = ref(false);                  // 是否显示打赏弹窗
+const showPurchaseDialog = ref(false);
+const selectedChapter = ref(null);
+const showPurchaseInsufficientDialog = ref(false); // 购买余额不足弹窗状态
 // 打赏相关状态和函数
 const accountBalance = ref(0);                      // 账号余额
 const selectedReward = ref(100);                    // 默认选中100点打赏金额
@@ -489,8 +529,10 @@ function goToLogin() {
 function handletonovel() {
     router.push('/Novels/Novel_Info/home');
 }
-function goToInf() {
-    router.push('/Novels/ReaderInfomation');
+//打开主页的方法
+function openMyHomePage() {
+    // 打开新窗口，跳转到用户主页
+    window.open(`/UserHome`, '_blank');
 }
 function goToRecharge() {
     router.push('/Novels/Novel_Recharge');
@@ -597,7 +639,8 @@ async function handleAddShelf() {
 }
 async function changeChapter(num) {
     try {
-        const response = await getChapter(selectNovelState.novelId, selectNovelState.chapterId + num);
+        const nextChapterId = selectNovelState.chapterId + num;
+        const response = await getChapter(selectNovelState.novelId, nextChapterId);
         if (response.status !== '已发布') {
             toast("章节未发布!", {
                 "type": "error",
@@ -605,12 +648,20 @@ async function changeChapter(num) {
             });
             return;
         }
-        if (response.isCharged === '是' && !hasPurchased.value) {
-            toast("此章节需要购买后才能阅读", {
-                "type": "warning",
-                "dangerouslyHTMLString": true
-            });
-            return;
+        // 检查章节购买状态
+        if (response.isCharged === '是') {
+            const purchaseStatus = await checkPurchase(
+                reader_state.readerId,
+                selectNovelState.novelId,
+                nextChapterId
+            );
+            if (!purchaseStatus?.hasPurchased) {
+                toast("此章节需要购买后才能阅读", {
+                    "type": "warning",
+                    "dangerouslyHTMLString": true
+                });
+                return;
+            }
         }
         selectNovelState.resetChapter(
             response.chapterId,
@@ -630,7 +681,7 @@ async function changeChapter(num) {
         toast("章节加载失败", {
             "type": "warning",
             "dangerouslyHTMLString": true
-        })
+        });
     }
 }
 const handleKeyDown = (e) => {
@@ -650,16 +701,45 @@ const handleBack = () => {
 const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
-// 获取章节列表
+// 在获取章节列表后，检查每个章节的购买状态
 const fetchChapters = async () => {
     try {
         const response = await getChaptersByNovel(selectNovelState.novelId);
-        chapters.value = response
-            .filter(chapter => chapter.status !== '草稿')  // 过滤掉状态为"草稿"的章节
-            .map(chapter => ({
-                ...chapter
-            }));
+        // 获取所有章节的购买状态
+        const chaptersWithPurchaseStatus = await Promise.all(
+            response
+                .filter(chapter => chapter.status !== '草稿')
+                .map(async chapter => {
+                    // 如果是收费章节，检查是否已购买
+                    if (chapter.isCharged === '是') {
+                        try {
+                            const purchaseStatus = await checkPurchase(
+                                reader_state.readerId,
+                                chapter.novelId,
+                                chapter.chapterId
+                            );
+                            return {
+                                ...chapter,
+                                hasPurchased: purchaseStatus?.hasPurchased || wholehasPurchased.value
+                            };
+                        } catch (error) {
+                            console.error(`检查章节 ${chapter.chapterId} 购买状态失败:`, error);
+                            return {
+                                ...chapter,
+                                hasPurchased: false
+                            };
+                        }
+                    }
+                    // 免费章节直接标记为已购买
+                    return {
+                        ...chapter,
+                        hasPurchased: true
+                    };
+                })
+        );
+        chapters.value = chaptersWithPurchaseStatus;
     } catch (error) {
+        console.error('获取目录失败:', error);
         toast("获取目录失败!", {
             "type": "error",
             "dangerouslyHTMLString": true
@@ -681,14 +761,61 @@ const toggleSortOrder = () => {
     sortAscending.value = !sortAscending.value;
 };
 
-// 跳转到指定章节
-const goToChapter = async (chapter) => {
-    // 如果是收费章节且未购买，不跳转
-    if (chapter.isCharged === '是' && !hasPurchased.value) {
-        toast("此章节需要购买后才能阅读", {
-            "type": "warning",
-            "dangerouslyHTMLString": true
+const purchase_Chapter = async () => {
+    try {
+        if (accountBalance.value < selectedChapter.value.calculatedPrice) {
+            showPurchaseDialog.value = false;
+            showPurchaseInsufficientDialog.value = true;
+            return;
+        }
+        const response = await purchaseChapter({
+            readerId: reader_state.readerId,
+            novelId: selectedChapter.value.novelId,
+            chapterId: selectedChapter.value.chapterId
         });
+        if (response.success) {
+            // 更新章节购买状态
+            const chapterIndex = chapters.value.findIndex(
+                c => c.chapterId === selectedChapter.value.chapterId
+            );
+            if (chapterIndex !== -1) {
+                chapters.value[chapterIndex].hasPurchased = true;
+            }
+            reader_state.balance -= selectedChapter.value.calculatedPrice;
+            toast("购买成功！", {
+                type: "success",
+                dangerouslyHTMLString: true
+            });
+            // 跳转到该章节
+            goToChapter(selectedChapter.value);
+        } else {
+            toast("购买失败: " + (response.message || "未知错误"), {
+                type: "error",
+                dangerouslyHTMLString: true
+            });
+        }
+    } catch (error) {
+        console.error('购买章节失败:', error);
+        if (error.response && error.response.status === 400) {
+            showPurchaseDialog.value = false;
+            showPurchaseInsufficientDialog.value = true;
+        } else {
+            toast("购买失败: " + (error.message || "未知错误"), {
+                type: "error",
+                dangerouslyHTMLString: true
+            });
+        }
+    } finally {
+        showPurchaseDialog.value = false;
+    }
+};
+
+// goToChapter 函数，使用章节级别的购买状态
+const goToChapter = async (chapter) => {
+    // 如果是收费章节且未购买，显示购买弹窗
+    if (chapter.isCharged === '是' && !chapter.hasPurchased) {
+        selectedChapter.value = chapter;
+        showPurchaseDialog.value = true;
         return;
     }
     try {
@@ -722,6 +849,7 @@ const goToChapter = async (chapter) => {
         });
     }
 };
+
 // 选择打赏金额
 const selectReward = (value) => {
     selectedReward.value = value;
@@ -1057,7 +1185,7 @@ onMounted(() => {
         if (availableVoices.value.length > 0) {
             selectedVoice.value = availableVoices.value[0].name;
         } else {
-            toast("未找到中文语音引擎", { type: "warning" });
+            console.error("未找到中文语音引擎", availableVoices.value);
         }
     } else {
         toast("您的浏览器不支持语音合成功能", { type: "error" });
@@ -1101,8 +1229,7 @@ const startSpeaking = () => {
     utterance.value.onend = () => {
         isSpeaking.value = false;
     };
-    utterance.value.onerror = (event) => {
-        console.error('语音合成错误:', event);
+    utterance.value.onerror = () => {
         isSpeaking.value = false;
         toast("已停止朗读。", { type: "success" });
     };
@@ -1145,7 +1272,7 @@ onMounted(() => {
 onMounted(async () => {
     try {
         const status = await getWholePurchaseStatus(reader_state.readerId, selectNovelState.novelId);
-        hasPurchased.value = status?.hasPurchased || false
+        wholehasPurchased.value = status?.hasPurchased || false
     } catch (err) {
         console.error('查询买断状态失败', err)
     }
@@ -1383,6 +1510,212 @@ onUnmounted(() => {
     line-height: 1.7;
     white-space: pre-line !important;
     word-break: break-word;
+}
+
+/* 购买弹窗样式*/
+.purchase-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.purchase-dialog {
+    background-color: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    padding: 25px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.3s ease;
+    z-index: 10000;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.purchase-content {
+    text-align: center;
+    margin: 25px 0;
+    font-size: 18px;
+    color: #333;
+    padding: 0 20px;
+}
+
+.purchase-content p {
+    margin: 15px 0;
+    font-weight: bold;
+    font-size: 20px;
+    color: #f56c6c;
+}
+
+.confirm-reward-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 15px;
+}
+
+.confirm-reward-btn:hover {
+    background-color: #ff5252;
+}
+
+.da_close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.2s;
+}
+
+.da_close-btn:hover {
+    color: #666;
+}
+
+/* 购买余额不足弹窗 - 完全独立样式 */
+.purchase-insufficient-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10001;
+}
+
+.purchase-insufficient-dialog {
+    background-color: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    padding: 20px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    animation: purchaseFadeIn 0.3s ease;
+}
+
+@keyframes purchaseFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.purchase-dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.purchase-dialog-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.purchase-close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+}
+
+.purchase-insufficient-content {
+    padding: 10px 0;
+}
+
+.purchase-insufficient-message {
+    color: #f56c6c;
+    font-size: 16px;
+    text-align: center;
+    margin: 10px 0 20px;
+}
+
+.purchase-amount-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 8px;
+}
+
+.purchase-amount-info span {
+    display: flex;
+    justify-content: space-between;
+    font-size: 15px;
+}
+
+.purchase-action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.purchase-recharge-btn {
+    flex: 1;
+    padding: 12px;
+    background-color: #f56c6c;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.purchase-recharge-btn:hover {
+    background-color: #e65c5c;
+}
+
+.purchase-cancel-btn {
+    flex: 1;
+    padding: 12px;
+    background-color: #f0f0f0;
+    color: #666;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.purchase-cancel-btn:hover {
+    background-color: #e0e0e0;
 }
 
 .right-menu {

@@ -23,3 +23,22 @@ export function purchaseChapter(purchaseData) {
         }
     })
 }
+
+/**
+ * 检查是否已购买章节
+ * @param {number} readerId - 读者ID
+ * @param {number} novelId - 小说ID
+ * @param {number} chapterId - 章节ID
+ * @returns {Promise<{success: boolean, hasPurchased: boolean}>} 返回购买状态
+ */
+export function checkPurchase(readerId, novelId, chapterId) {
+    return request({
+        url: '/api/Purchase/check',
+        method: 'get',
+        params: {
+            readerId,
+            novelId,
+            chapterId
+        }
+    })
+}

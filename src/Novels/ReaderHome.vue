@@ -30,8 +30,8 @@
                             <p>Lv1</p>
                         </div>
                         <div class="dropdown-divider"></div>
-                        <a href="#" @click.prevent="goToInf" class="dropdown-item">
-                            <i class="fa fa-book mr-2"></i> 我的书架
+                        <a href="#" @click.prevent="openMyHomePage" class="dropdown-item">
+                            <i class="fa fa-home mr-2"></i> 我的主页
                         </a>
                         <a href="#" @click.prevent="goToRecharge" class="dropdown-item">
                             <i class="fa fa-yen mr-2"></i> 去充值
@@ -180,8 +180,10 @@ function switchTab(tab) {
 function goToLogin() {
     router.push('/L_R/login');
 }
-function goToInf() {
-    router.push('/Novels/ReaderInfomation');
+//打开主页的方法
+function openMyHomePage() {
+    // 打开新窗口，跳转到用户主页
+    window.open(`/UserHome`, '_blank');
 }
 function goToRecharge() {
     router.push('/Novels/Novel_Recharge');

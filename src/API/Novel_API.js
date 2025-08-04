@@ -268,4 +268,30 @@ export function getLatestPublishedChapter(novelId) {
     })
 }
 
+/**
+ * 获取所有已发布的小说（状态为"连载"或"完结"）
+ * @returns {Promise<Array<Novel>>} 返回已发布小说数组
+ */
+export function getPublishedNovels() {
+    return request({
+        url: '/api/Novel/published',
+        method: 'get'
+    })
+}
 
+/**
+ * 获取分页的已发布小说
+ * @param {number} page - 页码
+ * @param {number} pageSize - 每页数量
+ * @returns {Promise<Array<Novel>>} 返回分页小说数组
+ */
+export function getPaginatedNovels(page = 1, pageSize = 15) {
+    return request({
+        url: '/api/Novel/published/by-id',
+        method: 'get',
+        params: {
+            page,
+            pageSize
+        }
+    })
+}

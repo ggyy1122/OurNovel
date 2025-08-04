@@ -124,6 +124,22 @@
             <pre>{{ apiResponse12 }}</pre>
         </div>
 
+        <h1>13:获取已发布小说</h1>
+        <button @click="function13">获取已发布小说</button>
+        <div v-if="apiResponse13">
+            <h3>响应数据：</h3>
+            <pre>{{ apiResponse13 }}</pre>
+        </div>
+
+        <h1>14:获取分页小说</h1>
+        <input v-model="page14" placeholder="输入页码" type="number" min="1" />
+        <input v-model="pageSize14" placeholder="输入每页数量" type="number" min="1" />
+        <button @click="function14">获取分页小说</button>
+        <div v-if="apiResponse14">
+            <h3>响应数据：</h3>
+            <pre>{{ apiResponse14 }}</pre>
+        </div>
+
     </div>
 </template>
 
@@ -141,7 +157,9 @@ import {
     getNovelCollectCount,
     uploadNovelCover,
     submitNovelEdit,
-    getLatestPublishedChapter
+    getLatestPublishedChapter,
+    getPublishedNovels,
+    getPaginatedNovels
 } from '@/API/Novel_API'
 
 import { useRouter } from 'vue-router'
@@ -374,6 +392,32 @@ async function function12() {
     } catch (error) {
         console.error('获取最新章节错误:', error)
         apiResponse12.value = { error: error.message }
+    }
+}
+
+//13:获取已发布小说
+const apiResponse13 = ref(null)
+async function function13() {
+    try {
+        const response = await getPublishedNovels()
+        apiResponse13.value = response
+    } catch (error) {
+        console.error('获取已发布小说错误:', error)
+        apiResponse13.value = { error: error.message }
+    }
+}
+
+//14:获取分页小说
+const page14 = ref(1)
+const pageSize14 = ref(15)
+const apiResponse14 = ref(null)
+async function function14() {
+    try {
+        const response = await getPaginatedNovels(page14.value, pageSize14.value)
+        apiResponse14.value = response
+    } catch (error) {
+        console.error('获取分页小说错误:', error)
+        apiResponse14.value = { error: error.message }
     }
 }
 </script>
