@@ -200,15 +200,15 @@ namespace OurNovel.Controllers
         }
 
         /// <summary>
-        /// 获取所有连载或完结的小说（分页，每页3条）
+        /// 获取所有已发布的小说（分页，按novelID顺序）
         /// </summary>
-        [HttpGet("all")]
-        public async Task<IActionResult> GetAllNovels([FromQuery] int page = 1)
+        [HttpGet("/published/by-id")]
+        public async Task<IActionResult> GetAllNovels([FromQuery] int page = 1, [FromQuery] int pageSize = 15)
         {
-            if (page < 1)
-                return BadRequest("页码必须大于等于1");
+            if (page < 1 || pageSize < 1)
+                return BadRequest("页码和每页数量必须大于等于1");
 
-            var novels = await _novelService.GetNovelsByPageAsync(page);
+            var novels = await _novelService.GetNovelsByPageAsync(page, pageSize);
             return Ok(novels);
         }
     }

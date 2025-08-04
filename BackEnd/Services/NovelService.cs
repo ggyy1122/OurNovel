@@ -204,11 +204,10 @@ namespace OurNovel.Services
 
 
         /// <summary>
-        /// 获取所有连载或完结的小说（分页，每页3条）
+        /// 获取所有已发布的小说（分页，按novelID顺序）
         /// </summary>
-        public async Task<List<Novel>> GetNovelsByPageAsync(int page)
+        public async Task<List<Novel>> GetNovelsByPageAsync(int page, int pageSize)
         {
-            const int pageSize = 3;
             int skip = (page - 1) * pageSize;
 
             return await _context.Novels
