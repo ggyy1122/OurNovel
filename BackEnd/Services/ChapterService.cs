@@ -160,6 +160,7 @@ namespace OurNovel.Services
 
             // 修改状态
             chapter.Status = newStatus;
+            chapter.PublishTime = DateTime.Now;
             await _chapterRepository.UpdateAsync(chapter);
 
             // 更新小说总字数与总价格
