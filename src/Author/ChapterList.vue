@@ -158,15 +158,15 @@
 </template>
 
 <script setup>
-import { computed} from 'vue';
+import { computed,onMounted} from 'vue';
 import { useRouter } from 'vue-router'
 import { useNovel } from '@/stores/CurrentNovel'
-import { useChapters } from '@/stores/Chapters'
+import { ChaptersStore } from '@/stores/Chapters'
 import { storeToRefs } from 'pinia'
 
 // 获取小说和章节相关状态和方法
 const { novel } = useNovel()
-const chaptersStore = useChapters(novel.value.novel_id)
+const chaptersStore = ChaptersStore()
 const { 
   activeChapter,
   showDeleteConfirm,
@@ -189,6 +189,16 @@ const {
 
 // 返回上一级
 const router = useRouter()
+
+
+onMounted(async () => {
+  try {
+    await chaptersStore.initialize(novel.value.novel_id)
+  } catch (error) {
+    console.error('初始化章节存储失败:', error)
+    router.push('/error') // 跳转到错误页面
+  }
+})
 const goBack = () => {
   router.go(-1)
 }
