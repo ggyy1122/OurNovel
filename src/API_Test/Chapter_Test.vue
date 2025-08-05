@@ -101,6 +101,15 @@
             <pre>{{ apiResponse7 }}</pre>
         </div>
 
+
+        <h1>8:新-获取小说的所有章节(不含内容)</h1>
+        <input v-model="novelId8" placeholder="输入小说ID" />
+        <button @click="function8">搜索</button>
+        <div v-if="apiResponse8">
+            <h3>响应数据：</h3>
+            <pre>{{ apiResponse8 }}</pre>
+        </div>
+
     </div>
 </template>
 
@@ -113,7 +122,8 @@ import {
     createChapter, 
     updateChapter, 
     deleteChapter,
-    reviewChapter 
+    reviewChapter ,
+    getNovelChaptersWithoutContent
 } from '@/API/Chapter_API'
 
 import { useRouter } from 'vue-router'
@@ -258,6 +268,20 @@ async function function7() {
     } catch (error) {
         console.error('审核章节请求错误:', error)
         apiResponse7.value = { error: error.message }
+    }
+}
+
+// 8: 新-获取小说的所有章节(含计算价格)
+const novelId8 = ref('')
+const apiResponse8 = ref(null)
+async function function8() {
+    try {
+        const response = await getNovelChaptersWithoutContent(novelId8.value)
+        apiResponse8.value = response
+        console.log('API 响应:', response)
+    } catch (error) {
+        console.error('API 请求错误:', error)
+        apiResponse8.value = { error: error.message + '，请检查小说ID是否正确' }
     }
 }
 </script>

@@ -43,6 +43,11 @@ import { ref, onMounted, onBeforeUnmount,computed } from 'vue'
 import { readerState } from '@/stores/index'
 import { getRecommendsByReader, deleteRecommend } from '@/API/Recommend_API'
 import { getAuthor } from '@/API/Author_API'
+import { useRouter } from 'vue-router'
+import { SelectNovel_State } from '@/stores/index'
+
+const selectNovelState = SelectNovel_State()
+const router = useRouter()
 
 const store = readerState()
 
@@ -132,8 +137,33 @@ function toggleSelect(novelId) {
   }
 }
 
-function viewDetail(item) {
-  alert('查看详情，小说ID：' + item.novel.novelId)
+// 查看详情
+async function viewDetail(item) {
+  try {
+        const response = await getAuthor(item.novel.authorId);
+        selectNovelState.resetNovel(
+            item.novel.novelId,
+            item.novel.authorId,
+            item.novel.novelName,
+            item.novel.introduction,
+            item.novel.createTime,
+            item.novel.coverUrl,
+            item.novel.score,
+            item.novel.totalWordCount,
+            item.novel.recommendCount,
+            item.novel.collectedCount,
+            item.novel.status,
+            item.novel.totalPrice,
+            response.authorName,
+            response.phone,
+            response.avatarUrl,
+            response.registerTime,
+            response.introduction
+        );
+    } catch (error) {
+        console.error('处理失败:', error);
+    }
+    router.push('/Novels/Novel_Info/home');
 }
 
 function handleClickOutside(event) {

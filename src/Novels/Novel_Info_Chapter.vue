@@ -132,7 +132,7 @@
 
 <script setup>
 import { ref, onMounted, computed, nextTick } from 'vue'
-import { getChaptersByNovel } from '@/API/Chapter_API'
+import { getNovelChaptersWithoutContent } from '@/API/Chapter_API'
 import { getWholePurchaseStatus, purchaseWholeNovel } from '@/API/Transaction_API'
 import { readerState, SelectNovel_State } from '@/stores/index'
 import { toast } from 'vue3-toastify'
@@ -175,7 +175,7 @@ const totalPages = computed(() =>
 // 初始化加载章节
 onMounted(async () => {
   try {
-    const response = await getChaptersByNovel(novelId);
+    const response = await getNovelChaptersWithoutContent(novelId);
     // 获取所有章节的购买状态
     const chaptersWithPurchaseStatus = await Promise.all(
       response

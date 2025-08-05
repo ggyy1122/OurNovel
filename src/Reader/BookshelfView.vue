@@ -14,7 +14,7 @@
             v-for="item in collects"
             :key="item.novel.novelId"
           >
-            <img :src="item.novel.fullCoverUrl" :alt="item.novel.novelName" />
+            <img :src="item.novel.fullCoverUrl" :alt="item.novel.novelName" @click="handle_NovelInfro(item)"/>
             <div class="book-title">{{ item.novel.novelName }}</div>
           </div>
           <div v-if="collects.length === 0" class="empty">暂无收藏内容</div>
@@ -36,7 +36,7 @@
             v-for="item in recommends"
             :key="item.novel.novelId"
           >
-            <img :src="item.novel.fullCoverUrl" :alt="item.novel.novelName" />
+            <img :src="item.novel.fullCoverUrl" :alt="item.novel.novelName" @click="handle_NovelInfro(item)"/>
             <div class="book-title">{{ item.novel.novelName }}</div>
           </div>
           <div v-if="recommends.length === 0" class="empty">暂无推荐内容</div>
@@ -58,7 +58,7 @@
             v-for="item in history"
             :key="item.novel.novelId"
           >
-            <img :src="item.novel.fullCoverUrl" :alt="item.novel.novelName" />
+            <img :src="item.novel.fullCoverUrl" :alt="item.novel.novelName" @click="handle_NovelInfro(item)"/>
             <div class="book-title">{{ item.novel.novelName }}</div>
           </div>
           <div v-if="history.length === 0" class="empty">暂无阅读历史</div>
@@ -77,6 +77,11 @@ import { getCollectsByReader } from '@/API/Collect_API'
 import { getRecommendsByReader } from '@/API/Recommend_API'
 import { getRecentReadingsByReaderId } from '@/API/Reader_API'
 import { getAuthor } from '@/API/Author_API'
+import { useRouter } from 'vue-router'
+import { SelectNovel_State } from '@/stores/index'
+
+const selectNovelState = SelectNovel_State()
+const router = useRouter()
 
 const store = readerState()
 const collects = ref([])
@@ -173,6 +178,36 @@ async function enrichNovelList(list = []) {
       return item
     })
   )
+}
+
+
+// 作品主页
+async function handle_NovelInfro(item) {
+  try {
+        const response = await getAuthor(item.novel.authorId);
+        selectNovelState.resetNovel(
+            item.novel.novelId,
+            item.novel.authorId,
+            item.novel.novelName,
+            item.novel.introduction,
+            item.novel.createTime,
+            item.novel.coverUrl,
+            item.novel.score,
+            item.novel.totalWordCount,
+            item.novel.recommendCount,
+            item.novel.collectedCount,
+            item.novel.status,
+            item.novel.totalPrice,
+            response.authorName,
+            response.phone,
+            response.avatarUrl,
+            response.registerTime,
+            response.introduction
+        );
+    } catch (error) {
+        console.error('处理失败:', error);
+    }
+    router.push('/Novels/Novel_Info/home');
 }
 
 // 滚动操作

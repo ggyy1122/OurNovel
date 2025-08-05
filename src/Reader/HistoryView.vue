@@ -10,7 +10,8 @@
           <button v-if="batchDeleteMode" @click="toggleSelectAll" class="select-all-btn">
             {{ allSelected ? '取消全选' : '全选' }}
           </button>
-          <button v-if="batchDeleteMode" @click="deleteSelected" :disabled="selectedIds.size === 0" class="batch-delete-confirm-btn">
+          <button v-if="batchDeleteMode" @click="deleteSelected" :disabled="selectedIds.size === 0"
+            class="batch-delete-confirm-btn">
             删除所选
           </button>
         </div>
@@ -20,16 +21,11 @@
         <div v-else>
           <div v-if="histories.length === 0" class="empty">暂无历史记录</div>
           <ul class="collect-list">
-            <li v-for="item in histories" :key="item.readingId" class="collect-item">
-              
-              <input
-                v-if="batchDeleteMode"
-                type="checkbox"
-                :value="item.novel.novelId"
+            <li v-for="item in histories" :key="item.readingId" class="collect-item" @click="handle_NovelInfro(item)">
+
+              <input v-if="batchDeleteMode" type="checkbox" :value="item.novel.novelId"
                 :checked="selectedIds.has(item.novel.novelId)"
-                @change="toggleSelect(item.novel.novelId, $event.target.checked)"
-                class="select-checkbox"
-              />
+                @change="toggleSelect(item.novel.novelId, $event.target.checked)" class="select-checkbox" />
 
               <img :src="item.novel.fullCoverUrl" alt="封面" class="cover" />
               <div class="collect-info">
@@ -55,7 +51,11 @@ import { ref, onMounted, computed } from 'vue'
 import { readerState } from '@/stores'
 import { getRecentReadingsByReaderId, deleteRecentReading } from '@/API/Reader_API'
 import { getAuthor } from '@/API/Author_API'
+import { useRouter } from 'vue-router'
+import { SelectNovel_State } from '@/stores/index'
 
+const selectNovelState = SelectNovel_State()
+const router = useRouter()
 const store = readerState()
 const histories = ref([])
 const loading = ref(false)
@@ -163,6 +163,35 @@ async function deleteSelected() {
   } catch (e) {
     alert('批量删除失败，请重试')
   }
+}
+
+// 作品主页
+async function handle_NovelInfro(item) {
+  try {
+    const response = await getAuthor(item.novel.authorId);
+    selectNovelState.resetNovel(
+      item.novel.novelId,
+      item.novel.authorId,
+      item.novel.novelName,
+      item.novel.introduction,
+      item.novel.createTime,
+      item.novel.coverUrl,
+      item.novel.score,
+      item.novel.totalWordCount,
+      item.novel.recommendCount,
+      item.novel.collectedCount,
+      item.novel.status,
+      item.novel.totalPrice,
+      response.authorName,
+      response.phone,
+      response.avatarUrl,
+      response.registerTime,
+      response.introduction
+    );
+  } catch (error) {
+    console.error('处理失败:', error);
+  }
+  router.push('/Novels/Novel_Info/home');
 }
 
 onMounted(fetchHistory)

@@ -544,7 +544,7 @@ watch(
 /*按钮逻辑部分*/
 //返回按钮
 function goback() {
-  router.push('/Novels/Novel_Layout/category');
+  router.back();
 }
 //收藏按钮的逻辑
 

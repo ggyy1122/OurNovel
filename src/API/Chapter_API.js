@@ -138,3 +138,18 @@ export function reviewChapter(novelId, chapterId, newStatus) {
         }
     })
 }
+
+/**
+ * 新：获取小说的所有章节（不含内容）
+ * @param {number} novelId - 小说ID
+ * @returns {Promise<Array>} 返回包含计算价格的章节数组
+ */
+export function getNovelChaptersWithoutContent(novelId) {
+    return request({
+        url: `/api/Chapter/novels/${novelId}/chapters`,
+        method: 'get',
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+}
