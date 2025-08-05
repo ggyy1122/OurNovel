@@ -473,7 +473,7 @@
 import { SelectNovel_State, readerState, current_state } from '@/stores/index';
 import { useRouter } from 'vue-router';
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
-import { getChapter, getChaptersByNovel } from '@/API/Chapter_API';
+import { getChapter, getNovelChaptersWithoutContent } from '@/API/Chapter_API';
 import { addOrUpdateCollect } from '@/API/Collect_API'
 import { getWholePurchaseStatus } from '@/API/Transaction_API'
 import { getReaderBalance, getReader } from '@/API/Reader_API';
@@ -704,7 +704,7 @@ const scrollToTop = () => {
 // 在获取章节列表后，检查每个章节的购买状态
 const fetchChapters = async () => {
     try {
-        const response = await getChaptersByNovel(selectNovelState.novelId);
+        const response = await getNovelChaptersWithoutContent(selectNovelState.novelId);
         // 获取所有章节的购买状态
         const chaptersWithPurchaseStatus = await Promise.all(
             response
