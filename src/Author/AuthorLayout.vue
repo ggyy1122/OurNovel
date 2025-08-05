@@ -70,7 +70,8 @@ onMounted(async () => {
 const logout = () => {
   if (confirm('确定要退出登录吗？')) {
     current_state().clearUserInfo()
-    author.currentAuthor = null
+    author.clearCurrentAuthor()
+    localStorage.removeItem('token')
     router.push('/L_R/Login')
   }
 }

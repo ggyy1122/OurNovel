@@ -110,8 +110,6 @@
 <script setup>
 // 导入小说状态
 import { useNovel } from '@/stores/CurrentNovel'
-import { useChapters } from '@/stores/Chapters'
-import { onMounted } from 'vue'
 
 const {
   novel,             
@@ -121,17 +119,6 @@ const {
   cancelDelete,       
   deleteNovel         
 } = useNovel()
-
-// 初始化章节store
-const chaptersStore = useChapters()
-
-// 组件挂载时获取章节
-onMounted(() => {
-  if (novel.value?.novel_id) {
-    chaptersStore.setNovelId(novel.value.novel_id)
-    chaptersStore.fetchChapters(novel.value.novel_id)
-  }
-})
 
 // 格式化时间
 const formatDateTime = (dateString) => {

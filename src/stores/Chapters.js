@@ -30,9 +30,9 @@ export const statusConfig = {
   }
 }
 
-export const useChapters = defineStore('chapters', {
+export const ChaptersStore = defineStore('chaptersStore', {
   state: () => ({
-    novelId:262,
+    novelId:null,
     chapters: [],
     activeChapterId: null,
     searchQuery: '',
@@ -68,6 +68,12 @@ export const useChapters = defineStore('chapters', {
   },
   
   actions: {
+    async initialize(novelId) {
+      if (!novelId) throw new Error('必须提供 novelId')
+      this.novelId = novelId
+      await this.fetchChapters(novelId)
+    },
+
     setNovelId(novelId) {
       this.novelId = novelId;
     },

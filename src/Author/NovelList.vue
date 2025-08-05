@@ -56,7 +56,13 @@
             <h3 class="novel-title">{{ novel.novel_name }}</h3>
             <p class="meta">
               <span>{{ novel.total_word_count }}字</span>
-              <span>♡{{ novel.collected_count }}</span>
+              
+              <span>
+                <svg class="bookmark-icon" viewBox="0 0 24 24" width="16" height="16">
+                  <path d="M18 2H6v16l6-3 6 3V2z" fill="none" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                {{ novel.collected_count }}
+              </span>
             </p>
           </div>
         </router-link>
@@ -432,5 +438,8 @@ export default {
   line-height: 1.3;
   margin-bottom: 12px;
   text-shadow: 0 1px 1px rgba(0,0,0,0.05); /* 微妙阴影 */
+}
+.bookmark-icon {
+  vertical-align: middle;
 }
 </style>

@@ -12,8 +12,8 @@ export function useNovel() {
   const route = useRoute()
   const router = useRouter()
   
-  // 共享的小说数据状态
-  const novel = ref({
+  // 使用 novelsStore 中的 currentNovel 作为初始值
+  const novel = ref(novelsStore.currentNovel || {
     novel_id: 0,
     novel_name: '',
     cover_url: '',
@@ -59,6 +59,8 @@ export function useNovel() {
       
       if (isMounted) {
         novel.value.comment_count = response.commentCount || 0
+        // 更新持久化存储
+        novelsStore.setCurrentNovel(novel.value)
       }
     } catch (error) {
       console.error('获取评论数失败:', error)
@@ -77,6 +79,8 @@ export function useNovel() {
       
       if (isMounted) {
         novel.value.categories = categoriesData.map(item => item.categoryName)
+        // 更新持久化存储
+        novelsStore.setCurrentNovel(novel.value)
       }
     } catch (error) {
       console.error('获取分类失败:', error)
@@ -93,24 +97,34 @@ export function useNovel() {
       if (isNaN(novelId)) {
         throw new Error('无效的小说ID')
       }
-      const fetchedNovel = novelsStore.getNovelById(novelId)
-      if (!fetchedNovel) {
-        throw new Error('找不到该小说')
+      
+      // 首先检查是否有持久化的当前小说
+      if (novelsStore.currentNovel && novelsStore.currentNovel.novel_id === novelId) {
+        novel.value = { ...novelsStore.currentNovel }
+      } else {
+        const fetchedNovel = novelsStore.getNovelById(novelId)
+        if (!fetchedNovel) {
+          throw new Error('找不到该小说')
+        }
+        
+        if (isMounted) {
+          novel.value = {
+            ...fetchedNovel,
+            cover_url: fetchedNovel.cover_url || 'https://ftp.bmp.ovh/imgs/2019/11/06800705be93b1bb.png',
+            categories: [],
+            comment_count: 0
+          }
+          // 设置当前小说到持久化存储
+          novelsStore.setCurrentNovel(novel.value)
+        }
       }
       
-      if (isMounted) {
-        novel.value = {
-          ...fetchedNovel,
-          cover_url: fetchedNovel.cover_url || 'https://ftp.bmp.ovh/imgs/2019/11/06800705be93b1bb.png',
-          categories: [],
-          comment_count: 0
-        }
-        // 并行获取分类和评论数
-        await Promise.all([
-          fetchCategories(novelId),
-          fetchCommentCount(novelId)
-        ])
-      }
+      // 并行获取分类和评论数
+      await Promise.all([
+        fetchCategories(novelId),
+        fetchCommentCount(novelId)
+      ])
+      
     } catch (err) {
       console.error(err)
       router.push('/author/novels')
@@ -141,6 +155,8 @@ export function useNovel() {
     const reader = new FileReader();
     reader.onload = (e) => {
       novel.value.cover_url = e.target.result;
+      // 更新持久化存储
+      novelsStore.setCurrentNovel(novel.value)
     };
     reader.readAsDataURL(file);
   }
@@ -183,6 +199,8 @@ export function useNovel() {
       deleteError.value = null
       await deleteNovel(novel.value.novel_id)
       await novelsStore.removeNovel(novel.value.novel_id)
+      // 清除持久化存储
+      novelsStore.clearCurrentNovel()
       router.push('/author/novels')
     } catch (error) {
       console.error('删除小说失败:', error)
@@ -213,6 +231,8 @@ export function useNovel() {
           const avatarUrl = await uploadNovelCover(novel.value.novel_id, coverFile);
           if (avatarUrl) {
             novel.value.cover_url = novelsStore.getFullCoverUrl(avatarUrl);
+            // 更新持久化存储
+            novelsStore.setCurrentNovel(novel.value)
           }
         }
       }
@@ -264,6 +284,6 @@ export function useNovel() {
     cancelDelete,
     deleteNovel: performDelete,
     saveNovel,
-    fetchCommentCount // 暴露获取评论数方法
+    fetchCommentCount
   }
 }

@@ -1,13 +1,15 @@
 // src/stores/Novels.js
 import { reactive } from 'vue'
 import { getAuthorNovel } from '@/API/Novel_API'
-import { authorStore} from './CurrentAuthor'
+import { authorStore } from './CurrentAuthor'
 
 export const novelsStore = reactive({
   novels: [],
+  currentNovel: JSON.parse(localStorage.getItem('currentNovel')) || null, 
   isLoading: false,
   error: null,
   shouldRefresh: false,
+  
   async fetchNovels() {
     this.isLoading = true
     this.error = null
@@ -30,7 +32,7 @@ export const novelsStore = reactive({
         create_time: novel.createTime,
         recommend_count: novel.recommendCount || 0,
         collected_count: novel.collectedCount || 0,
-        total_price:novel.totalPrice
+        total_price: novel.totalPrice
       }))
       
     } catch (error) {
@@ -47,14 +49,24 @@ export const novelsStore = reactive({
     }
   },
 
+  // 设置当前小说并持久化存储
+  setCurrentNovel(novel) {
+    this.currentNovel = novel
+    localStorage.setItem('currentNovel', JSON.stringify(novel))
+  },
+
+  // 清除当前小说
+  clearCurrentNovel() {
+    this.currentNovel = null
+    localStorage.removeItem('currentNovel')
+  },
+
   // 统一的封面URL处理方法
   getFullCoverUrl(partialPath) {
     if (!partialPath) {
       // 随机默认封面
       return 'https://picsum.photos/300/400?random=' + Math.floor(Math.random() * 1000)
     }
-    
-    // 如果已经是完整URL，直接返回
     if (partialPath.startsWith('http')) return partialPath
     const ossBase = 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/'
     return `${ossBase}${partialPath.replace(/^\//, '')}`
@@ -87,6 +99,9 @@ export const novelsStore = reactive({
   async removeNovel(id) {
     try {
       this.novels = this.novels.filter(novel => novel.novel_id !== id)
+      if (this.currentNovel && this.currentNovel.novel_id === id) {
+        this.clearCurrentNovel()
+      }
     } catch (error) {
       console.error('删除小说失败:', error)
       throw error

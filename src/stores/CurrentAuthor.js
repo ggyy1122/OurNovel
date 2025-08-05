@@ -7,7 +7,7 @@ import { changeAuthorPassword } from '@/API/Log_API'
 
 export const authorStore = reactive({
   // 作者数据
-  currentAuthor: {
+  currentAuthor: JSON.parse(localStorage.getItem("currentAuthor")) || {
     author_id: '',
     author_name: '加载中...',
     avatar_url: '', 
@@ -56,7 +56,7 @@ export const authorStore = reactive({
         avatar_url: this.getFullAvatarUrl(response.avatarUrl)  ,
         registertime: response.registerTime || null
       }
-      console.log(this.currentAuthor)
+      localStorage.setItem("currentAuthor", JSON.stringify(this.currentAuthor));
     } catch (error) {
       this.error = error
       console.error('获取作者信息失败:', error)
@@ -73,6 +73,20 @@ export const authorStore = reactive({
     } finally {
       this.isLoading = false
     }
+  },
+  // 退出登录清空信息
+  clearCurrentAuthor() {
+    this.currentAuthor = {
+      author_id: '',
+      author_name: '',
+      avatar_url: '',
+      introduction: '',
+      phone: '',
+      password: '',
+      earnings: 0,
+      registertime: null
+    };
+    localStorage.removeItem("currentAuthor");
   },
 
   getFullAvatarUrl(partialPath) {
