@@ -34,6 +34,30 @@ namespace OurNovel.Controllers
         }
 
         /// <summary>
+        /// 新：获取小说的所有章节
+        /// </summary>
+        [HttpGet("novels/{novelId}/chapters")]
+        public async Task<IActionResult> GetChapters(int novelId)
+        {
+            var chapters = await _chapterService.GetByNovelIdAsync(novelId);
+
+            var result = chapters.Select(c => new
+            {
+                c.NovelId,
+                c.ChapterId,
+                c.Title,
+                c.WordCount,
+                c.PricePerKilo,
+                c.IsCharged,
+                c.PublishTime,
+                c.Status,
+                CalculatedPrice = Math.Round((c.WordCount / 1000m) * c.PricePerKilo, 2)
+            });
+
+            return Ok(result);
+        }
+
+        /// <summary>
         /// 获取指定章节
         /// </summary>
         [HttpGet("{novelId:int}/{chapterId:int}")]
