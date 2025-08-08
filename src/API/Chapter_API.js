@@ -129,11 +129,13 @@ export function deleteChapter(novelId, chapterId) {
  * @param {string} newStatus - 新状态（"通过" 或 "封禁"）
  * @returns {Promise<{success: boolean, message: string}>}
  */
-export function reviewChapter(novelId, chapterId, newStatus) {
+export function reviewChapter(novelId, chapterId,newStatus, managerId,result) {
     return request({
         url: `/api/Chapter/novels/${novelId}/chapters/${chapterId}/review`,
         method: 'put',
         params: {
+            managerId: managerId,
+            result: result,
             newStatus: newStatus
         }
     })

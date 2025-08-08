@@ -71,3 +71,14 @@ export function processReport(reportId, progress, managerId) {
         }
     })
 }
+
+//根据id获取单个举报
+export function getReportById(reportId) {
+    return request({
+        url: `/api/Reports/${reportId}`,
+        method: 'get',
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+}
