@@ -2,6 +2,19 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Admin_Layout from '@/Admin/Admin_Layout.vue'
 import Dash_board from '@/Admin/Dash_Board.vue'
 import Novels_Board from '@/Admin/Novels_Board.vue'
+import Users_Board from '@/Admin/Users_Board.vue'
+import Chapter_Board from '@/Admin/Chapter_Board.vue'
+import ToBeReviewed_Novels from '@/Admin/ToBeReviewed_Novels.vue'
+import Serial_Novels from '@/Admin/Serial_Novels.vue'
+import Finish_Novels from '@/Admin/Finish_Novels.vue'
+import Ban_Novels from '@/Admin/Ban_Novels.vue'
+import NovelDetailView from '@/Admin/NovelDetailView.vue'
+import Complaints_processed from '@/Admin/Report_processed.vue'
+import Complaints_unprocessed from '@/Admin/Report_unprocessed.vue'
+import Comment_detail from '@/Admin/Comment_detail.vue'
+import NovelCreate from '@/Admin/Novel_Create.vue'
+
+
 import Home from '@/views/Home_test.vue'
 import Novel_Layout from '@/Novels/Novel_Layout.vue'
 import Novel_Home from '@/Novels/Novel_Home.vue'
@@ -218,8 +231,48 @@ const routes = [
             {
                 path: 'novelsboard',
                 component: Novels_Board
-            }
+            },
+            {
+                path: 'users',
+                component: Users_Board
+            },
+           {
+                path: 'chapterboard',
+                name: 'ChapterBoard',
+                component: Chapter_Board
+            },
+            {
+                path: 'chapter/:novel_id/:chapter_id',
+                name: 'ChapterContent',
+                component: () => import('@/Admin/Chapter_Content.vue'),
+                props: true
+            },
             // 其他管理路由可以在这里添加
+            {
+                path: 'novel_managent',
+                name: 'novel_managent',// 路由的唯一标识
+                children: [
+                    {path: 'ToBeReviewed_Novels', name: 'ToBeReviewed_Novels', component: ToBeReviewed_Novels} ,
+                    {path: 'Serial_Novels', name: 'Serial_Novels', component: Serial_Novels} ,
+                    {path: 'Finish_Novels', name: 'Finish_Novels', component: Finish_Novels} ,
+                    {path: 'Ban_Novels', name: 'Ban_Novels', component: Ban_Novels} ,
+                    { path: 'novelInfo', name: 'novel-detail', component: NovelDetailView },
+                    {path:'novel_create',name:'novel_create',component:NovelCreate}
+                ]
+            },
+            {
+                path: 'complaint_management',
+                name: 'complaint_management',
+                children: [
+                    { path: 'processed', name: 'processed', component: Complaints_processed },
+                    { path: 'unprocessed', name: 'unprocessed', component: Complaints_unprocessed }
+                ]
+            },
+            {
+                path: '/comment_detail',
+                name:'comment_detail',
+                component: Comment_detail
+            }
         ]
     },
     {
