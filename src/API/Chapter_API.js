@@ -155,3 +155,17 @@ export function getNovelChaptersWithoutContent(novelId) {
         }
     })
 }
+
+/**
+ * 获取所有章节更新日志
+ * @returns {Promise<Object>} 返回更新日志数组
+ */
+export function getChapterLogs() {
+    return request({
+        url: '/api/ChapterManagement/logs/all',
+        method: 'get',
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+}
