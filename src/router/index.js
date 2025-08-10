@@ -269,7 +269,7 @@ const routes = [
                 ]
             },
             {
-                path: '/comment_detail',
+                path: 'comment_detail',
                 name:'comment_detail',
                 component: Comment_detail
             }
