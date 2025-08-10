@@ -21,7 +21,8 @@
         <div v-else>
           <div v-if="histories.length === 0" class="empty">暂无历史记录</div>
           <ul class="collect-list">
-            <li v-for="item in histories" :key="item.readingId" class="collect-item" @click="handle_NovelInfro(item)">
+            <li v-for="item in histories" :key="item.readingId" class="collect-item"
+              @click="handle_NovelInfro(item, $event)">
 
               <input v-if="batchDeleteMode" type="checkbox" :value="item.novel.novelId"
                 :checked="selectedIds.has(item.novel.novelId)"
@@ -166,7 +167,10 @@ async function deleteSelected() {
 }
 
 // 作品主页
-async function handle_NovelInfro(item) {
+async function handle_NovelInfro(item, event) {
+  if (event && event.target.classList.contains('select-checkbox')) {
+    return;
+  }
   try {
     const response = await getAuthor(item.novel.authorId);
     selectNovelState.resetNovel(

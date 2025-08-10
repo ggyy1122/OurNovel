@@ -39,7 +39,7 @@
                     </template>
                 </div>
                 <!-- 分页控件 -->
-                <div v-if="rankedNovels.length > pageSize" class="pagination">
+                <div v-if="rankedNovels.length > 0" class="pagination">
                     <button :disabled="currentPage === 1" @click="changePage(currentPage - 1)" class="page-btn">
                         上一页
                     </button>
@@ -75,7 +75,7 @@ const rankType = ['前10榜', '前20榜']
 
 // 分页相关状态
 const currentPage = ref(1)
-const pageSize = ref(5) // 每页显示10条
+const pageSize = ref(10) // 每页显示10条
 const jumpPage = ref(1)
 
 const selectedTab = ref('全部')
