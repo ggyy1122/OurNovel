@@ -32,6 +32,27 @@
         </div>
 
         <div class="divider">
+        <span>专题：TJ小说网“历史区”征文</span>
+        </div>
+        <div class="history-novels-container">
+           <div class="intro-text">
+                主打 <strong>穿越历史</strong> 题材，<strong>奇思妙想</strong> 与 <strong>史实交融</strong>，书写别样 <strong>时空传奇</strong>。
+            </div>
+            <ul class="novel-list">
+                <li v-for="book in books" :key="book.novelId" class="novel-item">
+                    <div class="cover-wrapper">
+                         <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + book.cover" class="novel-cover" />
+                    </div>
+                    <div class="novel-info">
+                        <h4 class="novel-title">{{ book.title }}</h4>
+                        <p class="novel-author">作者：{{ book.author }}</p>
+                        <p class="novel-category">{{ book.category }}</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="divider">
             <span>大神风采</span>
         </div>
         <!-- 作者展示 -->
@@ -74,6 +95,29 @@
             </div>
             <button class="novel-carousel-control next" @click="nextNovel">›</button>
         </div>
+
+       <div class="divider">
+  <span>最近更新</span>
+</div>
+
+<table class="recent-update-table">
+  <thead>
+    <tr>
+      <th>书名</th>
+      <th>章节</th>
+      <th>作者</th>
+      <th>更新时间</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-for="update in recentUpdates" :key="update.title + update.chapter">
+      <td>《{{ update.title }}》</td>
+      <td>{{ update.chapter }}</td>
+      <td>{{ update.author }}</td>
+      <td>{{ update.time }}</td>
+    </tr>
+  </tbody>
+</table>
         <!-- 底部信息区域 -->
         <footer class="zh-footer">
             <div class="zh-footer-partner">
@@ -312,13 +356,100 @@ const prevSlide = () => {
 const goToSlide = (index) => {
     currentIndex.value = index
 }
+//历史征文
+import { getNovelsByCategory } from '@/API/NovelCategory_API'
 
-onMounted(() => {
-    startAutoPlay()
-    startNovelAutoPlay()
-    fetchAuthors()
-    fetchNovels()
+const books = ref([])
+
+async function fetchHistoryNovels() {
+  const novels = await getNovelsByCategory('历史')
+  if (!novels || novels.length === 0) {
+    books.value = []
+    return
+  }
+
+  const filtered = novels.filter(n => n.status === '连载' || n.status === '完结').slice(0, 5)
+
+  const detailedBooks = await Promise.all(
+    filtered.map(async (novel) => {
+      try {
+        const detail = await getNovel(novel.novelId)
+        let authorName = '未知作者'
+
+        try {
+          const author = await getAuthor(detail.authorId)
+          authorName = author.authorName || '未知作者'
+        } catch (error) {
+          console.warn('获取作者失败:', error)
+        }
+
+        return {
+          novelId: novel.novelId,
+          title: detail.novelName,
+          author: authorName,
+          status: detail.status,
+          cover: detail.coverUrl,
+          intro: detail.introduction
+        }
+      } catch {
+        return {
+          novelId: novel.novelId,
+          title: novel.title,
+          author: '未知作者',
+          status: novel.status,
+          cover: novel.coverImg,
+          intro: ''
+        }
+      }
+    })
+  )
+
+  books.value = detailedBooks
+}
+
+//更新
+import { getChapter, getChapterLogs } from '@/API/Chapter_API'  
+
+
+const recentUpdates = ref([])
+
+async function fetchRecentUpdates() {
+  const logsRes = await getChapterLogs()
+  if (!logsRes || !logsRes.data) return
+
+  const sortedLogs = logsRes.data
+    .sort((a, b) => new Date(b.time) - new Date(a.time))
+    .slice(0, 6)
+
+  const updates = await Promise.all(sortedLogs.map(async log => {
+    try {
+      const novel = await getNovel(log.novelId)
+      const chapter = await getChapter(log.novelId, log.chapterId)
+      const author = await getAuthor(novel.authorId)
+      return {
+        title: novel.novelName || '未知小说',
+        author: author.authorName || '未知作者',
+        chapter: `第${chapter.chapterId}章 ${chapter.title}`,
+        time: log.time
+      }
+    } catch {
+      return null
+    }
+  }))
+
+  recentUpdates.value = updates.filter(Boolean)
+}
+
+
+onMounted(async () => {
+  startAutoPlay()
+  startNovelAutoPlay()
+  fetchAuthors()
+  fetchNovels()
+  await fetchHistoryNovels()
+  fetchRecentUpdates()
 })
+
 onUnmounted(() => {
     pauseAutoPlay()
     stopNovelAutoPlay()
@@ -835,4 +966,101 @@ watch(novelCurrent, startNovelAutoPlay)
         padding-right: 10px;
     }
 }
+
+.history-novels-container {
+  padding: 20px;
+  background-color: #fff;
+}
+
+.novel-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.novel-item {
+  width: 180px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.novel-item:hover {
+  transform: translateY(-4px);
+}
+
+.cover-wrapper {
+  width: 100%;
+  height: 240px;
+  overflow: hidden;
+}
+
+.novel-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.novel-info {
+  padding: 10px;
+  text-align: left;
+}
+
+.novel-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0;
+  color: #333;
+}
+
+.novel-author {
+  font-size: 14px;
+  color: #777;
+  margin-top: 6px;
+}
+
+.novel-category {
+  font-size: 12px;
+  color: #aaa;
+  margin-top: 4px;
+}
+.intro-text {
+  margin: 10px 0 16px;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #444;
+  background: #f9f9f9;
+  padding: 10px 12px;
+  border-left: 4px solid #c39762;
+  border-radius: 4px;
+}
+.recent-update-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px; /* 和全页面匹配的字体大小 */
+}
+
+.recent-update-table th,
+.recent-update-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.recent-update-table th {
+  background-color: #f5f5f5; /* 表头淡灰色背景 */
+  font-weight: bold;
+}
+
+.recent-update-table tr:hover {
+  background-color: #fafafa; /* 鼠标悬停行高亮 */
+}
+
 </style>

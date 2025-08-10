@@ -129,11 +129,13 @@ export function deleteChapter(novelId, chapterId) {
  * @param {string} newStatus - 新状态（"通过" 或 "封禁"）
  * @returns {Promise<{success: boolean, message: string}>}
  */
-export function reviewChapter(novelId, chapterId, newStatus) {
+export function reviewChapter(novelId, chapterId,newStatus, managerId,result) {
     return request({
         url: `/api/Chapter/novels/${novelId}/chapters/${chapterId}/review`,
         method: 'put',
         params: {
+            managerId: managerId,
+            result: result,
             newStatus: newStatus
         }
     })
@@ -147,6 +149,20 @@ export function reviewChapter(novelId, chapterId, newStatus) {
 export function getNovelChaptersWithoutContent(novelId) {
     return request({
         url: `/api/Chapter/novels/${novelId}/chapters`,
+        method: 'get',
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+}
+
+/**
+ * 获取所有章节更新日志
+ * @returns {Promise<Object>} 返回更新日志数组
+ */
+export function getChapterLogs() {
+    return request({
+        url: '/api/ChapterManagement/logs/all',
         method: 'get',
         headers: {
             'Accept': 'application/json'
