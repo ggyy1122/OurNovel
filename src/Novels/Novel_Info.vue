@@ -282,8 +282,6 @@ import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import { getRatesByReader, addRate } from '@/API/Rate_API';
 import { checkPurchase } from '@/API/Purchase_API';
-
-
 const selectNovelState = SelectNovel_State();      //当前选择的小说对象
 const ReaderState = readerState();                   //当前读者对象
 const categories = ref([]);                          //分类数组
@@ -642,6 +640,20 @@ async function handleRead() {
       response.publishTime,
       response.status
     );
+    
+    // 添加或更新阅读记录
+    try {
+      // 假设readerId可以从用户状态获取，这里用selectNovelState.readerId表示
+      await addOrUpdateRecentReading(
+        ReaderState.readerId,  // 读者ID
+        selectNovelState.novelId    // 小说ID
+      );
+    } catch (historyError) {
+      console.error("记录阅读历史失败:", historyError);
+      // 这里可以选择不提示用户，因为阅读历史记录失败不影响主要功能
+    }
+    
+    // 跳转到阅读页面
     router.push('/Novels/reader');
   } catch (error) {
     toast("章节加载失败：第1章不存在！", {
