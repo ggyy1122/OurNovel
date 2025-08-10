@@ -25,7 +25,7 @@
           <td>{{ item.reason }}</td>
           <td>{{ item.reportTime }}</td>
           <td style="position:relative;">
-            <router-link :to="{ path: '/unprocessed_comment_detail', query: { id: item.reportId } }" class="view-link">查看</router-link>
+            <router-link :to="{ path: '/Admin/Admin_Layout/comment_detail', query: { id: item.reportId } }" class="view-link">查看</router-link>
             <span class="action-dots" @click="openMenu(item.reportId)">⋯</span>
             <div v-if="activeMenu === item.reportId" class="action-menu">
               <div class="action-item" @click="approve(item.reportId)">审核通过</div>
