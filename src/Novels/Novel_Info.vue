@@ -291,6 +291,7 @@ import {rewardNovel} from '@/API/Reward_API';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import {getRatesByReader,addRate} from '@/API/Rate_API';
+import {addOrUpdateRecentReading } from '@/API/Reader_API'
 
 
 
@@ -615,6 +616,8 @@ async function handleRead() {
       });
       return;
     }
+    
+    // 更新章节选择状态
     selectNovelState.resetChapter(
       response.chapterId,
       response.title,
@@ -626,6 +629,20 @@ async function handleRead() {
       response.publishTime,
       response.status
     );
+    
+    // 添加或更新阅读记录
+    try {
+      // 假设readerId可以从用户状态获取，这里用selectNovelState.readerId表示
+      await addOrUpdateRecentReading(
+        ReaderState.readerId,  // 读者ID
+        selectNovelState.novelId    // 小说ID
+      );
+    } catch (historyError) {
+      console.error("记录阅读历史失败:", historyError);
+      // 这里可以选择不提示用户，因为阅读历史记录失败不影响主要功能
+    }
+    
+    // 跳转到阅读页面
     router.push('/Novels/reader');
   } catch (error) {
     toast("章节加载失败：该章节不存在！", {
