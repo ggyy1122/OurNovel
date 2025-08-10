@@ -1,7 +1,6 @@
 // src/stores/CurrentNovel.js
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { authorStore } from './CurrentAuthor'
 import { novelsStore } from '@/stores/Novels'
 import { deleteNovel, submitNovelEdit } from '@/API/Novel_API'
 import { getCategoriesByNovel } from '@/API/NovelCategory_API'
@@ -216,12 +215,9 @@ export function useNovel() {
       editMode.value = false;
 
       await submitNovelEdit(novel.value.novel_id, {
-        novelId: novel.value.novel_id,
-        authorId: authorStore.currentAuthor.author_id,
         novelName: novel.value.novel_name,
         introduction: novel.value.introduction,
         status: novel.value.status,
-        totalPrice: 0
       });
 
       if (fileInput.value?.files?.length > 0) {
