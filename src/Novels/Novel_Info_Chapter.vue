@@ -304,8 +304,22 @@ async function handleChapterClick(chapter) {
     showChapterPurchaseDialog.value = true;
     return;
   }
+  try {
+    if (chapter.status !== '已发布') {
+      toast("第" + chapter.chapterId + "章未发布!", {
+        "type": "info",
+        "dangerouslyHTMLString": true
+      });
+      return;
+    }
+    selectChapter(chapter);
+  } catch (error) {
+    toast("章节加载失败!", {
+      "type": "info",
+      "dangerouslyHTMLString": true
+    });
+  }
 
-  selectChapter(chapter);
 }
 
 // 购买单章

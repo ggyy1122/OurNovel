@@ -41,7 +41,7 @@
       </template>
     </div>
     <!-- 分页控件 -->
-    <div v-if="filteredNovels.length > pageSize" class="pagination">
+    <div v-if="filteredNovels.length > 0" class="pagination">
       <button :disabled="currentPage === 1" @click="changePage(currentPage - 1)" class="page-btn">
         上一页
       </button>
@@ -71,7 +71,7 @@ import Novel_Card from '@/Novels/Novel_Card.vue'
 
 // 分页相关状态
 const currentPage = ref(1)
-const pageSize = ref(5) // 每页显示10条
+const pageSize = ref(10) // 每页显示10条
 const jumpPage = ref(1)
 
 // 分类数据
