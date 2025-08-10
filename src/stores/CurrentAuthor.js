@@ -163,21 +163,27 @@ export const authorStore = reactive({
     if (!this.validatePhone()) {
       return false;
     }
+    try {
+    this.isLoading = true;
     let avatarUrl = this.currentAuthor.avatar_url;
+    
+    // 如果是默认头像或dataURL，不上传
+    const isDefaultAvatar = typeof avatarUrl === 'string' && 
+      (avatarUrl.includes('default-avatar') || 
+       avatarUrl.startsWith('data:'));
+    
     const ossBase = 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/';
-    if (avatarUrl.startsWith(ossBase)) {
+    if (!isDefaultAvatar && avatarUrl.startsWith(ossBase)) {
       avatarUrl = avatarUrl.substring(ossBase.length);
     }
-    try {
-      this.isLoading = true;
     
-      const updateData = {
+    const updateData = {
       authorId: this.currentAuthor.author_id,
       authorName: this.currentAuthor.author_name,
       phone: this.currentAuthor.phone,
       introduction: this.currentAuthor.introduction,
       password: this.newPassword || this.currentAuthor.password, 
-      avatarUrl: avatarUrl,
+      avatarUrl: isDefaultAvatar ? null : avatarUrl, // 默认头像传null
       earnings: this.currentAuthor.earnings,
       registerTime: this.currentAuthor.registertime
     };

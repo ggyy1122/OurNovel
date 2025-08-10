@@ -245,17 +245,19 @@ export function uploadNovelCover(novelId, file) {
  * @param {Novel} editedNovel - 修改后的小说数据
  * @returns {Promise<{message: string, newNovelId: number}>}
  */
-export function submitNovelEdit(originalNovelId, editedNovel) {
+export function submitNovelEdit(novelId, updateData) {
     return request({
-        url: '/api/Novel/submit-edit',
+        url: `/api/Novel/submit-edit?originalNovelId=${novelId}`,
         method: 'post',
+        headers: {
+            'Content-Type': 'application/json'
+        },
         data: {
-            originalNovelId,
-            edited: editedNovel
+            originalNovelId: novelId,  
+            edited: updateData         
         }
     })
 }
-
 /**
  * 获取小说最新已发布章节信息
  * @param {number} novelId - 小说ID
