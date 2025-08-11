@@ -282,6 +282,7 @@ import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import { getRatesByReader, addRate } from '@/API/Rate_API';
 import { checkPurchase } from '@/API/Purchase_API';
+import {addOrUpdateRecentReading } from '@/API/Reader_API'
 const selectNovelState = SelectNovel_State();      //当前选择的小说对象
 const ReaderState = readerState();                   //当前读者对象
 const categories = ref([]);                          //分类数组

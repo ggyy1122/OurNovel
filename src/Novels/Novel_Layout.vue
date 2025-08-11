@@ -1,63 +1,71 @@
 <template>
     <div class="novels-layout">
         <!-- 顶部导航栏 -->
-        <header class="header" ref="mainHeader">
-            <div class="logo">
-                <img src="@/assets/logo.png" alt="TJ小说网" />
-                <h1>TJ小说网</h1>
-                <p>匠心打磨好作品</p>
+        <div class="combined-nav" ref="mainHeader">
+            <!-- 背景图片容器 -->
+            <div class="nav-bg">
+                <img src="@/assets/index_flower_left.png" class="bg-left" alt="左装饰">
+                <img src="@/assets/index_flower_right.png" class="bg-right" alt="右装饰">
             </div>
-            <div class="search-bar">
-                <input type="text" placeholder="输入小说名/作者名/读者名" v-model="searchQuery" @keyup.enter="handleSearch" />
-                <button @click="handleSearch">搜索</button>
-            </div>
-            <div class="user-actions">
-                <!-- 未登录状态 -->
-                <button v-if="!state.isloggedin" class="login-btn" @click="goToLogin">
-                    <span class="login-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <circle cx="12" cy="8" r="4" stroke="#222" stroke-width="2" />
-                            <ellipse cx="12" cy="17" rx="7" ry="4" stroke="#222" stroke-width="2" />
-                        </svg>
-                    </span>
-                    立即登录
-                </button>
-                <!-- 已登录状态 -->
-                <div v-else class="user-dropdown" @mouseenter="showDropdown = true" @mouseleave="showDropdown = false">
-                    <img :src="reader_state.formattedAvatarUrl" alt="用户头像" class="user-avatar" />
-                    <div v-if="showDropdown" class="dropdown-menu">
-                        <div class="user-info">
-                            <p>用户名：{{ reader_state.readerName }}</p>
-                            <p>Lv1</p>
+            <!-- 顶部内容 -->
+            <div class="nav-content">
+                <div class="logo">
+                    <img src="@/assets/logo.png" alt="TJ小说网" class="img" />
+                    <h1>TJ小说网</h1>
+                    <img src="@/assets/slogan.png" alt="匠心打磨好作品" class="img1" />
+                </div>
+                <div class="search-bar">
+                    <input type="text" placeholder="输入小说名/作者名/读者名" v-model="searchQuery" @keyup.enter="handleSearch" />
+                    <button @click="handleSearch">搜索</button>
+                </div>
+                <div class="user-actions">
+                    <!-- 未登录状态 -->
+                    <button v-if="!state.isloggedin" class="login-btn" @click="goToLogin">
+                        <span class="login-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="8" r="4" stroke="#222" stroke-width="2" />
+                                <ellipse cx="12" cy="17" rx="7" ry="4" stroke="#222" stroke-width="2" />
+                            </svg>
+                        </span>
+                        立即登录
+                    </button>
+                    <!-- 已登录状态 -->
+                    <div v-else class="user-dropdown" @mouseenter="showDropdown = true"
+                        @mouseleave="showDropdown = false">
+                        <img :src="reader_state.formattedAvatarUrl" alt="用户头像" class="user-avatar" />
+                        <div v-if="showDropdown" class="dropdown-menu">
+                            <div class="user-info">
+                                <p>用户名：{{ reader_state.readerName }}</p>
+                                <p>Lv1</p>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" @click.prevent="openMyHomePage" class="dropdown-item">
+                                <i class="fa fa-home mr-2"></i> 我的主页</a>
+                            <a href="#" @click.prevent="goToRecharge" class="dropdown-item">
+                                <i class="fa fa-yen mr-2"></i> 去充值
+                            </a>
+                            <a href="#" @click.prevent="logout" class="dropdown-item">
+                                <i class="fa fa-sign-out mr-2"></i> 退出
+                            </a>
                         </div>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" @click.prevent="openMyHomePage" class="dropdown-item">
-                            <i class="fa fa-home mr-2"></i> 我的主页</a>
-                        <a href="#" @click.prevent="goToRecharge" class="dropdown-item">
-                            <i class="fa fa-yen mr-2"></i> 去充值
-                        </a>
-                        <a href="#" @click.prevent="logout" class="dropdown-item">
-                            <i class="fa fa-sign-out mr-2"></i> 退出
-                        </a>
                     </div>
                 </div>
             </div>
-        </header>
-
-        <!-- 导航菜单 -->
-        <nav class="nav-menu" ref="mainNav" v-if="showNavMenu">
-            <ul>
-                <li>
-                    <router-link to="/Novels/Novel_Layout/home" active-class="active-link">首页</router-link>
-                </li>
-                <li>
-                    <router-link to="/Novels/Novel_Layout/category" active-class="active-link">分类</router-link>
-                </li>
-                <li>
-                    <router-link to="/Novels/Novel_Layout/rank" active-class="active-link">排行榜</router-link>
-                </li>
-            </ul>
-        </nav>
+            <!-- 导航菜单 -->
+            <nav class="nav-menu" ref="mainNav" v-if="showNavMenu">
+                <ul>
+                    <li>
+                        <router-link to="/Novels/Novel_Layout/home" active-class="active-link">首页</router-link>
+                    </li>
+                    <li>
+                        <router-link to="/Novels/Novel_Layout/category" active-class="active-link">分类</router-link>
+                    </li>
+                    <li>
+                        <router-link to="/Novels/Novel_Layout/rank" active-class="active-link">排行榜</router-link>
+                    </li>
+                </ul>
+            </nav>
+        </div>
 
         <!-- 悬浮导航栏 -->
         <div v-if="showNavMenu && showStickyNav" class="sticky-nav">
@@ -207,13 +215,53 @@ onUnmounted(() => {
     flex-direction: column;
     min-height: 100vh;
     position: relative;
+    /* background-color: #f7d8f4; */
+}
+
+.combined-nav {
+    position: relative;
+    background: #fdfafd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    z-index: 10;
+    padding: 0 75px;
+}
+
+.nav-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.bg-left {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+}
+
+.bg-right {
+    height: 60%;
+    width: auto;
+}
+
+.nav-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    z-index: 1;
 }
 
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
+    padding: 20px 75px;
     background-color: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
     z-index: 10;
@@ -224,23 +272,23 @@ onUnmounted(() => {
     align-items: center;
 }
 
-.logo img {
+.img {
     width: 50px;
     height: 50px;
-    margin-left: 30px;
+    margin-left: 40px;
     margin-right: 10px;
+    z-index: 10;
+}
+
+.img1 {
+    width: 170px;
+    height: 45px;
+    margin-left: 50px;
 }
 
 .logo h1 {
     font-size: 24px;
     margin: 0;
-}
-
-.logo p {
-    font-size: 18px;
-    color: #ff4d4f;
-    margin: 0;
-    margin-left: 16px;
 }
 
 .search-bar {
@@ -249,24 +297,24 @@ onUnmounted(() => {
     width: 100%;
     max-width: 400px;
     margin: 0 auto;
-    height: 40px;
+    height: 38px;
     margin-right: 180px;
 }
 
 .search-bar input {
     flex: 1;
     padding: 0 18px;
-    height: 36px;
+    height: 34px;
     border: 2px solid #ffd100;
     border-right: none;
     border-radius: 24px 0 0 24px;
     outline: none;
-    font-size: 18px;
+    font-size: 16px;
     background: #fff;
 }
 
 .search-bar button {
-    height: 40px;
+    height: 38px;
     padding: 0 32px;
     background-color: #ffd100;
     color: #222;
@@ -274,7 +322,7 @@ onUnmounted(() => {
     border: none;
     border-radius: 0 24px 24px 0;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 16px;
     box-shadow: none;
     transition: background 0.2s;
 }
@@ -307,14 +355,12 @@ onUnmounted(() => {
 .login-icon {
     display: flex;
     align-items: center;
-    margin-right: 8px;
 }
 
 .nav-menu {
-    background-color: #fff;
-    padding: 10px 20px;
+    padding: 20px 75px;
     border-bottom: 1px solid #eee;
-    z-index: 9;
+    z-index: -1;
 }
 
 .nav-menu ul {
@@ -371,12 +417,13 @@ onUnmounted(() => {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
+    width: 90%;
     background: #fff;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     z-index: 100;
     border-bottom: 1px solid #eee;
-    padding: 0 10px;
+    padding: 5px 75px;
+    margin: 0 auto;
 }
 
 .sticky-nav ul {
