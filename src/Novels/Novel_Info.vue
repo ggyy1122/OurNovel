@@ -276,7 +276,7 @@ import { getNovelWordCount, getNovelRecommendCount, getNovelCollectCount, getLat
 import { getAuthorNovelCount, getAuthorTotalWordCount, getAuthorRegisterDays } from '@/API/Author_API';
 import { getChapter } from '@/API/Chapter_API';
 import { addRecommend, deleteRecommend } from '@/API/Recommend_API';
-import { getReaderBalance } from '@/API/Reader_API';
+import { getReaderBalance, addOrUpdateRecentReading } from '@/API/Reader_API';
 import { rewardNovel } from '@/API/Reward_API';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
@@ -325,11 +325,14 @@ const rewardOptions = [
 const isCollected = computed(() => {
   //当前小说ID
   const currentNovelId = selectNovelState.novelId;
+  //console.log("是否收藏",currentNovelId)
+  //  console.log("本地收藏",ReaderState.favoriteBooks)
+  const a=ReaderState.favoriteBooks.some(item =>
+    item.novelId === currentNovelId)
+   // console.log("a",a)
   // 检查是否存在于收藏列表
-  return ReaderState.favoriteBooks.some(item =>
-    item.novel?.novelId === currentNovelId ||
-    item.novelId === currentNovelId
-  )
+  return a
+  
 })
 //是否被推荐
 const isRecommended = computed(() => {
@@ -581,7 +584,7 @@ const toggleCollect = async () => {
         {
           novelId: currentNovelId,
           novel: selectNovelState, // 保存完整作品信息
-          currentReaderId,
+          readerId:currentReaderId,
           isPublic: "no",
           collectTime: new Date().toISOString()
         }
