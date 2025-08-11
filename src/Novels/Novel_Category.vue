@@ -1,69 +1,72 @@
 <template>
-  <div class="novel-category-container">
-    <div class="category-filter">
-      <!-- 原有筛选部分保持不变 -->
-      <div class="filter-row">
-        <span class="filter-label">作品分类:</span>
-        <button v-for="category in categoriesWithAll" :key="category.id"
-          :class="['filter-btn', selected.category === category.categoryName ? 'active' : '']"
-          @click="selectFilter('category', category.categoryName)">
-          {{ category.categoryName }}
-        </button>
-      </div>
+  <div class="novel-category-wrapper">
+    <img :src="backgroundImages[currentBgIndex]" alt="background" class="background-image" />
+    <div class="novel-category-container">
+      <div class="category-filter">
+        <!-- 原有筛选部分保持不变 -->
+        <div class="filter-row">
+          <span class="filter-label">作品分类:</span>
+          <button v-for="category in categoriesWithAll" :key="category.id"
+            :class="['filter-btn', selected.category === category.categoryName ? 'active' : '']"
+            @click="selectFilter('category', category.categoryName)">
+            {{ category.categoryName }}
+          </button>
+        </div>
 
-      <div class="filter-row">
-        <span class="filter-label">作品字数:</span>
-        <button v-for="option in wordCountOptions" :key="option.value"
-          :class="['filter-btn', selected.wordCount === option.value ? 'active' : '']"
-          @click="selectFilter('wordCount', option.value)">
-          {{ option.text }}
-        </button>
-      </div>
+        <div class="filter-row">
+          <span class="filter-label">作品字数:</span>
+          <button v-for="option in wordCountOptions" :key="option.value"
+            :class="['filter-btn', selected.wordCount === option.value ? 'active' : '']"
+            @click="selectFilter('wordCount', option.value)">
+            {{ option.text }}
+          </button>
+        </div>
 
-      <div class="filter-row">
-        <span class="filter-label">是否完结:</span>
-        <button v-for="option in statusOptions" :key="option.value"
-          :class="['filter-btn', selected.isFinished === option.value ? 'active' : '']"
-          @click="selectFilter('isFinished', option.value)">
-          {{ option.text }}
-        </button>
+        <div class="filter-row">
+          <span class="filter-label">是否完结:</span>
+          <button v-for="option in statusOptions" :key="option.value"
+            :class="['filter-btn', selected.isFinished === option.value ? 'active' : '']"
+            @click="selectFilter('isFinished', option.value)">
+            {{ option.text }}
+          </button>
+        </div>
       </div>
-    </div>
-    <div class="novel-list">
-      <div v-if="loading" class="loading">加载中...</div>
-      <div v-else-if="!filteredNovels || filteredNovels.length === 0" class="no-data">暂无数据</div>
-      <template v-else>
-        <!-- 只显示当前页的小说 -->
-        <template v-for="(novel, index) in paginatedNovels" :key="novel.novelId">
-          <Novel_Card :novel="novel" :rank="(currentPage - 1) * pageSize + index + 1" />
-          <hr v-if="index < paginatedNovels.length - 1" class="novel-divider" />
+      <div class="novel-list">
+        <div v-if="loading" class="loading">加载中...</div>
+        <div v-else-if="!filteredNovels || filteredNovels.length === 0" class="no-data">暂无数据</div>
+        <template v-else>
+          <!-- 只显示当前页的小说 -->
+          <template v-for="(novel, index) in paginatedNovels" :key="novel.novelId">
+            <Novel_Card :novel="novel" :rank="(currentPage - 1) * pageSize + index + 1" />
+            <hr v-if="index < paginatedNovels.length - 1" class="novel-divider" />
+          </template>
         </template>
-      </template>
-    </div>
-    <!-- 分页控件 -->
-    <div v-if="filteredNovels.length > 0" class="pagination">
-      <button :disabled="currentPage === 1" @click="changePage(currentPage - 1)" class="page-btn">
-        上一页
-      </button>
-      <template v-for="page in visiblePages" :key="page">
-        <button :class="['page-btn', currentPage === page ? 'active' : '']" @click="changePage(page)">
-          {{ page }}
+      </div>
+      <!-- 分页控件 -->
+      <div v-if="filteredNovels.length > 0" class="pagination">
+        <button :disabled="currentPage === 1" @click="changePage(currentPage - 1)" class="page-btn">
+          上一页
         </button>
-      </template>
-      <button :disabled="currentPage === totalPages" @click="changePage(currentPage + 1)" class="page-btn">
-        下一页
-      </button>
-      <div class="page-jump">
-        <span>跳转至</span>
-        <input type="number" v-model.number="jumpPage" min="1" :max="totalPages" @keyup.enter="jumpToPage">
-        <span>/ {{ totalPages }} 页</span>
+        <template v-for="page in visiblePages" :key="page">
+          <button :class="['page-btn', currentPage === page ? 'active' : '']" @click="changePage(page)">
+            {{ page }}
+          </button>
+        </template>
+        <button :disabled="currentPage === totalPages" @click="changePage(currentPage + 1)" class="page-btn">
+          下一页
+        </button>
+        <div class="page-jump">
+          <span>跳转至</span>
+          <input type="number" v-model.number="jumpPage" min="1" :max="totalPages" @keyup.enter="jumpToPage">
+          <span>/ {{ totalPages }} 页</span>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch, computed } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, watch, computed } from 'vue'
 import { getAllCategories } from '@/API/Category_API'
 import { getNovelsByCategory } from '@/API/NovelCategory_API'
 import { getAllNovels } from '@/API/Novel_API'
@@ -235,12 +238,32 @@ function jumpToPage() {
   const page = Math.max(1, Math.min(jumpPage.value, totalPages.value))
   changePage(page)
 }
+// 背景图轮播相关
+const backgroundImages = [
+  require('@/assets/bac1.jpg'),
+  require('@/assets/bac2.jpg'),
+  require('@/assets/bac3.jpg'),
+  require('@/assets/bac4.jpg')
+]
+const currentBgIndex = ref(0)
+
+// 轮播背景图
+let bgInterval
 
 // 初始化数据
 onMounted(async () => {
   await fetchCategories()
   await fetchNovels()
   applyFilters()
+  // 启动背景轮播
+  bgInterval = setInterval(() => {
+    currentBgIndex.value = (currentBgIndex.value + 1) % backgroundImages.length
+  }, 3500)
+})
+
+// 组件卸载时清除定时器
+onUnmounted(() => {
+  clearInterval(bgInterval)
 })
 
 // 监听novels变化
@@ -248,14 +271,37 @@ watch(novels, applyFilters)
 </script>
 
 <style scoped>
-.novel-category-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+.novel-category-wrapper {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background-color: #fdfafd;
 }
 
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  object-fit: cover;
+  filter: blur(0.5px) brightness(0.9);
+  z-index: 0;
+  mask-image: linear-gradient(to bottom, black 30%, rgba(0, 0, 0, 0.7) 60%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 30%, rgba(0, 0, 0, 0.7) 60%, transparent 100%);
+  transition: opacity 1s ease-in-out;
+}
+
+.novel-category-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+  position: relative;
+  border-radius: 8px;
+}
+
+
 .category-filter {
-  background: #fafafa;
+  background: rgba(244, 242, 242, 0.6);
   border-radius: 16px;
   padding: 20px;
   margin-bottom: 24px;
