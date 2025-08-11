@@ -156,10 +156,12 @@ const fetchReaderData = async () => {
 // 获取收藏作品
 const fetchCollects = async () => {
     try {
-        const response = await getCollectsByReader(readerId)
-        collects.value = response || []
+        const response = await getCollectsByReader(readerId);
+        // 筛选出 isPublic 为 'yes' 的收藏
+        collects.value = response ? response.filter(item => item.isPublic === 'yes') : [];
+        console.log(collects.value); // 打印筛选后的结果
     } catch (error) {
-        console.error('获取收藏作品失败:', error)
+        console.error('获取收藏作品失败:', error);
     }
 }
 
