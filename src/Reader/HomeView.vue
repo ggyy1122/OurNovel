@@ -55,7 +55,7 @@
         <div class="card-content">
           <div class="card-title">我的推荐</div>
           <div class="card-value">{{ reader_state.recommendBooksCount }}本推荐</div>
-          <button class="card-button">立即查看</button>
+          <button class="card-button" @click="goToRecommend">立即查看</button>
         </div>
       </div>
       
@@ -63,7 +63,7 @@
         <div class="card-content">
           <div class="card-title">我的收藏</div>
           <div class="card-value">{{ reader_state.favoriteBooksCount }}本藏书</div>
-          <button class="card-button">立即查看</button>
+          <button class="card-button" @click="goToCollect">立即查看</button>
         </div>
       </div>
       
@@ -71,7 +71,7 @@
         <div class="card-content">
           <div class="card-title">最近阅读</div>
           <div class="card-value">{{  reader_state.readHistoryCount }}本最近阅读</div>
-          <button class="card-button">立即查看</button>
+          <button class="card-button" @click="goToHistory">立即查看</button>
         </div>
       </div>
     </div>
@@ -101,6 +101,18 @@ const fetchReaderBalance=async()=>{
 // 跳转到个人信息页
 const goToSelfInformation = () => {
   router.push('/UserHome/self-information') 
+}
+// 跳转到个人推荐页
+const goToRecommend = () => {
+  router.push('/BookShelf/Recommend') 
+}
+// 跳转到个人收藏页
+const goToCollect = () => {
+  router.push('/BookShelf/Collect') 
+}
+// 跳转到历史页
+const goToHistory = () => {
+  router.push('/BookShelf/History') 
 }
 // 显示充值界面
 const showRecharge = () => {

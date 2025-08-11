@@ -39,6 +39,17 @@
           </li>
         </ul>
       </nav>
+<!-- 修改后的小说主页按钮 -->
+<div class="novel-home-btn">
+  <a :href="'/Novels/Novel_Layout/home'" target="_blank" class="btn-link">
+    <span class="btn-icon">
+      <svg viewBox="0 0 24 24" width="18" height="18">
+        <path fill="currentColor" d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
+      </svg>
+    </span>
+    <span>小说主页</span>
+  </a>
+</div>
     </div>
   </header>
 </template>
@@ -133,6 +144,37 @@ export default {
 }
 
 .nav-icon svg {
+  vertical-align: middle;
+}
+
+/* 新增的小说主页按钮样式 */
+.novel-home-btn {
+  margin-left: auto;
+}
+
+.novel-home-btn .btn-link {
+  display: flex;
+  align-items: center;
+  color: white;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background-color: #ed424b;
+  transition: all 0.3s;
+  font-size: 14px;
+}
+
+.novel-home-btn .btn-link:hover {
+  background-color: #c1353a;
+}
+
+.novel-home-btn .btn-icon {
+  display: flex;
+  align-items: center;
+  margin-right: 6px;
+}
+
+.novel-home-btn .btn-icon svg {
   vertical-align: middle;
 }
 </style>
