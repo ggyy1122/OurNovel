@@ -22,6 +22,44 @@
         </div>
 
         <div class="divider">
+            <span>专栏 | 公告</span>
+        </div>
+
+        <!-- 专栏|公告 -->
+        <div class="main-banner-section">
+            <div class="banner-carousel">
+                <div class="carousel-imgs">
+                    <div v-for="(novel, idx) in carouselNovels" :key="novel.novelId" class="carousel-img-item"
+                        :class="{ active: idx === currentBanner }" @click="goToNovel(novel.novelId)">
+                        <img :src="novel.coverUrl" class="banner-img" :alt="novel.novelName" />
+                    </div>
+                </div>
+                <div class="carousel-titles">
+                    <div v-for="(novel, idx) in carouselNovels" :key="novel.novelId" class="carousel-title-item"
+                        :class="{ active: idx === currentBanner }" @click="setBanner(idx)">
+                        {{ novel.novelName }}
+                    </div>
+                </div>
+            </div>
+            <div class="banner-announcement">
+                <div class="announcement-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                        <path fill="currentColor"
+                            d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+                    </svg>
+                    公告
+                </div>
+                <ul class="announcement-list">
+                    <li v-for="(item, idx) in announcements" :key="idx">
+                        <a :href="item.link" target="_blank" :class="item.type">{{ item.text }}</a>
+                        <div v-if="idx < announcements.length - 1" style="border-bottom:1px solid #aaa; margin:5px 0;">
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="divider">
             <span>年度征文</span>
         </div>
         <div class="single-image-container">
@@ -199,16 +237,18 @@ import { getAuthor } from '@/API/Author_API'
 import { getNovel } from '@/API/Novel_API'
 import { SelectNovel_State } from '@/stores/index'
 import { useRouter } from 'vue-router'
+import { getChapter, getChapterLogs } from '@/API/Chapter_API'
+import { getNovelsByCategory } from '@/API/NovelCategory_API'
 
 const router = useRouter()
 const selectNovelState = SelectNovel_State()
 
 // Banner数据
 const carouselItems = ref([
-    { image: require('@/assets/1.jpg'), title: '七猫中文网', description: '匠心打磨好作品' },
+    { image: require('@/assets/1.jpg'), title: 'TJ中文网', description: '匠心打磨好作品' },
     { image: require('@/assets/2.jpg'), title: '热门小说推荐', description: '最新签约作品' },
     { image: require('@/assets/3.jpeg'), title: '作家专区', description: '点击进入 >' },
-    { image: require('@/assets/4.jpg'), title: '七猫中文网', description: '匠心打磨好作品' }
+    { image: require('@/assets/4.jpg'), title: 'TJ中文网', description: '匠心打磨好作品' }
 ])
 
 const authors = ref([])
@@ -364,7 +404,7 @@ const goToSlide = (index) => {
     currentIndex.value = index
 }
 //历史征文
-import { getNovelsByCategory } from '@/API/NovelCategory_API'
+
 
 const books = ref([])
 
@@ -437,8 +477,6 @@ async function fetchHistoryNovels() {
 }
 
 //更新
-import { getChapter, getChapterLogs } from '@/API/Chapter_API'
-
 
 const recentUpdates = ref([])
 
@@ -474,6 +512,40 @@ const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
+const carouselNovels = [
+    { novelId: 170, novelName: '如意姑娘的', coverUrl: require('@/assets/side1.jpg') },
+    { novelId: 170, novelName: '写给鼹鼠先生的情', coverUrl: require('@/assets/side2.jpg') },
+    { novelId: 170, novelName: '问九卿', coverUrl: require('@/assets/side3.jpg') },
+    { novelId: 170, novelName: '昭娇', coverUrl: require('@/assets/side4.jpg') },
+    { novelId: 170, novelName: '岁时来仪', coverUrl: require('@/assets/side5.jpg') }
+]
+
+const currentBanner = ref(2) // 默认显示第三个
+
+let timer = null
+
+function setBanner(idx) {
+    currentBanner.value = idx
+}
+
+const goToNovel = async (novelId) => {
+    try {
+        const response = await getNovel(novelId)
+        handleNovelClick(response)
+    } catch (error) {
+        console.error('处理失败:', error)
+    }
+}
+
+const announcements = [
+    { text: '[资讯] 书写抗战精神作品联展', link: 'https://mp.weixin.qq.com/s/4VeBev9GGxihH5MNVevfSg?mpshare=1&scene=1&srcid=0801zDxRpMpTTwRpb8djZYXr&sharer_shareinfo=467c009cbe86e604c7fb12947fa1170b&sharer_shareinfo_first=467c009cbe86e604c7fb12947fa1170b#wechat_redirect', type: 'news' },
+    { text: '[公告] 《听说你喜欢我》原著', link: 'https://www.hongxiu.com/book/3756981504436501', type: 'notice' },
+    { text: '[资讯] 25年绿书签行动来啦', link: 'https://mp.weixin.qq.com/s/c1G3OQ6-lWh5qwQ-sejJcg', type: 'news' },
+    { text: '[公告] 25年作家福利已上线', link: 'https://write.qq.com/portal/college/editordetail?gender=2&typeid=75457244950928251&idx=75460605762836001', type: 'notice' },
+    { text: '[公告] “风起国潮”二期征文', link: 'https://write.qq.com/portal/dashboard/actarticleDetail?id=665', type: 'notice' },
+    { text: '[公告] 红袖大神段寻新书来袭', link: 'https://www.hongxiu.com/book/32553967803686009', type: 'notice' }
+]
+
 onMounted(async () => {
     startAutoPlay()
     startNovelAutoPlay()
@@ -482,11 +554,15 @@ onMounted(async () => {
     scrollToTop()
     await fetchHistoryNovels()
     fetchRecentUpdates()
+    timer = setInterval(() => {
+        currentBanner.value = (currentBanner.value + 1) % carouselNovels.length
+    }, 3500)
 })
 
 onUnmounted(() => {
     pauseAutoPlay()
     stopNovelAutoPlay()
+    clearInterval(timer)
 })
 watch(novelCurrent, startNovelAutoPlay)
 </script>
@@ -862,6 +938,129 @@ watch(novelCurrent, startNovelAutoPlay)
 
 .divider span {
     padding: 0 15px;
+}
+
+.main-banner-section {
+    display: flex;
+    width: 90%;
+    margin-top: 24px;
+    height: 320px;
+    margin: 0 auto;
+}
+
+.banner-carousel {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+}
+
+.carousel-imgs {
+    position: relative;
+    width: 100%;
+    height: 260px;
+    overflow: hidden;
+}
+
+.carousel-img-item {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity .5s;
+    cursor: pointer;
+}
+
+.carousel-img-item.active {
+    opacity: 1;
+    z-index: 2;
+}
+
+.banner-img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.carousel-titles {
+    display: flex;
+    width: 100%;
+    margin-top: 0;
+}
+
+.carousel-title-item {
+    flex: 1;
+    background: rgba(40, 40, 40, 0.5);
+    color: #fff;
+    font-size: 20px;
+    text-align: center;
+    padding: 12px 0;
+    cursor: pointer;
+    transition: background .2s, color .2s;
+    border-right: 1px solid #fff;
+}
+
+.carousel-title-item:last-child {
+    border-right: none;
+}
+
+.carousel-title-item.active {
+    background: #ff4d4f;
+    color: #fff;
+}
+
+.banner-announcement {
+    flex: 1;
+    background: #fff;
+    margin-left: 32px;
+    padding: 5px 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    min-width: 320px;
+    max-width: 340px;
+}
+
+.announcement-title {
+    font-size: 26px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.announcement-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.announcement-list li {
+    margin-bottom: 12px;
+}
+
+.announcement-list a {
+    color: #ff4d4f;
+    font-size: 18px;
+    text-decoration: none;
+    transition: color .2s;
+}
+
+.announcement-list a:hover {
+    color: #e47f0d;
+}
+
+.announcement-list a.notice {
+    color: #222;
+}
+
+.announcement-list a.news {
+    color: #ff4d4f;
 }
 
 @media (max-width: 800px) {

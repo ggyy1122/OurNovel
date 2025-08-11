@@ -2,9 +2,9 @@
     <div class="search-results">
         <header class="header" ref="mainHeader">
             <div class="logo">
-                <img src="@/assets/logo.png" alt="TJ小说网" />
+                <img src="@/assets/logo.png" alt="TJ小说网" class="img" />
                 <h1>TJ小说网</h1>
-                <p>匠心打磨好作品</p>
+                <img src="@/assets/slogan.png" alt="匠心打磨好作品" class="img1" />
             </div>
             <span class="return" @click="handle_return"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"
                     height="20" width="20" style="vertical-align: -4px;">
@@ -310,10 +310,16 @@ const performSearch = async () => {
     align-items: center;
 }
 
-.logo img {
+.img {
     width: 36px;
     height: 36px;
     margin-right: 10px;
+}
+
+.img1 {
+    width: 160px;
+    height: 36px;
+    margin-left: 50px;
 }
 
 .logo h1 {
