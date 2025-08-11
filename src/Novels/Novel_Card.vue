@@ -164,7 +164,7 @@ async function handleRead() {
 }
 //作品主页
 async function handle_NovelInfro() {
-    handle();
+    await handle();
     router.push('/Novels/Novel_Info/home');
 }
 </script>

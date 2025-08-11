@@ -481,6 +481,7 @@ onUnmounted(() => {
     padding: 20px;
     min-height: 300px;
     overflow: auto;
+    background: #fdfafd;
 }
 
 .footer {
