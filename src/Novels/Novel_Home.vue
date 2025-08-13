@@ -103,6 +103,55 @@
             <span>꧁精选꧂</span>
         </div>
 
+        <div class="gender-selection-container">
+            <div class="gender-selection">
+                <div class="gender-header">
+                    <h2 class="gender-title" :class="{ active: showMale }" @click="showMoreMale"
+                        :style="{ flex: showMale ? '74%' : '24%' }">男频༒精选</h2>
+                    <h2 class="gender-title" :class="{ active: !showMale }" @click="showMoreFemale"
+                        :style="{ flex: showMale ? '26%' : '76%' }">女频༒精选</h2>
+                </div>
+                <div class="novels-container">
+                    <!-- 男频小说列表 -->
+                    <div class="novel-list1 male-novels"
+                        :style="{ transform: `translateX(${maleTranslateX}%)`, pointerEvents: 'none' }">
+                        <div v-for="(novel, index) in maleNovels" :key="novel.novelId" class="novel-card"
+                            :class="{ 'hidden': index < hiddenMaleCount }"
+                            :style="{ pointerEvents: index < hiddenMaleCount ? 'none' : 'auto' }">
+                            <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + novel.coverUrl"
+                                class="novel-cover2" @click="handleNovelClick(novel)" />
+                            <div class="novel-info">
+                                <h3 class="novel-name" @click="handleNovelClick(novel)">{{ novel.novelName }}</h3>
+                                <p class="novel-author" @click="goAuthorHome1(novel.authorId)">{{ novel.authorName }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 女频小说列表 -->
+                    <div class="novel-list1 female-novels"
+                        :style="{ transform: `translateX(${femaleTranslateX}%)`, pointerEvents: 'none' }">
+                        <div v-for="(novel, index) in femaleNovels" :key="novel.novelId" class="novel-card"
+                            :class="{ 'hidden': index >= visibleFemaleCount }"
+                            :style="{ pointerEvents: index >= visibleFemaleCount ? 'none' : 'auto' }">
+                            <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + novel.coverUrl"
+                                class="novel-cover2" @click="handleNovelClick(novel)" />
+                            <div class="novel-info">
+                                <h3 class="novel-name" @click="handleNovelClick(novel)">{{ novel.novelName }}</h3>
+                                <p class="novel-author" @click="goAuthorHome1(novel.authorId)">{{ novel.authorName }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 分割线控制 -->
+                    <div class="split-control" :style="{ left: (splitPosition - 2) + '%' }">
+                        <div class="split-line"></div>
+                        <button v-if="showMale" class="split-button" @click="showMoreFemale">‹</button>
+                        <button v-else class="split-button" @click="showMoreMale">›</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
 
         <div class="divider">
@@ -309,6 +358,75 @@ const rankingLists = [
     { title: '推荐榜', type: '推荐榜', data: recommendRanking },
     { title: '评分榜', type: '评分榜', data: scoreRanking }
 ]
+
+// 精选部分
+const maleNovelIds = [166, 167, 168, 169, 170, 222] // 男频小说ID (固定6个)
+const femaleNovelIds = [169, 170, 222, 263, 183, 462] // 女频小说ID (固定6个)
+const maleNovels = ref([])
+const femaleNovels = ref([])
+const splitPosition = ref(75) // 初始分割线位置(75%表示显示6男2女)
+const showMale = ref(true) // 默认显示男频精选
+
+// 计算属性
+const hiddenMaleCount = computed(() => {
+    // 根据分割线位置计算隐藏的男频小说数量
+    return Math.max(0, 6 - Math.floor(8 * splitPosition.value / 100))
+})
+
+const visibleFemaleCount = computed(() => {
+    // 根据分割线位置计算显示的女频小说数量
+    return Math.min(6, Math.floor(8 * (100 - splitPosition.value) / 100))
+})
+
+const maleTranslateX = computed(() => {
+    // 计算男频列表的平移量
+    return -hiddenMaleCount.value * 12.5 // 12.5% per novel
+})
+
+const femaleTranslateX = computed(() => {
+    // 计算女频列表的平移量
+    return (6 - visibleFemaleCount.value) * 12.5
+})
+
+// 获取小说数据
+const fetchFeaturedNovels = async () => {
+    try {
+        // 获取男频小说
+        const malePromises = maleNovelIds.map(id => getNovel(id))
+        const maleResults = await Promise.all(malePromises)
+        maleNovels.value = await Promise.all(maleResults.map(async novel => {
+            const author = await getAuthor(novel.authorId)
+            return {
+                ...novel,
+                authorName: author.authorName || '未知作者'
+            }
+        }))
+
+        // 获取女频小说
+        const femalePromises = femaleNovelIds.map(id => getNovel(id))
+        const femaleResults = await Promise.all(femalePromises)
+        femaleNovels.value = await Promise.all(femaleResults.map(async novel => {
+            const author = await getAuthor(novel.authorId)
+            return {
+                ...novel,
+                authorName: author.authorName || '未知作者'
+            }
+        }))
+    } catch (error) {
+        console.error('获取精选小说数据失败:', error)
+    }
+}
+
+const showMoreMale = () => {
+    splitPosition.value = 75 // 显示6男2女
+    showMale.value = true
+}
+
+const showMoreFemale = () => {
+    splitPosition.value = 25 // 显示2男6女
+    showMale.value = false
+}
+
 
 
 
@@ -636,6 +754,7 @@ onMounted(async () => {
     await fetchHistoryNovels()
     fetchRecentUpdates()
     fetchRankings()
+    fetchFeaturedNovels()
     timer = setInterval(() => {
         currentBanner.value = (currentBanner.value + 1) % carouselNovels.length
     }, 3500)
@@ -952,7 +1071,197 @@ watch(novelCurrent, startNovelAutoPlay)
     }
 }
 
+.gender-selection-container {
+    width: 100%;
+    margin: 30px auto;
+}
 
+.gender-selection {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.gender-header {
+    display: flex;
+    border-bottom: 1px solid #eee;
+    background-color: #f9f9f9;
+    transition: all 0.5s ease;
+}
+
+.gender-title {
+    flex: 1;
+    text-align: center;
+    padding: 15px 0;
+    margin: 0;
+    font-size: 20px;
+    cursor: pointer;
+    color: #666;
+    transition: all 0.3s;
+}
+
+.gender-title.active {
+    color: #ff4d4f;
+    background-color: #fff;
+    font-weight: bold;
+}
+
+.novels-container {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+}
+
+.novel-list1 {
+    position: absolute;
+    top: 0;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s ease;
+}
+
+.male-novels {
+    left: 0;
+    justify-content: flex-start;
+    background: linear-gradient(to right, #dceaf7 0%, #ffffff 100%);
+    background-size: 73% 100%;
+    background-repeat: no-repeat;
+    background-position: left top;
+}
+
+.female-novels {
+    left: 0;
+    justify-content: flex-end;
+    background: linear-gradient(to left, #f7d7e4 0%, #ffffff 100%);
+    background-size: 77% 100%;
+    background-repeat: no-repeat;
+    background-position: right top;
+}
+
+.novel-card {
+    flex: 0 0 12.5%;
+    padding: 10px;
+    box-sizing: border-box;
+    transition: opacity 0.3s;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.novel-card.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.novel-cover2 {
+    width: 140px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+    margin-top: 50px;
+    margin-bottom: 10px;
+}
+
+.novel-cover2:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s;
+}
+
+.novel-name:hover {
+    color: #f7b769;
+    transform: scale(1.05);
+    transition: color 0.3s, transform 0.3s;
+}
+
+.novel-author:hover {
+    color: #f0940a;
+    transform: scale(1.05);
+    transition: color 0.3s, transform 0.3s;
+}
+
+.novel-info {
+    padding: 10px 5px;
+}
+
+.novel-name {
+    margin: 0;
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.novel-author {
+    margin: 5px 0 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.split-control {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: left 0.5s ease;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.split-line {
+    width: 3px;
+    height: 100%;
+    background-color: #f96b6d;
+    margin: 0 auto;
+}
+
+.split-button {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background-color: #f73f42;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin: 5px 0;
+    transition: background-color 0.2s;
+}
+
+.split-button:hover {
+    background-color: #ff7875;
+}
+
+@media (max-width: 768px) {
+    .novel-card {
+        flex: 0 0 25%;
+    }
+
+    .novel-cover2 {
+        height: 120px;
+    }
+
+    .split-control {
+        width: 40px;
+        margin-left: -20px;
+    }
+
+    .split-button {
+        width: 20px;
+        height: 20px;
+        font-size: 12px;
+    }
+}
 
 .authors-container {
     display: flex;
