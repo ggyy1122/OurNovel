@@ -5,13 +5,25 @@
     <div v-if="comments.length > 0" class="comment-grid">
       <div v-for="comment in comments" :key="comment.commentId" class="comment-card">
         <div class="comment-header">
-          <div class="avatar-placeholder">👤</div>
+          <!-- 替换 👤 为头像，其它不动 -->
+          <div class="avatar">
+            <img
+              :src="getReaderAvatar(comment.readerId)"
+              alt="用户头像"
+              class="user-avatar"
+              @error="handleAvatarError"
+            />
+          </div>
+
           <div class="comment-info">
             <h3 class="comment-title">{{ comment.title }}</h3>
             <p class="comment-subtitle">
               第 {{ comment.chapterId }} 章 · {{ formatTime(comment.createTime) }}
+              <!-- 如需显示昵称，可取消注释： -->
+              <!-- · {{ getReaderName(comment.readerId) }} -->
             </p>
           </div>
+
           <div class="likes" @click="toggleLike(comment)">
             <span :class="['like-icon', { liked: likedCommentIds.has(comment.commentId) }]">
               {{ likedCommentIds.has(comment.commentId) ? '❤️' : '🤍' }}
@@ -31,16 +43,14 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getTopLikedComments } from '@/API/Comment_API'
-import {
-  likeComment,
-  unlikeComment,
-  isLiked
-} from '@/API/Likes_API'
-
+import { likeComment, unlikeComment, isLiked } from '@/API/Likes_API'
+import { getReader } from '@/API/Reader_API'  // 使用你已有的 API
 import { SelectNovel_State, readerState } from '@/stores/index'
-
 import 'vue3-toastify/dist/index.css'
 import { toast } from 'vue3-toastify'
+
+// ✅ 用 ES 模块导入兜底头像（避免 require 在 Vite 下问题）
+import defaultAvatar from '@/assets/logo.png'
 
 const selectNovelState = SelectNovel_State()
 const readerStore = readerState()
@@ -50,17 +60,52 @@ const novelId = selectNovelState.novelId
 const comments = ref([])
 const likedCommentIds = ref(new Set())
 
+// 头像/昵称缓存：readerId -> { avatarUrl(完整可用URL), readerName }
+const readersMap = ref(new Map())
+
+// 如果后端 avatarUrl 只返回 Key（文件名），用它拼完整 URL
+const OSS_BASE = 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/'
+
+// 把任意 avatar 字段格式化成“可直接 <img :src> 的完整 URL”
+function formatAvatarUrl(raw) {
+  if (!raw) return defaultAvatar
+  if (/^https?:\/\//i.test(raw)) return raw               // 已是 http(s)
+  if (raw.startsWith(OSS_BASE)) return raw                 // 已带域名
+  return OSS_BASE + encodeURIComponent(raw.replace(/^\/+/, '')) // 认为是 key
+}
+
+// 归一化 getReader 的返回结构
+function normalizeReader(r, id) {
+  const data = r?.data ?? r ?? {}
+  return {
+    readerId: data.readerId ?? id,
+    readerName: data.readerName || `读者${id}`,
+    avatarUrl: formatAvatarUrl(data.avatarUrl)
+  }
+}
+
 onMounted(async () => {
   try {
     const response = await getTopLikedComments(novelId, 10)
-    comments.value = response || []
+    comments.value = Array.isArray(response) ? response : []
 
-    for (const comment of comments.value) {
-      const res = await isLiked(comment.commentId, readerId)
-      if (res?.isLiked === true || res === true) {
-        likedCommentIds.value.add(comment.commentId)
-      }
+    // 点赞状态
+    for (const c of comments.value) {
+      const res = await isLiked(c.commentId, readerId)
+      if (res?.isLiked === true || res === true) likedCommentIds.value.add(c.commentId)
     }
+
+    // 批量补齐头像/昵称（用 getReader）
+    const ids = Array.from(new Set(comments.value.map(c => c.readerId))).filter(Boolean)
+    await Promise.all(ids.map(async (id) => {
+      if (readersMap.value.has(id)) return
+      try {
+        const r = await getReader(id)
+        readersMap.value.set(id, normalizeReader(r, id))
+      } catch {
+        readersMap.value.set(id, { avatarUrl: defaultAvatar, readerName: `读者${id}` })
+      }
+    }))
   } catch (error) {
     console.error('加载精选评论失败:', error)
   }
@@ -86,6 +131,15 @@ async function toggleLike(comment) {
     console.error('点赞操作失败:', error)
     toast.error('点赞操作失败，请稍后重试！')
   }
+}
+
+function getReaderAvatar(id) {
+  return readersMap.value.get(id)?.avatarUrl || defaultAvatar
+}
+
+
+function handleAvatarError(e) {
+  e.target.src = defaultAvatar
 }
 
 function formatTime(isoString) {
@@ -136,17 +190,19 @@ function formatTime(isoString) {
   margin-bottom: 12px;
 }
 
-.avatar-placeholder {
+/* 头像容器（保持你原布局，仅替换 👤） */
+.avatar {
   width: 40px;
   height: 40px;
-  background-color: #e0e0e0;
   border-radius: 50%;
-  font-size: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: hidden;
   margin-right: 12px;
   flex-shrink: 0;
+}
+.user-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .comment-info {
