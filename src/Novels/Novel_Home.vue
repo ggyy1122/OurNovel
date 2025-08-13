@@ -22,7 +22,7 @@
         </div>
 
         <div class="divider">
-            <span>专栏 | 公告</span>
+            <span>꧁专栏 | 公告꧂</span>
         </div>
 
         <!-- 专栏|公告 -->
@@ -60,7 +60,102 @@
         </div>
 
         <div class="divider">
-            <span>年度征文</span>
+            <span>꧁排行榜꧂</span>
+        </div>
+        <!-- 排行榜 -->
+        <div class="rankings-container">
+            <div class="ranking-column" v-for="(list, idx) in rankingLists" :key="idx" :class="`ranking-bg-${idx}`">
+                <div class="ranking-header">
+                    <h3>{{ list.title }}ღ</h3>
+                    <a @click="goToRankings(list.type)">更多 ></a>
+                </div>
+                <ul class="ranking-list">
+                    <!-- 第一名特殊展示 -->
+                    <li v-if="list.data.value.length" class="rank-top" @click="handleNovelClick(list.data.value[0])">
+                        <div class="rank-top-left">
+                            <span class="rank-number top-rank">🥇</span>
+                            <div class="rank-top-info">
+                                <div class="rank-title">{{ list.data.value[0].novelName }}</div>
+                                <div class="rank-count">{{ list.type === '收藏榜' ? list.data.value[0].collectedCount
+                                    + '收藏' :
+                                    list.type === '推荐榜' ? list.data.value[0].recommendCount + ' 推荐' :
+                                        list.data.value[0].score + '分'
+                                }}</div>
+                            </div>
+                        </div>
+                        <img v-if="list.data.value[0].coverUrl"
+                            :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + list.data.value[0].coverUrl"
+                            class="rank-top-img" :alt="list.data.value[0].novelName" />
+                    </li>
+                    <!-- 2-10名普通展示 -->
+                    <li v-for="(item, index) in list.data.value.slice(1, 10)" :key="item.novelId" class="rank-item"
+                        @click="handleNovelClick(item)">
+                        <span class="rank-number" :class="{ 'top-rank': index < 2 }">{{ index + 2 }}</span>
+                        <span class="rank-title">{{ item.novelName }}</span>
+                        <span class="rank-count">{{ list.type === '收藏榜' ? item.collectedCount + ' 收藏' : list.type ===
+                            '推荐榜' ? item.recommendCount + ' 推荐' : item.score + ' 分' }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="divider">
+            <span>꧁精选꧂</span>
+        </div>
+
+        <div class="gender-selection-container">
+            <div class="gender-selection">
+                <div class="gender-header">
+                    <h2 class="gender-title" :class="{ active: showMale }" @click="showMoreMale"
+                        :style="{ flex: showMale ? '74%' : '24%' }">男频༒精选</h2>
+                    <h2 class="gender-title" :class="{ active: !showMale }" @click="showMoreFemale"
+                        :style="{ flex: showMale ? '26%' : '76%' }">女频༒精选</h2>
+                </div>
+                <div class="novels-container">
+                    <!-- 男频小说列表 -->
+                    <div class="novel-list1 male-novels"
+                        :style="{ transform: `translateX(${maleTranslateX}%)`, pointerEvents: 'none' }">
+                        <div v-for="(novel, index) in maleNovels" :key="novel.novelId" class="novel-card"
+                            :class="{ 'hidden': index < hiddenMaleCount }"
+                            :style="{ pointerEvents: index < hiddenMaleCount ? 'none' : 'auto' }">
+                            <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + novel.coverUrl"
+                                class="novel-cover2" @click="handleNovelClick(novel)" />
+                            <div class="novel-info">
+                                <h3 class="novel-name" @click="handleNovelClick(novel)">{{ novel.novelName }}</h3>
+                                <p class="novel-author" @click="goAuthorHome1(novel.authorId)">{{ novel.authorName }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 女频小说列表 -->
+                    <div class="novel-list1 female-novels"
+                        :style="{ transform: `translateX(${femaleTranslateX}%)`, pointerEvents: 'none' }">
+                        <div v-for="(novel, index) in femaleNovels" :key="novel.novelId" class="novel-card"
+                            :class="{ 'hidden': index >= visibleFemaleCount }"
+                            :style="{ pointerEvents: index >= visibleFemaleCount ? 'none' : 'auto' }">
+                            <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + novel.coverUrl"
+                                class="novel-cover2" @click="handleNovelClick(novel)" />
+                            <div class="novel-info">
+                                <h3 class="novel-name" @click="handleNovelClick(novel)">{{ novel.novelName }}</h3>
+                                <p class="novel-author" @click="goAuthorHome1(novel.authorId)">{{ novel.authorName }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 分割线控制 -->
+                    <div class="split-control" :style="{ left: (splitPosition - 2) + '%' }">
+                        <div class="split-line"></div>
+                        <button v-if="showMale" class="split-button" @click="showMoreFemale">‹</button>
+                        <button v-else class="split-button" @click="showMoreMale">›</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="divider">
+            <span>꧁年度征文꧂</span>
         </div>
         <div class="single-image-container">
             <a href="https://activity.zongheng.com/activity/zhengwen/detail/384?forceMode=1" target="_blank"
@@ -70,7 +165,7 @@
         </div>
 
         <div class="divider">
-            <span>专题：TJ小说网“历史区”征文</span>
+            <span>꧁专题：TJ小说网“历史区”征文꧂</span>
         </div>
         <div class="history-novels-container">
             <div class="intro-text">
@@ -93,7 +188,7 @@
         </div>
 
         <div class="divider">
-            <span>大神风采</span>
+            <span>꧁大神风采꧂</span>
         </div>
         <!-- 作者展示 -->
         <div class="authors-container">
@@ -110,7 +205,7 @@
         </div>
 
         <div class="divider">
-            <span>编辑精选</span>
+            <span>꧁编辑精选꧂</span>
         </div>
         <!-- 编辑精选局中局轮播 -->
         <div class="novel-carousel-container" :style="bgStyle">
@@ -137,7 +232,7 @@
         </div>
 
         <div class="divider">
-            <span>最近更新</span>
+            <span>꧁最近更新꧂</span>
         </div>
 
         <table class="recent-update-table">
@@ -239,6 +334,8 @@ import { SelectNovel_State } from '@/stores/index'
 import { useRouter } from 'vue-router'
 import { getChapter, getChapterLogs } from '@/API/Chapter_API'
 import { getNovelsByCategory } from '@/API/NovelCategory_API'
+import { getCollectRanking, getRecommendRanking, getScoreRanking } from '@/API/Ranking_API'
+
 
 const router = useRouter()
 const selectNovelState = SelectNovel_State()
@@ -253,6 +350,84 @@ const carouselItems = ref([
 
 const authors = ref([])
 const novels = ref([])
+const collectRanking = ref([])
+const recommendRanking = ref([])
+const scoreRanking = ref([])
+const rankingLists = [
+    { title: '收藏榜', type: '收藏榜', data: collectRanking },
+    { title: '推荐榜', type: '推荐榜', data: recommendRanking },
+    { title: '评分榜', type: '评分榜', data: scoreRanking }
+]
+
+// 精选部分
+const maleNovelIds = [166, 167, 168, 169, 170, 222] // 男频小说ID (固定6个)
+const femaleNovelIds = [169, 170, 222, 263, 183, 462] // 女频小说ID (固定6个)
+const maleNovels = ref([])
+const femaleNovels = ref([])
+const splitPosition = ref(75) // 初始分割线位置(75%表示显示6男2女)
+const showMale = ref(true) // 默认显示男频精选
+
+// 计算属性
+const hiddenMaleCount = computed(() => {
+    // 根据分割线位置计算隐藏的男频小说数量
+    return Math.max(0, 6 - Math.floor(8 * splitPosition.value / 100))
+})
+
+const visibleFemaleCount = computed(() => {
+    // 根据分割线位置计算显示的女频小说数量
+    return Math.min(6, Math.floor(8 * (100 - splitPosition.value) / 100))
+})
+
+const maleTranslateX = computed(() => {
+    // 计算男频列表的平移量
+    return -hiddenMaleCount.value * 12.5 // 12.5% per novel
+})
+
+const femaleTranslateX = computed(() => {
+    // 计算女频列表的平移量
+    return (6 - visibleFemaleCount.value) * 12.5
+})
+
+// 获取小说数据
+const fetchFeaturedNovels = async () => {
+    try {
+        // 获取男频小说
+        const malePromises = maleNovelIds.map(id => getNovel(id))
+        const maleResults = await Promise.all(malePromises)
+        maleNovels.value = await Promise.all(maleResults.map(async novel => {
+            const author = await getAuthor(novel.authorId)
+            return {
+                ...novel,
+                authorName: author.authorName || '未知作者'
+            }
+        }))
+
+        // 获取女频小说
+        const femalePromises = femaleNovelIds.map(id => getNovel(id))
+        const femaleResults = await Promise.all(femalePromises)
+        femaleNovels.value = await Promise.all(femaleResults.map(async novel => {
+            const author = await getAuthor(novel.authorId)
+            return {
+                ...novel,
+                authorName: author.authorName || '未知作者'
+            }
+        }))
+    } catch (error) {
+        console.error('获取精选小说数据失败:', error)
+    }
+}
+
+const showMoreMale = () => {
+    splitPosition.value = 75 // 显示6男2女
+    showMale.value = true
+}
+
+const showMoreFemale = () => {
+    splitPosition.value = 25 // 显示2男6女
+    showMale.value = false
+}
+
+
 
 
 const fetchAuthors = async () => {
@@ -546,6 +721,30 @@ const announcements = [
     { text: '[公告] 红袖大神段寻新书来袭', link: 'https://www.hongxiu.com/book/32553967803686009', type: 'notice' }
 ]
 
+const fetchRankings = async () => {
+    try {
+        const [collectRes, recommendRes, scoreRes] = await Promise.all([
+            getCollectRanking(10),
+            getRecommendRanking(10),
+            getScoreRanking(10)
+        ])
+        // 过滤掉"待审核"和"封禁"状态的小说
+        collectRanking.value = collectRes.filter(novel => novel.status === '连载' || novel.status === '完结')
+        recommendRanking.value = recommendRes.filter(novel => novel.status === '连载' || novel.status === '完结')
+        scoreRanking.value = scoreRes.filter(novel => novel.status === '连载' || novel.status === '完结')
+    } catch (error) {
+        console.error('获取排行榜数据失败:', error)
+    }
+}
+//去排行榜
+const goToRankings = (type) => {
+    router.push({
+        path: '/Novels/Novel_Layout/rank',
+        query: { type }
+    })
+}
+
+
 onMounted(async () => {
     startAutoPlay()
     startNovelAutoPlay()
@@ -554,6 +753,8 @@ onMounted(async () => {
     scrollToTop()
     await fetchHistoryNovels()
     fetchRecentUpdates()
+    fetchRankings()
+    fetchFeaturedNovels()
     timer = setInterval(() => {
         currentBanner.value = (currentBanner.value + 1) % carouselNovels.length
     }, 3500)
@@ -673,6 +874,393 @@ watch(novelCurrent, startNovelAutoPlay)
 
 .carousel-indicators button.active {
     background-color: #ffcc00;
+}
+
+.rankings-container {
+    position: relative;
+    width: 80%;
+    display: flex;
+    gap: 20px;
+    margin: 20px auto 40px;
+    padding: 0 20px;
+}
+
+.ranking-column {
+    flex: 1;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 15px;
+    min-width: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 为每个排行榜添加不同的背景色和渐变效果 */
+.ranking-bg-0::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(253, 230, 224, 0.8), rgba(253, 230, 224, 0));
+    z-index: 0;
+}
+
+.ranking-bg-1::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(224, 242, 241, 0.8), rgba(224, 242, 241, 0));
+    z-index: 0;
+}
+
+.ranking-bg-2::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(237, 231, 246, 0.8), rgba(237, 231, 246, 0));
+    z-index: 0;
+}
+
+.ranking-header,
+.ranking-list {
+    position: relative;
+    z-index: 1;
+    background: transparent;
+}
+
+.ranking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #b3afaf;
+}
+
+.ranking-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.ranking-header a {
+    color: #666;
+    font-size: 16px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.ranking-header a:hover {
+    color: #f0940a;
+}
+
+.ranking-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.rank-top {
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    padding: 10px 8px;
+    position: relative;
+}
+
+.rank-item {
+    border-top: 1px dashed #b3afaf;
+}
+
+.rank-top-left {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.rank-top-info {
+    margin-left: 10px;
+}
+
+.rank-top-img {
+    width: 60px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-left: 18px;
+    box-shadow: 0 2px 8px rgba(255, 77, 79, 0.12);
+}
+
+.rank-number {
+    width: 32px;
+    font-weight: bold;
+    color: #f0940a;
+    margin-right: 10px;
+    text-align: center;
+    font-size: 18px;
+}
+
+.rank-number.top-rank {
+    color: #fff;
+    font-size: 18px;
+    background: #fa3f42;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(255, 77, 79, 0.12);
+    padding: 0;
+}
+
+.rank-title {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+
+.rank-count {
+    color: #888;
+    font-size: 13px;
+    margin-left: 10px;
+    white-space: nowrap;
+}
+
+.rank-divider {
+    border-bottom: 1px dashed #b3afaf;
+    margin: 8px 0;
+}
+
+.ranking-list li {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-radius: 4px;
+    padding-left: 8px;
+}
+
+.ranking-list li:hover {
+    background-color: #f9f9f9;
+    color: #eb4174;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .rankings-container {
+        flex-direction: column;
+    }
+
+    .ranking-column {
+        margin-bottom: 20px;
+    }
+}
+
+.gender-selection-container {
+    width: 100%;
+    margin: 30px auto;
+}
+
+.gender-selection {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.gender-header {
+    display: flex;
+    border-bottom: 1px solid #eee;
+    background-color: #f9f9f9;
+    transition: all 0.5s ease;
+}
+
+.gender-title {
+    flex: 1;
+    text-align: center;
+    padding: 15px 0;
+    margin: 0;
+    font-size: 20px;
+    cursor: pointer;
+    color: #666;
+    transition: all 0.3s;
+}
+
+.gender-title.active {
+    color: #ff4d4f;
+    background-color: #fff;
+    font-weight: bold;
+}
+
+.novels-container {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+}
+
+.novel-list1 {
+    position: absolute;
+    top: 0;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s ease;
+}
+
+.male-novels {
+    left: 0;
+    justify-content: flex-start;
+    background: linear-gradient(to right, #dceaf7 0%, #ffffff 100%);
+    background-size: 73% 100%;
+    background-repeat: no-repeat;
+    background-position: left top;
+}
+
+.female-novels {
+    left: 0;
+    justify-content: flex-end;
+    background: linear-gradient(to left, #f7d7e4 0%, #ffffff 100%);
+    background-size: 77% 100%;
+    background-repeat: no-repeat;
+    background-position: right top;
+}
+
+.novel-card {
+    flex: 0 0 12.5%;
+    padding: 10px;
+    box-sizing: border-box;
+    transition: opacity 0.3s;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.novel-card.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.novel-cover2 {
+    width: 140px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+    margin-top: 50px;
+    margin-bottom: 10px;
+}
+
+.novel-cover2:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s;
+}
+
+.novel-name:hover {
+    color: #f7b769;
+    transform: scale(1.05);
+    transition: color 0.3s, transform 0.3s;
+}
+
+.novel-author:hover {
+    color: #f0940a;
+    transform: scale(1.05);
+    transition: color 0.3s, transform 0.3s;
+}
+
+.novel-info {
+    padding: 10px 5px;
+}
+
+.novel-name {
+    margin: 0;
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.novel-author {
+    margin: 5px 0 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.split-control {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: left 0.5s ease;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.split-line {
+    width: 3px;
+    height: 100%;
+    background-color: #f96b6d;
+    margin: 0 auto;
+}
+
+.split-button {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background-color: #f73f42;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin: 5px 0;
+    transition: background-color 0.2s;
+}
+
+.split-button:hover {
+    background-color: #ff7875;
+}
+
+@media (max-width: 768px) {
+    .novel-card {
+        flex: 0 0 25%;
+    }
+
+    .novel-cover2 {
+        height: 120px;
+    }
+
+    .split-control {
+        width: 40px;
+        margin-left: -20px;
+    }
+
+    .split-button {
+        width: 20px;
+        height: 20px;
+        font-size: 12px;
+    }
 }
 
 .authors-container {

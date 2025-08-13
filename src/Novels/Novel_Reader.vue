@@ -658,7 +658,7 @@ async function changeChapter(num) {
         const nextChapterId = selectNovelState.chapterId + num;
         const response = await getChapter(selectNovelState.novelId, nextChapterId);
         if (response.status !== '已发布') {
-            toast("第"+nextChapterId+"章未发布!", {
+            toast("第" + nextChapterId + "章未发布!", {
                 "type": "info",
                 "dangerouslyHTMLString": true
             });
@@ -672,7 +672,7 @@ async function changeChapter(num) {
                 nextChapterId
             );
             if (!purchaseStatus?.hasPurchased) {
-                toast("第"+nextChapterId+"章需要购买后才能阅读", {
+                toast("第" + nextChapterId + "章需要购买后才能阅读", {
                     "type": "info",
                     "dangerouslyHTMLString": true
                 });
@@ -1190,8 +1190,6 @@ onMounted(() => {
             // 如果有中文语音，默认选择第一个
             if (availableVoices.value.length > 0) {
                 selectedVoice.value = availableVoices.value[0].name;
-            } else {
-                toast("未找到中文语音引擎", { type: "warning" });
             }
         };
         // 立即加载语音列表

@@ -75,6 +75,9 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import Novel_Card from './Novel_Card.vue'
 import { getCollectRanking, getRecommendRanking, getScoreRanking } from '@/API/Ranking_API'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
 
 const tabs = ['全部', '已完结', '连载中']
 const sideTabs = ['收藏榜', '推荐榜', '评分榜']
@@ -86,7 +89,7 @@ const pageSize = ref(10) // 每页显示10条
 const jumpPage = ref(1)
 
 const selectedTab = ref('全部')
-const selectedSideTab = ref('收藏榜')
+const selectedSideTab = ref(route.query.type || '收藏榜')
 const selectedRankType = ref('前10榜')
 const rankedNovels = ref([])
 const loading = ref(false)
@@ -184,10 +187,15 @@ const backgroundImages = [
 ]
 const currentBgIndex = ref(0)
 
+const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
 // 轮播背景图
 let bgInterval
 onMounted(() => {
     fetchRankingData()
+    scrollToTop()
     // 启动背景轮播
     bgInterval = setInterval(() => {
         currentBgIndex.value = (currentBgIndex.value + 1) % backgroundImages.length
