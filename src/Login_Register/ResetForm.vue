@@ -134,7 +134,10 @@ const handleResetPassword = async () => {
                 "type": "success",
                 "dangerouslyHTMLString": true
             });
-            router.push('/L_R/login');
+            //停顿3s后跳转
+            setTimeout(() => {
+                router.push('/L_R/login');
+            }, 3000);
         } catch (error) {
             console.error('密码重置失败:', error);
             toast("密码重置失败，请检查用户名或联系管理员", {

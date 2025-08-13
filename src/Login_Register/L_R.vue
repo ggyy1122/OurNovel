@@ -131,12 +131,13 @@ function switchTo(num) {
 
 .login-panel {
     width: 900px;
-    height: 600px;
+    height: auto;
     background: #fff;
     border-radius: 24px;
     display: flex;
     box-shadow: 0 10px 40px 0 rgba(60, 117, 221, 0.08);
     overflow: hidden;
+    margin-bottom: 150px;
 }
 
 .login-right {
