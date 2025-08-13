@@ -171,6 +171,9 @@ async function handle_NovelInfro(item, event) {
   if (event && event.target.classList.contains('select-checkbox')) {
     return;
   }
+  if (batchDeleteMode.value || (event && event.target.classList.contains('select-checkbox'))) {
+    return
+  }
   try {
     const response = await getAuthor(item.novel.authorId);
     selectNovelState.resetNovel(

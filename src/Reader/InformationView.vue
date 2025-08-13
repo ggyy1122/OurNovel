@@ -51,12 +51,11 @@ const gender = ref('男')
 const avatarFile = ref(null)
 const avatarPreviewUrl = ref('')
 const apiResponseAvatar = ref(null)
-const prefix = 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/'
 const defaultAvatar = 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg'
 
 function getFormattedAvatarUrl(avatarUrl) {
   if (!avatarUrl || avatarUrl.trim() === '') {
-    return prefix + defaultAvatar
+    return defaultAvatar
   }
   if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
     return avatarUrl
