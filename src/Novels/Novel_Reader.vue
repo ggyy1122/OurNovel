@@ -829,12 +829,6 @@ const purchase_Chapter = async () => {
 
 // goToChapter 函数，使用章节级别的购买状态
 const goToChapter = async (chapter) => {
-    // 如果是收费章节且未购买，显示购买弹窗
-    if (chapter.isCharged === '是' && !chapter.hasPurchased) {
-        selectedChapter.value = chapter;
-        showPurchaseDialog.value = true;
-        return;
-    }
     try {
         const response = await getChapter(chapter.novelId, chapter.chapterId);
         if (response.status !== '已发布') {
@@ -842,6 +836,12 @@ const goToChapter = async (chapter) => {
                 "type": "info",
                 "dangerouslyHTMLString": true
             });
+            return;
+        }
+        // 如果是收费章节且未购买，显示购买弹窗
+        if (chapter.isCharged === '是' && !chapter.hasPurchased) {
+            selectedChapter.value = chapter;
+            showPurchaseDialog.value = true;
             return;
         }
         selectNovelState.resetChapter(

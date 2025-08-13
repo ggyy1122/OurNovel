@@ -23,11 +23,30 @@
                         </path>
                     </svg>
                 </span>
-                <input type="text" v-model="phone" maxlength="11" placeholder="请输入手机号(先随便输，以后再说)" class="login-input"
+                <input type="text" v-model="phone" maxlength="11" placeholder="请输入手机号" class="login-input"
                     autocomplete="tel" />
                 <span class="phone-len">{{ phone.length }} / 11</span>
             </div>
-            <div v-if="phoneError" class="error-tip">请输入手机号</div>
+            <div v-if="phoneError" class="error-tip">请输入11位手机号</div>
+            <!-- 图形验证码部分 -->
+            <div class="input-group" :class="{ 'error-border': captchaError }">
+                <span class="input-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="20" height="20">
+                        <path fill="currentColor"
+                            d="M160 160v704h704V160zm-32-64h768a32 32 0 0 1 32 32v768a32 32 0 0 1-32 32H128a32 32 0 0 1-32-32V128a32 32 0 0 1 32-32">
+                        </path>
+                        <path fill="currentColor"
+                            d="M384 288q64 0 64 64t-64 64q-64 0-64-64t64-64M185.408 876.992l-50.816-38.912L350.72 556.032a96 96 0 0 1 134.592-17.856l1.856 1.472 122.88 99.136a32 32 0 0 0 44.992-4.864l216-269.888 49.92 39.936-215.808 269.824-.256.32a96 96 0 0 1-135.04 14.464l-122.88-99.072-.64-.512a32 32 0 0 0-44.8 5.952z">
+                        </path>
+                    </svg>
+                </span>
+                <input type="text" v-model="captcha" placeholder="请输入图形验证码" class="login-input" />
+                <div class="captcha-container">
+                    <canvas ref="captchaCanvas" width="120" height="40" @click="generateCaptcha"></canvas>
+                </div>
+            </div>
+            <div v-if="captchaError" class="error-tip">{{ captchaErrorMsg }}</div>
+            <!-- 短信验证码输入框 -->
             <div class="input-group" :class="{ 'error-border': codeError }">
                 <span class="input-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="20" height="20">
@@ -39,11 +58,13 @@
                         </path>
                     </svg>
                 </span>
-                <input type="text" v-model="code" placeholder="手机验证码(先随便输)" class="login-input"
+                <input type="text" v-model="code" placeholder="请输入验证码" class="login-input"
                     autocomplete="one-time-code" />
-                <button type="button" class="code-btn" @click="getCode" :disabled="codeCountdown > 0">获取验证码</button>
+                <button type="button" class="code-btn" @click="getCode" :disabled="codeCountdown > 0">
+                    {{ codeCountdown > 0 ? `${codeCountdown}秒后重试` : '获取验证码' }}
+                </button>
             </div>
-            <div v-if="codeError" class="error-tip">请输入手机验证码</div>
+            <div v-if="codeError" class="error-tip">{{ codeErrorMsg }}</div>
             <div class="input-group" :class="{ 'error-border': passwordError }">
                 <span class="input-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="20" height="20">
@@ -98,19 +119,26 @@
         <div class="login-tip">
             已有账号？<a href="#" @click.prevent="goLogin">返回登录</a>
         </div>
+
+        <!-- 开发模式验证码提示 -->
+        <div v-if="showDevCode" class="dev-code-hint">
+            <p>验证码: <strong>{{ devCode }}</strong> (仅用于测试)</p>
+        </div>
     </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onBeforeUnmount, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { current_state } from '@/stores/index';
 import { registerAuthor, registerManager, registerReader } from '@/API/Log_API';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
-const showModal = ref(false)
+
+const showModal = ref(false);
 const state = current_state();
 
+// 表单数据
 const username = ref("");
 const phone = ref("");
 const code = ref("");
@@ -118,75 +146,218 @@ const password = ref("");
 const showPassword = ref(false);
 const agree = ref(false);
 
+// 错误状态
 const usernameError = ref(false);
 const phoneError = ref(false);
 const codeError = ref(false);
+const codeErrorMsg = ref("");
 const passwordError = ref(false);
+
+// 验证码相关
+const codeCountdown = ref(0);
+const timer = ref(null);
+const devCode = ref("");
+const showDevCode = ref(false);
+
 const router = useRouter();
 
-const codeCountdown = ref(0);
-let timer = null;
+// 新增图形验证码相关变量
+const captchaCanvas = ref(null);
+const captchaText = ref("");
+const captcha = ref("");
+const captchaError = ref(false);
+const captchaErrorMsg = ref("");
+// 组件挂载时生成图形验证码
+onMounted(() => {
+    generateCaptcha();
+});
+
+// 生成图形验证码
+function generateCaptcha() {
+    const ctx = captchaCanvas.value.getContext('2d');
+    ctx.clearRect(0, 0, 120, 40);
+    // 生成随机字符串（排除容易混淆的字符）
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let text = '';
+    for (let i = 0; i < 4; i++) {
+        text += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    captchaText.value = text;
+    // 绘制背景
+    ctx.fillStyle = '#f8f9fa';
+    ctx.fillRect(0, 0, 120, 40);
+    // 绘制干扰线
+    for (let i = 0; i < 5; i++) {
+        ctx.strokeStyle = getRandomColor(100, 200);
+        ctx.beginPath();
+        ctx.moveTo(Math.random() * 120, Math.random() * 40);
+        ctx.lineTo(Math.random() * 120, Math.random() * 40);
+        ctx.stroke();
+    }
+    // 绘制文字
+    for (let i = 0; i < text.length; i++) {
+        ctx.fillStyle = getRandomColor(0, 100);
+        ctx.font = `${20 + Math.random() * 5}px Arial`;
+        ctx.fillText(
+            text[i],
+            20 + i * 25,
+            25 + Math.random() * 10
+        );
+    }
+}
+
+// 生成随机颜色
+function getRandomColor(min = 0, max = 255) {
+    const r = min + Math.floor(Math.random() * (max - min));
+    const g = min + Math.floor(Math.random() * (max - min));
+    const b = min + Math.floor(Math.random() * (max - min));
+    return `rgb(${r},${g},${b})`;
+}
+
+// 验证图形验证码
+function verifyCaptcha() {
+    if (!captcha.value) {
+        captchaError.value = true;
+        captchaErrorMsg.value = "请输入图形验证码";
+        toast.error("请输入图形验证码");
+        return false;
+    }
+
+    if (captcha.value.toUpperCase() !== captchaText.value) {
+        captchaError.value = true;
+        captchaErrorMsg.value = "图形验证码错误";
+        toast.error("图形验证码错误");
+        generateCaptcha(); // 验证失败刷新验证码
+        return false;
+    }
+    captchaError.value = false;
+    return true;
+}
+// 组件卸载前清除定时器
+onBeforeUnmount(() => {
+    if (timer.value) clearInterval(timer.value);
+});
+
+// 生成6位随机验证码
+function generateRandomCode() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// 获取验证码
 function getCode() {
+    // 验证手机号格式
     if (!phone.value || phone.value.length !== 11) {
         phoneError.value = true;
+        toast.error("请输入正确的11位手机号");
         return;
     }
+    // 生成验证码
+    const verificationCode = generateRandomCode();
+    devCode.value = verificationCode;
+    showDevCode.value = true;
+    // 存储验证码到localStorage，设置5分钟过期
+    const codeData = {
+        code: verificationCode,
+        phone: phone.value,
+        expires: Date.now() + 5 * 60 * 1000 // 5分钟后过期
+    };
+    localStorage.setItem("verificationCode", JSON.stringify(codeData));
+    // 启动倒计时
     codeCountdown.value = 60;
-    timer = setInterval(() => {
+    timer.value = setInterval(() => {
         codeCountdown.value--;
-        if (codeCountdown.value <= 0) clearInterval(timer);
+        if (codeCountdown.value <= 0) {
+            clearInterval(timer.value);
+            timer.value = null;
+        }
     }, 1000);
-    toast("验证码已发送到手机: " + phone.value, {
-        "type": "success",
-        "dangerouslyHTMLString": true
-    })
+    // 提示用户(开发模式下显示验证码)
+    toast.success(`验证码已生成: ${verificationCode}`, {
+        description: "开发模式下直接显示验证码",
+        autoClose: 10000
+    });
+}
+
+// 验证验证码
+function verifyCode() {
+    const storedData = JSON.parse(localStorage.getItem("verificationCode"));
+    // 检查是否已发送验证码
+    if (!storedData) {
+        codeErrorMsg.value = "请先获取验证码";
+        toast.error("请先获取验证码");
+        return false;
+    }
+    // 检查验证码是否过期
+    if (storedData.expires < Date.now()) {
+        codeErrorMsg.value = "验证码已过期，请重新获取";
+        toast.error("验证码已过期，请重新获取");
+        localStorage.removeItem("verificationCode");
+        return false;
+    }
+    // 检查手机号是否匹配
+    if (storedData.phone !== phone.value) {
+        codeErrorMsg.value = "验证码与手机号不匹配";
+        toast.error("验证码与手机号不匹配");
+        return false;
+    }
+    // 检查验证码是否正确
+    if (storedData.code !== code.value) {
+        codeErrorMsg.value = "验证码错误";
+        toast.error("验证码错误");
+        return false;
+    }
+    return true;
 }
 
 const handleRegister = async () => {
-    // Validate inputs
+    // 重置错误状态
     usernameError.value = !username.value;
     phoneError.value = !phone.value || phone.value.length !== 11;
     codeError.value = !code.value;
     passwordError.value = !password.value;
-
-    if (usernameError.value || phoneError.value || codeError.value || passwordError.value || !agree.value) {
+    // 验证图形验证码
+    const isCaptchaValid = verifyCaptcha();
+    // 验证短信验证码
+    const isCodeValid = code.value ? verifyCode() : false;
+    if (usernameError.value || phoneError.value || !isCaptchaValid ||
+        !isCodeValid || passwordError.value || !agree.value) {
+        if (!code.value) {
+            codeError.value = true;
+            codeErrorMsg.value = "请输入短信验证码";
+            toast.error("请输入短信验证码");
+        }
         return;
     }
-
     try {
         let response;
-        if (state.value === 0) { // Reader registration
+        if (state.value === 0) { // 读者注册
             response = await registerReader({
                 readerName: username.value,
                 password: password.value
             });
-        } else if (state.value === 1) { // Author registration
+        } else if (state.value === 1) { // 作者注册
             response = await registerAuthor({
                 authorName: username.value,
                 password: password.value
             });
-        } else if (state.value === 2) { // Manager registration
+        } else if (state.value === 2) { // 管理员注册
             response = await registerManager({
                 managerName: username.value,
                 password: password.value
             });
         }
-
         if (response) {
-            toast("注册成功！", {
-                "type": "success",
-                "dangerouslyHTMLString": true
-            })
-            router.push('/L_R/login');
+            toast.success("注册成功！");
+            //停顿3s后跳转登录
+            setTimeout(() => {
+                router.push('/L_R/login');
+            }, 3000);
         }
     } catch (error) {
         console.error('注册失败:', error);
-        toast("注册失败，请稍后再试", {
-            "type": "error",
-            "dangerouslyHTMLString": true
-        })
+        toast.error("注册失败:用户名已存在！");
     }
-}
+};
 
 function goLogin() {
     router.push('/L_R/login');
@@ -194,47 +365,6 @@ function goLogin() {
 </script>
 
 <style scoped>
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    max-width: 600px;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.modal-body {
-    margin: 1.5rem 0;
-}
-
-button {
-    padding: 0.5rem 1rem;
-    background-color: #ffd100;
-    color: #f5eeee;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #e89a09;
-    color: #222
-}
-
 .register-left {
     width: 70%;
     padding: 60px 50px 0 50px;
@@ -335,6 +465,29 @@ button:hover {
     cursor: not-allowed;
 }
 
+
+.captcha-container {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-right: 0px;
+    margin-top: 3px;
+}
+
+.captcha-container canvas {
+    border: 1px solid #e0e3e7;
+    border-radius: 4px;
+    cursor: pointer;
+    background: #f8f9fa;
+}
+
+/* 调整短信验证码按钮位置 */
+.code-btn {
+    right: 0;
+    margin-right: 0;
+}
+
 .reg-options {
     display: flex;
     align-items: center;
@@ -397,6 +550,65 @@ button:hover {
 
 .login-tip a:hover {
     text-decoration: underline;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal-body {
+    margin: 1.5rem 0;
+}
+
+button {
+    padding: 0.5rem 1rem;
+    background-color: #ffd100;
+    color: #f5eeee;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #e89a09;
+    color: #222
+}
+
+/* 开发模式验证码提示样式 */
+.dev-code-hint {
+    margin-top: 20px;
+    padding: 12px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    border: 1px dashed #ffd100;
+    margin-bottom: 20px;
+}
+
+.dev-code-hint strong {
+    color: #ff4757;
+    font-size: 16px;
 }
 
 @media (max-width: 900px) {
