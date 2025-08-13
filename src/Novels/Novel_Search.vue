@@ -320,6 +320,7 @@ const performSearch = async () => {
     width: 160px;
     height: 36px;
     margin-left: 50px;
+    color: #94B5D7
 }
 
 .logo h1 {

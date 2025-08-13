@@ -151,7 +151,7 @@ function formatTime(isoString) {
 <style scoped>
 .comment-section {
   padding: 24px;
-  background: #f9f9fb;
+  background:  #edf1f1ff;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
 }

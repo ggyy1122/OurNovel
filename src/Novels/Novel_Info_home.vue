@@ -92,7 +92,7 @@ watch(
 .introduction-section {
   margin: 40px 0;
   padding: 15px;
-  background-color: #f9f9f9;
+  background-color:  #edf1f1ff;
   border-radius: 5px;
 }
 
@@ -104,7 +104,7 @@ watch(
 .chapter-content {
   margin-top: 20px;
   padding: 15px;
-  background-color: #fff;
+  background-color: #eceae3ff;
   border: 1px solid #eee;
   border-radius: 5px;
 }
