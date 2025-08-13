@@ -1,4 +1,4 @@
-<template>
+<template> 
   <div class="users">
     <div class="header">
       <h2>用户管理</h2>
@@ -41,7 +41,16 @@
       </thead>
       <tbody>
         <tr v-for="user in filteredUsers" :key="user.id">
-          <td><img :src="user.avatar" alt="头像" class="avatar" /></td>
+          <!-- 修改点：当 avatar 为 null/空时展示灰色占位块 -->
+          <td>
+            <template v-if="user.avatar">
+              <img :src="user.avatar" alt="头像" class="avatar" />
+            </template>
+            <template v-else>
+              <div class="avatar-placeholder" aria-hidden="true"></div>
+            </template>
+          </td>
+
           <td>{{ user.name }}</td>
           <td>{{ user.phone }}</td>
           <td v-if="userType === 'reader'">{{ user.gender }}</td>
@@ -280,11 +289,23 @@ const deleteUser = async (id) => {
   background-color: #e9f3fb;
 }
 
+/* 原 avatar 样式保持不变（图片时） */
 .avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
   border: 1px solid #ccc;
+  object-fit: cover;
+}
+
+/* 新增：灰色占位块（avatar 为 null 时显示） */
+.avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #d8d8d8; /* 灰色背景 */
+  border: 1px solid #ccc;
+  display: inline-block;
 }
 
 /* 加载动画样式 */

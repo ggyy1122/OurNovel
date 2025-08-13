@@ -9,7 +9,7 @@
       </div>
     </div>
     <div v-else>
-      <p>加载中或未找到该章节。</p>
+      <p>章节内容为空</p>
     </div>
 
     <div class="buttons">
