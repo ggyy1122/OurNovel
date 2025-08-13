@@ -137,6 +137,24 @@
                 </a>
             </div>
         </footer>
+        <!--我的主页-->
+        <div class="fixed-button home-btn" @click="openMyHomePage">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24" height="24">
+                <path fill="currentColor"
+                    d="M192 413.952V896h640V413.952L512 147.328zM139.52 374.4l352-293.312a32 32 0 0 1 40.96 0l352 293.312A32 32 0 0 1 896 398.976V928a32 32 0 0 1-32 32H160a32 32 0 0 1-32-32V398.976a32 32 0 0 1 11.52-24.576">
+                </path>
+            </svg>
+            <span>主页</span>
+        </div>
+        <!-- 回到顶部按钮 -->
+        <div class="fixed-button top-btn" @click="scrollToTop">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24" height="24">
+                <path fill="currentColor"
+                    d="M160 832h704a32 32 0 1 1 0 64H160a32 32 0 1 1 0-64zm384-578.304V704h-64V247.296L237.248 490.048 192 444.8 508.8 128l316.8 316.8-45.312 45.248z">
+                </path>
+            </svg>
+            <span>顶部</span>
+        </div>
     </div>
 </template>
 
@@ -199,6 +217,11 @@ const handleScroll = () => {
     const threshold = headerHeight + navHeight
     showStickyNav.value = window.scrollY > threshold
 }
+
+// 回到顶部功能
+const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
 
 onMounted(() => {
     window.addEventListener('scroll', handleScroll)
@@ -666,5 +689,57 @@ onUnmounted(() => {
 .sticky-header-content .dropdown-menu {
     top: 100%;
     right: -10px;
+}
+
+/* 回到顶部按钮样式 */
+.fixed-button {
+    position: fixed;
+    right: 50px;
+    bottom: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background-color: #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 999;
+}
+
+/* 主页按钮 */
+.fixed-button.home-btn {
+    bottom: 220px;
+}
+
+/* 回到顶部按钮 */
+.fixed-button.top-btn {
+    bottom: 160px;
+}
+
+.fixed-button:hover {
+    background-color: #f5f5f5;
+    transform: translateY(-2px);
+}
+
+.fixed-button svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* 在较大屏幕上显示文字 */
+@media (min-width: 768px) {
+    .fixed-button {
+        width: auto;
+        padding: 0 16px;
+        border-radius: 24px;
+    }
+
+    .fixed-button span {
+        margin-left: 8px;
+        font-size: 14px;
+    }
 }
 </style>
