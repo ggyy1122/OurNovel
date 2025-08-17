@@ -211,5 +211,21 @@ namespace OurNovel.Controllers
             var novels = await _novelService.GetNovelsByPageAsync(page, pageSize);
             return Ok(novels);
         }
+
+        /// <summary>
+        /// 获取已发布小说（分页 + 条件筛选，按 NovelId 顺序）
+        /// </summary>
+        [HttpGet("/published/filter-by-id")]
+        public async Task<ActionResult<PagedResult<Novel>>> GetNovels(
+         int page = 1,
+         int pageSize = 10,
+         string? category = null,
+         long? minWordCount = null,
+         long? maxWordCount = null,
+         bool? isFinished = null)
+        {
+            var result = await _novelService.GetNovelsAsync(page, pageSize, category, minWordCount, maxWordCount, isFinished);
+            return Ok(result);
+        }
     }
 }

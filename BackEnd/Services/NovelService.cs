@@ -217,6 +217,61 @@ namespace OurNovel.Services
                 .Take(pageSize)
                 .ToListAsync();
         }
+        /// <summary>
+        /// 获取小说列表（支持分类、字数区间、是否完结等条件 + 分页）
+        /// </summary>
+        public async Task<List<Novel>> GetNovelsAsync(
+            int page,
+            int pageSize,
+            string? category = null,
+            long? minWordCount = null,
+            long? maxWordCount = null,
+            bool? isFinished = null)
+        {
+            int skip = (page - 1) * pageSize;
+
+            // 先拿基础查询：只要已发布的小说
+            var query = _context.Novels
+                .Where(n => n.Status == "连载" || n.Status == "完结")
+                .AsQueryable();
+
+            // 分类过滤（用 join）
+            if (!string.IsNullOrEmpty(category))
+            {
+                query =
+                    from novel in query
+                    join nc in _context.NovelCategories on novel.NovelId equals nc.NovelId
+                    where nc.CategoryName == category
+                    select novel;
+            }
+
+            // 字数过滤
+            if (minWordCount.HasValue)
+            {
+                query = query.Where(n => n.TotalWordCount >= minWordCount.Value);
+            }
+            if (maxWordCount.HasValue)
+            {
+                query = query.Where(n => n.TotalWordCount <= maxWordCount.Value);
+            }
+
+            // 是否完结过滤
+            if (isFinished.HasValue)
+            {
+                query = isFinished.Value
+                    ? query.Where(n => n.Status == "完结")
+                    : query.Where(n => n.Status == "连载");
+            }
+
+            // 排序 + 分页
+            return await query
+                .OrderBy(n => n.NovelId)
+                .Skip(skip)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+
 
         /// <summary>
         /// 上传小说封面，并更新封面地址ַ
