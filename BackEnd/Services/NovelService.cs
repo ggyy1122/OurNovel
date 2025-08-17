@@ -220,7 +220,7 @@ namespace OurNovel.Services
         /// <summary>
         /// 获取小说列表（支持分类、字数区间、是否完结等条件 + 分页）
         /// </summary>
-        public async Task<List<Novel>> GetNovelsAsync(
+        public async Task<PagedResult<Novel>> GetNovelsAsync(
             int page,
             int pageSize,
             string? category = null,
@@ -228,48 +228,48 @@ namespace OurNovel.Services
             long? maxWordCount = null,
             bool? isFinished = null)
         {
-            int skip = (page - 1) * pageSize;
-
-            // 先拿基础查询：只要已发布的小说
             var query = _context.Novels
                 .Where(n => n.Status == "连载" || n.Status == "完结")
                 .AsQueryable();
 
-            // 分类过滤（用 join）
             if (!string.IsNullOrEmpty(category))
             {
-                query =
-                    from novel in query
-                    join nc in _context.NovelCategories on novel.NovelId equals nc.NovelId
-                    where nc.CategoryName == category
-                    select novel;
+                query = from novel in query
+                        join nc in _context.NovelCategories on novel.NovelId equals nc.NovelId
+                        where nc.CategoryName == category
+                        select novel;
             }
 
-            // 字数过滤
             if (minWordCount.HasValue)
-            {
                 query = query.Where(n => n.TotalWordCount >= minWordCount.Value);
-            }
-            if (maxWordCount.HasValue)
-            {
-                query = query.Where(n => n.TotalWordCount <= maxWordCount.Value);
-            }
 
-            // 是否完结过滤
+            if (maxWordCount.HasValue)
+                query = query.Where(n => n.TotalWordCount <= maxWordCount.Value);
+
             if (isFinished.HasValue)
-            {
                 query = isFinished.Value
                     ? query.Where(n => n.Status == "完结")
                     : query.Where(n => n.Status == "连载");
-            }
 
-            // 排序 + 分页
-            return await query
+            int totalCount = await query.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            var items = await query
                 .OrderBy(n => n.NovelId)
-                .Skip(skip)
+                .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+
+            return new PagedResult<Novel>
+            {
+                TotalCount = totalCount,
+                TotalPages = totalPages,
+                Page = page,
+                PageSize = pageSize,
+                Items = items
+            };
         }
+
 
 
 
