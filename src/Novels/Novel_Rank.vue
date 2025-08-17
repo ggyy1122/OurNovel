@@ -123,27 +123,25 @@ async function fetchRankingData() {
     try {
         loading.value = true
         let response
+        const statusFilter = selectedTab.value === '全部' ? null :
+            (selectedTab.value === '已完结' ? '完结' : '连载')
+
         switch (selectedSideTab.value) {
             case '收藏榜':
-                response = await getCollectRanking(rankLimit.value)
+                response = await getCollectRanking(rankLimit.value, statusFilter)
                 break
             case '推荐榜':
-                response = await getRecommendRanking(rankLimit.value)
+                response = await getRecommendRanking(rankLimit.value, statusFilter)
                 break
             case '评分榜':
-                response = await getScoreRanking(rankLimit.value)
+                response = await getScoreRanking(rankLimit.value, statusFilter)
                 break
             default:
-                response = await getCollectRanking(rankLimit.value)
+                response = await getCollectRanking(rankLimit.value, statusFilter)
         }
-        // 过滤掉"待审核"和"封禁"状态的小说
-        rankedNovels.value = Array.isArray(response)
-            ? response.filter(novel => novel.status === '连载' || novel.status === '完结')
-            : []
-        if (selectedTab.value !== '全部') {
-            const statusFilter = selectedTab.value === '已完结' ? '完结' : '连载'
-            rankedNovels.value = rankedNovels.value.filter(novel => novel.status === statusFilter)
-        }
+
+        rankedNovels.value = Array.isArray(response) ? response : []
+
         // 重置到第一页
         currentPage.value = 1
         jumpPage.value = 1
@@ -171,9 +169,11 @@ function jumpToPage() {
 function selectRankingType(type) {
     selectedSideTab.value = type
 }
+
 function changeRankLimit(type) {
     selectedRankType.value = type
 }
+
 watch([selectedSideTab, selectedRankType, selectedTab], () => {
     fetchRankingData()
 })

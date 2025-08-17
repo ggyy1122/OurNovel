@@ -60,6 +60,32 @@
         </div>
 
         <div class="divider">
+            <span>꧁分类꧂</span>
+        </div>
+
+        <!-- 分类展示部分 -->
+        <div class="categories-container">
+            <div class="categories-header">
+                <h2>热门分类</h2>
+                <button class="more-button" @click="goToAllCategories">更多分类 ›</button>
+            </div>
+            <div class="categories-grid">
+                <div v-for="(category, index) in categories" :key="category.categoryName" class="category-card"
+                    :class="`category-${index % 5}`" @click="goToCategory(category.categoryName)"
+                    @mouseenter="hoverCategory = index" @mouseleave="hoverCategory = null">
+                    <div class="category-content">
+                        <h3>{{ category.categoryName }}</h3>
+                        <transition name="fade">
+                            <div v-if="hoverCategory === index" class="category-hover">
+                                <span>点击探索</span>
+                            </div>
+                        </transition>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider">
             <span>꧁排行榜꧂</span>
         </div>
         <!-- 排行榜 -->
@@ -335,6 +361,7 @@ import { useRouter } from 'vue-router'
 import { getChapter, getChapterLogs } from '@/API/Chapter_API'
 import { getNovelsByCategory } from '@/API/NovelCategory_API'
 import { getCollectRanking, getRecommendRanking, getScoreRanking } from '@/API/Ranking_API'
+import { getAllCategories } from '@/API/Category_API'
 
 
 const router = useRouter()
@@ -744,8 +771,37 @@ const goToRankings = (type) => {
     })
 }
 
+const categories = ref([])
+const hoverCategory = ref(null)
+
+// 获取分类数据
+const fetchCategories = async () => {
+    try {
+        const allCategories = await getAllCategories()
+        // 随机排序并取前15个
+        categories.value = allCategories
+            .sort(() => Math.random() - 0.5)
+            .slice(0, 15)
+    } catch (error) {
+        console.error('获取分类数据失败:', error)
+    }
+}
+
+// 跳转到分类页面
+const goToCategory = (categoryName) => {
+    router.push({
+        path: '/Novels/Novel_Layout/category',
+        query: { categoryName }
+    })
+}
+
+// 跳转到全部分类页面
+const goToAllCategories = () => {
+    router.push('/Novels/Novel_Layout/category')
+}
 
 onMounted(async () => {
+    fetchCategories()
     startAutoPlay()
     startNovelAutoPlay()
     fetchAuthors()
@@ -1068,6 +1124,188 @@ watch(novelCurrent, startNovelAutoPlay)
 
     .ranking-column {
         margin-bottom: 20px;
+    }
+}
+
+.categories-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto 40px;
+    padding: 20px;
+    background: linear-gradient(to bottom, #fdfafd, #ffffff);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.categories-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.categories-header h2 {
+    font-size: 24px;
+    color: #333;
+    margin: 0;
+    position: relative;
+    padding-left: 15px;
+}
+
+.categories-header h2::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(to bottom, #ff4d4f, #f7b769);
+    border-radius: 2px;
+}
+
+.more-button {
+    background: none;
+    border: none;
+    color: #555;
+    font-size: 17px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s;
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+
+.more-button:hover {
+    color: #ff4d4f;
+    background: rgba(255, 77, 79, 0.1);
+    transform: translateX(5px);
+}
+
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 20px;
+}
+
+.category-card {
+    position: relative;
+    height: 50px;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.category-content {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+    color: white;
+}
+
+.category-card:hover .category-icon {
+    transform: scale(1.2);
+}
+
+.category-content h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.category-hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 500;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.category-card:hover .category-hover {
+    opacity: 1;
+}
+
+/* 不同分类的背景色 */
+.category-0 {
+    background: linear-gradient(135deg, #fb9bad, #f79aba);
+}
+
+.category-1 {
+    background: linear-gradient(135deg, #a5a5f3, #a8bff7);
+}
+
+.category-2 {
+    background: linear-gradient(135deg, #90ccf4, #84defa);
+}
+
+.category-3 {
+    background: linear-gradient(135deg, #8af0b6, #8bf7e1);
+}
+
+.category-4 {
+    background: linear-gradient(135deg, #f794a4, #e7c880);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .categories-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+
+    .category-card {
+        height: 100px;
+    }
+
+    .category-icon {
+        font-size: 24px;
+    }
+
+    .category-content h3 {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .categories-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 12px;
+    }
+
+    .category-card {
+        height: 80px;
+    }
+
+    .category-icon {
+        font-size: 20px;
+        margin-bottom: 5px;
+    }
+
+    .category-content h3 {
+        font-size: 14px;
     }
 }
 

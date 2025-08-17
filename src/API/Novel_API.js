@@ -253,8 +253,8 @@ export function submitNovelEdit(novelId, updateData) {
             'Content-Type': 'application/json'
         },
         data: {
-            originalNovelId: novelId,  
-            edited: updateData         
+            originalNovelId: novelId,
+            edited: updateData
         }
     })
 }
@@ -289,11 +289,43 @@ export function getPublishedNovels() {
  */
 export function getPaginatedNovels(page = 1, pageSize = 15) {
     return request({
-        url: '/api/Novel/published/by-id',
+        url: '/published/by-id',
         method: 'get',
         params: {
             page,
             pageSize
+        }
+    })
+}
+
+/**
+ * 获取已发布小说（分页 + 条件筛选，按 NovelId 顺序）
+ * @param {number} page - 页码
+ * @param {number} pageSize - 每页数量
+ * @param {string} [category] - 分类
+ * @param {number} [minWordCount] - 最小字数
+ * @param {number} [maxWordCount] - 最大字数
+ * @param {boolean} [isFinished] - 是否完结
+ * @returns {Promise<PagedResult<Novel>>} 返回分页结果
+ */
+export function getFilteredNovels(
+    page = 1,
+    pageSize = 10,
+    category = null,
+    minWordCount = null,
+    maxWordCount = null,
+    isFinished = null
+) {
+    return request({
+        url: '/published/filter-by-id',
+        method: 'get',
+        params: {
+            page,
+            pageSize,
+            category,
+            minWordCount,
+            maxWordCount,
+            isFinished
         }
     })
 }
