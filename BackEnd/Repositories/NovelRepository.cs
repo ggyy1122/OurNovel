@@ -14,7 +14,7 @@ public class NovelRepository : Repository<Novel, int>, INovelRepository
         _context = context;
     }
 
-    public async Task<List<CollectRankingDto>> GetTopCollectedNovelsAsync(int topN)
+    public async Task<List<CollectRankingDto>> GetTopCollectedNovelsAsync(int topN, string? status = null)
     {
         var topCollected = await _context.Collects
             .GroupBy(c => c.NovelId)
@@ -25,8 +25,16 @@ public class NovelRepository : Repository<Novel, int>, INovelRepository
 
         var novelIds = topCollected.Select(x => x.NovelId).ToList();
 
-        var novels = await _context.Novels
-            .Where(n => novelIds.Contains(n.NovelId))
+        var novelsQuery = _context.Novels
+            .Where(n => novelIds.Contains(n.NovelId));
+
+        // 添加状态筛选
+        if (!string.IsNullOrEmpty(status))
+        {
+            novelsQuery = novelsQuery.Where(n => n.Status == status);
+        }
+
+        var novels = await novelsQuery
             .Include(n => n.Author)
             .ToListAsync();
 
@@ -56,11 +64,19 @@ public class NovelRepository : Repository<Novel, int>, INovelRepository
     }
 
 
-    public async Task<List<RecommendRankingDto>> GetTopRecommendedNovelsAsync(int topN)
+    public async Task<List<RecommendRankingDto>> GetTopRecommendedNovelsAsync(int topN, string? status = null)
     {
-        var novels = await _context.Novels
+        var novelsQuery = _context.Novels
+            .Where(n => n.RecommendCount > 0);
+
+        // 添加状态筛选
+        if (!string.IsNullOrEmpty(status))
+        {
+            novelsQuery = novelsQuery.Where(n => n.Status == status);
+        }
+
+        var novels = await novelsQuery
             .Include(n => n.Author)
-            .Where(n => n.RecommendCount > 0)
             .OrderByDescending(n => n.RecommendCount)
             .Take(topN)
             .ToListAsync();
@@ -86,11 +102,19 @@ public class NovelRepository : Repository<Novel, int>, INovelRepository
     }
 
 
-    public async Task<List<ScoreRankingDto>> GetTopScoredNovelsAsync(int topN)
+    public async Task<List<ScoreRankingDto>> GetTopScoredNovelsAsync(int topN, string? status = null)
     {
-        var novels = await _context.Novels
+        var novelsQuery = _context.Novels
+            .Where(n => n.Score > 0);
+
+        // 添加状态筛选
+        if (!string.IsNullOrEmpty(status))
+        {
+            novelsQuery = novelsQuery.Where(n => n.Status == status);
+        }
+
+        var novels = await novelsQuery
             .Include(n => n.Author)
-            .Where(n => n.Score > 0)
             .OrderByDescending(n => n.Score)
             .Take(topN)
             .ToListAsync();

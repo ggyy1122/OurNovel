@@ -99,31 +99,25 @@ namespace OurNovel.Services
         /// <summary>
         /// 获取收藏榜单
         /// </summary>
-        /// <param name="topN"></param>
-        /// <returns></returns>
-        public async Task<List<CollectRankingDto>> GetTopCollectedNovelsAsync(int topN)
+        public async Task<List<CollectRankingDto>> GetTopCollectedNovelsAsync(int topN, string? status = null)
         {
-            return await _novelRepository.GetTopCollectedNovelsAsync(topN);
+            return await _novelRepository.GetTopCollectedNovelsAsync(topN, status);
         }
 
         /// <summary>
         /// 获取推荐榜单
         /// </summary>
-        /// <param name="topN"></param>
-        /// <returns></returns>
-        public async Task<List<RecommendRankingDto>> GetTopRecommendedNovelsAsync(int topN)
+        public async Task<List<RecommendRankingDto>> GetTopRecommendedNovelsAsync(int topN, string? status = null)
         {
-            return await _novelRepository.GetTopRecommendedNovelsAsync(topN);
+            return await _novelRepository.GetTopRecommendedNovelsAsync(topN, status);
         }
 
         /// <summary>
         /// 获取评分榜单
         /// </summary>
-        /// <param name="topN"></param>
-        /// <returns></returns>
-        public async Task<List<ScoreRankingDto>> GetTopScoredNovelsAsync(int topN)
+        public async Task<List<ScoreRankingDto>> GetTopScoredNovelsAsync(int topN, string? status = null)
         {
-            return await _novelRepository.GetTopScoredNovelsAsync(topN);
+            return await _novelRepository.GetTopScoredNovelsAsync(topN, status);
         }
 
 
