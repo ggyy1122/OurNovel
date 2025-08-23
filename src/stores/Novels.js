@@ -11,6 +11,11 @@ export const novelsStore = reactive({
   shouldRefresh: false,
   
   async fetchNovels() {
+    if (!authorStore.currentAuthor?.author_id) {
+      console.error('无法获取作者ID')
+      this.error = { message: '作者信息未加载完成' }
+      await authorStore.fetchAuthorData()
+    }
     this.isLoading = true
     this.error = null
     

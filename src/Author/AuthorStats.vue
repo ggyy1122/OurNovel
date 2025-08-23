@@ -266,7 +266,7 @@ export default {
         { min: 2, max: 4, label: '2-4分' },
         { min: 4, max: 6, label: '4-6分' },
         { min: 6, max: 8, label: '6-8分' },
-        { min: 8, max: 10, label: '8-10分' }
+        { min: 8, max: Infinity, label: '8-10分' }
       ]
       
       const scoreData = scoreRanges.map(range => {
