@@ -400,6 +400,17 @@ const selectChapter = (chapter) => {
   console.log('选择章节:', chapter);
   // 实际应该跳转到阅读页面
   // router.push({ name: 'ChapterRead', params: { chapterId: chapter.id } });
+    router.push({
+    name: 'ChapterContent',
+    params: {
+      novel_id: route.query.id,
+      chapter_id: chapter.chapterId
+    },
+    query: {
+      title: chapter.title,
+      content: chapter.content
+    }
+  })
 };
 </script>
 

@@ -9,7 +9,7 @@
       </div>
     </div>
     <div v-else>
-      <p>加载中或未找到该章节。</p>
+      <p>章节内容为空</p>
     </div>
 
     <div class="buttons">
@@ -60,7 +60,7 @@ onMounted(async () => {
 })
 
 const goBack = () => {
-  router.push({ name: 'ChapterBoard' }) // 确保 router/index.js 里 name 是 ChapterBoard
+  router.go(-1) // 确保 router/index.js 里 name 是 ChapterBoard
 }
 </script>
 

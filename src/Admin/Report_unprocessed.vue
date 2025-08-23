@@ -9,9 +9,7 @@
     <table class="complaint-table">
       <thead>
         <tr>
-          <th><input type="checkbox" v-model="selectAll" @change="toggleSelectAll" /></th>
-          <th>评论者</th>
-          <th>举报者</th>
+          <th>评论内容</th>
           <th>举报原因</th>
           <th>举报时间</th>
           <th>操作</th>
@@ -19,26 +17,26 @@
       </thead>
       <tbody>
         <tr v-for="item in reports" :key="item.reportId">
-          <td><input type="checkbox" v-model="selectedIds" :value="item.reportId" /></td>
-          <td>{{ item.commentId }}</td>
-          <td>{{ item.readerId }}</td>
+          <td>{{ item.commentContent }}</td>
           <td>{{ item.reason }}</td>
           <td>{{ item.reportTime }}</td>
-          <td style="position:relative;">
-            <router-link :to="{ path: '/Admin/Admin_Layout/comment_detail', query: { id: item.reportId } }" class="view-link">查看</router-link>
-            <span class="action-dots" @click="openMenu(item.reportId)">⋯</span>
-            <div v-if="activeMenu === item.reportId" class="action-menu">
-              <div class="action-item" @click="approve(item.reportId)">审核通过</div>
-              <div class="action-item" @click="reject(item.reportId)">审核不通过</div>
-            </div>
-          </td>
+             <td>
+              <button
+                class="view-btn"
+                @click="view(item.reportId)"
+              >查看</button>
+              <button 
+                class="approve-btn" 
+                @click="approve(novel.novelId)"
+              >审核通过</button>
+              <button 
+                class="reject-btn" 
+                @click="reject(novel.novelId)"
+              >审核不通过</button>
+            </td>
         </tr>
       </tbody>
     </table>
-    <div v-if="selectedIds.length" class="batch-actions">
-      <button @click="approveSelected">批量审核通过</button>
-      <button @click="rejectSelected">批量审核不通过</button>
-    </div>
    
   </div>
   </div>
@@ -46,8 +44,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted } from 'vue'
 import {getAllReports} from '@/API/Report_API'
+import{getComment} from '@/API/Comment_API'
+import{useRouter } from 'vue-router'
 //----------------------------------------------------------------------------------------------------------------
 //获取评论数据
 const reports=ref([])
@@ -61,8 +61,24 @@ const getReportsData=async () => {
       reportTime: report.reportTime,
       progress: report.progress,
       commentId: report.commentId,
-      readerId: report.readerId
+      readerId: report.readerId,
+      commentContent: '未知' // 初始值，稍后通过 API 获取
     }))
+     // 逐个获取评论内容
+    for (const report of reports.value) {
+      try {
+        const comment = await getComment(report.commentId)
+        if (comment && comment.content) {
+           if (comment.content.length > 10) {
+              report.commentContent = comment.content.substring(0, 10) + '...'
+            } else {
+              report.commentContent = comment.content
+            }
+        }
+      } catch (err) {
+        report.commentContent = '获取失败'
+      }
+    }
   } catch (error) {
     console.error('获取举报数据失败:', error)
   } finally {
@@ -74,50 +90,22 @@ const getReportsData=async () => {
 //从数据库获取信息时的加载中动画
 const loading = ref(false)  // 加载状态
 //----------------------------------------------------------------------------------------------------------------
-const selectedIds = ref([])//被选中的
-const selectAll = ref(false)//是否全选
-const activeMenu = ref(null)
-
-function toggleSelectAll() {
-  if (selectAll.value) {
-    selectedIds.value = reports.value.map(n => n.reportId)
-  } else {
-    selectedIds.value = []
-  }
-}
-function openMenu(id) {
-  activeMenu.value = activeMenu.value === id ? null : id
+//查看举报详情
+const router = useRouter()
+const view = (reportId) => {
+  // 跳转到评论详情页面，传递举报ID
+  router.push({ path: '/Admin/Admin_Layout/comment_detail', query: { id: reportId } })
 }
 
 
 
-function approveSelected() {
-  selectedIds.value = []
-}
-function rejectSelected() {
-  selectedIds.value = []
-}
 
 
 
-function handleClickOutside(e) {
-  if (activeMenu.value !== null) {
-    const menus = document.querySelectorAll('.action-menu, .action-dots')
-    let isMenu = false
-    menus.forEach(menu => {
-      if (menu.contains(e.target)) isMenu = true
-    })
-    if (!isMenu) activeMenu.value = null
-  }
-}
+
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
   getReportsData() // 页面加载时调用
 })
-onBeforeUnmount(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
-
 
 
 
@@ -142,7 +130,7 @@ onBeforeUnmount(() => {
 .complaint-table th, .complaint-table td {
   padding: 12px 8px;
   border-bottom: 1px solid #eee;
-  text-align: left;
+  text-align: center;
 }
 .complaint-table tr{
   transition: background-color 0.2s;
@@ -152,6 +140,22 @@ onBeforeUnmount(() => {
 }
 .complaint-table th {
   background: #dde3ee;
+}
+.complaint-table th:nth-child(1),
+.complaint-table td:nth-child(1) {
+  width: 150px; /* 评论内容列 */
+}
+.complaint-table th:nth-child(2),
+.complaint-table td:nth-child(2) {
+  width: 160px; /* 举报原因列 */
+}
+.complaint-table th:nth-child(3),
+.complaint-table td:nth-child(3) {
+  width: 150px; /* 举报时间列 */
+}
+.complaint-table th:nth-child(4),
+.complaint-table td:nth-child(4) {
+  width: 250px; /* 操作列 */
 }
 .view-link {
   color: #42b983;
@@ -223,5 +227,42 @@ onBeforeUnmount(() => {
   to {
     transform: rotate(360deg);
   }
+}
+
+.approve-btn {
+  margin-right: 10px;
+  padding: 6px 12px;
+  border: none;
+  background-color: #486482;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.approve-btn:hover {
+  background-color: #35495e;
+}
+.reject-btn {
+  margin-right: 10px;
+  padding: 6px 12px;
+  border: none;
+  background-color:  #ad7079;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.reject-btn:hover {
+  background: #90555f;
+}
+.view-btn {
+  margin-right: 10px;
+  padding: 6px 12px;
+  border: none;
+  background-color: #486482;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.view-btn:hover {
+  background-color: #35495e;
 }
 </style>

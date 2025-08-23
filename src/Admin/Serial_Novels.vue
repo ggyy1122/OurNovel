@@ -47,7 +47,6 @@
     <table class="novel-table">
       <thead>
         <tr>
-          <th><input type="checkbox" v-model="selectAll" @change="toggleSelectAll" /></th>
           <th>小说名</th>
           <th>作者</th>
           <th>操作</th>
@@ -55,9 +54,6 @@
       </thead>
       <tbody>
         <tr v-for="novel in pagedNovels" :key="novel.novelId">
-          <td>
-            <input type="checkbox" v-model="selectedIds" :value="novel.novelId" />
-          </td>
           <td><router-link
             :to="{path:`/Admin/Admin_Layout/novel_managent/novelInfo`,query:{id:novel.novelId,text:novel.authorName}}"
             class="novel-link"
@@ -72,11 +68,6 @@
         </tr>
       </tbody>
     </table>
-    
-        <div v-if="selectedIds.length" class="batch-actions">
-          <button @click="deleteSelected">批量删除</button>
-          <button @click="moveSelected">批量移动至</button>
-        </div>
          <!-- 分页控件 -->
       <div class="pagination">
         <button @click="prevPage" :disabled="currentPage === 1">上一页</button>
@@ -94,7 +85,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 
 
 
@@ -272,57 +263,22 @@ function rejectNovel(id) {
 }
 //----------------------------------------------------------------------------------------------------------------
 
-const selectedIds = ref([])
-const selectAll = ref(false)
 
 
 
 
-function handleClickOutside(e) {
-  // 如果有三点菜单弹出，且点击的不是菜单本身，则关闭菜单
-  if (activeMenu.value !== null) {
-    // 判断是否点击在菜单或三个点上
-    const menus = document.querySelectorAll('.action-menu, .action-dots')
-    let isMenu = false
-    menus.forEach(menu => {
-      if (menu.contains(e.target)) isMenu = true
-    })
-    if (!isMenu) activeMenu.value = null
-  }
-}
+
+
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
   getNovelsData() // 页面加载时调用 store 方法
 })
-onBeforeUnmount(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
 
 
-function toggleSelectAll() {//全选
-  if (selectAll.value) {
-    selectedIds.value = novels.value.map(n => n.id)
-  } else {
-    selectedIds.value = []
-  }
-}
 
 //----------------------------------------------------------------------------------------------------------------
-//三点菜单的操作
-const activeMenu = ref(null)
 
 
-
-function deleteSelected() {
-  novels.value = novels.value.filter(n => !selectedIds.value.includes(n.id))
-  selectedIds.value = []
-  selectAll.value = false
-}
-
-function moveSelected() {
-  alert('将选中的小说批量移动至其他分组（示例）')
-}
 
 
 

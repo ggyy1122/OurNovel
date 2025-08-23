@@ -47,7 +47,6 @@
     <table class="novel-table">
       <thead>
         <tr>
-          <th><input type="checkbox" v-model="selectAll" @change="toggleSelectAll" /></th>
           <th>小说名</th>
           <th>作者</th>
           <th>操作</th>
@@ -55,15 +54,16 @@
       </thead>
       <tbody>
         <tr v-for="novel in pagedNovels" :key="novel.novelId">
-          <td>
-            <input type="checkbox" v-model="selectedIds" :value="novel.novelId" />
-          </td>
           <td><router-link
             :to="{path:`/Admin/Admin_Layout/novel_managent/novelInfo`,query:{id:novel.novelId,text:novel.authorName}}"
             class="novel-link"
           >{{ novel.novelName }}</router-link></td>
           <td>{{ novel.authorName }}</td>
           <td>
+              <button
+                class="view-btn"
+                @click="viewNovel(novel.novelId, novel.authorName)"
+              >查看</button>
               <button 
                 class="approve-btn" 
                 @click="approveNovel(novel.novelId)"
@@ -76,11 +76,6 @@
         </tr>
       </tbody>
     </table>
-    
-        <div v-if="selectedIds.length" class="batch-actions">
-          <button @click="deleteSelected">批量删除</button>
-          <button @click="moveSelected">批量移动至</button>
-        </div>
          <!-- 分页控件 -->
       <div class="pagination">
         <button @click="prevPage" :disabled="currentPage === 1">上一页</button>
@@ -98,7 +93,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount,computed } from 'vue'
+import { ref, onMounted,computed } from 'vue'
 
 
 
@@ -111,6 +106,7 @@ import {getAllCategories} from '@/API/Category_API'
 import{getNovelsByCategory} from '@/API/NovelCategory_API'
 import { current_state } from '@/stores/index'
 import { storeToRefs } from 'pinia'
+import{ useRouter} from 'vue-router'
 
 const currentState = current_state()
 const { id: managerID } = storeToRefs(currentState)
@@ -292,55 +288,24 @@ function rejectNovel(id) {
 }
 //----------------------------------------------------------------------------------------------------------------
 
-const selectedIds = ref([])
-const selectAll = ref(false)
 
 
-
-function handleClickOutside(e) {
-  // 如果有三点菜单弹出，且点击的不是菜单本身，则关闭菜单
-  if (activeMenu.value !== null) {
-    // 判断是否点击在菜单或三个点上
-    const menus = document.querySelectorAll('.action-menu, .action-dots')
-    let isMenu = false
-    menus.forEach(menu => {
-      if (menu.contains(e.target)) isMenu = true
-    })
-    if (!isMenu) activeMenu.value = null
-  }
-}
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
   getNovelsData() // 页面加载时调用 store 方法
 })
-onBeforeUnmount(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
 
-
-function toggleSelectAll() {//全选
-  if (selectAll.value) {
-    selectedIds.value = novels.value.map(n => n.id)
-  } else {
-    selectedIds.value = []
-  }
-}
 
 //----------------------------------------------------------------------------------------------------------------
-//三点菜单的操作
-const activeMenu = ref(null)
 
 
 
-function deleteSelected() {
-  novels.value = novels.value.filter(n => !selectedIds.value.includes(n.id))
-  selectedIds.value = []
-  selectAll.value = false
-}
 
-function moveSelected() {
-  alert('将选中的小说批量移动至其他分组（示例）')
+const router = useRouter()
+function viewNovel(novelId, authorName) {
+  // 跳转到小说详情页，携带小说ID和作者名
+  // 这里的实现依赖于你的路由设置，假设详情页路由为 /novel/:id
+  router.push({ path: `/Admin/Admin_Layout/novel_managent/novelInfo`, query: { id: novelId, text: authorName } });
 }
 
 
@@ -399,7 +364,7 @@ function moveSelected() {
 .novel-table th, .novel-table td {
   padding: 12px 8px;
   border-bottom: 1px solid #eee;
-  text-align: left;
+  text-align:  center;
 }
 .novel-table tr{
   transition: background-color 0.2s;
@@ -409,24 +374,21 @@ function moveSelected() {
 }
 .novel-table th {
   background: #dde3ee;
+  text-align: center; /* 表头居中 */
+}
+.novel-table th:nth-child(1),
+.novel-table td:nth-child(1) {
+  width: 300px;  /* 小说名列 */
+}
+.novel-table th:nth-child(2),
+.novel-table td:nth-child(2) {
+  width: 180px;  /* 作者列 */
+}
+.novel-table th:nth-child(3),
+.novel-table td:nth-child(3) {
+  width: 320px;  /* 操作按钮列 */
 }
 
-.batch-actions {
-  margin-top: 16px;
-  text-align: right;
-}
-.batch-actions button {
-  margin-left: 12px;
-  padding: 6px 18px;
-  background: #42b983;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.batch-actions button:hover {
-  background: #2c3e50;
-}
 
 .filter-container {
   display: flex;
@@ -573,30 +535,39 @@ function moveSelected() {
   border: 1px solid #ccc;
 }
 .approve-btn {
-  background: #409eff;
-  color: #fff;
+  margin-right: 10px;
+  padding: 6px 12px;
   border: none;
+  background-color: #486482;
+  color: #fff;
   border-radius: 4px;
-  padding: 6px 14px;
-  margin-right: 8px;
   cursor: pointer;
-  font-weight: bold;
-  transition: background 0.2s;
 }
 .approve-btn:hover {
-  background: #66b1ff;
+  background-color: #35495e;
 }
 .reject-btn {
-  background: #ff4d4f;
-  color: #fff;
+  margin-right: 10px;
+  padding: 6px 12px;
   border: none;
+  background-color:  #ad7079;
+  color: #fff;
   border-radius: 4px;
-  padding: 6px 14px;
   cursor: pointer;
-  font-weight: bold;
-  transition: background 0.2s;
 }
 .reject-btn:hover {
-  background: #d9363e;
+  background: #90555f;
+}
+.view-btn {
+  margin-right: 10px;
+  padding: 6px 12px;
+  border: none;
+  background-color: #486482;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.view-btn:hover {
+  background-color: #35495e;
 }
 </style>
