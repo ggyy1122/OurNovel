@@ -46,7 +46,7 @@
             <div class="chapter-meta">
               <span class="word-count">{{ chapter.word_count }}字</span>
               <span class="status" :class="chapter.status">
-                {{ getStatusText(chapter.status) }}
+                {{ chapter.status === '首次审核' ? '审核中' : getStatusText(chapter.status) }}
               </span>
               <span class="price">¥{{ chapter.calculated_price }}</span>
               <span class="publish-time" v-if="chapter.status === '已发布'">
@@ -75,7 +75,6 @@
               class="chapter-title-input" 
               v-model="activeChapter.title" 
               placeholder="输入章节标题"
-              :disabled="activeChapter.status === '审核中' || activeChapter.status === '已发布'"
             >
             <!-- 编辑工具栏 -->
             <div class="editor-toolbar">
@@ -83,7 +82,7 @@
               <button 
                 class="save-btn" 
                 @click="saveChapter" 
-                :disabled="activeChapter.status === '审核中' || activeChapter.status === '已发布'"
+                :disabled=" activeChapter.status === '已发布'"
               >
                 保存
               </button>
@@ -103,8 +102,8 @@
             class="content-editor" 
             v-model="activeChapter.content" 
             placeholder="在此输入章节内容..."
+            @keydown.enter="handleEnterKey"
             @input="updateWordCount"
-            :disabled="activeChapter.status === '审核中' || activeChapter.status === '已发布'"
           ></textarea>
           <!-- 编辑底部 -->
           <div class="editor-footer">
@@ -119,7 +118,6 @@
                 min="0" 
                 step="0.01"
                 @input="updateCalculatedPrice"
-                :disabled="activeChapter.status === '审核中' || activeChapter.status === '已发布'"
               >
               <span class="final-price">最终价格: ¥{{ activeChapter.calculated_price }}</span>
             </div>
@@ -128,7 +126,6 @@
               <label>是否收费:</label>
               <select 
                 v-model="activeChapter.is_charged" 
-                :disabled="activeChapter.status === '审核中' || activeChapter.status === '已发布'"
               >
                 <option value="是">是</option>
                 <option value="否">否</option>
@@ -202,7 +199,25 @@ onMounted(async () => {
 const goBack = () => {
   router.go(-1)
 }
-
+// 换行空格
+const handleEnterKey = (event) => {
+  if (event.key === 'Enter') {
+    event.preventDefault();    
+    if (!activeChapter.value.content) {
+      activeChapter.value.content = '';
+    }
+    
+    const cursorPos = event.target.selectionStart;
+    const textBefore = activeChapter.value.content.substring(0, cursorPos);
+    const textAfter = activeChapter.value.content.substring(cursorPos);
+    
+    activeChapter.value.content = textBefore + '\n　　' + textAfter;
+    setTimeout(() => {
+      event.target.selectionStart = cursorPos + 3;
+      event.target.selectionEnd = cursorPos + 3;
+    }, 0);
+  }
+};
 // 选择章节
 const selectChapter = (chapter) => {
   console.log('点击章节:', chapter) 
@@ -367,7 +382,7 @@ const confirmDeleteChapter = (chapter) => {
 .status.草稿 {
   color: #f39c12;
 }
-
+.status.首次审核 ,
 .status.审核中 {
   color: #3498db;
 }
@@ -483,7 +498,7 @@ const confirmDeleteChapter = (chapter) => {
   border-color: #c8e6c9;
   color: #2e7d32;
 }
-
+.status-btn.首次审核,
 .status-btn.审核中 {
   background-color: #e3f2fd;
   border-color: #bbdefb;
@@ -505,6 +520,8 @@ const confirmDeleteChapter = (chapter) => {
   font-family: inherit;
   font-size: 14px;
   line-height: 1.6;
+  text-indent: 2em;
+  white-space: pre-wrap;
 }
 
 /* 禁用状态编辑区 */

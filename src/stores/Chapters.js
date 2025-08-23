@@ -4,28 +4,34 @@ import { getChaptersByNovel, deleteChapter,createChapter,updateChapter } from '@
 
 // 状态配置
 export const statusConfig = {
-  '草稿': { 
+  '草稿': {
     text: '草稿',
     actionText: '提交审核',
-    nextStatus: '审核中',
+    nextStatus: '首次审核', 
     color: '#888'
   },
-  '审核中': { 
-    text: '审核中',
+  '首次审核': {
+    text: '首次审核',
     actionText: '审核中',
-    nextStatus: null,
+    nextStatus: null, 
     color: '#FFA500'
   },
-  '封禁': { 
+  '审核中': {
+    text: '审核中',
+    actionText: '审核中',
+    nextStatus: null, 
+    color: '#FFA500'
+  },
+  '封禁': {
     text: '封禁',
     actionText: '申请解封',
-    nextStatus: '审核中',
+    nextStatus: '首次审核', 
     color: '#FF0000'
   },
-  '已发布': { 
+  '已发布': {
     text: '已发布',
-    actionText: '撤回为草稿',
-    nextStatus: '草稿',
+    actionText: '提交更改', 
+    nextStatus: '审核中',
     color: '#4CAF50'
   }
 }
@@ -210,7 +216,7 @@ export const ChaptersStore = defineStore('chaptersStore', {
         }
         const newChapter = {
           novel_id: novelId,
-          title: `第${nextChapterId}章`,
+          title: `第${nextChapterId}章 `,
           content: null,
           word_count: 0,
           price_per_kilo: 0.5,
@@ -302,7 +308,7 @@ export const ChaptersStore = defineStore('chaptersStore', {
       // 确保深拷贝且类型正确
       this.chapterToDelete = {
         ...chapter,
-        chapter_id: chapter.chapter_id // 强制转换为字符串
+        chapter_id: chapter.chapter_id 
       };
       this.showDeleteConfirm = true;
     },
