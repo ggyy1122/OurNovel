@@ -51,12 +51,11 @@ const gender = ref('男')
 const avatarFile = ref(null)
 const avatarPreviewUrl = ref('')
 const apiResponseAvatar = ref(null)
-const prefix = 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/'
 const defaultAvatar = 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg'
 
 function getFormattedAvatarUrl(avatarUrl) {
   if (!avatarUrl || avatarUrl.trim() === '') {
-    return prefix + defaultAvatar
+    return defaultAvatar
   }
   if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
     return avatarUrl
@@ -146,26 +145,9 @@ label {
   margin-bottom: 8px;
   color: #555;
 }
-
-.upload-button {
-  display: inline-block;
-  padding: 8px 16px;
-  background-color:  #ed424b;
-  color: white;
-  border-radius: 8px;
-  cursor: pointer;
-    font-weight: 500; 
-  font-size: 18px;  
-  transition: background-color 0.3s, transform 0.1s;
-  user-select: none;
-}
-
-.upload-button:hover {
-  background-color:#f05e74;
-}
-
-.upload-button:active {
-  transform: scale(0.98);
+.avatar-upload {
+  margin-bottom: 20px;
+  text-align: left; /* 确保内容靠左 */
 }
 
 .avatar-image {
@@ -174,9 +156,31 @@ label {
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 10px;
-  border: 2px solid    #ed424b;
+  border: 2px solid #ed424b;
+  display: block; /* 让图片占据整行 */
 }
 
+.upload-button {
+  display: block; /* 让按钮占据整行 */
+  width: fit-content; /* 宽度自适应内容 */
+  padding: 8px 16px;
+  background-color: #ed424b;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500; 
+  font-size: 18px;  
+  transition: background-color 0.3s, transform 0.1s;
+  user-select: none;
+}
+
+.upload-button:hover {
+  background-color: #f05e74;
+}
+
+.upload-button:active {
+  transform: scale(0.98);
+}
 input[type="text"],
 select {
   width: 60%;

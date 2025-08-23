@@ -183,3 +183,20 @@ export function deleteRecentReading(readerId, novelId) {
     }
   });
 }
+
+/**
+ * 添加或更新指定读者的某本小说的最近阅读记录
+ * @param {number} readerId - 读者 ID
+ * @param {number} novelId - 小说 ID
+ * @returns {Promise<any>}
+ */
+export function addOrUpdateRecentReading(readerId, novelId) {
+  return request({
+    url: '/api/RecentReadings/add-or-update',
+    method: 'post',
+    params: {
+      readerId,
+      novelId
+    }
+  });
+}

@@ -22,7 +22,166 @@
         </div>
 
         <div class="divider">
-            <span>年度征文</span>
+            <span>꧁专栏 | 公告꧂</span>
+        </div>
+
+        <!-- 专栏|公告 -->
+        <div class="main-banner-section">
+            <div class="banner-carousel">
+                <div class="carousel-imgs">
+                    <div v-for="(novel, idx) in carouselNovels" :key="novel.novelId" class="carousel-img-item"
+                        :class="{ active: idx === currentBanner }" @click="goToNovel(novel.novelId)">
+                        <img :src="novel.coverUrl" class="banner-img" :alt="novel.novelName" />
+                    </div>
+                </div>
+                <div class="carousel-titles">
+                    <div v-for="(novel, idx) in carouselNovels" :key="novel.novelId" class="carousel-title-item"
+                        :class="{ active: idx === currentBanner }" @click="setBanner(idx)">
+                        {{ novel.novelName }}
+                    </div>
+                </div>
+            </div>
+            <div class="banner-announcement">
+                <div class="announcement-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                        <path fill="currentColor"
+                            d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+                    </svg>
+                    公告
+                </div>
+                <ul class="announcement-list">
+                    <li v-for="(item, idx) in announcements" :key="idx">
+                        <a :href="item.link" target="_blank" :class="item.type">{{ item.text }}</a>
+                        <div v-if="idx < announcements.length - 1" style="border-bottom:1px solid #aaa; margin:5px 0;">
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="divider">
+            <span>꧁分类꧂</span>
+        </div>
+
+        <!-- 分类展示部分 -->
+        <div class="categories-container">
+            <div class="categories-header">
+                <h2>热门分类</h2>
+                <button class="more-button" @click="goToAllCategories">更多分类 ›</button>
+            </div>
+            <div class="categories-grid">
+                <div v-for="(category, index) in categories" :key="category.categoryName" class="category-card"
+                    :class="`category-${index % 5}`" @click="goToCategory(category.categoryName)"
+                    @mouseenter="hoverCategory = index" @mouseleave="hoverCategory = null">
+                    <div class="category-content">
+                        <h3>{{ category.categoryName }}</h3>
+                        <transition name="fade">
+                            <div v-if="hoverCategory === index" class="category-hover">
+                                <span>点击探索</span>
+                            </div>
+                        </transition>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider">
+            <span>꧁排行榜꧂</span>
+        </div>
+        <!-- 排行榜 -->
+        <div class="rankings-container">
+            <div class="ranking-column" v-for="(list, idx) in rankingLists" :key="idx" :class="`ranking-bg-${idx}`">
+                <div class="ranking-header">
+                    <h3>{{ list.title }}ღ</h3>
+                    <a @click="goToRankings(list.type)">更多 ></a>
+                </div>
+                <ul class="ranking-list">
+                    <!-- 第一名特殊展示 -->
+                    <li v-if="list.data.value.length" class="rank-top" @click="handleNovelClick(list.data.value[0])">
+                        <div class="rank-top-left">
+                            <span class="rank-number top-rank">🥇</span>
+                            <div class="rank-top-info">
+                                <div class="rank-title">{{ list.data.value[0].novelName }}</div>
+                                <div class="rank-count">{{ list.type === '收藏榜' ? list.data.value[0].collectedCount
+                                    + '收藏' :
+                                    list.type === '推荐榜' ? list.data.value[0].recommendCount + ' 推荐' :
+                                        list.data.value[0].score + '分'
+                                }}</div>
+                            </div>
+                        </div>
+                        <img v-if="list.data.value[0].coverUrl"
+                            :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + list.data.value[0].coverUrl"
+                            class="rank-top-img" :alt="list.data.value[0].novelName" />
+                    </li>
+                    <!-- 2-10名普通展示 -->
+                    <li v-for="(item, index) in list.data.value.slice(1, 10)" :key="item.novelId" class="rank-item"
+                        @click="handleNovelClick(item)">
+                        <span class="rank-number" :class="{ 'top-rank': index < 2 }">{{ index + 2 }}</span>
+                        <span class="rank-title">{{ item.novelName }}</span>
+                        <span class="rank-count">{{ list.type === '收藏榜' ? item.collectedCount + ' 收藏' : list.type ===
+                            '推荐榜' ? item.recommendCount + ' 推荐' : item.score + ' 分' }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="divider">
+            <span>꧁精选꧂</span>
+        </div>
+
+        <div class="gender-selection-container">
+            <div class="gender-selection">
+                <div class="gender-header">
+                    <h2 class="gender-title" :class="{ active: showMale }" @click="showMoreMale"
+                        :style="{ flex: showMale ? '74%' : '24%' }">男频༒精选</h2>
+                    <h2 class="gender-title" :class="{ active: !showMale }" @click="showMoreFemale"
+                        :style="{ flex: showMale ? '26%' : '76%' }">女频༒精选</h2>
+                </div>
+                <div class="novels-container">
+                    <!-- 男频小说列表 -->
+                    <div class="novel-list1 male-novels"
+                        :style="{ transform: `translateX(${maleTranslateX}%)`, pointerEvents: 'none' }">
+                        <div v-for="(novel, index) in maleNovels" :key="novel.novelId" class="novel-card"
+                            :class="{ 'hidden': index < hiddenMaleCount }"
+                            :style="{ pointerEvents: index < hiddenMaleCount ? 'none' : 'auto' }">
+                            <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + novel.coverUrl"
+                                class="novel-cover2" @click="handleNovelClick(novel)" />
+                            <div class="novel-info">
+                                <h3 class="novel-name" @click="handleNovelClick(novel)">{{ novel.novelName }}</h3>
+                                <p class="novel-author" @click="goAuthorHome1(novel.authorId)">{{ novel.authorName }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 女频小说列表 -->
+                    <div class="novel-list1 female-novels"
+                        :style="{ transform: `translateX(${femaleTranslateX}%)`, pointerEvents: 'none' }">
+                        <div v-for="(novel, index) in femaleNovels" :key="novel.novelId" class="novel-card"
+                            :class="{ 'hidden': index >= visibleFemaleCount }"
+                            :style="{ pointerEvents: index >= visibleFemaleCount ? 'none' : 'auto' }">
+                            <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + novel.coverUrl"
+                                class="novel-cover2" @click="handleNovelClick(novel)" />
+                            <div class="novel-info">
+                                <h3 class="novel-name" @click="handleNovelClick(novel)">{{ novel.novelName }}</h3>
+                                <p class="novel-author" @click="goAuthorHome1(novel.authorId)">{{ novel.authorName }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 分割线控制 -->
+                    <div class="split-control" :style="{ left: (splitPosition - 2) + '%' }">
+                        <div class="split-line"></div>
+                        <button v-if="showMale" class="split-button" @click="showMoreFemale">‹</button>
+                        <button v-else class="split-button" @click="showMoreMale">›</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="divider">
+            <span>꧁年度征文꧂</span>
         </div>
         <div class="single-image-container">
             <a href="https://activity.zongheng.com/activity/zhengwen/detail/384?forceMode=1" target="_blank"
@@ -32,20 +191,22 @@
         </div>
 
         <div class="divider">
-        <span>专题：TJ小说网“历史区”征文</span>
+            <span>꧁专题：TJ小说网“历史区”征文꧂</span>
         </div>
         <div class="history-novels-container">
-           <div class="intro-text">
+            <div class="intro-text">
                 主打 <strong>穿越历史</strong> 题材，<strong>奇思妙想</strong> 与 <strong>史实交融</strong>，书写别样 <strong>时空传奇</strong>。
             </div>
             <ul class="novel-list">
                 <li v-for="book in books" :key="book.novelId" class="novel-item">
                     <div class="cover-wrapper">
-                         <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + book.cover" class="novel-cover" />
+                        <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + book.cover"
+                            class="novel-cover1" @click="handleNovelClick(book)" />
                     </div>
                     <div class="novel-info">
-                        <h4 class="novel-title">{{ book.title }}</h4>
-                        <p class="novel-author">作者：{{ book.author }}</p>
+                        <h4 class="novel-title1" @click="handleNovelClick(book)">{{ book.title }}</h4>
+                        <p>作者：<span class="novel-author1" @click="goAuthorHome1(book.authorId)">{{ book.author }}</span>
+                        </p>
                         <p class="novel-category">{{ book.category }}</p>
                     </div>
                 </li>
@@ -53,7 +214,7 @@
         </div>
 
         <div class="divider">
-            <span>大神风采</span>
+            <span>꧁大神风采꧂</span>
         </div>
         <!-- 作者展示 -->
         <div class="authors-container">
@@ -70,7 +231,7 @@
         </div>
 
         <div class="divider">
-            <span>编辑精选</span>
+            <span>꧁编辑精选꧂</span>
         </div>
         <!-- 编辑精选局中局轮播 -->
         <div class="novel-carousel-container" :style="bgStyle">
@@ -96,28 +257,28 @@
             <button class="novel-carousel-control next" @click="nextNovel">›</button>
         </div>
 
-       <div class="divider">
-  <span>最近更新</span>
-</div>
+        <div class="divider">
+            <span>꧁最近更新꧂</span>
+        </div>
 
-<table class="recent-update-table">
-  <thead>
-    <tr>
-      <th>书名</th>
-      <th>章节</th>
-      <th>作者</th>
-      <th>更新时间</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr v-for="update in recentUpdates" :key="update.title + update.chapter">
-      <td>《{{ update.title }}》</td>
-      <td>{{ update.chapter }}</td>
-      <td>{{ update.author }}</td>
-      <td>{{ update.time }}</td>
-    </tr>
-  </tbody>
-</table>
+        <table class="recent-update-table">
+            <thead>
+                <tr>
+                    <th>书名</th>
+                    <th>章节</th>
+                    <th>作者</th>
+                    <th>更新时间</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="update in recentUpdates" :key="update.title + update.chapter">
+                    <td>《{{ update.title }}》</td>
+                    <td>{{ update.chapter }}</td>
+                    <td @click="goAuthorHome1(update.authorId)" class="novel-author1">{{ update.author }}</td>
+                    <td>{{ update.time }}</td>
+                </tr>
+            </tbody>
+        </table>
         <!-- 底部信息区域 -->
         <footer class="zh-footer">
             <div class="zh-footer-partner">
@@ -197,20 +358,103 @@ import { getAuthor } from '@/API/Author_API'
 import { getNovel } from '@/API/Novel_API'
 import { SelectNovel_State } from '@/stores/index'
 import { useRouter } from 'vue-router'
+import { getChapter, getChapterLogs } from '@/API/Chapter_API'
+import { getNovelsByCategory } from '@/API/NovelCategory_API'
+import { getCollectRanking, getRecommendRanking, getScoreRanking } from '@/API/Ranking_API'
+import { getAllCategories } from '@/API/Category_API'
+
 
 const router = useRouter()
 const selectNovelState = SelectNovel_State()
 
 // Banner数据
 const carouselItems = ref([
-    { image: require('@/assets/1.jpg'), title: '七猫中文网', description: '匠心打磨好作品' },
+    { image: require('@/assets/1.jpg'), title: 'TJ中文网', description: '匠心打磨好作品' },
     { image: require('@/assets/2.jpg'), title: '热门小说推荐', description: '最新签约作品' },
     { image: require('@/assets/3.jpeg'), title: '作家专区', description: '点击进入 >' },
-    { image: require('@/assets/4.jpg'), title: '七猫中文网', description: '匠心打磨好作品' }
+    { image: require('@/assets/4.jpg'), title: 'TJ中文网', description: '匠心打磨好作品' }
 ])
 
 const authors = ref([])
 const novels = ref([])
+const collectRanking = ref([])
+const recommendRanking = ref([])
+const scoreRanking = ref([])
+const rankingLists = [
+    { title: '收藏榜', type: '收藏榜', data: collectRanking },
+    { title: '推荐榜', type: '推荐榜', data: recommendRanking },
+    { title: '评分榜', type: '评分榜', data: scoreRanking }
+]
+
+// 精选部分
+const maleNovelIds = [166, 167, 168, 169, 170, 222] // 男频小说ID (固定6个)
+const femaleNovelIds = [169, 170, 222, 263, 183, 462] // 女频小说ID (固定6个)
+const maleNovels = ref([])
+const femaleNovels = ref([])
+const splitPosition = ref(75) // 初始分割线位置(75%表示显示6男2女)
+const showMale = ref(true) // 默认显示男频精选
+
+// 计算属性
+const hiddenMaleCount = computed(() => {
+    // 根据分割线位置计算隐藏的男频小说数量
+    return Math.max(0, 6 - Math.floor(8 * splitPosition.value / 100))
+})
+
+const visibleFemaleCount = computed(() => {
+    // 根据分割线位置计算显示的女频小说数量
+    return Math.min(6, Math.floor(8 * (100 - splitPosition.value) / 100))
+})
+
+const maleTranslateX = computed(() => {
+    // 计算男频列表的平移量
+    return -hiddenMaleCount.value * 12.5 // 12.5% per novel
+})
+
+const femaleTranslateX = computed(() => {
+    // 计算女频列表的平移量
+    return (6 - visibleFemaleCount.value) * 12.5
+})
+
+// 获取小说数据
+const fetchFeaturedNovels = async () => {
+    try {
+        // 获取男频小说
+        const malePromises = maleNovelIds.map(id => getNovel(id))
+        const maleResults = await Promise.all(malePromises)
+        maleNovels.value = await Promise.all(maleResults.map(async novel => {
+            const author = await getAuthor(novel.authorId)
+            return {
+                ...novel,
+                authorName: author.authorName || '未知作者'
+            }
+        }))
+
+        // 获取女频小说
+        const femalePromises = femaleNovelIds.map(id => getNovel(id))
+        const femaleResults = await Promise.all(femalePromises)
+        femaleNovels.value = await Promise.all(femaleResults.map(async novel => {
+            const author = await getAuthor(novel.authorId)
+            return {
+                ...novel,
+                authorName: author.authorName || '未知作者'
+            }
+        }))
+    } catch (error) {
+        console.error('获取精选小说数据失败:', error)
+    }
+}
+
+const showMoreMale = () => {
+    splitPosition.value = 75 // 显示6男2女
+    showMale.value = true
+}
+
+const showMoreFemale = () => {
+    splitPosition.value = 25 // 显示2男6女
+    showMale.value = false
+}
+
+
 
 
 const fetchAuthors = async () => {
@@ -235,6 +479,7 @@ const fetchNovels = async () => {
 
 const handleNovelClick = async (novel) => {
     try {
+        console.log('点击小说:', novel)
         // 获取作者信息
         const response = await getAuthor(novel.authorId)
         // 更新store中的小说信息
@@ -266,6 +511,10 @@ const handleNovelClick = async (novel) => {
 
 const goAuthorHome = (author) => {
     router.push(`/author/${author.authorId}`);
+};
+
+const goAuthorHome1 = (authorId) => {
+    router.push(`/author/${authorId}`);
 };
 
 // 局中局设置
@@ -357,102 +606,220 @@ const goToSlide = (index) => {
     currentIndex.value = index
 }
 //历史征文
-import { getNovelsByCategory } from '@/API/NovelCategory_API'
+
 
 const books = ref([])
 
 async function fetchHistoryNovels() {
-  const novels = await getNovelsByCategory('历史')
-  if (!novels || novels.length === 0) {
-    books.value = []
-    return
-  }
+    const novels = await getNovelsByCategory('历史')
+    if (!novels || novels.length === 0) {
+        books.value = []
+        return
+    }
 
-  const filtered = novels.filter(n => n.status === '连载' || n.status === '完结').slice(0, 5)
+    const filtered = novels.filter(n => n.status === '连载' || n.status === '完结').slice(0, 5)
 
-  const detailedBooks = await Promise.all(
-    filtered.map(async (novel) => {
-      try {
-        const detail = await getNovel(novel.novelId)
-        let authorName = '未知作者'
+    const detailedBooks = await Promise.all(
+        filtered.map(async (novel) => {
+            try {
+                const detail = await getNovel(novel.novelId)
+                let authorName = '未知作者'
 
-        try {
-          const author = await getAuthor(detail.authorId)
-          authorName = author.authorName || '未知作者'
-        } catch (error) {
-          console.warn('获取作者失败:', error)
-        }
+                try {
+                    const author = await getAuthor(detail.authorId)
+                    authorName = author.authorName || '未知作者'
+                } catch (error) {
+                    console.warn('获取作者失败:', error)
+                }
 
-        return {
-          novelId: novel.novelId,
-          title: detail.novelName,
-          author: authorName,
-          status: detail.status,
-          cover: detail.coverUrl,
-          intro: detail.introduction
-        }
-      } catch {
-        return {
-          novelId: novel.novelId,
-          title: novel.title,
-          author: '未知作者',
-          status: novel.status,
-          cover: novel.coverImg,
-          intro: ''
-        }
-      }
-    })
-  )
+                return {
+                    novelId: novel.novelId,
+                    authorId: detail.authorId,
+                    novelName: detail.novelName,
+                    introduction: detail.introduction,
+                    createTime: detail.createTime,
+                    coverUrl: detail.coverUrl,
+                    score: detail.score,
+                    totalWordCount: detail.totalWordCount,
+                    recommendCount: detail.recommendCount,
+                    collectedCount: detail.collectedCount,
+                    totalPrice: detail.totalPrice,
 
-  books.value = detailedBooks
+
+                    title: detail.novelName,
+                    author: authorName,
+                    status: detail.status,
+                    cover: detail.coverUrl,
+                    intro: detail.introduction
+                }
+            } catch {
+                return {
+                    novelId: novel.novelId,
+                    authorId: novel.authorId || '',
+                    novelName: novel.title || '',
+                    introduction: novel.introduction || '',
+                    createTime: novel.createTime || '',
+                    coverUrl: novel.coverImg || '',
+                    score: novel.score || 0,
+                    totalWordCount: novel.totalWordCount || 0,
+                    recommendCount: novel.recommendCount || 0,
+                    collectedCount: novel.collectedCount || 0,
+                    totalPrice: novel.totalPrice || 0,
+                    title: novel.title,
+                    author: '未知作者',
+                    status: novel.status,
+                    cover: novel.coverImg,
+                    intro: ''
+                }
+            }
+        })
+    )
+
+    books.value = detailedBooks
 }
 
 //更新
-import { getChapter, getChapterLogs } from '@/API/Chapter_API'  
-
 
 const recentUpdates = ref([])
 
 async function fetchRecentUpdates() {
-  const logsRes = await getChapterLogs()
-  if (!logsRes || !logsRes.data) return
+    const logsRes = await getChapterLogs()
+    if (!logsRes || !logsRes.data) return
 
-  const sortedLogs = logsRes.data
-    .sort((a, b) => new Date(b.time) - new Date(a.time))
-    .slice(0, 6)
+    const sortedLogs = logsRes.data
+        .sort((a, b) => new Date(b.time) - new Date(a.time))
+        .slice(0, 6)
 
-  const updates = await Promise.all(sortedLogs.map(async log => {
-    try {
-      const novel = await getNovel(log.novelId)
-      const chapter = await getChapter(log.novelId, log.chapterId)
-      const author = await getAuthor(novel.authorId)
-      return {
-        title: novel.novelName || '未知小说',
-        author: author.authorName || '未知作者',
-        chapter: `第${chapter.chapterId}章 ${chapter.title}`,
-        time: log.time
-      }
-    } catch {
-      return null
-    }
-  }))
+    const updates = await Promise.all(sortedLogs.map(async log => {
+        try {
+            const novel = await getNovel(log.novelId)
+            const chapter = await getChapter(log.novelId, log.chapterId)
+            const author = await getAuthor(novel.authorId)
+            return {
+                title: novel.novelName || '未知小说',
+                authorId: novel.authorId,
+                author: author.authorName || '未知作者',
+                chapter: `第${chapter.chapterId}章 ${chapter.title}`,
+                time: log.time
+            }
+        } catch {
+            return null
+        }
+    }))
 
-  recentUpdates.value = updates.filter(Boolean)
+    recentUpdates.value = updates.filter(Boolean)
 }
 
+const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+const carouselNovels = [
+    { novelId: 170, novelName: '如意姑娘的', coverUrl: require('@/assets/side1.jpg') },
+    { novelId: 170, novelName: '写给鼹鼠先生的情', coverUrl: require('@/assets/side2.jpg') },
+    { novelId: 170, novelName: '问九卿', coverUrl: require('@/assets/side3.jpg') },
+    { novelId: 170, novelName: '昭娇', coverUrl: require('@/assets/side4.jpg') },
+    { novelId: 170, novelName: '岁时来仪', coverUrl: require('@/assets/side5.jpg') }
+]
+
+const currentBanner = ref(2) // 默认显示第三个
+
+let timer = null
+
+function setBanner(idx) {
+    currentBanner.value = idx
+}
+
+const goToNovel = async (novelId) => {
+    try {
+        const response = await getNovel(novelId)
+        handleNovelClick(response)
+    } catch (error) {
+        console.error('处理失败:', error)
+    }
+}
+
+const announcements = [
+    { text: '[资讯] 书写抗战精神作品联展', link: 'https://mp.weixin.qq.com/s/4VeBev9GGxihH5MNVevfSg?mpshare=1&scene=1&srcid=0801zDxRpMpTTwRpb8djZYXr&sharer_shareinfo=467c009cbe86e604c7fb12947fa1170b&sharer_shareinfo_first=467c009cbe86e604c7fb12947fa1170b#wechat_redirect', type: 'news' },
+    { text: '[公告] 《听说你喜欢我》原著', link: 'https://www.hongxiu.com/book/3756981504436501', type: 'notice' },
+    { text: '[资讯] 25年绿书签行动来啦', link: 'https://mp.weixin.qq.com/s/c1G3OQ6-lWh5qwQ-sejJcg', type: 'news' },
+    { text: '[公告] 25年作家福利已上线', link: 'https://write.qq.com/portal/college/editordetail?gender=2&typeid=75457244950928251&idx=75460605762836001', type: 'notice' },
+    { text: '[公告] “风起国潮”二期征文', link: 'https://write.qq.com/portal/dashboard/actarticleDetail?id=665', type: 'notice' },
+    { text: '[公告] 红袖大神段寻新书来袭', link: 'https://www.hongxiu.com/book/32553967803686009', type: 'notice' }
+]
+
+const fetchRankings = async () => {
+    try {
+        const [collectRes, recommendRes, scoreRes] = await Promise.all([
+            getCollectRanking(10),
+            getRecommendRanking(10),
+            getScoreRanking(10)
+        ])
+        // 过滤掉"待审核"和"封禁"状态的小说
+        collectRanking.value = collectRes.filter(novel => novel.status === '连载' || novel.status === '完结')
+        recommendRanking.value = recommendRes.filter(novel => novel.status === '连载' || novel.status === '完结')
+        scoreRanking.value = scoreRes.filter(novel => novel.status === '连载' || novel.status === '完结')
+    } catch (error) {
+        console.error('获取排行榜数据失败:', error)
+    }
+}
+//去排行榜
+const goToRankings = (type) => {
+    router.push({
+        path: '/Novels/Novel_Layout/rank',
+        query: { type }
+    })
+}
+
+const categories = ref([])
+const hoverCategory = ref(null)
+
+// 获取分类数据
+const fetchCategories = async () => {
+    try {
+        const allCategories = await getAllCategories()
+        // 随机排序并取前15个
+        categories.value = allCategories
+            .sort(() => Math.random() - 0.5)
+            .slice(0, 15)
+    } catch (error) {
+        console.error('获取分类数据失败:', error)
+    }
+}
+
+// 跳转到分类页面
+const goToCategory = (categoryName) => {
+    router.push({
+        path: '/Novels/Novel_Layout/category',
+        query: { categoryName }
+    })
+}
+
+// 跳转到全部分类页面
+const goToAllCategories = () => {
+    router.push('/Novels/Novel_Layout/category')
+}
 
 onMounted(async () => {
-  startAutoPlay()
-  startNovelAutoPlay()
-  fetchAuthors()
-  fetchNovels()
-  await fetchHistoryNovels()
-  fetchRecentUpdates()
+    fetchCategories()
+    startAutoPlay()
+    startNovelAutoPlay()
+    fetchAuthors()
+    fetchNovels()
+    scrollToTop()
+    await fetchHistoryNovels()
+    fetchRecentUpdates()
+    fetchRankings()
+    fetchFeaturedNovels()
+    timer = setInterval(() => {
+        currentBanner.value = (currentBanner.value + 1) % carouselNovels.length
+    }, 3500)
 })
 
 onUnmounted(() => {
     pauseAutoPlay()
     stopNovelAutoPlay()
+    clearInterval(timer)
 })
 watch(novelCurrent, startNovelAutoPlay)
 </script>
@@ -563,6 +930,575 @@ watch(novelCurrent, startNovelAutoPlay)
 
 .carousel-indicators button.active {
     background-color: #ffcc00;
+}
+
+.rankings-container {
+    position: relative;
+    width: 80%;
+    display: flex;
+    gap: 20px;
+    margin: 20px auto 40px;
+    padding: 0 20px;
+}
+
+.ranking-column {
+    flex: 1;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 15px;
+    min-width: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 为每个排行榜添加不同的背景色和渐变效果 */
+.ranking-bg-0::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(253, 230, 224, 0.8), rgba(253, 230, 224, 0));
+    z-index: 0;
+}
+
+.ranking-bg-1::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(224, 242, 241, 0.8), rgba(224, 242, 241, 0));
+    z-index: 0;
+}
+
+.ranking-bg-2::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(237, 231, 246, 0.8), rgba(237, 231, 246, 0));
+    z-index: 0;
+}
+
+.ranking-header,
+.ranking-list {
+    position: relative;
+    z-index: 1;
+    background: transparent;
+}
+
+.ranking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #b3afaf;
+}
+
+.ranking-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.ranking-header a {
+    color: #666;
+    font-size: 16px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.ranking-header a:hover {
+    color: #f0940a;
+}
+
+.ranking-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.rank-top {
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    padding: 10px 8px;
+    position: relative;
+}
+
+.rank-item {
+    border-top: 1px dashed #b3afaf;
+}
+
+.rank-top-left {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.rank-top-info {
+    margin-left: 10px;
+}
+
+.rank-top-img {
+    width: 60px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-left: 18px;
+    box-shadow: 0 2px 8px rgba(255, 77, 79, 0.12);
+}
+
+.rank-number {
+    width: 32px;
+    font-weight: bold;
+    color: #f0940a;
+    margin-right: 10px;
+    text-align: center;
+    font-size: 18px;
+}
+
+.rank-number.top-rank {
+    color: #fff;
+    font-size: 18px;
+    background: #fa3f42;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(255, 77, 79, 0.12);
+    padding: 0;
+}
+
+.rank-title {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+
+.rank-count {
+    color: #888;
+    font-size: 13px;
+    margin-left: 10px;
+    white-space: nowrap;
+}
+
+.rank-divider {
+    border-bottom: 1px dashed #b3afaf;
+    margin: 8px 0;
+}
+
+.ranking-list li {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-radius: 4px;
+    padding-left: 8px;
+}
+
+.ranking-list li:hover {
+    background-color: #f9f9f9;
+    color: #eb4174;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .rankings-container {
+        flex-direction: column;
+    }
+
+    .ranking-column {
+        margin-bottom: 20px;
+    }
+}
+
+.categories-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto 40px;
+    padding: 20px;
+    background: linear-gradient(to bottom, #fdfafd, #ffffff);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.categories-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.categories-header h2 {
+    font-size: 24px;
+    color: #333;
+    margin: 0;
+    position: relative;
+    padding-left: 15px;
+}
+
+.categories-header h2::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(to bottom, #ff4d4f, #f7b769);
+    border-radius: 2px;
+}
+
+.more-button {
+    background: none;
+    border: none;
+    color: #555;
+    font-size: 17px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s;
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+
+.more-button:hover {
+    color: #ff4d4f;
+    background: rgba(255, 77, 79, 0.1);
+    transform: translateX(5px);
+}
+
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 20px;
+}
+
+.category-card {
+    position: relative;
+    height: 50px;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.category-content {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+    color: white;
+}
+
+.category-card:hover .category-icon {
+    transform: scale(1.2);
+}
+
+.category-content h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.category-hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 500;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.category-card:hover .category-hover {
+    opacity: 1;
+}
+
+/* 不同分类的背景色 */
+.category-0 {
+    background: linear-gradient(135deg, #fb9bad, #f79aba);
+}
+
+.category-1 {
+    background: linear-gradient(135deg, #a5a5f3, #a8bff7);
+}
+
+.category-2 {
+    background: linear-gradient(135deg, #90ccf4, #84defa);
+}
+
+.category-3 {
+    background: linear-gradient(135deg, #8af0b6, #8bf7e1);
+}
+
+.category-4 {
+    background: linear-gradient(135deg, #f794a4, #e7c880);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .categories-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+
+    .category-card {
+        height: 100px;
+    }
+
+    .category-icon {
+        font-size: 24px;
+    }
+
+    .category-content h3 {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .categories-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 12px;
+    }
+
+    .category-card {
+        height: 80px;
+    }
+
+    .category-icon {
+        font-size: 20px;
+        margin-bottom: 5px;
+    }
+
+    .category-content h3 {
+        font-size: 14px;
+    }
+}
+
+.gender-selection-container {
+    width: 100%;
+    margin: 30px auto;
+}
+
+.gender-selection {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.gender-header {
+    display: flex;
+    border-bottom: 1px solid #eee;
+    background-color: #f9f9f9;
+    transition: all 0.5s ease;
+}
+
+.gender-title {
+    flex: 1;
+    text-align: center;
+    padding: 15px 0;
+    margin: 0;
+    font-size: 20px;
+    cursor: pointer;
+    color: #666;
+    transition: all 0.3s;
+}
+
+.gender-title.active {
+    color: #ff4d4f;
+    background-color: #fff;
+    font-weight: bold;
+}
+
+.novels-container {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+}
+
+.novel-list1 {
+    position: absolute;
+    top: 0;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s ease;
+}
+
+.male-novels {
+    left: 0;
+    justify-content: flex-start;
+    background: linear-gradient(to right, #dceaf7 0%, #ffffff 100%);
+    background-size: 73% 100%;
+    background-repeat: no-repeat;
+    background-position: left top;
+}
+
+.female-novels {
+    left: 0;
+    justify-content: flex-end;
+    background: linear-gradient(to left, #f7d7e4 0%, #ffffff 100%);
+    background-size: 77% 100%;
+    background-repeat: no-repeat;
+    background-position: right top;
+}
+
+.novel-card {
+    flex: 0 0 12.5%;
+    padding: 10px;
+    box-sizing: border-box;
+    transition: opacity 0.3s;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.novel-card.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.novel-cover2 {
+    width: 140px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+    margin-top: 50px;
+    margin-bottom: 10px;
+}
+
+.novel-cover2:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s;
+}
+
+.novel-name:hover {
+    color: #f7b769;
+    transform: scale(1.05);
+    transition: color 0.3s, transform 0.3s;
+}
+
+.novel-author:hover {
+    color: #f0940a;
+    transform: scale(1.05);
+    transition: color 0.3s, transform 0.3s;
+}
+
+.novel-info {
+    padding: 10px 5px;
+}
+
+.novel-name {
+    margin: 0;
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.novel-author {
+    margin: 5px 0 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.split-control {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: left 0.5s ease;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.split-line {
+    width: 3px;
+    height: 100%;
+    background-color: #f96b6d;
+    margin: 0 auto;
+}
+
+.split-button {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background-color: #f73f42;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin: 5px 0;
+    transition: background-color 0.2s;
+}
+
+.split-button:hover {
+    background-color: #ff7875;
+}
+
+@media (max-width: 768px) {
+    .novel-card {
+        flex: 0 0 25%;
+    }
+
+    .novel-cover2 {
+        height: 120px;
+    }
+
+    .split-control {
+        width: 40px;
+        margin-left: -20px;
+    }
+
+    .split-button {
+        width: 20px;
+        height: 20px;
+        font-size: 12px;
+    }
 }
 
 .authors-container {
@@ -830,6 +1766,129 @@ watch(novelCurrent, startNovelAutoPlay)
     padding: 0 15px;
 }
 
+.main-banner-section {
+    display: flex;
+    width: 90%;
+    margin-top: 24px;
+    height: 320px;
+    margin: 0 auto;
+}
+
+.banner-carousel {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+}
+
+.carousel-imgs {
+    position: relative;
+    width: 100%;
+    height: 260px;
+    overflow: hidden;
+}
+
+.carousel-img-item {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity .5s;
+    cursor: pointer;
+}
+
+.carousel-img-item.active {
+    opacity: 1;
+    z-index: 2;
+}
+
+.banner-img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.carousel-titles {
+    display: flex;
+    width: 100%;
+    margin-top: 0;
+}
+
+.carousel-title-item {
+    flex: 1;
+    background: rgba(40, 40, 40, 0.5);
+    color: #fff;
+    font-size: 20px;
+    text-align: center;
+    padding: 12px 0;
+    cursor: pointer;
+    transition: background .2s, color .2s;
+    border-right: 1px solid #fff;
+}
+
+.carousel-title-item:last-child {
+    border-right: none;
+}
+
+.carousel-title-item.active {
+    background: #ff4d4f;
+    color: #fff;
+}
+
+.banner-announcement {
+    flex: 1;
+    background: #fff;
+    margin-left: 32px;
+    padding: 5px 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    min-width: 320px;
+    max-width: 340px;
+}
+
+.announcement-title {
+    font-size: 26px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.announcement-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.announcement-list li {
+    margin-bottom: 12px;
+}
+
+.announcement-list a {
+    color: #ff4d4f;
+    font-size: 18px;
+    text-decoration: none;
+    transition: color .2s;
+}
+
+.announcement-list a:hover {
+    color: #e47f0d;
+}
+
+.announcement-list a.notice {
+    color: #222;
+}
+
+.announcement-list a.news {
+    color: #ff4d4f;
+}
+
 @media (max-width: 800px) {
     .novel-carousel-container {
         min-height: 270px;
@@ -968,99 +2027,118 @@ watch(novelCurrent, startNovelAutoPlay)
 }
 
 .history-novels-container {
-  padding: 20px;
-  background-color: #fff;
+    padding: 20px;
+    background-color: #fff;
 }
 
 .novel-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  list-style: none;
-  padding: 0;
-  margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 .novel-item {
-  width: 180px;
-  background: #f9f9f9;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease;
-  cursor: pointer;
+    width: 180px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+    cursor: pointer;
 }
 
 .novel-item:hover {
-  transform: translateY(-4px);
+    transform: translateY(-4px);
 }
 
 .cover-wrapper {
-  width: 100%;
-  height: 240px;
-  overflow: hidden;
+    width: 100%;
+    height: 240px;
+    overflow: hidden;
 }
 
-.novel-cover {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+.novel-cover1 {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.novel-cover1:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
 }
 
 .novel-info {
-  padding: 10px;
-  text-align: left;
+    padding: 10px;
+    text-align: left;
 }
 
-.novel-title {
-  font-size: 16px;
-  font-weight: bold;
-  margin: 0;
-  color: #333;
+.novel-title1 {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0;
+    color: #333;
 }
 
-.novel-author {
-  font-size: 14px;
-  color: #777;
-  margin-top: 6px;
+.novel-title1:hover {
+    color: #f0940a;
+    cursor: pointer;
+}
+
+.novel-author1 {
+    font-size: 15px;
+    color: #777;
+    margin-top: 6px;
+}
+
+.novel-author1:hover {
+    color: #f0940a;
+    cursor: pointer;
 }
 
 .novel-category {
-  font-size: 12px;
-  color: #aaa;
-  margin-top: 4px;
+    font-size: 12px;
+    color: #aaa;
+    margin-top: 4px;
 }
+
 .intro-text {
-  margin: 10px 0 16px;
-  font-size: 18px;
-  line-height: 1.6;
-  color: #444;
-  background: #f9f9f9;
-  padding: 10px 12px;
-  border-left: 4px solid #c39762;
-  border-radius: 4px;
+    margin: 10px 0 16px;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #444;
+    background: #f9f9f9;
+    padding: 10px 12px;
+    border-left: 4px solid #c39762;
+    border-radius: 4px;
 }
+
 .recent-update-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px; /* 和全页面匹配的字体大小 */
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    /* 和全页面匹配的字体大小 */
 }
 
 .recent-update-table th,
 .recent-update-table td {
-  padding: 8px 12px;
-  text-align: left;
-  border-bottom: 1px solid #eaeaea;
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid #eaeaea;
 }
 
 .recent-update-table th {
-  background-color: #f5f5f5; /* 表头淡灰色背景 */
-  font-weight: bold;
+    background-color: #f5f5f5;
+    /* 表头淡灰色背景 */
+    font-weight: bold;
 }
 
 .recent-update-table tr:hover {
-  background-color: #fafafa; /* 鼠标悬停行高亮 */
+    background-color: #fafafa;
+    /* 鼠标悬停行高亮 */
 }
-
 </style>

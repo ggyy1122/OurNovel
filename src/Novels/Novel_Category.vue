@@ -1,78 +1,101 @@
 <template>
-  <div class="novel-category-container">
-    <div class="category-filter">
-      <!-- 原有筛选部分保持不变 -->
-      <div class="filter-row">
-        <span class="filter-label">作品分类:</span>
-        <button v-for="category in categoriesWithAll" :key="category.id"
-          :class="['filter-btn', selected.category === category.categoryName ? 'active' : '']"
-          @click="selectFilter('category', category.categoryName)">
-          {{ category.categoryName }}
-        </button>
-      </div>
+  <div class="novel-category-wrapper">
+    <img :src="backgroundImages[currentBgIndex]" alt="background" class="background-image" />
+    <div class="novel-category-container">
+      <div class="category-filter">
+        <!-- 筛选部分 -->
+        <div class="filter-row">
+          <span class="filter-label">作品分类:</span>
+          <button v-for="category in categoriesWithAll" :key="category.id"
+            :class="['filter-btn', selected.category === category.categoryName ? 'active' : '']"
+            @click="selectFilter('category', category.categoryName)">
+            {{ category.categoryName }}
+          </button>
+        </div>
 
-      <div class="filter-row">
-        <span class="filter-label">作品字数:</span>
-        <button v-for="option in wordCountOptions" :key="option.value"
-          :class="['filter-btn', selected.wordCount === option.value ? 'active' : '']"
-          @click="selectFilter('wordCount', option.value)">
-          {{ option.text }}
-        </button>
-      </div>
+        <div class="filter-row">
+          <span class="filter-label">作品字数:</span>
+          <button v-for="option in wordCountOptions" :key="option.value"
+            :class="['filter-btn', selected.wordCount === option.value ? 'active' : '']"
+            @click="selectFilter('wordCount', option.value)">
+            {{ option.text }}
+          </button>
+        </div>
 
-      <div class="filter-row">
-        <span class="filter-label">是否完结:</span>
-        <button v-for="option in statusOptions" :key="option.value"
-          :class="['filter-btn', selected.isFinished === option.value ? 'active' : '']"
-          @click="selectFilter('isFinished', option.value)">
-          {{ option.text }}
-        </button>
+        <div class="filter-row">
+          <span class="filter-label">是否完结:</span>
+          <button v-for="option in statusOptions" :key="option.value"
+            :class="['filter-btn', selected.isFinished === option.value ? 'active' : '']"
+            @click="selectFilter('isFinished', option.value)">
+            {{ option.text }}
+          </button>
+        </div>
       </div>
-    </div>
-    <div class="novel-list">
-      <div v-if="loading" class="loading">加载中...</div>
-      <div v-else-if="!filteredNovels || filteredNovels.length === 0" class="no-data">暂无数据</div>
-      <template v-else>
-        <!-- 只显示当前页的小说 -->
-        <template v-for="(novel, index) in paginatedNovels" :key="novel.novelId">
-          <Novel_Card :novel="novel" :rank="(currentPage - 1) * pageSize + index + 1" />
-          <hr v-if="index < paginatedNovels.length - 1" class="novel-divider" />
+      <div class="display-mode-switch">
+        <span class="switch-label">显示模式:</span>
+        <div class="switch-container" :class="switchActiveClass">
+          <button :class="['switch-btn', displayMode === 'image' ? 'active' : '']" @click="displayMode = 'image'">
+            1列
+          </button>
+          <button :class="['switch-btn', displayMode === 'text' ? 'active' : '']" @click="displayMode = 'text'">
+            2列
+          </button>
+        </div>
+      </div>
+      <div class="novel-list" :class="{ 'text-mode': displayMode === 'text' }">
+        <div v-if="loading" class="loading">加载中...</div>
+        <div v-else-if="!novels || novels.length === 0" class="no-data">暂无数据</div>
+        <template v-else>
+          <template v-for="(novel, index) in novels" :key="novel.novelId">
+            <component :is="displayMode === 'image' ? Novel_Card : Novel_Card1" :novel="novel"
+              :rank="(currentPage - 1) * pageSize + index + 1" />
+            <hr v-if="index < novels.length - 1 && displayMode === 'image'" class="novel-divider" />
+          </template>
         </template>
-      </template>
-    </div>
-    <!-- 分页控件 -->
-    <div v-if="filteredNovels.length > pageSize" class="pagination">
-      <button :disabled="currentPage === 1" @click="changePage(currentPage - 1)" class="page-btn">
-        上一页
-      </button>
-      <template v-for="page in visiblePages" :key="page">
-        <button :class="['page-btn', currentPage === page ? 'active' : '']" @click="changePage(page)">
-          {{ page }}
+      </div>
+      <!-- 分页控件 -->
+      <div v-if="totalItems > 0" class="pagination">
+        <button :disabled="currentPage === 1" @click="changePage(currentPage - 1)" class="page-btn">
+          上一页
         </button>
-      </template>
-      <button :disabled="currentPage === totalPages" @click="changePage(currentPage + 1)" class="page-btn">
-        下一页
-      </button>
-      <div class="page-jump">
-        <span>跳转至</span>
-        <input type="number" v-model.number="jumpPage" min="1" :max="totalPages" @keyup.enter="jumpToPage">
-        <span>/ {{ totalPages }} 页</span>
+        <template v-for="page in visiblePages" :key="page">
+          <button :class="['page-btn', currentPage === page ? 'active' : '']" @click="changePage(page)">
+            {{ page }}
+          </button>
+        </template>
+        <button :disabled="currentPage === totalPages" @click="changePage(currentPage + 1)" class="page-btn">
+          下一页
+        </button>
+        <div class="page-jump">
+          <span>跳转至</span>
+          <input type="number" v-model.number="jumpPage" min="1" :max="totalPages" @keyup.enter="jumpToPage">
+          <span>/ {{ totalPages }} 页</span>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch, computed } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, watch, computed } from 'vue'
 import { getAllCategories } from '@/API/Category_API'
-import { getNovelsByCategory } from '@/API/NovelCategory_API'
-import { getAllNovels } from '@/API/Novel_API'
+import { getFilteredNovels } from '@/API/Novel_API'
 import Novel_Card from '@/Novels/Novel_Card.vue'
+import Novel_Card1 from '@/Novels/SearchNovelCard.vue'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
+const displayMode = ref('image') // 'image' 或 'text'
+
+// 属性来切换开关状态
+const switchActiveClass = computed(() => ({
+  'text-active': displayMode.value === 'text'
+}))
 // 分页相关状态
 const currentPage = ref(1)
-const pageSize = ref(5) // 每页显示10条
+const pageSize = computed(() => displayMode.value === 'image' ? 10 : 20) // 10条，20条
 const jumpPage = ref(1)
+const totalItems = ref(0)
 
 // 分类数据
 const categories = ref([])
@@ -80,7 +103,7 @@ const novels = ref([])
 const loading = ref(false)
 
 // 添加全部选项后的分类数据
-const categoriesWithAll = ref([
+const categoriesWithAll = computed(() => [
   { id: 0, categoryName: '全部' },
   ...categories.value
 ])
@@ -102,19 +125,13 @@ const statusOptions = [
 
 // 当前选中的筛选条件
 const selected = reactive({
-  category: '全部', // 默认选中"全部"
+  category: route.query.categoryName || '全部', // 默认选中"全部"
   wordCount: '',
   isFinished: ''
 })
 
 // 计算属性
-const filteredNovels = ref([])
-const totalPages = computed(() => Math.ceil(filteredNovels.value.length / pageSize.value))
-const paginatedNovels = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value
-  const end = start + pageSize.value
-  return filteredNovels.value.slice(start, end)
-})
+const totalPages = computed(() => Math.ceil(totalItems.value / pageSize.value))
 const visiblePages = computed(() => {
   const maxVisible = 5 // 最多显示5个页码
   const half = Math.floor(maxVisible / 2)
@@ -133,10 +150,6 @@ async function fetchCategories() {
   try {
     const response = await getAllCategories()
     categories.value = response
-    categoriesWithAll.value = [
-      { id: 0, categoryName: '全部' },
-      ...response
-    ]
   } catch (error) {
     console.error('获取分类失败:', error)
   }
@@ -146,69 +159,53 @@ async function fetchCategories() {
 async function fetchNovels() {
   try {
     loading.value = true
-    const response = await getAllNovels()
-    // 过滤掉"待审核"和"封禁"状态的小说
-    novels.value = Array.isArray(response)
-      ? response.filter(novel => novel.status === '连载' || novel.status === '完结')
-      : []
+
+    // 转换筛选条件为API需要的格式
+    const category = selected.category === '全部' ? null : selected.category
+    let minWordCount = null
+    let maxWordCount = null
+    let isFinished = null
+
+    // 处理字数筛选
+    switch (selected.wordCount) {
+      case '10k':
+        maxWordCount = 10000
+        break
+      case '20k':
+        minWordCount = 10000
+        maxWordCount = 20000
+        break
+      case '30k':
+        minWordCount = 20000
+        maxWordCount = 30000
+        break
+      case 'gt30k':
+        minWordCount = 30000
+        break
+    }
+
+    // 处理状态筛选
+    if (selected.isFinished === '完结') {
+      isFinished = true
+    } else if (selected.isFinished === '连载') {
+      isFinished = false
+    }
+
+    const response = await getFilteredNovels(
+      currentPage.value,
+      pageSize.value,
+      category,
+      minWordCount,
+      maxWordCount,
+      isFinished
+    )
+
+    novels.value = response.items || []
+    totalItems.value = response.totalCount || 0
   } catch (error) {
     console.error('获取小说列表失败:', error)
-  } finally {
-    loading.value = false
-  }
-}
-
-// 根据分类筛选小说 
-async function filterByCategory() {
-  if (!selected.category || selected.category === '全部') {
-    return novels.value
-  }
-  try {
-    loading.value = true
-    const response = await getNovelsByCategory(selected.category)
-    // 过滤掉"待审核"和"封禁"状态的小说
-    return Array.isArray(response)
-      ? response.filter(novel => novel.status === '连载' || novel.status === '完结')
-      : []
-  } catch (error) {
-    console.error('获取分类小说失败:', error)
-    return []
-  } finally {
-    loading.value = false
-  }
-}
-
-// 综合筛选结果
-async function applyFilters() {
-  try {
-    loading.value = true
-    let result = await filterByCategory()
-    if (!result) {
-      filteredNovels.value = []
-      return
-    }
-    if (selected.wordCount) {
-      result = result.filter(novel => {
-        const wordCount = novel.totalWordCount || 0
-        switch (selected.wordCount) {
-          case '10k': return wordCount < 10000
-          case '20k': return wordCount >= 10000 && wordCount < 20000
-          case '30k': return wordCount >= 20000 && wordCount < 30000
-          case 'gt30k': return wordCount >= 30000
-          default: return true
-        }
-      })
-    }
-    if (selected.isFinished) {
-      result = result.filter(novel => novel.status === selected.isFinished)
-    }
-    filteredNovels.value = result || []
-    // 筛选后重置到第一页
-    currentPage.value = 1
-    jumpPage.value = 1
-  } catch (error) {
-    console.error('筛选小说失败:', error)
-    filteredNovels.value = []
+    novels.value = []
+    totalItems.value = 0
   } finally {
     loading.value = false
   }
@@ -216,11 +213,11 @@ async function applyFilters() {
 
 // 选择筛选条件
 function selectFilter(type, value) {
-  if (type === 'category' && selected[type] === value) {
-    return
-  }
   selected[type] = value
-  applyFilters()
+  // 任何筛选条件改变都重新获取数据
+  currentPage.value = 1
+  jumpPage.value = 1
+  fetchNovels()
 }
 
 // 分页相关方法
@@ -228,6 +225,7 @@ function changePage(page) {
   if (page < 1 || page > totalPages.value) return
   currentPage.value = page
   jumpPage.value = page
+  fetchNovels()
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
@@ -236,29 +234,80 @@ function jumpToPage() {
   changePage(page)
 }
 
+// 背景图轮播相关
+const backgroundImages = [
+  require('@/assets/bac1.jpg'),
+  require('@/assets/bac2.jpg'),
+  require('@/assets/bac3.jpg'),
+  require('@/assets/bac4.jpg')
+]
+const currentBgIndex = ref(0)
+
+// 轮播背景图
+let bgInterval
+
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
 // 初始化数据
 onMounted(async () => {
   await fetchCategories()
   await fetchNovels()
-  applyFilters()
+  scrollToTop()
+  // 启动背景轮播
+  bgInterval = setInterval(() => {
+    currentBgIndex.value = (currentBgIndex.value + 1) % backgroundImages.length
+  }, 3500)
 })
 
-// 监听novels变化
-watch(novels, applyFilters)
+// 组件卸载时清除定时器
+onUnmounted(() => {
+  clearInterval(bgInterval)
+})
+
+// 监听显示模式变化，重新获取数据
+watch(displayMode, () => {
+  fetchNovels()
+})
 </script>
 
 <style scoped>
-.novel-category-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+/* 原有的样式保持不变 */
+.novel-category-wrapper {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background-color: #fdfafd;
 }
 
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  object-fit: cover;
+  filter: blur(0.5px) brightness(0.9);
+  z-index: 0;
+  mask-image: linear-gradient(to bottom, black 30%, rgba(0, 0, 0, 0.7) 60%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 30%, rgba(0, 0, 0, 0.7) 60%, transparent 100%);
+  transition: opacity 1s ease-in-out;
+}
+
+.novel-category-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+  position: relative;
+  border-radius: 8px;
+}
+
+
 .category-filter {
-  background: #fafafa;
+  background: rgba(244, 242, 242, 0.6);
   border-radius: 16px;
   padding: 20px;
-  margin-bottom: 24px;
+  margin-bottom: 15px;
 }
 
 .filter-row {
@@ -297,6 +346,77 @@ watch(novels, applyFilters)
 
 .filter-btn:hover {
   background: #fffbe6;
+}
+
+.novel-list.text-mode {
+  width: 90%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 80px;
+  margin: 10px auto;
+}
+
+.novel-list.text-mode .novel-divider {
+  display: none;
+}
+
+.display-mode-switch {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  background: rgba(244, 242, 242, 0.6);
+  border-radius: 16px;
+  padding: 10px 20px;
+}
+
+.switch-label {
+  font-weight: bold;
+  font-size: 16px;
+  margin-right: 15px;
+  color: #666;
+}
+
+.switch-container {
+  display: flex;
+  border-radius: 20px;
+  background: #fcfafa;
+  padding: 2px;
+  position: relative;
+  border: 1px solid #efefef;
+  transition: background 0.3s ease;
+}
+
+.switch-btn {
+  position: relative;
+  padding: 6px 20px;
+  border: none;
+  background: transparent;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+.switch-btn.active {
+  color: #fff;
+  font-weight: bold;
+}
+
+.switch-container::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 0;
+  width: 50%;
+  height: calc(100% - 4px);
+  background: #ffd100;
+  border-radius: 18px;
+  transition: all 0.3s ease;
+}
+
+.switch-container.text-active::after {
+  left: 50%;
 }
 
 .novel-list {

@@ -304,8 +304,22 @@ async function handleChapterClick(chapter) {
     showChapterPurchaseDialog.value = true;
     return;
   }
+  try {
+    if (chapter.status !== '已发布') {
+      toast("第" + chapter.chapterId + "章未发布!", {
+        "type": "info",
+        "dangerouslyHTMLString": true
+      });
+      return;
+    }
+    selectChapter(chapter);
+  } catch (error) {
+    toast("章节加载失败!", {
+      "type": "info",
+      "dangerouslyHTMLString": true
+    });
+  }
 
-  selectChapter(chapter);
 }
 
 // 购买单章
@@ -381,14 +395,14 @@ function selectChapter(chapter) {
 <style scoped>
 .chapter-list {
   padding: 20px;
-  background-color: #f9f9f9;
+  background-color:  #edf1f1ff;
   border-radius: 8px;
 }
 
 .chapter-item {
   cursor: pointer;
   padding: 15px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #edf1f1ff;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -398,7 +412,7 @@ function selectChapter(chapter) {
 }
 
 .chapter-item:hover {
-  background-color: #f0f0f0;
+  background-color: #EFE9D3;
 }
 
 .chapter-item.banned {
@@ -473,7 +487,7 @@ p {
 }
 
 .pagination-container button {
-  background-color: #4CAF50;
+  background-color: #bfc5d5;
   color: white;
   border: none;
   padding: 5px 10px;
@@ -485,7 +499,7 @@ p {
 }
 
 .pagination-container button:hover {
-  background-color: #45a049;
+  background-color: #bfc5d5;
 }
 
 .pagination-container button:disabled {

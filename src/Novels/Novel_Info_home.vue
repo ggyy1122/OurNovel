@@ -21,18 +21,33 @@
 </template>
 
 <script setup>
-import { SelectNovel_State } from '@/stores/index';
+import { SelectNovel_State,readerState  } from '@/stores/index';
 import {getChapter} from '@/API/Chapter_API.js';
 import { watch,ref } from 'vue';
 import { useRouter} from 'vue-router';
+import {addOrUpdateRecentReading } from '@/API/Reader_API'
 
 const selectNovelState = SelectNovel_State();      //小说对象
+const ReaderState=readerState();                   //当前读者对象
 const firstChapter = ref('') ;                     // 第一章内容
 const  router =useRouter()
 // 继续阅读按钮点击事件
-const goToNextChapter = () => {
-  if(firstChapter.value)
-   router.push('/Novels/reader');
+const goToNextChapter = async () => {
+  if (firstChapter.value) {
+    try {
+      // 添加或更新阅读记录
+      await addOrUpdateRecentReading(
+        ReaderState.readerId,  // 读者ID
+        selectNovelState.novelId    // 小说ID
+      );
+    } catch (historyError) {
+      console.error("记录阅读历史失败:", historyError);
+      // 这里可以选择不提示用户，因为阅读历史记录失败不影响主要功能
+    }
+    
+    // 跳转到阅读页面
+    router.push('/Novels/reader');
+  }
 };
 //获取第一章的函数
 const fetchChapter=async(chapterId)=>{
@@ -77,7 +92,7 @@ watch(
 .introduction-section {
   margin: 40px 0;
   padding: 15px;
-  background-color: #f9f9f9;
+  background-color:  #edf1f1ff;
   border-radius: 5px;
 }
 
@@ -89,7 +104,7 @@ watch(
 .chapter-content {
   margin-top: 20px;
   padding: 15px;
-  background-color: #fff;
+  background-color: #eceae3ff;
   border: 1px solid #eee;
   border-radius: 5px;
 }

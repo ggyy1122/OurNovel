@@ -54,9 +54,9 @@
           </span>
         </div>
         <!-- 最新章节信息 -->
-           <h1 class="newest-chapter" v-if="hasChapter">
-          最新章节第{{ chapterId }}章  {{ formattedDate }}
-              </h1>
+        <h1 class="newest-chapter" v-if="hasChapter">
+          最新章节第{{ chapterId }}章 {{ formattedDate }}
+        </h1>
         <!-- 新增的蓝色按钮组 -->
         <div class="action-buttons">
           <button class="blue-border-btn" @click="handleRead">
@@ -65,7 +65,7 @@
           <button class="blue-border-btn" :class="{ 'is-collected': isCollected }" @click="toggleCollect">
             {{ isCollected ? '已收藏' : '收藏作品' }}
           </button>
-          <button class="blue-border-btn"  :class="{ 'is-recommended': isRecommended }"  @click="handleRecommend">
+          <button class="blue-border-btn" :class="{ 'is-recommended': isRecommended }" @click="handleRecommend">
             {{ isRecommended ? '已推荐' : '推荐作品' }}
           </button>
           <button class="blue-border-btn" @click="showRewardDialog = true">
@@ -91,7 +91,7 @@
             </div>
             <div class="data-card">
 
-              <div class="data-value">{{  authorRegisterDays }}</div>
+              <div class="data-value">{{ authorRegisterDays }}</div>
               <div class="data-label">创作天数</div>
             </div>
           </div>
@@ -101,22 +101,20 @@
   </div>
   <!-- 导航栏展示 -->
   <div class="novel-container">
+    <!-- 修改导航栏部分 -->
     <nav class="nav-menu" ref="mainNav">
       <ul>
         <li>
-          <router-link to="/Novels/Novel_Info/home" active-class="active-link">
-            作品介绍
-          </router-link>
+          <a :class="{ 'active-link': $route.path.endsWith('/home') }"
+            @click.prevent="switchTab('/Novels/Novel_Info/home')" href="#">作品介绍</a>
         </li>
         <li>
-          <router-link to="/Novels/Novel_Info/chapter" active-class="active-link">
-            作品目录
-          </router-link>
+          <a :class="{ 'active-link': $route.path.endsWith('/chapter') }"
+            @click.prevent="switchTab('/Novels/Novel_Info/chapter')" href="#">作品目录</a>
         </li>
         <li>
-          <router-link to="/Novels/Novel_Info/comment" active-class="active-link">
-            评论
-          </router-link>
+          <a :class="{ 'active-link': $route.path.endsWith('/comment') }"
+            @click.prevent="switchTab('/Novels/Novel_Info/comment')" href="#">评论</a>
         </li>
       </ul>
     </nav>
@@ -125,98 +123,91 @@
     </main>
   </div>
   <!-- 改成 div 弹窗（样式上模拟 dialog 就行） -->
- <div v-if="showRecommendDialog" class="recommend-dialog-overlay">
+  <div v-if="showRecommendDialog" class="recommend-dialog-overlay">
     <div class="recommend-dialog">
       <div class="dialog-content">
         <h3>{{ isRecommended ? '推荐状态' : '推荐原因' }}</h3>
         <template v-if="!isRecommended">
-          <textarea
-            v-model="recommendReason"
-            placeholder="这本小说太棒了，快来推荐一下吧!(可选)"
-            class="recommend-textarea"
-          ></textarea>
+          <textarea v-model="recommendReason" placeholder="这本小说太棒了，快来推荐一下吧!(可选)" class="recommend-textarea"></textarea>
         </template>
         <template v-else>
           <p class="already-recommended">您已推荐</p>
         </template>
         <div class="dialog-actions">
           <button class="cancel-btn" @click="showRecommendDialog = false">退出</button>
-          <button
-            v-if="!isRecommended"
-            @click="submitRecommend"
-            class="confirm-btn"
-          >
+          <button v-if="!isRecommended" @click="submitRecommend" class="confirm-btn">
             确认推荐
           </button>
-           <button
-          v-if="isRecommended"
-          @click="cancelRecommend"
-          class="cancel-recommend-btn"
-        >
-          取消推荐
-        </button>
+          <button v-if="isRecommended" @click="cancelRecommend" class="cancel-recommend-btn">
+            取消推荐
+          </button>
         </div>
       </div>
     </div>
   </div>
-    <!-- 新增的固定位置按钮 -->
-<div class="fixed-buttons">
-   <!-- 阅读按钮 -->
-  <div class="fixed-button" @click="handleRead">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-      <path fill="currentColor" d="M21.59 11.59h-1.34a1 1 0 0 0 0 2h1.34a1 1 0 0 0 0-2zm-18.18 0H2.07a1 1 0 0 0 0 2h1.34a1 1 0 0 0 0-2zm15.09-7h-1.34a1 1 0 0 0 0 2h1.34a1 1 0 0 0 0-2zm-12.73 0H2.07a1 1 0 0 0 0 2h1.34a1 1 0 0 0 0-2zm15.09 0h-1.34a1 1 0 0 0 0 2h1.34a1 1 0 0 0 0-2zm-12.73 0H2.07a1 1 0 0 0 0 2h1.34a1 1 0 0 0 0-2zm9.09 11H8.66a1 1 0 0 0 0 2h6.36a1 1 0 0 0 0-2zm0-7H8.66a1 1 0 0 0 0 2h6.36a1 1 0 0 0 0-2zm0-7H8.66a1 1 0 0 0 0 2h6.36a1 1 0 0 0 0-2z"/>
-    </svg>
-    <span>阅读</span>
-  </div>
-  <!-- 充值按钮 -->
-  <div class="fixed-button" @click="handleRecharge">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-      <path fill="currentColor" d="M12 2a10 10 0 1 0 10 10 10 10 0 0 0-10-10zm1 14a1 1 0 0 1-2 0v-3h-2a1 1 0 0 1 0-2h3a1 1 0 0 1 1 1zm4.6-6.08a1 1 0 0 1-.2 1.4 7 7 0 0 1-9.93-1.4 1 1 0 1 1 1.6-1.2 5 5 0 0 0 7.13.8 1 1 0 0 1 1.4.2z"/>
-    </svg>
-    <span>充值</span>
-  </div>
-  
-  <!-- 评分按钮 -->
-<div class="fixed-button" @click="handleRatingClick">
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-    <path :fill="hasRating ? '#1890ff' : 'currentColor'" 
-          d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"/>
-  </svg>
-  <span :style="{ color: hasRating ? '#1890ff' : '' }">
-    {{ hasRating ? '已评分' : '评分' }}
-  </span>
-</div>
+  <!-- 新增的固定位置按钮 -->
+  <div class="fixed-buttons">
+    <!-- 阅读按钮 -->
+    <div class="fixed-button" @click="handleRead">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+        <path fill="currentColor"
+          d="M21.59 11.59h-1.34a1 1 0 0 0 0 2h1.34a1 1 0 0 0 0-2zm-18.18 0H2.07a1 1 0 0 0 0 2h1.34a1 1 0 0 0 0-2zm15.09-7h-1.34a1 1 0 0 0 0 2h1.34a1 1 0 0 0 0-2zm-12.73 0H2.07a1 1 0 0 0 0 2h1.34a1 1 0 0 0 0-2zm15.09 0h-1.34a1 1 0 0 0 0 2h1.34a1 1 0 0 0 0-2zm-12.73 0H2.07a1 1 0 0 0 0 2h1.34a1 1 0 0 0 0-2zm9.09 11H8.66a1 1 0 0 0 0 2h6.36a1 1 0 0 0 0-2zm0-7H8.66a1 1 0 0 0 0 2h6.36a1 1 0 0 0 0-2zm0-7H8.66a1 1 0 0 0 0 2h6.36a1 1 0 0 0 0-2z" />
+      </svg>
+      <span>阅读</span>
+    </div>
+    <!-- 充值按钮 -->
+    <div class="fixed-button" @click="handleRecharge">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+        <path fill="currentColor"
+          d="M12 2a10 10 0 1 0 10 10 10 10 0 0 0-10-10zm1 14a1 1 0 0 1-2 0v-3h-2a1 1 0 0 1 0-2h3a1 1 0 0 1 1 1zm4.6-6.08a1 1 0 0 1-.2 1.4 7 7 0 0 1-9.93-1.4 1 1 0 1 1 1.6-1.2 5 5 0 0 0 7.13.8 1 1 0 0 1 1.4.2z" />
+      </svg>
+      <span>充值</span>
+    </div>
 
-</div>
- <!-- 评分弹窗 -->
+    <!-- 评分按钮 -->
+    <div class="fixed-button" @click="handleRatingClick">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+        <path :fill="hasRating ? '#1890ff' : 'currentColor'"
+          d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z" />
+      </svg>
+      <span :style="{ color: hasRating ? '#1890ff' : '' }">
+        {{ hasRating ? '已评分' : '评分' }}
+      </span>
+    </div>
+
+    <!-- 回到顶部 -->
+    <div class="fixed-button" @click="scrollToTop">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24" height="24">
+        <path fill="currentColor"
+          d="M160 832h704a32 32 0 1 1 0 64H160a32 32 0 1 1 0-64m384-578.304V704h-64V247.296L237.248 490.048 192 444.8 508.8 128l316.8 316.8-45.312 45.248z">
+        </path>
+      </svg> <span>顶部</span>
+    </div>
+
+  </div>
+  <!-- 评分弹窗 -->
   <div v-if="showRatingDialog" class="rating-dialog-overlay">
     <div class="rating-dialog">
       <div class="dialog-header">
         <h3>{{ hasRating ? '您的评分' : '为作品评分' }}</h3>
         <button class="close-btn" @click="closeDialog">&times;</button>
       </div>
-      
+
       <div class="stars-container">
-        <div v-for="i in 10" :key="i" 
-             class="star" 
-             @click="selectRating(i)"
-             @mouseover="hoverRating = i"
-             @mouseleave="hoverRating = null">
+        <div v-for="i in 10" :key="i" class="star" @click="selectRating(i)" @mouseover="hoverRating = i"
+          @mouseleave="hoverRating = null">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28">
-            <path :fill="getStarColor(i)" 
-                  d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+            <path :fill="getStarColor(i)"
+              d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
           </svg>
         </div>
       </div>
-      
+
       <div class="rating-value">
         {{ currentRating || hoverRating || 0 }} 分
       </div>
-      
-      <button v-if="!hasRating" 
-              class="submit-btn" 
-              @click="submitRating"
-              :disabled="!currentRating">
+
+      <button v-if="!hasRating" class="submit-btn" @click="submitRating" :disabled="!currentRating">
         提交评分
       </button>
     </div>
@@ -226,26 +217,25 @@
   <!-- 打赏弹窗 -->
   <div v-if="showRewardDialog" class="reward-dialog-overlay">
     <div class="reward-dialog">
-     
-      <div class="dialog-header" style="display: flex; justify-content: center; align-items: center; position: relative;">
-           <h3 style="margin: 0;">打赏</h3>
-           <button class="close-btn " @click="showRewardDialog = false" style="position: absolute; right: 20px;">&times;</button>
-       </div>
-      
+
+      <div class="dialog-header"
+        style="display: flex; justify-content: center; align-items: center; position: relative;">
+        <h3 style="margin: 0;">打赏</h3>
+        <button class="close-btn " @click="showRewardDialog = false"
+          style="position: absolute; right: 20px;">&times;</button>
+      </div>
+
       <div class="reward-options">
-        <div 
-          v-for="option in rewardOptions" 
-          :key="option.value"
+        <div v-for="option in rewardOptions" :key="option.value"
           :class="['reward-option', { 'selected': selectedReward === option.value }]"
-          @click="selectReward(option.value)"
-        >
+          @click="selectReward(option.value)">
           <span>{{ option.label }}</span>
           <svg v-if="selectedReward === option.value" class="check-icon" viewBox="0 0 24 24">
-            <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" fill="none"/>
+            <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" fill="none" />
           </svg>
         </div>
       </div>
-      
+
       <div class="balance-info">
         <span>账户余额 {{ accountBalance }} 起点币</span>
         <span>本次打赏 {{ selectedReward }} 起点币</span>
@@ -277,36 +267,34 @@
 
 <script setup>
 
-import {ref, watch,computed} from 'vue';
-import { useRouter} from 'vue-router';
-import { SelectNovel_State,readerState } from '@/stores/index';
-import { getCategoriesByNovel} from '@/API/NovelCategory_API';
-import {addOrUpdateCollect,deleteCollect} from '@/API/Collect_API';
-import {getNovelWordCount, getNovelRecommendCount,getNovelCollectCount,getLatestPublishedChapter} from '@/API/Novel_API';
-import {  getAuthorNovelCount,getAuthorTotalWordCount,getAuthorRegisterDays}  from '@/API/Author_API';
+import { ref, watch, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { SelectNovel_State, readerState } from '@/stores/index';
+import { getCategoriesByNovel } from '@/API/NovelCategory_API';
+import { addOrUpdateCollect, deleteCollect } from '@/API/Collect_API';
+import { getNovelWordCount, getNovelRecommendCount, getNovelCollectCount, getLatestPublishedChapter } from '@/API/Novel_API';
+import { getAuthorNovelCount, getAuthorTotalWordCount, getAuthorRegisterDays } from '@/API/Author_API';
 import { getChapter } from '@/API/Chapter_API';
-import {addRecommend,deleteRecommend} from '@/API/Recommend_API';
-import {getReaderBalance} from '@/API/Reader_API';
-import {rewardNovel} from '@/API/Reward_API';
+import { addRecommend, deleteRecommend } from '@/API/Recommend_API';
+import { getReaderBalance, addOrUpdateRecentReading } from '@/API/Reader_API';
+import { rewardNovel } from '@/API/Reward_API';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
-import {getRatesByReader,addRate} from '@/API/Rate_API';
-
-
-
+import { getRatesByReader, addRate } from '@/API/Rate_API';
+import { checkPurchase } from '@/API/Purchase_API';
 const selectNovelState = SelectNovel_State();      //当前选择的小说对象
-const ReaderState=readerState();                   //当前读者对象
-const categories=ref([]);                          //分类数组
+const ReaderState = readerState();                   //当前读者对象
+const categories = ref([]);                          //分类数组
 const isLoadingCategories = ref(false);            //是否在加载
-const novelWordCount=ref(0);                       //当前小说的字数
-const collectedCount=ref(0);                       //当前小说的被收藏数
-const recommendCount=ref(0);                       //当前小说的被推荐数
-const authorNovelCount=ref(0);                      //当前作者的创作小说数
-const authorWordCount=ref(0);                      //当前作者的创作总字数
-const authorRegisterDays=ref(0);                   //当前作者的创作天数
+const novelWordCount = ref(0);                       //当前小说的字数
+const collectedCount = ref(0);                       //当前小说的被收藏数
+const recommendCount = ref(0);                       //当前小说的被推荐数
+const authorNovelCount = ref(0);                      //当前作者的创作小说数
+const authorWordCount = ref(0);                      //当前作者的创作总字数
+const authorRegisterDays = ref(0);                   //当前作者的创作天数
 const router = useRouter();
 const showRecommendDialog = ref(false);               // 是否显示推荐弹窗
-const recommendReason = ref('') ;                     // 用户输入的推荐理由
+const recommendReason = ref('');                     // 用户输入的推荐理由
 const showRewardDialog = ref(false);                  // 是否显示打赏弹窗
 const accountBalance = ref(0);                        // 账号余额
 const selectedReward = ref(100);                      // 默认选中100点打赏金额
@@ -314,7 +302,7 @@ const chapterId = ref(null)
 const publishTime = ref(null)
 const hasChapter = ref(false)
 const hasRating = ref(false);                           // 是否评分
-const currentRating=ref(0);                             //当前评分
+const currentRating = ref(0);                             //当前评分
 const showRatingDialog = ref(false);
 const hoverRating = ref(null);
 
@@ -328,8 +316,8 @@ const rewardOptions = [
   { value: 1000, label: '1000点' },
   { value: 2000, label: '2000点' },
   { value: 10000, label: '1万点' },
-  { value: 50000, label: '5万点'},
-  { value: 100000, label: '10万点'}
+  { value: 50000, label: '5万点' },
+  { value: 100000, label: '10万点' }
 ];
 
 
@@ -337,12 +325,15 @@ const rewardOptions = [
 const isCollected = computed(() => {
   //当前小说ID
   const currentNovelId = selectNovelState.novelId;
+  //console.log("是否收藏",currentNovelId)
+  //  console.log("本地收藏",ReaderState.favoriteBooks)
+  const a=ReaderState.favoriteBooks.some(item =>
+    item.novelId === currentNovelId)
+   // console.log("a",a)
   // 检查是否存在于收藏列表
-  return ReaderState.favoriteBooks.some(item =>
-    item.novel?.novelId === currentNovelId ||
-    item.novelId === currentNovelId
-  )
-}) 
+  return a
+  
+})
 //是否被推荐
 const isRecommended = computed(() => {
   //当前小说ID
@@ -352,7 +343,7 @@ const isRecommended = computed(() => {
     item.novel?.novelId === currentNovelId ||
     item.novelId === currentNovelId
   )
-}) 
+})
 
 
 //处理图片错误
@@ -370,7 +361,7 @@ function getStatusClass(status) {
 }
 const formattedDate = computed(() => {
   if (!publishTime.value) return ''
-  
+
   const date = new Date(publishTime.value)
   return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`
 })
@@ -402,7 +393,7 @@ const fetchWordCount = async () => {
     const response = await getNovelWordCount(selectNovelState.novelId)
     novelWordCount.value = response.data?.totalWords || response?.totalWords || 0
 
-     console.log('最终字数:',  novelWordCount.value) // 调试
+    console.log('最终字数:', novelWordCount.value) // 调试
   } catch (error) {
     console.error('获取字数失败:', error)
     novelWordCount.value = 0
@@ -410,11 +401,11 @@ const fetchWordCount = async () => {
 }
 // 获取推荐数的函数
 
-const fetchRecommendCount = async ()=>{
+const fetchRecommendCount = async () => {
   try {
     const response = await getNovelRecommendCount(selectNovelState.novelId)
     recommendCount.value = response.data?.recommendCount || response?.recommendCount || 0
-        console.log('最终推荐数:',  recommendCount.value) // 调试
+    console.log('最终推荐数:', recommendCount.value) // 调试
   } catch (error) {
     console.error('获取推荐数失败:', error)
     recommendCount.value = 0
@@ -422,11 +413,11 @@ const fetchRecommendCount = async ()=>{
 
 }
 // 获取收藏数的函数
-const fetchCollectedCount = async ()=>{
+const fetchCollectedCount = async () => {
   try {
     const response = await getNovelCollectCount(selectNovelState.novelId)
     collectedCount.value = response.data?.collectCount || response?.collectCount || 0
-      console.log('最终收藏数:',  collectedCount.value) // 调试
+    console.log('最终收藏数:', collectedCount.value) // 调试
   } catch (error) {
     console.error('获取收藏数失败:', error)
     collectedCount.value = 0
@@ -434,11 +425,11 @@ const fetchCollectedCount = async ()=>{
 
 }
 // 获取作者创作书籍数的函数
-const fetchAuthorNovelCount = async ()=>{
+const fetchAuthorNovelCount = async () => {
   try {
     const response = await getAuthorNovelCount(selectNovelState.authorId)
-    authorNovelCount.value = response.data?.novelCount || response?.novelCount|| 0
-      console.log('最终作者创作数:',  authorNovelCount.value) // 调试
+    authorNovelCount.value = response.data?.novelCount || response?.novelCount || 0
+    console.log('最终作者创作数:', authorNovelCount.value) // 调试
   } catch (error) {
     console.error('获取作者作品数失败:', error)
     collectedCount.value = 0
@@ -446,46 +437,46 @@ const fetchAuthorNovelCount = async ()=>{
 
 }
 //获取作者创作总字数的函数
-const fetchAuthorWordCount  =async ()=>{
-    try {
+const fetchAuthorWordCount = async () => {
+  try {
     const response = await getAuthorTotalWordCount(selectNovelState.authorId)
-    authorWordCount.value = response.data?.totalWordCount || response?.totalWordCount|| 0
+    authorWordCount.value = response.data?.totalWordCount || response?.totalWordCount || 0
   } catch (error) {
     console.error('获取作者创作字数失败:', error)
-     authorWordCount.value = 0
+    authorWordCount.value = 0
   }
 }
 //获取作者创作天数
-const fetchAuthorRegisterDays =async ()=>{
-    try {
+const fetchAuthorRegisterDays = async () => {
+  try {
     const response = await getAuthorRegisterDays(selectNovelState.authorId)
-   authorRegisterDays.value = response.data?.registerDays || response?.registerDays|| 0
-   console.log('获取作者创作天数:', authorRegisterDays.value)
+    authorRegisterDays.value = response.data?.registerDays || response?.registerDays || 0
+    console.log('获取作者创作天数:', authorRegisterDays.value)
   } catch (error) {
     console.error('获取作者创作天数失败:', error)
-     authorRegisterDays.value = 0
+    authorRegisterDays.value = 0
   }
 }
 //获取账号余额的函数
-const fetchReaderBalance=async()=>{
+const fetchReaderBalance = async () => {
   try {
     const response = await getReaderBalance(ReaderState.readerId)
-    accountBalance.value = response.data?.balance || response?.balance|| 0
-   console.log('获取用户余额:', accountBalance.value)
+    accountBalance.value = response.data?.balance || response?.balance || 0
+    console.log('获取用户余额:', accountBalance.value)
   } catch (error) {
     console.error('获取用户余额失败:', error)
-     accountBalance.value = 0
+    accountBalance.value = 0
   }
 }
 //获取最新章节
 const fetchNewestChapter = async () => {
   try {
     const response = await getLatestPublishedChapter(selectNovelState.novelId)
-     chapterId.value = response?.chapterId||0
-     publishTime.value = response?.publishTime||''
+    chapterId.value = response?.chapterId || 0
+    publishTime.value = response?.publishTime || ''
     hasChapter.value = true
-   console.log('response:', response)
-  }  catch (error) {
+    console.log('response:', response)
+  } catch (error) {
     if (error.message !== 'Error: response') {
       console.error('获取章节信息失败:', error)
     }
@@ -522,8 +513,8 @@ watch(
           fetchAuthorNovelCount(),
           fetchAuthorWordCount(),
           fetchAuthorRegisterDays(),
-           fetchNewestChapter(),
-           fetchRatingStatus()
+          fetchNewestChapter(),
+          fetchRatingStatus()
         ])
         console.log('小说详情页数据更新完成！')
       } catch (error) {
@@ -553,6 +544,17 @@ watch(
 function goback() {
   router.back();
 }
+//切换标签页
+function switchTab(path) {
+  router.replace(path)
+}
+//回到顶部
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+onMounted(() => {
+  scrollToTop();
+});
 //收藏按钮的逻辑
 
 const toggleCollect = async () => {
@@ -563,10 +565,10 @@ const toggleCollect = async () => {
       // 取消收藏
       await deleteCollect(currentNovelId, currentReaderId);
       const newFavorites = ReaderState.favoriteBooks.filter(item =>
-       item.novel?.novelId !== currentNovelId && 
+        item.novel?.novelId !== currentNovelId &&
         item.novelId !== currentNovelId
-       )
-       ReaderState.updateFavoriteBooks(newFavorites) 
+      )
+      ReaderState.updateFavoriteBooks(newFavorites)
 
 
       toast("取消收藏", {
@@ -577,19 +579,19 @@ const toggleCollect = async () => {
       // 添加收藏
       await addOrUpdateCollect(currentNovelId, ReaderState.readerId, 'no');
       //  更新推荐列表（安全方式）
-        const newFavoriteBooks = [
-       ...ReaderState.favoriteBooks, // 解构原有数组
+      const newFavoriteBooks = [
+        ...ReaderState.favoriteBooks, // 解构原有数组
         {
-        novelId: currentNovelId,
-        novel: selectNovelState, // 保存完整作品信息
-        currentReaderId,
-        isPublic: "no",
-        collectTime: new Date().toISOString()
+          novelId: currentNovelId,
+          novel: selectNovelState, // 保存完整作品信息
+          readerId:currentReaderId,
+          isPublic: "no",
+          collectTime: new Date().toISOString()
         }
-       ]
-  
-       //  通过 action 更新（触发同步）
-       ReaderState.updateFavoriteBooks(newFavoriteBooks)
+      ]
+
+      //  通过 action 更新（触发同步）
+      ReaderState.updateFavoriteBooks(newFavoriteBooks)
 
       toast("收藏成功", {
         "type": "success",
@@ -609,11 +611,26 @@ async function handleRead() {
   try {
     const response = await getChapter(selectNovelState.novelId, 1);
     if (response.status !== '已发布') {
-      toast("章节未发布!", {
-        "type": "error",
+      toast("第1章未发布!", {
+        "type": "info",
         "dangerouslyHTMLString": true
       });
       return;
+    }
+    // 检查章节购买状态
+    if (response.isCharged === '是') {
+      const purchaseStatus = await checkPurchase(
+        ReaderState.readerId,
+        selectNovelState.novelId,
+        1
+      );
+      if (!purchaseStatus?.hasPurchased) {
+        toast("第1章需要购买后才能阅读", {
+          "type": "info",
+          "dangerouslyHTMLString": true
+        });
+        return;
+      }
     }
     selectNovelState.resetChapter(
       response.chapterId,
@@ -626,10 +643,24 @@ async function handleRead() {
       response.publishTime,
       response.status
     );
+    
+    // 添加或更新阅读记录
+    try {
+      // 假设readerId可以从用户状态获取，这里用selectNovelState.readerId表示
+      await addOrUpdateRecentReading(
+        ReaderState.readerId,  // 读者ID
+        selectNovelState.novelId    // 小说ID
+      );
+    } catch (historyError) {
+      console.error("记录阅读历史失败:", historyError);
+      // 这里可以选择不提示用户，因为阅读历史记录失败不影响主要功能
+    }
+    
+    // 跳转到阅读页面
     router.push('/Novels/reader');
   } catch (error) {
-    toast("章节加载失败：该章节不存在！", {
-      "type": "warning",
+    toast("章节加载失败：第1章不存在！", {
+      "type": "info",
       "dangerouslyHTMLString": true
     })
   }
@@ -645,37 +676,37 @@ const handleRecommend = async () => {
   } else {
     // 未推荐 → 弹出输入框
     showRecommendDialog.value = true
-    
+
   }
 }
 //提交推荐内容
 const submitRecommend = async () => {
-    const currentNovelId = selectNovelState.novelId;
-    const currentReaderId = ReaderState.readerId;
-     const currentReason = recommendReason.value;
+  const currentNovelId = selectNovelState.novelId;
+  const currentReaderId = ReaderState.readerId;
+  const currentReason = recommendReason.value;
   try {
     // 调用推荐 API
-   const response = await addRecommend(currentNovelId, currentReaderId, currentReason)
-        console.log('添加推荐响应:', response)
+    const response = await addRecommend(currentNovelId, currentReaderId, currentReason)
+    console.log('添加推荐响应:', response)
 
     // 更新本地状态
     isRecommended.value = true
     showRecommendDialog.value = false
-    
-     //  更新推荐列表（安全方式）
-  const newRecommendBooks = [
-    ...ReaderState.recommendBooks, // 解构原有数组
-    {
-      novelId: selectNovelState.novelId,
-      novel: selectNovelState, // 保存完整作品信息
-      readerId: ReaderState.readerId,
-      reason: recommendReason.value,
-      recommendTime: new Date().toISOString()
-    }
-  ]
-  
-  // 通过 action 更新（触发同步）
-  ReaderState.updateRecommendBooks(newRecommendBooks)
+
+    //  更新推荐列表（安全方式）
+    const newRecommendBooks = [
+      ...ReaderState.recommendBooks, // 解构原有数组
+      {
+        novelId: selectNovelState.novelId,
+        novel: selectNovelState, // 保存完整作品信息
+        readerId: ReaderState.readerId,
+        reason: recommendReason.value,
+        recommendTime: new Date().toISOString()
+      }
+    ]
+
+    // 通过 action 更新（触发同步）
+    ReaderState.updateRecommendBooks(newRecommendBooks)
 
     // 提示成功
     toast("推荐成功！", {
@@ -686,49 +717,49 @@ const submitRecommend = async () => {
 
   } catch (error) {
     console.error('推荐失败:', error)
-    toast("推荐失败，请重试", { 
+    toast("推荐失败，请重试", {
       type: "error",
       dangerouslyHTMLString: true
     })
   }
 }
 //取消推荐
-const cancelRecommend=async()=>{
-    const currentNovelId = selectNovelState.novelId;
-    const currentReaderId = ReaderState.readerId;
- try{
-      // 取消推荐
-      await deleteRecommend(currentNovelId, currentReaderId);
-      const newRecommendBooks = ReaderState.recommendBooks.filter(item =>
-        item.novel?.novelId !== currentNovelId &&
-        item.novelId !== currentNovelId
-         
-      );
-      ReaderState.updateRecommendBooks(newRecommendBooks)
-      toast("取消推荐", {
-        "type": "success",
-        "dangerouslyHTMLString": true
-      })
-      showRecommendDialog.value = false;
- }
- catch(error){
- console.error('推荐操作失败:', error);
+const cancelRecommend = async () => {
+  const currentNovelId = selectNovelState.novelId;
+  const currentReaderId = ReaderState.readerId;
+  try {
+    // 取消推荐
+    await deleteRecommend(currentNovelId, currentReaderId);
+    const newRecommendBooks = ReaderState.recommendBooks.filter(item =>
+      item.novel?.novelId !== currentNovelId &&
+      item.novelId !== currentNovelId
+
+    );
+    ReaderState.updateRecommendBooks(newRecommendBooks)
+    toast("取消推荐", {
+      "type": "success",
+      "dangerouslyHTMLString": true
+    })
+    showRecommendDialog.value = false;
+  }
+  catch (error) {
+    console.error('推荐操作失败:', error);
     toast("推荐失败", {
       "type": "error",
       "dangerouslyHTMLString": true
     })
- }
+  }
 }
 
 const showBalanceInsufficientDialog = ref(false);
 //选择打赏金额
-const selectReward=(value)=>{selectedReward.value=value;}
+const selectReward = (value) => { selectedReward.value = value; }
 //确认打赏按钮
 // 确认打赏按钮逻辑
 const confirmReward = async () => {
-      const currentNovelId = selectNovelState.novelId;
-     const currentReaderId = ReaderState.readerId;
-     const currentvalue = selectedReward.value;
+  const currentNovelId = selectNovelState.novelId;
+  const currentReaderId = ReaderState.readerId;
+  const currentvalue = selectedReward.value;
   try {
     // 1. 检查余额是否充足
     if (accountBalance.value < selectedReward.value) {
@@ -740,36 +771,36 @@ const confirmReward = async () => {
     const response = await rewardNovel({
       readerId: currentReaderId,    // 当前用户ID
       novelId: currentNovelId, // 被打赏小说ID
-      amount:  currentvalue    // 打赏金额
+      amount: currentvalue    // 打赏金额
     });
     readerState.balance -= currentvalue; // 更新余额
     // 3. 处理成功结果
     toast(`成功打赏 ${currentvalue} 起点币`, {
-         type: "success", // 改为 success 类型
-         dangerouslyHTMLString: true
-          });
+      type: "success", // 改为 success 类型
+      dangerouslyHTMLString: true
+    });
     console.log('打赏结果:', response.data);
 
     // 4. 刷新余额
-     await fetchReaderBalance();
-     if (typeof ReaderState.updateBalance === 'function') {
-  ReaderState.updateBalance(accountBalance.value)
-} else {
-  console.error('updateBalance is not a function!')
-}
-     console.log("余额",ReaderState.balance)
-    
+    await fetchReaderBalance();
+    if (typeof ReaderState.updateBalance === 'function') {
+      ReaderState.updateBalance(accountBalance.value)
+    } else {
+      console.error('updateBalance is not a function!')
+    }
+    console.log("余额", ReaderState.balance)
+
     // 5. 关闭弹窗
     //showRewardDialog.value = false;
 
-    
+
   } catch (error) {
     // 错误处理
     console.error('打赏失败:', error);
     toast(`打赏失败: ${error.message}`, {
-   type: "error",
-    dangerouslyHTMLString: true
-   });
+      type: "error",
+      dangerouslyHTMLString: true
+    });
     // 失败时重新获取最新余额
     await fetchReaderBalance();
   }
@@ -781,8 +812,8 @@ const goToRecharge = () => {
   const route = router.resolve({ path: '/Novels/Novel_Recharge' });
   window.open(route.href, '_blank'); // 新窗口打开
 };
-const handleRecharge=()=>{
-const route = router.resolve({ path: '/Novels/Novel_Recharge' });
+const handleRecharge = () => {
+  const route = router.resolve({ path: '/Novels/Novel_Recharge' });
   window.open(route.href, '_blank'); // 新窗口打开
 
 }
@@ -811,16 +842,16 @@ const getStarColor = (i) => {
   if (hasRating.value) {
     return i <= currentRating.value ? '#FFD700' : '#DDD';
   }
-  return (hoverRating.value && i <= hoverRating.value) || 
-         (!hoverRating.value && currentRating.value && i <= currentRating.value) 
-         ? '#FFD700' : '#DDD';
+  return (hoverRating.value && i <= hoverRating.value) ||
+    (!hoverRating.value && currentRating.value && i <= currentRating.value)
+    ? '#FFD700' : '#DDD';
 };
 
 // 提交评分
 const submitRating = async () => {
   try {
     // 这里调用API提交评分
-    await addRate(selectNovelState.novelId,ReaderState.readerId,currentRating.value);
+    await addRate(selectNovelState.novelId, ReaderState.readerId, currentRating.value);
     hasRating.value = true;
     closeDialog();
   } catch (error) {
@@ -1231,6 +1262,7 @@ const submitRating = async () => {
   border-color: #bfbfbf;
   color: #595959;
 }
+
 /* 新增的已推荐状态 */
 .blue-border-btn.is-recommended {
   border-color: #d9d9d9;
@@ -1434,7 +1466,7 @@ const submitRating = async () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1447,13 +1479,20 @@ const submitRating = async () => {
   border-radius: 16px;
   min-width: 320px;
   max-width: 90vw;
-  box-shadow: 0 8px 32px rgba(0,0,0,.18);
-  animation: popup-fade-in 0.22s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, .18);
+  animation: popup-fade-in 0.22s cubic-bezier(.4, 0, .2, 1);
 }
 
 @keyframes popup-fade-in {
-  from { opacity: 0; transform: scale(0.95);}
-  to { opacity: 1; transform: scale(1);}
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .dialog-content {
@@ -1473,7 +1512,7 @@ h3 {
 .recommend-textarea {
   width: 100%;
   min-height: 70px;
-   box-sizing: border-box;
+  box-sizing: border-box;
   border-radius: 6px;
   border: 1px solid #e1e4e8;
   padding: 10px;
@@ -1483,6 +1522,7 @@ h3 {
   background: #f9fafb;
   transition: border-color 0.2s;
 }
+
 .recommend-textarea:focus {
   border-color: #409eff;
   outline: none;
@@ -1498,7 +1538,8 @@ h3 {
 
 .dialog-actions {
   display: flex;
-  justify-content: center;   /* 居中所有按钮 */
+  justify-content: center;
+  /* 居中所有按钮 */
   gap: 24px;
   margin-top: 24px;
 }
@@ -1518,6 +1559,7 @@ h3 {
   background: #f5f6fa;
   color: #909399;
 }
+
 .cancel-btn:hover {
   background: #e5e8ef;
   color: #606266;
@@ -1528,9 +1570,11 @@ h3 {
   color: #fff;
   font-weight: 500;
 }
+
 .confirm-btn:hover {
   background: #2979ff;
 }
+
 .cancel-recommend-btn {
   background: #ffeded;
   color: #e74c3c;
@@ -1543,6 +1587,7 @@ h3 {
   margin-left: 0;
   transition: background 0.18s, color 0.18s;
 }
+
 .cancel-recommend-btn:hover {
   background: #ffcccc;
   color: #c0392b;
@@ -1646,6 +1691,7 @@ h3 {
   font-size: 14px;
   color: #666;
 }
+
 .confirm-reward-btn {
   width: 100%;
   padding: 12px;
@@ -1655,15 +1701,15 @@ h3 {
   border-radius: 4px;
   font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s; 
+  transition: background-color 0.2s, transform 0.1s;
 
   &:hover {
     background-color: #ff5252;
   }
 
   &:active {
-    transform: scale(0.98); 
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
+    transform: scale(0.98);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   }
 }
 
@@ -1710,7 +1756,7 @@ h3 {
     padding: 0 16px;
     border-radius: 24px;
   }
-  
+
   .fixed-button span {
     margin-left: 8px;
     font-size: 14px;

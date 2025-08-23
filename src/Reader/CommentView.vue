@@ -97,11 +97,17 @@ const expandedCommentId = ref(null)
 
 onMounted(async () => {
   try {
-    const res = await getCommentsByReaderId(readerId)  // 新接口
+    const res = await getCommentsByReaderId(readerId)
     userComments.value = res || []
   } catch (err) {
-    error.value = '获取评论失败'
-    console.error(err)
+    // 如果是 404，表示无评论，给空数组，不显示错误
+    if (err.response && err.response.status === 404) {
+      userComments.value = []
+      error.value = null
+    } else {
+      error.value = '获取评论失败'
+      console.error(err)
+    }
   } finally {
     loading.value = false
   }
@@ -132,9 +138,9 @@ function toggleReplies(commentId) {
 }
 
 .no-comments {
-  color: #999;
-  font-style: italic;
-  font-size: 14px;
+    text-align: center;
+  font-size: 18px;
+  margin: 20px 0;
 }
 
 .comment-bubble {

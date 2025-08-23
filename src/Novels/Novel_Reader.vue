@@ -639,11 +639,27 @@ async function handleAddShelf() {
 }
 async function changeChapter(num) {
     try {
+        // 检查是否是第一章且点击上一章
+        if (num === -1 && selectNovelState.chapterId === 1) {
+            toast("当前为第1章，无上一章", {
+                "type": "info",
+                "dangerouslyHTMLString": true
+            });
+            return;
+        }
+        // 检查是否是最后一章且点击下一章
+        if (num === 1 && selectNovelState.chapterId === chapters.value[chapters.value.length - 1]?.chapterId) {
+            toast("当前为最后1章，无下一章", {
+                "type": "info",
+                "dangerouslyHTMLString": true
+            });
+            return;
+        }
         const nextChapterId = selectNovelState.chapterId + num;
         const response = await getChapter(selectNovelState.novelId, nextChapterId);
         if (response.status !== '已发布') {
-            toast("章节未发布!", {
-                "type": "error",
+            toast("第" + nextChapterId + "章未发布!", {
+                "type": "info",
                 "dangerouslyHTMLString": true
             });
             return;
@@ -656,8 +672,8 @@ async function changeChapter(num) {
                 nextChapterId
             );
             if (!purchaseStatus?.hasPurchased) {
-                toast("此章节需要购买后才能阅读", {
-                    "type": "warning",
+                toast("第" + nextChapterId + "章需要购买后才能阅读", {
+                    "type": "info",
                     "dangerouslyHTMLString": true
                 });
                 return;
@@ -677,9 +693,10 @@ async function changeChapter(num) {
         comments.value = []; // 清空评论列表
         showComments.value = false; // 切换章节时隐藏评论
         router.push('/Novels/reader');
+        scrollToTop();
     } catch (error) {
         toast("章节加载失败", {
-            "type": "warning",
+            "type": "info",
             "dangerouslyHTMLString": true
         });
     }
@@ -812,19 +829,19 @@ const purchase_Chapter = async () => {
 
 // goToChapter 函数，使用章节级别的购买状态
 const goToChapter = async (chapter) => {
-    // 如果是收费章节且未购买，显示购买弹窗
-    if (chapter.isCharged === '是' && !chapter.hasPurchased) {
-        selectedChapter.value = chapter;
-        showPurchaseDialog.value = true;
-        return;
-    }
     try {
         const response = await getChapter(chapter.novelId, chapter.chapterId);
         if (response.status !== '已发布') {
-            toast("章节未发布!", {
-                "type": "error",
+            toast("第" + chapter.chapterId + "章未发布!", {
+                "type": "info",
                 "dangerouslyHTMLString": true
             });
+            return;
+        }
+        // 如果是收费章节且未购买，显示购买弹窗
+        if (chapter.isCharged === '是' && !chapter.hasPurchased) {
+            selectedChapter.value = chapter;
+            showPurchaseDialog.value = true;
             return;
         }
         selectNovelState.resetChapter(
@@ -844,7 +861,7 @@ const goToChapter = async (chapter) => {
         scrollToTop();
     } catch (error) {
         toast("章节加载失败!", {
-            "type": "error",
+            "type": "info",
             "dangerouslyHTMLString": true
         });
     }
@@ -1173,8 +1190,6 @@ onMounted(() => {
             // 如果有中文语音，默认选择第一个
             if (availableVoices.value.length > 0) {
                 selectedVoice.value = availableVoices.value[0].name;
-            } else {
-                toast("未找到中文语音引擎", { type: "warning" });
             }
         };
         // 立即加载语音列表
@@ -1268,6 +1283,7 @@ watch(
 onMounted(() => {
     window.addEventListener('keydown', handleKeyDown);
     fetchChapters();
+    scrollToTop();
 });
 onMounted(async () => {
     try {

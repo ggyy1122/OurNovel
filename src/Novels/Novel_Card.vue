@@ -39,6 +39,7 @@ import { SelectNovel_State, readerState } from '@/stores/index';
 import { getAuthor } from '@/API/Author_API'
 import { addOrUpdateCollect } from '@/API/Collect_API'
 import { getChapter } from '@/API/Chapter_API';
+import { checkPurchase } from '@/API/Purchase_API';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 const selectNovelState = SelectNovel_State();
@@ -110,6 +111,7 @@ async function handle() {
             response.registerTime,
             response.introduction
         );
+        console.log('小说信息已更新到状态管理！');
     } catch (error) {
         console.error('处理失败:', error);
     }
@@ -117,14 +119,29 @@ async function handle() {
 //立即阅读
 async function handleRead() {
     try {
-        handle();
+        await handle();
         const response = await getChapter(props.novel.novelId, 1);
         if (response.status !== '已发布') {
-            toast("章节未发布!", {
-                "type": "error",
+            toast("第1章未发布!", {
+                "type": "info",
                 "dangerouslyHTMLString": true
             });
             return;
+        }
+        // 检查章节购买状态
+        if (response.isCharged === '是') {
+            const purchaseStatus = await checkPurchase(
+                reader_state.readerId,
+                selectNovelState.novelId,
+                1
+            );
+            if (!purchaseStatus?.hasPurchased) {
+                toast("第1章需要购买后才能阅读", {
+                    "type": "info",
+                    "dangerouslyHTMLString": true
+                });
+                return;
+            }
         }
         selectNovelState.resetChapter(
             response.chapterId,
@@ -139,15 +156,15 @@ async function handleRead() {
         );
         router.push('/Novels/reader');
     } catch (error) {
-        toast("该小说还没有章节！", {
-            "type": "warning",
+        toast("章节加载失败：第1章不存在！", {
+            "type": "info",
             "dangerouslyHTMLString": true
         })
     }
 }
 //作品主页
 async function handle_NovelInfro() {
-    handle();
+    await handle();
     router.push('/Novels/Novel_Info/home');
 }
 </script>
