@@ -41,7 +41,16 @@
       </thead>
       <tbody>
         <tr v-for="user in filteredUsers" :key="user.id">
-          <td><img :src="user.avatar" alt="头像" class="avatar" /></td>
+          <!-- 头像逻辑：支持 OSS URL 拼接，无图回退默认头像 -->
+          <td>
+            <img
+              :src="user.avatar ? `https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/${user.avatar}` : require('@/assets/default-avatar.jpeg')"
+              alt="头像"
+              class="avatar"
+              @error="e => e.target.src = require('@/assets/default-avatar.jpeg')"
+            />
+          </td>
+
           <td>{{ user.name }}</td>
           <td>{{ user.phone }}</td>
           <td v-if="userType === 'reader'">{{ user.gender }}</td>
@@ -58,6 +67,7 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { getAllReaders, getAllAuthors, deleteReader, deleteAuthorWithNovels } from '@/API/UserManage_API.js'
+
 const userType = ref('reader')
 
 const readers = ref([])
@@ -78,7 +88,7 @@ const fetchReaders = async () => {
     const res = await getAllReaders()
     readers.value = res.map(r => ({
       id: r.readerId,
-      avatar: r.avatarUrl,
+      avatar: r.avatarUrl,  // 文件名，模板里拼接 OSS URL
       name: r.readerName,
       phone: r.phone,
       gender: r.gender
@@ -96,7 +106,7 @@ const fetchAuthors = async () => {
     const res = await getAllAuthors()
     authors.value = res.map(a => ({
       id: a.authorId,
-      avatar: a.avatarUrl,
+      avatar: a.avatarUrl,  // 文件名，模板里拼接 OSS URL
       name: a.authorName,
       phone: a.phone,
       income: a.earning || 0
@@ -156,7 +166,6 @@ const deleteUser = async (id) => {
       await deleteReader(id)
       readers.value = readers.value.filter(user => user.id !== id)
     } else {
-      // 调用新函数
       await deleteAuthorWithNovels(id)
       authors.value = authors.value.filter(user => user.id !== id)
     }
@@ -165,7 +174,6 @@ const deleteUser = async (id) => {
     alert('删除失败，请检查权限或网络。')
   }
 }
-
 </script>
 
 <style scoped>
@@ -226,7 +234,7 @@ const deleteUser = async (id) => {
 }
 
 .btn-filter {
-  background-color: #486482; 
+  background-color: #486482;
   color: white;
 }
 
@@ -235,7 +243,7 @@ const deleteUser = async (id) => {
 }
 
 .btn-reset {
-  background-color: #ad7079; 
+  background-color: #ad7079;
   color: white;
 }
 
@@ -272,7 +280,7 @@ const deleteUser = async (id) => {
 }
 
 .user-table th {
-  background-color: #e3eaf1; 
+  background-color: #e3eaf1;
   color: #555;
 }
 
@@ -280,11 +288,13 @@ const deleteUser = async (id) => {
   background-color: #e9f3fb;
 }
 
+/* 头像样式（与作者页一致） */
 .avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
   border: 1px solid #ccc;
+  object-fit: cover;
 }
 
 /* 加载动画样式 */

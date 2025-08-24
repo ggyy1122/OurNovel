@@ -13,7 +13,7 @@ import Complaints_processed from '@/Admin/Report_processed.vue'
 import Complaints_unprocessed from '@/Admin/Report_unprocessed.vue'
 import Comment_detail from '@/Admin/Comment_detail.vue'
 import NovelCreate from '@/Admin/Novel_Create.vue'
-
+import CategoryManage from '@/Admin/Category_Manage.vue'
 
 import Home from '@/views/Home_test.vue'
 import Novel_Layout from '@/Novels/Novel_Layout.vue'
@@ -272,6 +272,11 @@ const routes = [
                 path: 'comment_detail',
                 name:'comment_detail',
                 component: Comment_detail
+            },
+            {
+                path:'category_manage',
+                name:'category_manage',
+                component:CategoryManage
             }
         ]
     },

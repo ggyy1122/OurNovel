@@ -8,30 +8,32 @@
       <span>加载中...</span>
     </div>
 
-    <!-- 章节表格 -->
-    <table v-else class="chapter-table">
-      <thead>
-        <tr>
-          <th>小说ID</th>
-          <th>章节标题</th>
-          <th>操作</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="chapter in chapters" :key="`${chapter.novelId}-${chapter.chapterId}`">
-          <td>{{ chapter.novelId }}</td>
-          <td>{{ chapter.title }}</td>
-          <td>
-            <button @click="goToContent(chapter)">查看内容</button>
-            <button @click="approveChapter(chapter)">审核通过</button>
-            <button @click="rejectChapter(chapter)" class="btn-reject">审核不通过</button>
-          </td>
-        </tr>
-        <tr v-if="chapters.length === 0 && !loading">
-          <td colspan="3" style="text-align: center; color: #888;">暂无待审核章节</td>
-        </tr>
-      </tbody>
-    </table>
+   <!-- 章节表格 -->
+<table v-else class="chapter-table">
+  <thead>
+    <tr>
+      <th>小说ID</th>
+      <th>章节ID</th> <!-- 新增 -->
+      <th>章节标题</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-for="chapter in chapters" :key="`${chapter.novelId}-${chapter.chapterId}`">
+      <td>{{ chapter.novelId }}</td>
+      <td>{{ chapter.chapterId }}</td> <!-- 新增 -->
+      <td>{{ chapter.title }}</td>
+      <td>
+        <button @click="goToContent(chapter)">查看内容</button>
+        <button @click="approveChapter(chapter)">审核通过</button>
+        <button @click="rejectChapter(chapter)" class="btn-reject">审核不通过</button>
+      </td>
+    </tr>
+    <tr v-if="chapters.length === 0 && !loading">
+      <td colspan="4" style="text-align: center; color: #888;">暂无待审核章节</td>
+    </tr>
+  </tbody>
+   </table>
   </div>
 </template>
 
