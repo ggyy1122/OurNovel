@@ -66,11 +66,11 @@
               >查看</button>
               <button 
                 class="approve-btn" 
-                @click="approveNovel(novel.novelId)"
+                @click="index=1;noId=novel.novelId;executeReview()"
               >审核通过</button>
               <button 
                 class="reject-btn" 
-                @click="rejectNovel(novel.novelId)"
+                @click="showModal=true;index=2;noId=novel.novelId"
               >审核不通过</button>
           </td>
         </tr>
@@ -87,6 +87,22 @@
         </span>
         <button @click="nextPage" :disabled="currentPage === totalPages">下一页</button>
       </div>
+      <!-- result的输入框 -->
+    <div v-if="showModal" class="modal-overlay">
+      <div class="modal-content">
+        <h3>请输入result</h3>
+        <input 
+          v-model="inputValue" 
+          @keyup.enter="confirmInput"
+          placeholder="请输入内容"
+          class="modal-input"
+        >
+        <div class="modal-buttons">
+          <button @click="confirmInput" class="confirm-btn">确定</button>
+          <button @click="cancelInput" class="cancel-btn">取消</button>
+        </div>
+      </div>
+    </div>
   </div>
   </div>
   
@@ -250,42 +266,52 @@ const loading = ref(false)  // 加载状态
 
 //----------------------------------------------------------------------------------------------------------------
 //小说审核
-
+const noId=ref(0)//小说id
+const index=ref(0)//状态
+const showModal = ref(false)//result的输入框
+const inputValue = ref('');
+const result = ref('');
 import { reviewNovel } from '@/API/Novel_API'
-function approveNovel(id) {
+
+const confirmInput = () => {
+  if (inputValue.value.trim()) {
+    result.value = inputValue.value;
+    showModal.value = false;
+    inputValue.value = '';
+    executeReview();
+  }
+  else {
+    alert('请输入有效的内容');
+  }
+};
+
+const cancelInput = () => {
+  showModal.value = false;
+  inputValue.value = '';
+};
+
+//审核
+const executeReview=async()=>{
   loading.value = true // 开始加载
-  reviewNovel(id, '连载', managerID.value,'通过').then(response => {
-    if (response.success) {
-       // 移除已审核小说
-      categoryNovels.value = categoryNovels.value.filter(novel => novel.novelId !== id)
-      novels.value = novels.value.filter(novel => novel.novelId !== id)
-    } else {
-      alert('审核失败：' + response.message)
+  try {
+    if(index.value===1){//审核通过
+      await reviewNovel(noId.value, '连载', managerID.value,'通过');
+    }else if(index.value===2){
+      await reviewNovel(noId.value, '封禁', managerID.value,result.value);
     }
-  }).catch(error => {
-    console.error('审核失败:', error)
-    alert('审核失败，请稍后再试。')
-  }).finally(() => {
-    loading.value = false
-  })
+    categoryNovels.value = categoryNovels.value.filter(novel => novel.novelId !== noId.value)
+    novels.value = novels.value.filter(novel => novel.novelId !== noId.value)
+     console.log('操作成功，小说已审核');
+  } catch (error) {
+    console.error('操作失败:', error)
+    alert('操作失败，请稍后重试')
+  } finally {
+    loading.value = false // 结束加载
+  }
 }
-function rejectNovel(id) {
-  loading.value = true // 开始加载
-  reviewNovel(id, '封禁', managerID.value,'不通过').then(response => {
-    if (response.success) {
-       // 移除已审核小说
-      categoryNovels.value = categoryNovels.value.filter(novel => novel.novelId !== id)
-      novels.value = novels.value.filter(novel => novel.novelId !== id)
-    } else {
-      alert('审核失败：' + response.message)
-    }
-  }).catch(error => {
-    console.error('审核失败:', error)
-    alert('审核失败，请稍后再试。')
-  }).finally(() => {
-    loading.value = false
-  })
-}
+
+
+
 //----------------------------------------------------------------------------------------------------------------
 
 
@@ -569,5 +595,48 @@ function viewNovel(novelId, authorName) {
 }
 .view-btn:hover {
   background-color: #35495e;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal-input {
+  width: 100%;
+  padding: 8px;
+  margin: 15px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.confirm-btn {
+  background-color: #42b983;
+  color: white;
+}
+
+.cancel-btn {
+  background-color: #f0f0f0;
 }
 </style>

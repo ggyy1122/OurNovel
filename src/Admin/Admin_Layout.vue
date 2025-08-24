@@ -3,7 +3,6 @@
         <!-- 顶部导航栏 -->
         <header class="admin-header">
             <h2>小说阅读平台管理系统</h2>
-            <button @click="logout">退出登录</button>
         </header>
 
        <!-- 侧边导航栏 -->
@@ -15,7 +14,7 @@
       <nav><!--nav表示导航链接-->
           <router-link to="/Admin/Admin_Layout/dashboard" class="submenu-link">
             <i class="fas fa-table menu-icon"></i>
-            <span v-if="!sidebar.isCollapsed">仪表盘</span>
+            <span v-if="!sidebar.isCollapsed">数据统计</span>
           </router-link>
           <router-link to="/Admin/Admin_Layout/users" class="submenu-link">
             <i class="fas fa-users menu-icon"></i>
@@ -38,13 +37,21 @@
             <span>封禁</span></router-link>
           </div>
         </div>
-            <router-link to="/Admin/Admin_Layout/chapterboard" class="submenu-link">
+          <router-link to="/Admin/Admin_Layout/category_manage" class="submenu-link">
+            <i class="fas fa-globe menu-icon"></i>
+            <span v-if="!sidebar.isCollapsed">分类管理</span>
+          </router-link>
+          <router-link to="/Admin/Admin_Layout/chapterboard" class="submenu-link">
             <i class="fas fa-file-signature menu-icon"></i>
             <span v-if="!sidebar.isCollapsed">章节管理</span>
           </router-link>
           <router-link to="/Admin/Admin_Layout/complaint_management/unprocessed" class="submenu-link">
             <i class="fas fa-volume-off menu-icon"></i>
             <span v-if="!sidebar.isCollapsed">举报处理</span>
+          </router-link>
+          <router-link to="/Admin/Admin_Layout" class="submenu-link" @click="logout">
+            <i class="fas fa-gear menu-icon"></i>
+            <span v-if="!sidebar.isCollapsed" @click="logout">退出登录</span>
           </router-link>
       </nav>
     </div>

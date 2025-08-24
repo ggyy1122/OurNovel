@@ -214,6 +214,7 @@ const getNovelData=async () => {
         title: chapter.title,
         publishTime: chapter.publishTime,
         status: chapter.status,
+        content: chapter.content
       }))
     }
     const categoryResponse=await getCategoriesByNovel(route.query.id)
@@ -228,7 +229,7 @@ const getNovelData=async () => {
   }
 }
 //----------------------------------------------------------------------------------------------------------------
-import {reviewChapter,deleteChapter} from '@/API/Chapter_API'
+import {reviewChapter} from '@/API/Chapter_API'
 //章节操作
 const chapterOp=[
   {
@@ -293,18 +294,7 @@ function executeReview() {
 }
 
 
-//删除
-function deleteChapterById(chapterId) {
-  deleteChapter(route.query.id,chapterId)
-    .then(() => {
-      console.log('章节已删除:', chapterId)
-      closeAllMenus()
-      getNovelData()
-    })
-    .catch(err => {
-      console.error('章节删除失败:', err)
-    })
-}
+
 
 //----------------------------------------------------------------------------------------------------------------
 //加载中动画

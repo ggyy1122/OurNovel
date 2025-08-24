@@ -27,17 +27,33 @@
               >查看</button>
               <button 
                 class="approve-btn" 
-                @click="approve(novel.novelId)"
+                @click="showModal=true;index=1;reId=item.reportId;comId=item.commentId"
               >审核通过</button>
               <button 
                 class="reject-btn" 
-                @click="reject(novel.novelId)"
+                @click="showModal=true;index=2;reId=item.reportId;comId=item.commentId"
               >审核不通过</button>
             </td>
         </tr>
       </tbody>
     </table>
-   
+     <!-- result的输入框 -->
+    <div v-if="showModal" class="modal-overlay">
+      <div class="modal-content">
+        <h3>请输入result</h3>
+        <input 
+          v-model="inputValue" 
+          @keyup.enter="confirmInput"
+          placeholder="请输入内容"
+          class="modal-input"
+        >
+        <div class="modal-buttons">
+          <button @click="confirmInput" class="confirm-btn">确定</button>
+          <button @click="cancelInput" class="cancel-btn">取消</button>
+        </div>
+      </div>
+    </div>
+
   </div>
   </div>
   
@@ -45,8 +61,8 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import {getAllReports} from '@/API/Report_API'
-import{getComment} from '@/API/Comment_API'
+import {getAllReports,processReport} from '@/API/Report_API'
+import{getComment,setCommentStatus} from '@/API/Comment_API'
 import{useRouter } from 'vue-router'
 //----------------------------------------------------------------------------------------------------------------
 //获取评论数据
@@ -97,7 +113,55 @@ const view = (reportId) => {
   router.push({ path: '/Admin/Admin_Layout/comment_detail', query: { id: reportId } })
 }
 
+const showModal = ref(false)//result的输入框
+const inputValue = ref('');
+const result = ref('');
+const index=ref(0);//表示审核操作，1为通过，2为不通过
+const reId=ref(0);//表示举报Id
+const comId=ref(0);//表示评论Id
 
+//获取管理员ID
+import { current_state } from '@/stores/index'
+import { storeToRefs } from 'pinia'
+const currentState = current_state()
+const { id: managerID } = storeToRefs(currentState)
+
+
+const confirmInput = () => {
+if (inputValue.value.trim()) {
+    result.value = inputValue.value;
+    showModal.value = false;
+    inputValue.value = '';
+    executeReview(); // 传入当前章节ID
+  }
+  else {
+    alert('请输入有效的内容');
+  }
+};
+
+const cancelInput = () => {
+  showModal.value = false;
+  inputValue.value = '';
+};
+
+const executeReview=async()=>{
+  loading.value = true // 开始加载
+  try {
+    if(index.value===1){//审核通过代表成功举报，
+      await processReport(reId.value, '成功', managerID.value,result.value);
+      await setCommentStatus(comId.value, '封禁',managerID.value,result.value);
+    }else if(index.value===2){
+      await processReport(reId.value, '失败', managerID.value,result.value);
+    }
+    reports.value = reports.value.filter(report => report.reportId !== reId.value)
+     console.log('操作成功，举报已处理');
+  } catch (error) {
+    console.error('操作失败:', error)
+    alert('操作失败，请稍后重试')
+  } finally {
+    loading.value = false // 结束加载
+  }
+}
 
 
 
@@ -264,5 +328,49 @@ onMounted(() => {
 }
 .view-btn:hover {
   background-color: #35495e;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal-input {
+  width: 100%;
+  padding: 8px;
+  margin: 15px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.confirm-btn {
+  background-color: #42b983;
+  color: white;
+}
+
+.cancel-btn {
+  background-color: #f0f0f0;
 }
 </style>

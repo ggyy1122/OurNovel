@@ -60,9 +60,13 @@
           >{{ novel.novelName }}</router-link></td>
           <td>{{ novel.authorName }}</td>
           <td>
+              <button
+                class="view-btn"
+                @click="viewNovel(novel.novelId, novel.authorName)"
+              >查看</button>
               <button 
                 class="reject-btn" 
-                @click="rejectNovel(novel.novelId)"
+                @click="showModal=true;noId=novel.novelId"
               >封禁</button>
           </td>
         </tr>
@@ -79,6 +83,22 @@
         </span>
         <button @click="nextPage" :disabled="currentPage === totalPages">下一页</button>
       </div>
+      <!-- result的输入框 -->
+    <div v-if="showModal" class="modal-overlay">
+      <div class="modal-content">
+        <h3>请输入result</h3>
+        <input 
+          v-model="inputValue" 
+          @keyup.enter="confirmInput"
+          placeholder="请输入内容"
+          class="modal-input"
+        >
+        <div class="modal-buttons">
+          <button @click="confirmInput" class="confirm-btn">确定</button>
+          <button @click="cancelInput" class="cancel-btn">取消</button>
+        </div>
+      </div>
+    </div>
   </div>
   </div>
   
@@ -241,26 +261,48 @@ const loading = ref(false)  // 加载状态
 
 //----------------------------------------------------------------------------------------------------------------
 //小说审核
-
 import { reviewNovel } from '@/API/Novel_API'
 
-function rejectNovel(id) {
+//小说审核
+const noId=ref(0)//小说id
+const showModal = ref(false)//result的输入框
+const inputValue = ref('');
+const result = ref('');
+
+const confirmInput = () => {
+  if (inputValue.value.trim()) {
+    result.value = inputValue.value;
+    showModal.value = false;
+    inputValue.value = '';
+    executeReview();
+  }
+  else {
+    alert('请输入有效的内容');
+  }
+};
+
+const cancelInput = () => {
+  showModal.value = false;
+  inputValue.value = '';
+};
+
+//审核
+const executeReview=async()=>{
   loading.value = true // 开始加载
-  reviewNovel(id, '封禁', managerID.value,'不通过').then(response => {
-    if (response.success) {
-       // 移除已审核小说
-      categoryNovels.value = categoryNovels.value.filter(novel => novel.novelId !== id)
-      novels.value = novels.value.filter(novel => novel.novelId !== id)
-    } else {
-      alert('审核失败：' + response.message)
-    }
-  }).catch(error => {
-    console.error('审核失败:', error)
-    alert('审核失败，请稍后再试。')
-  }).finally(() => {
-    loading.value = false
-  })
+  try {
+    await reviewNovel(noId.value, '封禁', managerID.value,result.value);
+    categoryNovels.value = categoryNovels.value.filter(novel => novel.novelId !== noId.value)
+    novels.value = novels.value.filter(novel => novel.novelId !== noId.value)
+     console.log('操作成功，小说已审核');
+  } catch (error) {
+    console.error('操作失败:', error)
+    alert('操作失败，请稍后重试')
+  } finally {
+    loading.value = false // 结束加载
+  }
 }
+
+
 //----------------------------------------------------------------------------------------------------------------
 
 
@@ -277,6 +319,13 @@ onMounted(() => {
 
 
 //----------------------------------------------------------------------------------------------------------------
+import { useRouter } from 'vue-router'
+const router = useRouter()
+function viewNovel(novelId, authorName) {
+  // 跳转到小说详情页，携带小说ID和作者名
+  // 这里的实现依赖于你的路由设置，假设详情页路由为 /novel/:id
+  router.push({ path: `/Admin/Admin_Layout/novel_managent/novelInfo`, query: { id: novelId, text: authorName } });
+}
 
 
 
@@ -336,7 +385,7 @@ onMounted(() => {
 .novel-table th, .novel-table td {
   padding: 12px 8px;
   border-bottom: 1px solid #eee;
-  text-align: left;
+  text-align:center;
 }
 .novel-table tr{
   transition: background-color 0.2s;
@@ -347,23 +396,19 @@ onMounted(() => {
 .novel-table th {
   background: #dde3ee;
 }
+.novel-table th:nth-child(1),
+.novel-table td:nth-child(1) {
+  width: 300px;  /* 小说名列 */
+}
+.novel-table th:nth-child(2),
+.novel-table td:nth-child(2) {
+  width: 180px;  /* 作者列 */
+}
+.novel-table th:nth-child(3),
+.novel-table td:nth-child(3) {
+  width: 320px;  /* 操作按钮列 */
+}
 
-.batch-actions {
-  margin-top: 16px;
-  text-align: right;
-}
-.batch-actions button {
-  margin-left: 12px;
-  padding: 6px 18px;
-  background: #42b983;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.batch-actions button:hover {
-  background: #2c3e50;
-}
 
 .filter-container {
   display: flex;
@@ -510,16 +555,70 @@ onMounted(() => {
   border: 1px solid #ccc;
 }
 .reject-btn {
-  background: #ff4d4f;
-  color: #fff;
+  margin-right: 10px;
+  padding: 6px 12px;
   border: none;
+  background-color:  #ad7079;
+  color: #fff;
   border-radius: 4px;
-  padding: 6px 14px;
   cursor: pointer;
-  font-weight: bold;
-  transition: background 0.2s;
 }
 .reject-btn:hover {
-  background: #d9363e;
+  background: #90555f;
+}
+.view-btn {
+  margin-right: 10px;
+  padding: 6px 12px;
+  border: none;
+  background-color: #486482;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.view-btn:hover {
+  background-color: #35495e;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal-input {
+  width: 100%;
+  padding: 8px;
+  margin: 15px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.confirm-btn {
+  background-color: #42b983;
+  color: white;
+}
+
+.cancel-btn {
+  background-color: #f0f0f0;
 }
 </style>

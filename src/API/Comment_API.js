@@ -113,14 +113,15 @@ export function deleteComment(commentId) {
  * @param {number} managerId - 管理员ID
  * @returns {Promise<void>}
  */
-export function setCommentStatus(commentId, status, managerId) {
+export function setCommentStatus(commentId, status, managerId,result) {
     return request({
         url: '/api/Comments/Status',
         method: 'post',
         params: {
-            commentId,
-            status,
-            managerId
+            commentId:commentId,
+            status:status,
+            managerId:managerId,
+            result:result
         }
     })
 }
