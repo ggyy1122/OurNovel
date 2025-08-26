@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using OurNovel.Data;
 using OurNovel.Models;
@@ -16,49 +16,42 @@ public class NovelRepository : Repository<Novel, int>, INovelRepository
 
     public async Task<List<CollectRankingDto>> GetTopCollectedNovelsAsync(int topN, string? status = null)
     {
-        var topCollected = await _context.Collects
-            .GroupBy(c => c.NovelId)
-            .Select(g => new { NovelId = g.Key, CollectCount = g.Count() })
-            .OrderByDescending(x => x.CollectCount)
-            .Take(topN)
-            .ToListAsync();
-
-        var novelIds = topCollected.Select(x => x.NovelId).ToList();
-
         var novelsQuery = _context.Novels
-            .Where(n => novelIds.Contains(n.NovelId));
+            .Where(n => n.CollectedCount >= 0);
 
         // 添加状态筛选
         if (!string.IsNullOrEmpty(status))
         {
             novelsQuery = novelsQuery.Where(n => n.Status == status);
         }
+        else
+        {
+            // status 为 null 时，只筛选"连载"或"完结"状态
+            novelsQuery = novelsQuery.Where(n => n.Status == "连载" || n.Status == "完结");
+        }
 
         var novels = await novelsQuery
             .Include(n => n.Author)
+            .OrderByDescending(n => n.CollectedCount)
+            .Take(topN)
             .ToListAsync();
 
-        var result = topCollected.Join(novels,
-            c => c.NovelId,
-            n => n.NovelId,
-            (c, n) => new CollectRankingDto
-            {
-                NovelId = n.NovelId,
-                NovelName = n.NovelName ?? string.Empty,
-                AuthorId = n.AuthorId,
-                AuthorName = n.Author?.AuthorName ?? "未知作者",
-                CoverUrl = n.CoverUrl ?? string.Empty,
-                Introduction = n.Introduction ?? string.Empty,
-                CollectedCount = c.CollectCount,
-                Score = n.Score,
-                TotalWordCount = n.TotalWordCount,
-                Status = n.Status ?? "未知状态",
-                TotalPrice = n.TotalPrice ?? 0,
-                RecommendCount = n.RecommendCount ?? 0,
-                CreateTime = n.CreateTime
-            })
-            .OrderByDescending(x => x.CollectedCount)
-            .ToList();
+        var result = novels.Select(n => new CollectRankingDto
+        {
+            NovelId = n.NovelId,
+            NovelName = n.NovelName ?? string.Empty,
+            AuthorId = n.AuthorId,
+            AuthorName = n.Author?.AuthorName ?? "未知作者",
+            CoverUrl = n.CoverUrl ?? string.Empty,
+            Introduction = n.Introduction ?? string.Empty,
+            CollectedCount = n.CollectedCount ?? 0,
+            Score = n.Score,
+            TotalWordCount = n.TotalWordCount,
+            Status = n.Status ?? "未知状态",
+            TotalPrice = n.TotalPrice ?? 0,
+            RecommendCount = n.RecommendCount ?? 0,
+            CreateTime = n.CreateTime
+        }).ToList();
 
         return result;
     }
@@ -67,12 +60,17 @@ public class NovelRepository : Repository<Novel, int>, INovelRepository
     public async Task<List<RecommendRankingDto>> GetTopRecommendedNovelsAsync(int topN, string? status = null)
     {
         var novelsQuery = _context.Novels
-            .Where(n => n.RecommendCount > 0);
+            .Where(n => n.RecommendCount >= 0);
 
         // 添加状态筛选
         if (!string.IsNullOrEmpty(status))
         {
             novelsQuery = novelsQuery.Where(n => n.Status == status);
+        }
+        else
+        {
+            // status 为 null 时，只筛选"连载"或"完结"状态
+            novelsQuery = novelsQuery.Where(n => n.Status == "连载" || n.Status == "完结");
         }
 
         var novels = await novelsQuery
@@ -105,12 +103,17 @@ public class NovelRepository : Repository<Novel, int>, INovelRepository
     public async Task<List<ScoreRankingDto>> GetTopScoredNovelsAsync(int topN, string? status = null)
     {
         var novelsQuery = _context.Novels
-            .Where(n => n.Score > 0);
+            .Where(n => n.Score >= 0);
 
         // 添加状态筛选
         if (!string.IsNullOrEmpty(status))
         {
             novelsQuery = novelsQuery.Where(n => n.Status == status);
+        }
+        else
+        {
+            // status 为 null 时，只筛选"连载"或"完结"状态
+            novelsQuery = novelsQuery.Where(n => n.Status == "连载" || n.Status == "完结");
         }
 
         var novels = await novelsQuery
@@ -128,7 +131,7 @@ public class NovelRepository : Repository<Novel, int>, INovelRepository
             CoverUrl = n.CoverUrl ?? string.Empty,
             Introduction = n.Introduction ?? string.Empty,
             RecommendCount = n.RecommendCount ?? 0,
-            Score = n.Score??0,
+            Score = n.Score ?? 0,
             TotalWordCount = n.TotalWordCount,
             Status = n.Status ?? "未知状态",
             TotalPrice = n.TotalPrice ?? 0,
