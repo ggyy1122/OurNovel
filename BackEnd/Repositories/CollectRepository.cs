@@ -49,6 +49,7 @@ public class CollectRepository : ICollectRepository
         return await _context.Collects
             .Include(c => c.Novel)
             .Where(c => c.ReaderId == readerId)
+            .Where(c => c.Novel.Status == "连载" || c.Novel.Status == "完结")
             .ToListAsync();
     }
 
