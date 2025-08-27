@@ -52,6 +52,7 @@ public class RecentReadingsRepository : IRecentReadingsRepository
         return await _context.RecentReadings
             .Include(r => r.Novel)
             .Where(r => r.ReaderId == readerId)
+            .Where(r => r.Novel.Status == "连载" || r.Novel.Status == "完结")
             .OrderByDescending(r => r.RecentReadingTime)  
             .ToListAsync();
     }
