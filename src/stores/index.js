@@ -75,7 +75,7 @@ export const readerState = defineStore('reader', {
         readHistoryCount: (state) => state.readHistory.length,
     },
     actions: {
-        initializeReader(id, name, password, phone, gender, balance, avatarUrl, backgroundUrl, isCollectVisible, isRecommendVisible, favoriteBooks, recommendBooks) {
+        initializeReader(id, name, password, phone, gender, balance, avatarUrl, backgroundUrl, isCollectVisible, isRecommendVisible, favoriteBooks, recommendBooks, readHistory) {
             this.readerId = id || 0;
             this.readerName = name || "";
             this.password = password || "";
@@ -89,7 +89,7 @@ export const readerState = defineStore('reader', {
 
             this.favoriteBooks = favoriteBooks || []; // 初始化收藏书籍
             this.recommendBooks = recommendBooks || []; // 初始化推荐书籍
-            this.readHistory = []; // 初始化阅读历史
+            this.readHistory = readHistory || []; // 初始化阅读历史
             this.isloggedin = true;
             this.lastLoginTime = new Date().toISOString(); // 设置最近登录时间
         },

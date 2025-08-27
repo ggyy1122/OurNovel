@@ -2,11 +2,11 @@
   <div class="introduction-section">
     <strong class="intro-label">简介：</strong>
     <p>{{ selectNovelState.introduction }}</p>
-    
+
     <div v-if="firstChapter" class="chapter-content">
       <h3>第一章</h3>
       <div class="content">{{ firstChapter }}</div>
-      
+
       <!-- 添加的继续阅读按钮 -->
       <div class="continue-reading-container">
         <button class="continue-reading-btn" @click="goToNextChapter">
@@ -21,16 +21,17 @@
 </template>
 
 <script setup>
-import { SelectNovel_State,readerState  } from '@/stores/index';
-import {getChapter} from '@/API/Chapter_API.js';
-import { watch,ref } from 'vue';
-import { useRouter} from 'vue-router';
-import {addOrUpdateRecentReading } from '@/API/Reader_API'
+import { SelectNovel_State, readerState } from '@/stores/index';
+import { getChapter } from '@/API/Chapter_API.js';
+import { watch, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { addOrUpdateRecentReading } from '@/API/Reader_API'
+import { checkPurchase } from '@/API/Purchase_API';
 
 const selectNovelState = SelectNovel_State();      //小说对象
-const ReaderState=readerState();                   //当前读者对象
-const firstChapter = ref('') ;                     // 第一章内容
-const  router =useRouter()
+const ReaderState = readerState();                   //当前读者对象
+const firstChapter = ref('');                     // 第一章内容
+const router = useRouter()
 // 继续阅读按钮点击事件
 const goToNextChapter = async () => {
   if (firstChapter.value) {
@@ -44,15 +45,35 @@ const goToNextChapter = async () => {
       console.error("记录阅读历史失败:", historyError);
       // 这里可以选择不提示用户，因为阅读历史记录失败不影响主要功能
     }
-    
+
     // 跳转到阅读页面
     router.push('/Novels/reader');
   }
 };
 //获取第一章的函数
-const fetchChapter=async(chapterId)=>{
+const fetchChapter = async (chapterId) => {
   try {
-    const response = await getChapter(selectNovelState.novelId,chapterId)
+    const response = await getChapter(selectNovelState.novelId, chapterId)
+    if (response.status === '审核中') {
+      firstChapter.value = '第1章正在审核中，请稍后再试'
+      return;
+    } else if (response.status === '封禁') {
+      firstChapter.value = '第1章已封禁，无法查看内容'
+      return;
+    } else if (response.status === '首次审核' || response.status === '草稿') {
+      return;
+    }
+    if (response.isCharged === '是') {
+      const purchaseStatus = await checkPurchase(
+        selectNovelState.readerId,
+        selectNovelState.novelId,
+        chapterId
+      );
+      if (!purchaseStatus || !purchaseStatus.hasPurchased) {
+        firstChapter.value = '第1章为付费章节，您尚未购买，无法查看'
+        return;
+      }
+    }
     selectNovelState.resetChapter(
       response.chapterId,
       response.title,
@@ -64,10 +85,9 @@ const fetchChapter=async(chapterId)=>{
       response.publishTime,
       response.status
     );
-    firstChapter.value=response.content
+    firstChapter.value = response.content
   } catch (error) {
     console.error('获取章节失败', error)
-    
   }
 }
 
@@ -92,7 +112,7 @@ watch(
 .introduction-section {
   margin: 40px 0;
   padding: 15px;
-  background-color:  #edf1f1ff;
+  background-color: #edf1f1ff;
   border-radius: 5px;
 }
 
@@ -115,7 +135,8 @@ watch(
 }
 
 .content {
-  white-space: pre-line; /* 保留换行符 */
+  white-space: pre-line;
+  /* 保留换行符 */
   line-height: 1.6;
 }
 
@@ -129,7 +150,8 @@ watch(
   background-color: white;
   color: #333;
   border: 1px solid #ddd;
-  border-radius: 20px; /* 圆角胶囊形状 */
+  border-radius: 20px;
+  /* 圆角胶囊形状 */
   padding: 10px 25px;
   font-size: 16px;
   cursor: pointer;

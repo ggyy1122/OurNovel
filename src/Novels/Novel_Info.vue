@@ -237,8 +237,8 @@
       </div>
 
       <div class="balance-info">
-        <span>账户余额 {{ accountBalance }} 起点币</span>
-        <span>本次打赏 {{ selectedReward }} 起点币</span>
+        <span>账户余额 {{ accountBalance }} 元</span>
+        <span>本次打赏 {{ selectedReward }} 元</span>
       </div>
       <button class="confirm-reward-btn" @click="confirmReward">
         确认打赏
@@ -254,8 +254,8 @@
       <div class="insufficient-content">
         <p class="insufficient-message">账户余额不足</p>
         <div class="amount-info">
-          <span>本次打赏 {{ selectedReward }} 起点币</span>
-          <span>账户余额 {{ accountBalance }} 起点币·还差 {{ selectedReward - accountBalance }} 起点币</span>
+          <span>本次打赏 {{ selectedReward }} 元</span>
+          <span>账户余额 {{ accountBalance }} 元·还差 {{ (selectedReward - accountBalance).toFixed(2) }} 元</span>
         </div>
         <div class="quick-payment">
           <button class="recharge-btn" @click="goToRecharge">去充值</button>
@@ -297,7 +297,7 @@ const showRecommendDialog = ref(false);               // 是否显示推荐弹�
 const recommendReason = ref('');                     // 用户输入的推荐理由
 const showRewardDialog = ref(false);                  // 是否显示打赏弹窗
 const accountBalance = ref(0);                        // 账号余额
-const selectedReward = ref(100);                      // 默认选中100点打赏金额
+const selectedReward = ref(1);                      // 默认选中1点打赏金额
 const chapterId = ref(null)
 const publishTime = ref(null)
 const hasChapter = ref(false)
@@ -310,14 +310,14 @@ const hoverRating = ref(null);
 const defaultCoverImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E书籍封面%3C/text%3E%3C/svg%3E";// 默认封面图片
 const defaultAuthorAvatar = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E作者头像%3C/text%3E%3C/svg%3E";// 默认作者头像
 const rewardOptions = [
-  { value: 10, label: '10点' },
-  { value: 100, label: '100点' },
-  { value: 500, label: '500点' },
-  { value: 1000, label: '1000点' },
-  { value: 2000, label: '2000点' },
-  { value: 10000, label: '1万点' },
-  { value: 50000, label: '5万点' },
-  { value: 100000, label: '10万点' }
+  { value: 1, label: '1元' },
+  { value: 10, label: '10元' },
+  { value: 50, label: '50元' },
+  { value: 100, label: '100元' },
+  { value: 200, label: '200元' },
+  { value: 1000, label: '1千元' },
+  { value: 5000, label: '5千元' },
+  { value: 10000, label: '1万元' }
 ];
 
 
@@ -327,12 +327,12 @@ const isCollected = computed(() => {
   const currentNovelId = selectNovelState.novelId;
   //console.log("是否收藏",currentNovelId)
   //  console.log("本地收藏",ReaderState.favoriteBooks)
-  const a=ReaderState.favoriteBooks.some(item =>
+  const a = ReaderState.favoriteBooks.some(item =>
     item.novelId === currentNovelId)
-   // console.log("a",a)
+  // console.log("a",a)
   // 检查是否存在于收藏列表
   return a
-  
+
 })
 //是否被推荐
 const isRecommended = computed(() => {
@@ -584,7 +584,7 @@ const toggleCollect = async () => {
         {
           novelId: currentNovelId,
           novel: selectNovelState, // 保存完整作品信息
-          readerId:currentReaderId,
+          readerId: currentReaderId,
           isPublic: "no",
           collectTime: new Date().toISOString()
         }
@@ -610,8 +610,8 @@ const toggleCollect = async () => {
 async function handleRead() {
   try {
     const response = await getChapter(selectNovelState.novelId, 1);
-    if (response.status !== '已发布') {
-      toast("第1章未发布!", {
+    if (response.status === '首次审核' || response.status === '草稿') {
+      toast("暂无第1章", {
         "type": "info",
         "dangerouslyHTMLString": true
       });
@@ -643,7 +643,7 @@ async function handleRead() {
       response.publishTime,
       response.status
     );
-    
+
     // 添加或更新阅读记录
     try {
       // 假设readerId可以从用户状态获取，这里用selectNovelState.readerId表示
@@ -655,7 +655,7 @@ async function handleRead() {
       console.error("记录阅读历史失败:", historyError);
       // 这里可以选择不提示用户，因为阅读历史记录失败不影响主要功能
     }
-    
+
     // 跳转到阅读页面
     router.push('/Novels/reader');
   } catch (error) {
@@ -775,7 +775,7 @@ const confirmReward = async () => {
     });
     readerState.balance -= currentvalue; // 更新余额
     // 3. 处理成功结果
-    toast(`成功打赏 ${currentvalue} 起点币`, {
+    toast(`成功打赏 ${currentvalue} 元`, {
       type: "success", // 改为 success 类型
       dangerouslyHTMLString: true
     });
