@@ -203,8 +203,16 @@ app.UseAuthentication();
 // 授权中间件（如果后续启用认证）
 app.UseAuthorization();
 
+// 提供静态文件（如 JS, CSS, 图片等），这些文件通常放在 wwwroot 目录下
+app.UseStaticFiles();
+// 配置默认文件（例如 index.html）
+app.UseDefaultFiles();
+
 // 映射控制器路由
 app.MapControllers();
+
+// 这个中间件会捕获所有未被其他路由匹配的请求，并返回 index.html
+app.MapFallbackToFile("index.html");
 
 // 启动应用
 app.Run();
