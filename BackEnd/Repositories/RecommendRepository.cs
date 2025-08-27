@@ -36,6 +36,7 @@ public class RecommendRepository : IRecommendRepository
         return await _context.Recommends
             .Include(r => r.Novel)
             .Where(r => r.ReaderId == readerId)
+            .Where(r => r.Novel.Status == "连载" || r.Novel.Status == "完结")
             .ToListAsync();
     }
 
