@@ -66,7 +66,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { current_state, readerState } from '@/stores/index';
 import { loginAuthor, loginManager, loginReader } from '@/API/Log_API';
-import { getReader } from '@/API/Reader_API';
+import { getReader, getRecentReadingsByReaderId } from '@/API/Reader_API';
 import { getCollectsByReader } from '@/API/Collect_API';
 import { getRecommendsByReader } from '@/API/Recommend_API';
 import { toast } from "vue3-toastify";
@@ -110,6 +110,8 @@ const handleLogin = async () => {
                 const readerDetails = await getReader(response.readerId);
                 const response_collect = await getCollectsByReader(response.readerId);
                 const response_recommend = await getRecommendsByReader(response.readerId);
+                const response_readHistory = await getRecentReadingsByReaderId(response.readerId);
+
 
                 reader_state.initializeReader(readerDetails.readerId,
                     readerDetails.readerName,
@@ -122,7 +124,8 @@ const handleLogin = async () => {
                     readerDetails.isCollectVisible,
                     readerDetails.isRecommendVisible,
                     response_collect,
-                    response_recommend
+                    response_recommend,
+                    response_readHistory
                 );
                 router.push('/Novels/Novel_Layout/home');
             } else if (state.value === 1) { // 作者

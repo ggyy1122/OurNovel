@@ -63,7 +63,7 @@
             <button class="close-btn" @click="showPurchaseModal = false">×</button>
           </div>
           <div class="modal-body">
-            <p>本书整本价格为 <strong>￥{{ (selectNovelState.totalPrice / 100).toFixed(2) }}</strong></p>
+            <p>本书整本价格为 <strong>￥{{ selectNovelState.totalPrice }}</strong></p>
           </div>
           <div class="modal-footer">
             <button class="confirm-btn" @click="confirmPurchase">确认购买</button>
@@ -79,9 +79,9 @@
           <div class="insufficient-content">
             <p class="insufficient-message">账户余额不足</p>
             <div class="amount-info">
-              <span>本次购买 {{ (selectNovelState.totalPrice / 100).toFixed(2) }} 元</span>
-              <span>账户余额 {{ (readerStore.balance / 100).toFixed(2) }} 元·还差 {{ ((selectNovelState.totalPrice -
-                readerStore.balance) / 100).toFixed(2) }} 元</span>
+              <span>本次购买 {{ selectNovelState.totalPrice }} 元</span>
+              <span>账户余额 {{ readerStore.balance }} 元·还差 {{ (selectNovelState.totalPrice - readerStore.balance) }}
+                元</span>
             </div>
             <div class="quick-payment">
               <button class="recharge-btn" @click="goToRecharge">去充值</button>
@@ -94,12 +94,12 @@
         <div class="purchase-dialog">
           <div class="dialog-header"
             style="display: flex; justify-content: center; align-items: center; position: relative;">
-            <h3 style="margin: 0;">购买章节</h3>
+            <h3 style="margin: 0;">购买第{{ selectedChapter.chapterId }}章</h3>
             <button class="da_close-btn" @click="showChapterPurchaseDialog = false"
               style="position: absolute; right: 20px;">&times;</button>
           </div>
           <div class="purchase-content">
-            <p>本章节价格为 ￥{{ (selectedChapter.calculatedPrice / 100).toFixed(2) }}</p>
+            <p>本章节价格为 ￥{{ selectedChapter.calculatedPrice }}</p>
           </div>
           <button class="confirm-reward-btn" @click="purchase_Chapter">
             确认购买
@@ -116,8 +116,8 @@
           <div class="purchase-insufficient-content">
             <p class="purchase-insufficient-message">账户余额不足，无法购买本章节</p>
             <div class="purchase-amount-info">
-              <span>章节价格：{{ (selectedChapter.calculatedPrice / 100).toFixed(2) }}元</span>
-              <span>当前余额：{{ (readerStore.balance / 100).toFixed(2) }}元</span>
+              <span>章节价格：{{ selectedChapter.calculatedPrice }}元</span>
+              <span>当前余额：{{ readerStore.balance }}元</span>
             </div>
             <div class="purchase-action-buttons">
               <button class="purchase-recharge-btn" @click="goToRecharge">立即充值</button>
@@ -132,7 +132,7 @@
 
 <script setup>
 import { ref, onMounted, computed, nextTick } from 'vue'
-import { getNovelChaptersWithoutContent } from '@/API/Chapter_API'
+import { getNovelChaptersWithoutContent, getChapter } from '@/API/Chapter_API'
 import { getWholePurchaseStatus, purchaseWholeNovel } from '@/API/Transaction_API'
 import { readerState, SelectNovel_State } from '@/stores/index'
 import { toast } from 'vue3-toastify'
@@ -164,7 +164,7 @@ const selectedChapter = ref(null)
 
 // 过滤掉草稿章节
 const visibleChapters = computed(() =>
-  chapterList.value.filter(ch => ch.status !== '草稿')
+  chapterList.value.filter(ch => ch.status !== '草稿' && ch.status !== '首次审核')
 );
 
 // 总页数
@@ -179,7 +179,7 @@ onMounted(async () => {
     // 获取所有章节的购买状态
     const chaptersWithPurchaseStatus = await Promise.all(
       response
-        .filter(chapter => chapter.status !== '草稿')
+        .filter(chapter => chapter.status !== '草稿' && chapter.status !== '首次审核')
         .map(async chapter => {
           // 如果是收费章节，检查是否已购买
           if (chapter.isCharged === '是') {
@@ -296,23 +296,14 @@ function isDisabled(chapter) {
 
 // 处理章节点击
 async function handleChapterClick(chapter) {
-  if (isDisabled(chapter)) return;
-
-  // 如果是收费章节且未购买，显示购买弹窗
-  if (chapter.isCharged === '是' && !chapter.hasPurchased && !hasPurchased.value) {
-    selectedChapter.value = chapter;
-    showChapterPurchaseDialog.value = true;
-    return;
-  }
   try {
-    if (chapter.status !== '已发布') {
-      toast("第" + chapter.chapterId + "章未发布!", {
-        "type": "info",
-        "dangerouslyHTMLString": true
-      });
+    // 如果是收费章节且未购买，显示购买弹窗
+    if (chapter.isCharged === '是' && !chapter.hasPurchased && !hasPurchased.value) {
+      selectedChapter.value = chapter;
+      showChapterPurchaseDialog.value = true;
       return;
     }
-    selectChapter(chapter);
+    selectChapter(chapter.chapterId);
   } catch (error) {
     toast("章节加载失败!", {
       "type": "info",
@@ -347,12 +338,15 @@ async function purchase_Chapter() {
       }
       await updateDisplayedChapters();
       readerStore.balance -= selectedChapter.value.calculatedPrice;
+      showChapterPurchaseDialog.value = false;
       toast("购买成功！", {
         type: "success",
         dangerouslyHTMLString: true
       });
+      //停顿2s
+      await new Promise(resolve => setTimeout(resolve, 2000));
       // 跳转到该章节
-      selectChapter(selectedChapter.value);
+      selectChapter(selectedChapter.value.chapterId);
     } else {
       toast("购买失败: " + (response.message || "未知错误"), {
         type: "error",
@@ -376,26 +370,35 @@ async function purchase_Chapter() {
 }
 
 // 选中章节后存入全局状态
-function selectChapter(chapter) {
-  selectNovelState.resetChapter(
-    chapter.chapterId,
-    chapter.title,
-    chapter.content,
-    chapter.wordCount,
-    chapter.pricePerKilo,
-    chapter.calculatedPrice,
-    chapter.isCharged,
-    chapter.publishTime,
-    chapter.status
-  );
-  router.push('/Novels/reader');
+async function selectChapter(chapterId) {
+  try {
+    const response = await getChapter(novelId, chapterId);
+    selectNovelState.resetChapter(
+      response.chapterId,
+      response.title,
+      response.content,
+      response.wordCount,
+      response.pricePerKilo,
+      response.calculatedPrice,
+      response.isCharged,
+      response.publishTime,
+      response.status
+    );
+    router.push('/Novels/reader');
+  } catch (error) {
+    toast("第" + chapterId + "章加载失败!", {
+      type: "error",
+      dangerouslyHTMLString: true
+    });
+    console.error('获取章节内容失败:', error);
+  }
 }
 </script>
 
 <style scoped>
 .chapter-list {
   padding: 20px;
-  background-color:  #edf1f1ff;
+  background-color: #edf1f1ff;
   border-radius: 8px;
 }
 
@@ -417,7 +420,6 @@ function selectChapter(chapter) {
 
 .chapter-item.banned {
   background-color: #e0e0e0;
-  cursor: not-allowed;
 }
 
 .chapter-info {

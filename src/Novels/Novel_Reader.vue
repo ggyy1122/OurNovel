@@ -133,7 +133,7 @@
                 </div>
                 <div class="novel-content"
                     :style="{ fontSize: fontSize + 'px', fontFamily: fontFamily, color: textColor }"
-                    v-html="formatContent(selectNovelState.cha_content)">
+                    v-html="getFormattedContent()">
                 </div>
                 <div class="chapter-nav-buttons">
                     <button class="nav-button prev" @click="changeChapter(-1)">上一章</button>
@@ -212,9 +212,9 @@
                             <div v-for="reply in comment.replies" :key="reply.commentId" class="reply-item">
                                 <div class="reply-header">
                                     <img :src="getReaderAvatar(reply.readerId)" alt="用户头像" class="reply-avatar"
-                                        @error="handleAvatarError" @click="goReaderHome(comment.readerId)" />
+                                        @error="handleAvatarError" @click="goReaderHome(reply.readerId)" />
                                     <div class="reply-info">
-                                        <span class="reply-author" @click="goReaderHome(comment.readerId)">{{
+                                        <span class="reply-author" @click="goReaderHome(reply.readerId)">{{
                                             getReaderName(reply.readerId) }}</span>
                                         <span class="reply-time">{{ formatTime(reply.createTime) }}</span>
                                     </div>
@@ -385,8 +385,8 @@
                     </div>
                 </div>
                 <div class="balance-info">
-                    <span>账户余额 {{ accountBalance }} 起点币</span>
-                    <span>本次打赏 {{ selectedReward }} 起点币</span>
+                    <span>账户余额 {{ accountBalance }} 元</span>
+                    <span>本次打赏 {{ selectedReward }} 元</span>
                 </div>
                 <button class="confirm-reward-btn" @click="confirmReward">
                     确认打赏
@@ -402,8 +402,8 @@
                 <div class="insufficient-content">
                     <p class="insufficient-message">账户余额不足</p>
                     <div class="amount-info">
-                        <span>本次打赏 {{ selectedReward }} 起点币</span>
-                        <span>账户余额 {{ accountBalance }} 起点币·还差 {{ selectedReward - accountBalance }} 起点币</span>
+                        <span>本次打赏 {{ selectedReward }} 元</span>
+                        <span>账户余额 {{ accountBalance }} 元·还差 {{ (selectedReward - accountBalance).toFixed(2) }} 元</span>
                     </div>
                     <div class="quick-payment">
                         <button class="recharge-btn" @click="goToRecharge">去充值</button>
@@ -435,12 +435,12 @@
         <div class="purchase-dialog">
             <div class="dialog-header"
                 style="display: flex; justify-content: center; align-items: center; position: relative;">
-                <h3 style="margin: 0;">购买章节</h3>
+                <h3 style="margin: 0;">购买第{{ selectedChapter.chapterId }}章</h3>
                 <button class="da_close-btn" @click="showPurchaseDialog = false"
                     style="position: absolute; right: 20px;">&times;</button>
             </div>
             <div class="purchase-content">
-                <p>本章节价格为 ￥{{ (selectedChapter.calculatedPrice / 100).toFixed(2) }}</p>
+                <p>本章节价格为 ￥{{ selectedChapter.calculatedPrice }}</p>
             </div>
             <button class="confirm-reward-btn" @click="purchase_Chapter">
                 确认购买
@@ -457,8 +457,8 @@
             <div class="purchase-insufficient-content">
                 <p class="purchase-insufficient-message">账户余额不足，无法购买本章节</p>
                 <div class="purchase-amount-info">
-                    <span>章节价格：{{ (selectedChapter.calculatedPrice / 100).toFixed(2) }}元</span>
-                    <span>当前余额：{{ (accountBalance / 100).toFixed(2) }}元</span>
+                    <span>章节价格：{{ selectedChapter.calculatedPrice }}元</span>
+                    <span>当前余额：{{ accountBalance }}元</span>
                 </div>
                 <div class="purchase-action-buttons">
                     <button class="purchase-recharge-btn" @click="goToRecharge">立即充值</button>
@@ -501,7 +501,7 @@ const selectedChapter = ref(null);
 const showPurchaseInsufficientDialog = ref(false); // 购买余额不足弹窗状态
 // 打赏相关状态和函数
 const accountBalance = ref(0);                      // 账号余额
-const selectedReward = ref(100);                    // 默认选中100点打赏金额
+const selectedReward = ref(1);                    // 默认选中1点打赏金额
 const showBalanceInsufficientDialog = ref(false);   // 是否显示余额不足弹窗
 const showComments = ref(false);
 const comments = ref([]);
@@ -513,14 +513,14 @@ const likedComments = ref(new Set()); // 存储已点赞的评论ID
 const topN = ref(10); // 获取点赞数前10的评论
 const expandedReplies = ref(new Set());
 const rewardOptions = [
-    { value: 10, label: '10点' },
-    { value: 100, label: '100点' },
-    { value: 500, label: '500点' },
-    { value: 1000, label: '1000点' },
-    { value: 2000, label: '2000点' },
-    { value: 10000, label: '1万点' },
-    { value: 50000, label: '5万点' },
-    { value: 100000, label: '10万点' }
+    { value: 1, label: '1元' },
+    { value: 10, label: '10元' },
+    { value: 50, label: '50元' },
+    { value: 100, label: '100元' },
+    { value: 200, label: '200元' },
+    { value: 1000, label: '1千元' },
+    { value: 5000, label: '5千元' },
+    { value: 10000, label: '1万元' }
 ];
 
 function goToLogin() {
@@ -656,29 +656,24 @@ async function changeChapter(num) {
             return;
         }
         const nextChapterId = selectNovelState.chapterId + num;
-        const response = await getChapter(selectNovelState.novelId, nextChapterId);
-        if (response.status !== '已发布') {
-            toast("第" + nextChapterId + "章未发布!", {
+        // 查找下一章的信息
+        const nextChapter = chapters.value.find(ch => ch.chapterId === nextChapterId);
+        if (!nextChapter) {
+            toast("未找到章节信息", {
                 "type": "info",
                 "dangerouslyHTMLString": true
             });
             return;
         }
         // 检查章节购买状态
-        if (response.isCharged === '是') {
-            const purchaseStatus = await checkPurchase(
-                reader_state.readerId,
-                selectNovelState.novelId,
-                nextChapterId
-            );
-            if (!purchaseStatus?.hasPurchased) {
-                toast("第" + nextChapterId + "章需要购买后才能阅读", {
-                    "type": "info",
-                    "dangerouslyHTMLString": true
-                });
-                return;
-            }
+        if (nextChapter.isCharged === '是' && !nextChapter.hasPurchased) {
+            // 显示购买弹窗
+            selectedChapter.value = nextChapter;
+            showPurchaseDialog.value = true;
+            return;
         }
+        // 获取章节内容
+        const response = await getChapter(selectNovelState.novelId, nextChapterId);
         selectNovelState.resetChapter(
             response.chapterId,
             response.title,
@@ -695,6 +690,7 @@ async function changeChapter(num) {
         router.push('/Novels/reader');
         scrollToTop();
     } catch (error) {
+        console.error('切换章节失败:', error);
         toast("章节加载失败", {
             "type": "info",
             "dangerouslyHTMLString": true
@@ -725,7 +721,7 @@ const fetchChapters = async () => {
         // 获取所有章节的购买状态
         const chaptersWithPurchaseStatus = await Promise.all(
             response
-                .filter(chapter => chapter.status !== '草稿')
+                .filter(chapter => chapter.status !== '草稿' && chapter.status !== '首次审核')
                 .map(async chapter => {
                     // 如果是收费章节，检查是否已购买
                     if (chapter.isCharged === '是') {
@@ -778,6 +774,7 @@ const toggleSortOrder = () => {
     sortAscending.value = !sortAscending.value;
 };
 
+// 购买章节函数，购买成功后刷新章节内容
 const purchase_Chapter = async () => {
     try {
         if (accountBalance.value < selectedChapter.value.calculatedPrice) {
@@ -803,8 +800,26 @@ const purchase_Chapter = async () => {
                 type: "success",
                 dangerouslyHTMLString: true
             });
-            // 跳转到该章节
-            goToChapter(selectedChapter.value);
+            // 获取章节内容并跳转
+            const chapterContent = await getChapter(
+                selectedChapter.value.novelId,
+                selectedChapter.value.chapterId
+            );
+            selectNovelState.resetChapter(
+                chapterContent.chapterId,
+                chapterContent.title,
+                chapterContent.content,
+                chapterContent.wordCount,
+                chapterContent.pricePerKilo,
+                chapterContent.calculatedPrice,
+                chapterContent.isCharged,
+                chapterContent.publishTime,
+                chapterContent.status
+            );
+            comments.value = [];
+            showComments.value = false;
+            showPurchaseDialog.value = false;
+            scrollToTop();
         } else {
             toast("购买失败: " + (response.message || "未知错误"), {
                 type: "error",
@@ -830,20 +845,13 @@ const purchase_Chapter = async () => {
 // goToChapter 函数，使用章节级别的购买状态
 const goToChapter = async (chapter) => {
     try {
-        const response = await getChapter(chapter.novelId, chapter.chapterId);
-        if (response.status !== '已发布') {
-            toast("第" + chapter.chapterId + "章未发布!", {
-                "type": "info",
-                "dangerouslyHTMLString": true
-            });
-            return;
-        }
         // 如果是收费章节且未购买，显示购买弹窗
         if (chapter.isCharged === '是' && !chapter.hasPurchased) {
             selectedChapter.value = chapter;
             showPurchaseDialog.value = true;
             return;
         }
+        const response = await getChapter(chapter.novelId, chapter.chapterId);
         selectNovelState.resetChapter(
             response.chapterId,
             response.title,
@@ -860,12 +868,33 @@ const goToChapter = async (chapter) => {
         showCatalog.value = false;
         scrollToTop();
     } catch (error) {
+        console.error('打开章节失败:', error);
         toast("章节加载失败!", {
             "type": "info",
             "dangerouslyHTMLString": true
         });
     }
 };
+
+// 添加获取格式化内容的函数
+const getFormattedContent = () => {
+    // 检查章节状态
+    if (selectNovelState.cha_status === '封禁') {
+        fontSize.value = 30;
+        return '<div style="text-align: center; padding: 50px; color: #f56c6c;">该章节已封禁，无法查看内容</div>';
+    } else if (selectNovelState.cha_status === '审核中') {
+        fontSize.value = 30;
+        return '<div style="text-align: center; padding: 50px; color: #e6a23c;">该章节正在审核中，请稍后再试</div>';
+    }
+    // 正常章节显示内容
+    fontSize.value = 18;
+    return formatContent(selectNovelState.cha_content);
+};
+
+// 添加计算属性来判断是否禁用评论和听书
+const isChapterDisabled = computed(() => {
+    return ['封禁', '审核中'].includes(selectNovelState.cha_status);
+});
 
 // 选择打赏金额
 const selectReward = (value) => {
@@ -901,7 +930,7 @@ const confirmReward = async () => {
             amount: currentvalue
         });
         reader_state.balance -= currentvalue;
-        toast(`成功打赏 ${currentvalue} 起点币`, {
+        toast(`成功打赏 ${currentvalue} 元`, {
             type: "success",
             dangerouslyHTMLString: true
         });
@@ -919,6 +948,13 @@ const confirmReward = async () => {
 };
 // 切换评论显示
 const toggleComments = () => {
+    if (isChapterDisabled.value) {
+        toast("当前章节无法查看评论", {
+            "type": "warning",
+            "dangerouslyHTMLString": true
+        });
+        return;
+    }
     showComments.value = !showComments.value;
     if (showComments.value && comments.value.length === 0) {
         fetchComments();
@@ -1208,6 +1244,13 @@ onMounted(() => {
 });
 
 const toggleTextToSpeech = () => {
+    if (isChapterDisabled.value) {
+        toast("当前章节无法使用听书功能", {
+            "type": "warning",
+            "dangerouslyHTMLString": true
+        });
+        return;
+    }
     if (!speechSynthesis.value) {
         toast("您的浏览器不支持语音合成功能", { type: "error" });
         return;
@@ -1281,6 +1324,7 @@ watch(
     }
 );
 onMounted(() => {
+    fetchReaderBalance();
     window.addEventListener('keydown', handleKeyDown);
     fetchChapters();
     scrollToTop();
@@ -2769,6 +2813,10 @@ button.active {
     margin-right: 8px;
 }
 
+.reply-avatar:hover {
+    transform: scale(1.1);
+}
+
 .reply-info {
     flex: 1;
 }
@@ -2777,6 +2825,10 @@ button.active {
     font-weight: bold;
     font-size: 13px;
     color: #333;
+}
+
+.reply-author:hover {
+    color: #f0940a;
 }
 
 .reply-time {

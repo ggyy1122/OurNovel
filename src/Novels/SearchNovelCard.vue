@@ -129,8 +129,8 @@ async function handleRead() {
     try {
         await handle();
         const response = await getChapter(props.novel.novelId, 1);
-        if (response.status !== '已发布') {
-            toast("第1章未发布!", {
+        if (response.status === '首次审核' || response.status === '草稿') {
+            toast("暂无第1章", {
                 "type": "info",
                 "dangerouslyHTMLString": true
             });

@@ -56,12 +56,12 @@
                     <div class="nums-row">
                         <span>
                             收藏数
-                            <span class="num">{{ reader.isCollectVisible === '是' ? collects.length : '隐藏' }}</span>
+                            <span class="num">{{ reader.isCollectVisible !== '否' ? collects.length : '已隐藏' }}</span>
                         </span>
                         <span class="sep">|</span>
                         <span>
                             推荐数
-                            <span class="num">{{ reader.isRecommendVisible === '是' ? recommends.length : '隐藏' }}</span>
+                            <span class="num">{{ reader.isRecommendVisible !== '否' ? recommends.length : '已隐藏' }}</span>
                         </span>
                     </div>
                     <div class="intro">
