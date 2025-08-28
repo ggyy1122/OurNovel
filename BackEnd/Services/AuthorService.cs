@@ -156,5 +156,17 @@ namespace OurNovel.Services
                 .OrderBy(n => n.NovelId)
                 .ToListAsync();
         }
+
+        /// <summary>
+        /// 根据作者 ID 获取该作者的筛选为‘连载和完结’的小说
+        /// </summary>
+        public async Task<List<Novel>> GetNovelsByAuthorIdWithScreeningAsync(int authorId)
+        {
+            return await _context.Novels
+                .Where(n => n.AuthorId == authorId)
+                .Where(n => n.Status == "连载" || n.Status == "完结")
+                .OrderBy(n => n.NovelId)
+                .ToListAsync();
+        }
     }
 }
