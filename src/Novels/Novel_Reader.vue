@@ -127,7 +127,7 @@
                         <span>书名：{{ selectNovelState.novelName }}</span>
                         <span>作者：{{ selectNovelState.authorName }}</span>
                         <span>本章字数：{{ selectNovelState.cha_wordCount }}</span>
-                        <span>更新时间：{{ selectNovelState.cha_publishTime }}</span>
+                        <span>更新时间：{{ selectNovelState.cha_publishTime.replace('T', ' ') }}</span>
                     </div>
                     <div class="chapter-divider"></div>
                 </div>

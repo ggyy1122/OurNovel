@@ -47,6 +47,7 @@ import { getAuthor } from '@/API/Author_API';
 import { addOrUpdateCollect } from '@/API/Collect_API';
 import { getChapter } from '@/API/Chapter_API';
 import { checkPurchase } from '@/API/Purchase_API';
+import { addOrUpdateRecentReading } from '@/API/Reader_API';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 const props = defineProps({
@@ -162,6 +163,17 @@ async function handleRead() {
             response.publishTime,
             response.status
         );
+
+        // 添加或更新阅读记录
+        try {
+            await addOrUpdateRecentReading(
+                reader_state.readerId,      // 读者ID
+                selectNovelState.novelId    // 小说ID
+            );
+        } catch (historyError) {
+            console.error("记录阅读历史失败:", historyError);
+        }
+
         router.push('/Novels/reader');
     } catch (error) {
         toast("章节加载失败：第1章不存在！", {

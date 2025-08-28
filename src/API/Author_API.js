@@ -136,12 +136,12 @@ export function getAuthorRegisterDays(authorId) {
 /** 
  * 获取作者的所有小说
  * @param {number} authorId - 参数：作者ID
- * @returns {Promise<Array<Novel>>} - 返回作者的小说数组
+ * @returns {Promise<Array<Novel>>} - 获取该作者的筛选为‘连载和完结’的小说
  * @typedef {Object} Novel - 小说对象
  */
 export function getAuthorNovels(authorId) {
     return request({
-        url: `/api/Author/${authorId}/novels`,
+        url: `/api/Author/${authorId}/novel`,
         method: 'get'
     })
 }

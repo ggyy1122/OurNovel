@@ -36,17 +36,45 @@
 
       <button type="submit" :disabled="phoneError">保存修改</button>
     </form>
+
+    <!-- 账号注销区域 -->
+    <div class="account-deletion">
+      <h3>账号管理</h3>
+      <p>永久删除您的账号及相关所有数据。此操作不可撤销，请谨慎操作。</p>
+      <button class="delete-account-btn" @click="confirmAccountDeletion">
+        注销账号
+      </button>
+    </div>
+
+    <!-- 确认对话框 -->
+    <div v-if="showDeleteConfirm" class="modal-overlay">
+      <div class="confirmation-dialog">
+        <h3>确认注销账号</h3>
+        <p>您确定要永久删除您的账号吗？此操作将：</p>
+        <ul>
+          <li>删除所有个人数据</li>
+          <li>清除阅读记录和收藏</li>
+          <li>无法恢复账号和相关信息</li>
+        </ul>
+        <div class="dialog-actions">
+          <button class="cancel-btn" @click="showDeleteConfirm = false">取消</button>
+          <button class="confirm-delete-btn" @click="deleteAccount">确认注销</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { readerState } from '@/stores/index'
-import { updateReader, uploadReaderAvatar } from '@/API/Reader_API'
+import { updateReader, uploadReaderAvatar, deleteReader } from '@/API/Reader_API'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
+import { useRouter } from 'vue-router'
 
 const store = readerState()
+const router = useRouter()
 
 const readerName = ref('')
 const phone = ref('')
@@ -55,6 +83,7 @@ const avatarFile = ref(null)
 const avatarPreviewUrl = ref('')
 const apiResponseAvatar = ref(null)
 const defaultAvatar = 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg'
+const showDeleteConfirm = ref(false)
 
 // 计算属性验证电话号码
 const phoneError = computed(() => {
@@ -150,6 +179,29 @@ async function saveReaderChanges() {
     avatarPreviewUrl.value = getFormattedAvatarUrl(store.avatarUrl)
   } catch (error) {
     toast.error('修改失败，请稍后再试')
+  }
+}
+
+// 账号注销相关功能
+function confirmAccountDeletion() {
+  showDeleteConfirm.value = true
+}
+
+async function deleteAccount() {
+  try {
+    await deleteReader(store.readerId)
+    toast.success('账号已成功注销')
+    // 清除用户状态
+    store.resetReaderInfo()
+    //停顿1.5s
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    // 跳转到登录页面或首页
+    router.push('/L_R/Login')
+  } catch (error) {
+    toast.error('注销账号失败，请稍后再试')
+    console.error('注销账号错误:', error)
+  } finally {
+    showDeleteConfirm.value = false
   }
 }
 </script>
@@ -269,7 +321,6 @@ select:focus {
   font-weight: bold;
 }
 
-
 input[type="checkbox"] {
   transform: scale(1.2);
   accent-color: #ed424b;
@@ -287,6 +338,7 @@ button[type="submit"] {
   font-size: 18px;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.1s;
+  margin-bottom: 30px;
 }
 
 button[type="submit"]:hover:not(:disabled) {
@@ -300,5 +352,117 @@ button[type="submit"]:active:not(:disabled) {
 button[type="submit"]:disabled {
   background-color: #ccc;
   cursor: not-allowed;
+}
+
+/* 账号注销区域样式 */
+.account-deletion {
+  margin-top: 40px;
+  padding: 20px;
+  border-top: 1px solid #eaeaea;
+  text-align: center;
+}
+
+.account-deletion h3 {
+  color: #ff4d4f;
+  margin-bottom: 15px;
+}
+
+.account-deletion p {
+  color: #666;
+  margin-bottom: 20px;
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+
+.delete-account-btn {
+  padding: 12px 24px;
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.delete-account-btn:hover {
+  background-color: #d9363e;
+}
+
+/* 确认对话框样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.confirmation-dialog {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  max-width: 450px;
+  width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.confirmation-dialog h3 {
+  color: #ff4d4f;
+  margin-bottom: 15px;
+}
+
+.confirmation-dialog p {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.confirmation-dialog ul {
+  margin-bottom: 20px;
+  padding-left: 20px;
+  color: #666;
+}
+
+.confirmation-dialog li {
+  margin-bottom: 8px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.cancel-btn {
+  padding: 10px 20px;
+  background-color: #f0f0f0;
+  color: #333;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.cancel-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.confirm-delete-btn {
+  padding: 10px 20px;
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.confirm-delete-btn:hover {
+  background-color: #d9363e;
 }
 </style>
