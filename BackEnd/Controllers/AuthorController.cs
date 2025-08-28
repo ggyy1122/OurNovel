@@ -100,5 +100,15 @@ namespace OurNovel.Controllers
             var novels = await _authorService.GetNovelsByAuthorIdAsync(authorId);
             return Ok(novels);
         }
+
+        /// <summary>
+        /// 根据作者 ID 获取该作者的筛选为‘连载和完结’的小说
+        /// </summary>
+        [HttpGet("{authorId}/novel")]
+        public async Task<IActionResult> GetAuthorNovelWithScreening(int authorId)
+        {
+            var novels = await _authorService.GetNovelsByAuthorIdWithScreeningAsync(authorId);
+            return Ok(novels);
+        }
     }
 }
