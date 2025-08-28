@@ -8,24 +8,24 @@ export const carouselItems_data = [
 
 // 精选小说ID
 export const featuredNovelIds = {
-    male: [166, 167, 168, 169, 170, 222], // 男频小说ID
-    female: [169, 170, 222, 263, 183, 462] // 女频小说ID
+    male: [166, 167, 168, 169, 183, 222, 263, 422], // 男频小说ID
+    female: [462, 484, 501, 521, 561, 581, 601, 621] // 女频小说ID
 }
 
 // 作者ID列表
 export const authorIds = [62, 201, 123]
 
 // 小说ID列表
-export const novelIds = [166, 167, 168, 169, 170, 222, 263, 183, 462]
+export const novelIds = [166, 167, 168, 169, 183, 222, 263, 422]
 
 
 // 专栏轮播小说数据
 export const carouselNovels_data = [
-    { novelId: 170, novelName: '如意姑娘的', coverUrl: require('@/assets/side1.jpg') },
-    { novelId: 170, novelName: '写给鼹鼠先生的情', coverUrl: require('@/assets/side2.jpg') },
-    { novelId: 170, novelName: '问九卿', coverUrl: require('@/assets/side3.jpg') },
-    { novelId: 170, novelName: '昭娇', coverUrl: require('@/assets/side4.jpg') },
-    { novelId: 170, novelName: '岁时来仪', coverUrl: require('@/assets/side5.jpg') }
+    { novelId: 462, novelName: '如意姑娘的', coverUrl: require('@/assets/side1.jpg') },
+    { novelId: 462, novelName: '写给鼹鼠先生的情', coverUrl: require('@/assets/side2.jpg') },
+    { novelId: 462, novelName: '问九卿', coverUrl: require('@/assets/side3.jpg') },
+    { novelId: 462, novelName: '昭娇', coverUrl: require('@/assets/side4.jpg') },
+    { novelId: 462, novelName: '岁时来仪', coverUrl: require('@/assets/side5.jpg') }
 ]
 
 // 公告数据

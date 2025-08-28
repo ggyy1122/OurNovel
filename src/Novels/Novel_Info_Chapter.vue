@@ -135,6 +135,7 @@ import { ref, onMounted, computed, nextTick } from 'vue'
 import { getNovelChaptersWithoutContent, getChapter } from '@/API/Chapter_API'
 import { getWholePurchaseStatus, purchaseWholeNovel } from '@/API/Transaction_API'
 import { readerState, SelectNovel_State } from '@/stores/index'
+import { addOrUpdateRecentReading } from '@/API/Reader_API';
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 import { useRouter } from 'vue-router';
@@ -384,6 +385,17 @@ async function selectChapter(chapterId) {
       response.publishTime,
       response.status
     );
+
+    // 添加或更新阅读记录
+    try {
+      await addOrUpdateRecentReading(
+        readerStore.readerId,      // 读者ID
+        selectNovelState.novelId    // 小说ID
+      );
+    } catch (historyError) {
+      console.error("记录阅读历史失败:", historyError);
+    }
+
     router.push('/Novels/reader');
   } catch (error) {
     toast("第" + chapterId + "章加载失败!", {

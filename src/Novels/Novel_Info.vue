@@ -578,12 +578,28 @@ const toggleCollect = async () => {
     } else {
       // 添加收藏
       await addOrUpdateCollect(currentNovelId, ReaderState.readerId, 'no');
+      // 只提取需要的小说信息字段
+      const novelData = {
+        novelId: selectNovelState.novelId,
+        authorId: selectNovelState.authorId,
+        novelName: selectNovelState.novelName,
+        introduction: selectNovelState.introduction,
+        createTime: selectNovelState.createTime,
+        coverUrl: selectNovelState.coverUrl,
+        score: selectNovelState.score,
+        totalWordCount: selectNovelState.totalWordCount,
+        recommendCount: selectNovelState.recommendCount,
+        collectedCount: selectNovelState.collectedCount,
+        status: selectNovelState.status,
+        originalNovelId: selectNovelState.originalNovelId,
+        totalPrice: selectNovelState.totalPrice
+      };
       //  更新推荐列表（安全方式）
       const newFavoriteBooks = [
         ...ReaderState.favoriteBooks, // 解构原有数组
         {
           novelId: currentNovelId,
-          novel: selectNovelState, // 保存完整作品信息
+          novel: novelData, // 保存完整作品信息
           readerId: currentReaderId,
           isPublic: "no",
           collectTime: new Date().toISOString()
