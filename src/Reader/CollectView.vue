@@ -7,13 +7,11 @@
       <div v-else>
         <div v-if="collects.length === 0" class="empty">暂无收藏内容</div>
         <ul class="collect-list">
-          <li
-            v-for="item in collects"
-            :key="item.novelId"
-            class="collect-item"
-            :class="{ selected: selectedNovelId === item.novel.novelId }"
-            @click="toggleSelect(item.novel.novelId)"
-          >
+          <li v-for="item in collects" :key="item.novelId" class="collect-item"
+            :class="{ selected: selectedNovelId === item.novel.novelId }" @click="toggleSelect(item.novel.novelId)">
+            <div class="privacy-status" :class="item.isPublic === 'yes' ? 'public' : 'private'">
+              {{ item.isPublic === 'yes' ? '公开' : '私密' }}
+            </div>
             <img :src="item.novel.fullCoverUrl" alt="封面" class="cover" />
             <div class="collect-info">
               <h3 class="novel-name">{{ item.novel.novelName }}</h3>
@@ -27,11 +25,7 @@
                 <span>收藏数：<strong>{{ item.novel.collectedCount }}</strong></span>
               </div>
             </div>
-            <div
-              v-if="selectedNovelId === item.novel.novelId"
-              class="overlay"
-              @click.stop
-            >
+            <div v-if="selectedNovelId === item.novel.novelId" class="overlay" @click.stop>
               <button class="overlay-button" @click="viewDetail(item)">查看详情</button>
               <button class="overlay-button" @click="updateCollectPublic(item.novel.novelId)">是否公开</button>
               <button class="overlay-button" @click="cancelCollect(item.novel.novelId)">取消收藏</button>
@@ -39,24 +33,24 @@
           </li>
         </ul>
         <div v-if="isPublicDialogVisible" class="dialog-mask">
-    <div class="dialog-box">
-      <h3>设置收藏状态</h3>
-      <p>请选择该收藏是否公开：</p>
-      <div class="dialog-buttons">
-        <button @click="confirmPublic('yes')">公开</button>
-        <button @click="confirmPublic('no')">私密</button>
-      </div>
-    </div>
-  </div>
+          <div class="dialog-box">
+            <h3>设置收藏状态</h3>
+            <p>请选择该收藏是否公开：</p>
+            <div class="dialog-buttons">
+              <button @click="confirmPublic('yes')">公开</button>
+              <button @click="confirmPublic('no')">私密</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount,computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { readerState } from '@/stores/index'
-import { getCollectsByReader, deleteCollect,addOrUpdateCollect } from '@/API/Collect_API'
+import { getCollectsByReader, deleteCollect, addOrUpdateCollect } from '@/API/Collect_API'
 import { getAuthor } from '@/API/Author_API'
 import { useRouter } from 'vue-router'
 import { SelectNovel_State } from '@/stores/index'
@@ -148,30 +142,30 @@ function toggleSelect(novelId) {
 // 作品详情
 async function viewDetail(item) {
   try {
-        const response = await getAuthor(item.novel.authorId);
-        selectNovelState.resetNovel(
-            item.novel.novelId,
-            item.novel.authorId,
-            item.novel.novelName,
-            item.novel.introduction,
-            item.novel.createTime,
-            item.novel.coverUrl,
-            item.novel.score,
-            item.novel.totalWordCount,
-            item.novel.recommendCount,
-            item.novel.collectedCount,
-            item.novel.status,
-            item.novel.totalPrice,
-            response.authorName,
-            response.phone,
-            response.avatarUrl,
-            response.registerTime,
-            response.introduction
-        );
-    } catch (error) {
-        console.error('处理失败:', error);
-    }
-    router.push('/Novels/Novel_Info/home');
+    const response = await getAuthor(item.novel.authorId);
+    selectNovelState.resetNovel(
+      item.novel.novelId,
+      item.novel.authorId,
+      item.novel.novelName,
+      item.novel.introduction,
+      item.novel.createTime,
+      item.novel.coverUrl,
+      item.novel.score,
+      item.novel.totalWordCount,
+      item.novel.recommendCount,
+      item.novel.collectedCount,
+      item.novel.status,
+      item.novel.totalPrice,
+      response.authorName,
+      response.phone,
+      response.avatarUrl,
+      response.registerTime,
+      response.introduction
+    );
+  } catch (error) {
+    console.error('处理失败:', error);
+  }
+  router.push('/Novels/Novel_Info/home');
 }
 function handleClickOutside(event) {
   if (!event.target.closest('.collect-item')) {
@@ -218,7 +212,6 @@ onBeforeUnmount(() => {
 
 
 <style scoped>
-
 .collects-container {
   max-width: 900px;
   margin: 0 auto;
@@ -227,7 +220,9 @@ onBeforeUnmount(() => {
   color: #333;
 }
 
-.loading, .error, .empty {
+.loading,
+.error,
+.empty {
   text-align: center;
   font-size: 18px;
   margin: 20px 0;
@@ -359,8 +354,10 @@ onBeforeUnmount(() => {
 
 .dialog-mask {
   position: fixed;
-  top: 0; left: 0;
-  right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-color: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
@@ -394,4 +391,25 @@ onBeforeUnmount(() => {
   color: white;
 }
 
+.privacy-status {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  z-index: 5;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.privacy-status.public {
+  background-color: #409EFF;
+  color: white;
+}
+
+.privacy-status.private {
+  background-color: #E6A23C;
+  color: white;
+}
 </style>
