@@ -237,8 +237,8 @@
       </div>
 
       <div class="balance-info">
-        <span>账户余额 {{ accountBalance }} 元</span>
-        <span>本次打赏 {{ selectedReward }} 元</span>
+        <span>账户余额 {{ accountBalance }} 虚拟币</span>
+        <span>本次打赏 {{ selectedReward }} 虚拟币</span>
       </div>
       <button class="confirm-reward-btn" @click="confirmReward">
         确认打赏
@@ -254,8 +254,8 @@
       <div class="insufficient-content">
         <p class="insufficient-message">账户余额不足</p>
         <div class="amount-info">
-          <span>本次打赏 {{ selectedReward }} 元</span>
-          <span>账户余额 {{ accountBalance }} 元·还差 {{ (selectedReward - accountBalance).toFixed(2) }} 元</span>
+          <span>本次打赏 {{ selectedReward }} 虚拟币</span>
+          <span>账户余额 {{ accountBalance }} 虚拟币·还差 {{ (selectedReward - accountBalance).toFixed(2) }} 虚拟币</span>
         </div>
         <div class="quick-payment">
           <button class="recharge-btn" @click="goToRecharge">去充值</button>
@@ -310,14 +310,14 @@ const hoverRating = ref(null);
 const defaultCoverImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E书籍封面%3C/text%3E%3C/svg%3E";// 默认封面图片
 const defaultAuthorAvatar = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E作者头像%3C/text%3E%3C/svg%3E";// 默认作者头像
 const rewardOptions = [
-  { value: 1, label: '1元' },
-  { value: 10, label: '10元' },
-  { value: 50, label: '50元' },
-  { value: 100, label: '100元' },
-  { value: 200, label: '200元' },
-  { value: 1000, label: '1千元' },
-  { value: 5000, label: '5千元' },
-  { value: 10000, label: '1万元' }
+  { value: 1, label: '1虚拟币' },
+  { value: 10, label: '10虚拟币' },
+  { value: 50, label: '50虚拟币' },
+  { value: 100, label: '100虚拟币' },
+  { value: 200, label: '200虚拟币' },
+  { value: 1000, label: '1千虚拟币' },
+  { value: 5000, label: '5千虚拟币' },
+  { value: 10000, label: '1万虚拟币' }
 ];
 
 
@@ -791,7 +791,7 @@ const confirmReward = async () => {
     });
     readerState.balance -= currentvalue; // 更新余额
     // 3. 处理成功结果
-    toast(`成功打赏 ${currentvalue} 元`, {
+    toast(`成功打赏 ${currentvalue} 虚拟币`, {
       type: "success", // 改为 success 类型
       dangerouslyHTMLString: true
     });
