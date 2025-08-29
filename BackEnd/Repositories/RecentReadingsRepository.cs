@@ -1,4 +1,4 @@
-﻿using OurNovel.Data;
+﻿﻿using OurNovel.Data;
 using OurNovel.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -27,8 +27,9 @@ public class RecentReadingsRepository : IRecentReadingsRepository
         }
         else
         {
-            // 存在，更新最近阅读时间
+            // 存在，更新最近阅读时间和章节ID
             existing.RecentReadingTime = DateTime.Now;
+            existing.ChapterId = entity.ChapterId;
             _context.RecentReadings.Update(existing);
         }
 
@@ -57,4 +58,9 @@ public class RecentReadingsRepository : IRecentReadingsRepository
             .ToListAsync();
     }
 
+    public async Task<RecentReadings?> GetByReaderAndNovelAsync(int readerId, int novelId)
+    {
+        return await _context.RecentReadings
+            .FirstOrDefaultAsync(r => r.ReaderId == readerId && r.NovelId == novelId);
+    }
 }
