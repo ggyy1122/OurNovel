@@ -25,7 +25,7 @@ export const statusConfig = {
   '封禁': {
     text: '封禁',
     actionText: '申请解封',
-    nextStatus: '首次审核', 
+    nextStatus: '审核中', 
     color: '#FF0000'
   },
   '已发布': {

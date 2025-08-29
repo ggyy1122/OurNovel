@@ -110,15 +110,22 @@
 <script setup>
 // 导入小说状态
 import { useNovel } from '@/stores/CurrentNovel'
-
+import { onMounted } from 'vue'
 const {
   novel,             
   showDeleteDialog,   
   handleImageError,   
   confirmDelete,      
   cancelDelete,       
-  deleteNovel         
+  deleteNovel,
+  fetchNovelFromAPI      
 } = useNovel()
+
+onMounted(() => {
+  if (novel.value.novel_id) {
+    fetchNovelFromAPI(novel.value.novel_id)
+  }
+})
 
 // 格式化时间
 const formatDateTime = (dateString) => {

@@ -241,8 +241,8 @@ export function uploadNovelCover(novelId, file) {
 
 /**
  * 提交小说修改
- * @param {number} originalNovelId - 原始小说ID
- * @param {Novel} editedNovel - 修改后的小说数据
+ * @param {number} novelId - 原始小说ID
+ * @param {object} updateData - 修改后的小说数据
  * @returns {Promise<{message: string, newNovelId: number}>}
  */
 export function submitNovelEdit(novelId, updateData) {
@@ -252,12 +252,10 @@ export function submitNovelEdit(novelId, updateData) {
         headers: {
             'Content-Type': 'application/json'
         },
-        data: {
-            originalNovelId: novelId,
-            edited: updateData
-        }
+        data: updateData
     })
 }
+
 /**
  * 获取小说最新已发布章节信息
  * @param {number} novelId - 小说ID
