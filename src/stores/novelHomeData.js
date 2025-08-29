@@ -9,7 +9,7 @@ export const carouselItems_data = [
 // 精选小说ID
 export const featuredNovelIds = {
     male: [166, 167, 168, 169, 183, 222, 263, 422], // 男频小说ID
-    female: [462, 484, 501, 521, 561, 581, 601, 621] // 女频小说ID
+    female: [462, 484, 501, 521, 561, 581, 601, 666] // 女频小说ID
 }
 
 // 作者ID列表

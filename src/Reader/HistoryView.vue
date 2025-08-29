@@ -27,7 +27,9 @@
               <input v-if="batchDeleteMode" type="checkbox" :value="item.novel.novelId"
                 :checked="selectedIds.has(item.novel.novelId)"
                 @change="toggleSelect(item.novel.novelId, $event.target.checked)" class="select-checkbox" />
-
+              <div class="chapter-hint">
+                最近阅读第{{ item.chapterId }}章
+              </div>
               <img :src="item.novel.fullCoverUrl" alt="封面" class="cover" />
               <div class="collect-info">
                 <h3 class="novel-name">{{ item.novel.novelName }}</h3>
@@ -297,6 +299,20 @@ onMounted(fetchHistory)
   height: 20px;
   cursor: pointer;
   z-index: 20;
+}
+
+.chapter-hint {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  z-index: 5;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  background-color: #409EFF;
+  color: white;
 }
 
 .cover {

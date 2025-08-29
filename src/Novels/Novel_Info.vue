@@ -237,8 +237,8 @@
       </div>
 
       <div class="balance-info">
-        <span>账户余额 {{ accountBalance }} 元</span>
-        <span>本次打赏 {{ selectedReward }} 元</span>
+        <span>账户余额 {{ accountBalance }} 币</span>
+        <span>本次打赏 {{ selectedReward }} 币</span>
       </div>
       <button class="confirm-reward-btn" @click="confirmReward">
         确认打赏
@@ -254,8 +254,8 @@
       <div class="insufficient-content">
         <p class="insufficient-message">账户余额不足</p>
         <div class="amount-info">
-          <span>本次打赏 {{ selectedReward }} 元</span>
-          <span>账户余额 {{ accountBalance }} 元·还差 {{ (selectedReward - accountBalance).toFixed(2) }} 元</span>
+          <span>本次打赏 {{ selectedReward }} 币</span>
+          <span>账户余额 {{ accountBalance }} 币·还差 {{ (selectedReward - accountBalance).toFixed(2) }} 币</span>
         </div>
         <div class="quick-payment">
           <button class="recharge-btn" @click="goToRecharge">去充值</button>
@@ -276,7 +276,7 @@ import { getNovelWordCount, getNovelRecommendCount, getNovelCollectCount, getLat
 import { getAuthorNovelCount, getAuthorTotalWordCount, getAuthorRegisterDays } from '@/API/Author_API';
 import { getChapter } from '@/API/Chapter_API';
 import { addRecommend, deleteRecommend } from '@/API/Recommend_API';
-import { getReaderBalance, addOrUpdateRecentReading } from '@/API/Reader_API';
+import { getReaderBalance, addOrUpdateRecentReading, getLastReadChapterId } from '@/API/Reader_API';
 import { rewardNovel } from '@/API/Reward_API';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
@@ -310,14 +310,14 @@ const hoverRating = ref(null);
 const defaultCoverImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E书籍封面%3C/text%3E%3C/svg%3E";// 默认封面图片
 const defaultAuthorAvatar = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23f3f4f6' rx='8'/%3E%3Ctext x='100' y='140' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3E作者头像%3C/text%3E%3C/svg%3E";// 默认作者头像
 const rewardOptions = [
-  { value: 1, label: '1元' },
-  { value: 10, label: '10元' },
-  { value: 50, label: '50元' },
-  { value: 100, label: '100元' },
-  { value: 200, label: '200元' },
-  { value: 1000, label: '1千元' },
-  { value: 5000, label: '5千元' },
-  { value: 10000, label: '1万元' }
+  { value: 1, label: '1币' },
+  { value: 10, label: '10币' },
+  { value: 50, label: '50币' },
+  { value: 100, label: '100币' },
+  { value: 200, label: '200币' },
+  { value: 1000, label: '1千币' },
+  { value: 5000, label: '5千币' },
+  { value: 10000, label: '1万币' }
 ];
 
 
@@ -625,23 +625,50 @@ const toggleCollect = async () => {
 //开始阅读按钮的逻辑
 async function handleRead() {
   try {
-    const response = await getChapter(selectNovelState.novelId, 1);
+    // 获取用户上次阅读的章节ID，如果没有记录则返回1
+    let chapterIdToRead = 1;
+    try {
+      const lastReadResponse = await getLastReadChapterId(
+        ReaderState.readerId,
+        selectNovelState.novelId
+      );
+      chapterIdToRead = lastReadResponse || 1;
+    } catch (error) {
+      console.warn("获取阅读历史失败，使用默认第1章:", error);
+      chapterIdToRead = 1;
+    }
+    // 使用 let 声明 response，因为后面可能需要重新赋值
+    let response = await getChapter(selectNovelState.novelId, chapterIdToRead);
     if (response.status === '首次审核' || response.status === '草稿') {
-      toast("暂无第1章", {
+      toast(`暂无第${chapterIdToRead}章`, {
         "type": "info",
         "dangerouslyHTMLString": true
       });
-      return;
+      // 如果目标章节不存在，尝试获取第1章
+      if (chapterIdToRead !== 1) {
+        try {
+          const firstChapterResponse = await getChapter(selectNovelState.novelId, 1);
+          if (firstChapterResponse.status !== '首次审核' && firstChapterResponse.status !== '草稿') {
+            chapterIdToRead = 1;
+            response = firstChapterResponse;
+          }
+        } catch (fallbackError) {
+          console.error("获取第1章也失败:", fallbackError);
+          return;
+        }
+      } else {
+        return;
+      }
     }
     // 检查章节购买状态
-    if (response.isCharged === '是') {
+    if (response.status === '已发布' && response.isCharged === '是') {
       const purchaseStatus = await checkPurchase(
         ReaderState.readerId,
         selectNovelState.novelId,
-        1
+        chapterIdToRead
       );
       if (!purchaseStatus?.hasPurchased) {
-        toast("第1章需要购买后才能阅读", {
+        toast(`第${chapterIdToRead}章需要购买后才能阅读`, {
           "type": "info",
           "dangerouslyHTMLString": true
         });
@@ -659,26 +686,24 @@ async function handleRead() {
       response.publishTime,
       response.status
     );
-
-    // 添加或更新阅读记录
+    // 添加或更新阅读记录（使用实际阅读的章节ID）
     try {
-      // 假设readerId可以从用户状态获取，这里用selectNovelState.readerId表示
       await addOrUpdateRecentReading(
-        ReaderState.readerId,  // 读者ID
-        selectNovelState.novelId    // 小说ID
+        ReaderState.readerId,      // 读者ID
+        selectNovelState.novelId,  // 小说ID
+        chapterIdToRead            // 实际阅读的章节ID
       );
     } catch (historyError) {
       console.error("记录阅读历史失败:", historyError);
-      // 这里可以选择不提示用户，因为阅读历史记录失败不影响主要功能
     }
-
     // 跳转到阅读页面
     router.push('/Novels/reader');
   } catch (error) {
-    toast("章节加载失败：第1章不存在！", {
-      "type": "info",
+    console.error("阅读失败:", error);
+    toast("无法获取章节内容", {
+      "type": "error",
       "dangerouslyHTMLString": true
-    })
+    });
   }
 }
 
@@ -791,7 +816,7 @@ const confirmReward = async () => {
     });
     readerState.balance -= currentvalue; // 更新余额
     // 3. 处理成功结果
-    toast(`成功打赏 ${currentvalue} 元`, {
+    toast(`成功打赏 ${currentvalue} 币`, {
       type: "success", // 改为 success 类型
       dangerouslyHTMLString: true
     });

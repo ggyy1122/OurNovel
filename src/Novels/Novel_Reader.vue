@@ -347,10 +347,12 @@
                             <span class="chapter-number">第{{ chapter.chapterId }}章</span>
                             <span class="ca_chapter-title">{{ chapter.title }}</span>
                             <span class="chapter-status">{{ chapter.status }}</span>
-                            <span v-if="chapter.isCharged === '是'" class="vip-tag">VIP</span>
+                            <span v-if="chapter.isCharged === '是'" class="vip-tag">收费</span>
+                            <span v-else class="free-tag">免费</span>
                             <span v-if="chapter.chapterId === selectNovelState.chapterId"
                                 class="current-badge">正在阅读</span>
-                            <div v-if="chapter.isCharged === '是' && !chapter.hasPurchased" class="lock-overlay">
+                            <div v-if="chapter.status === '已发布' && chapter.isCharged === '是' && !chapter.hasPurchased"
+                                class="lock-overlay">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="20" height="20">
                                     <path fill="currentColor"
                                         d="M224 448a32 32 0 0 0-32 32v384a32 32 0 0 0 32 32h576a32 32 0 0 0 32-32V480a32 32 0 0 0-32-32zm0-64h576a96 96 0 0 1 96 96v384a96 96 0 0 1-96 96H224a96 96 0 0 1-96-96V480a96 96 0 0 1 96-96">
@@ -385,8 +387,8 @@
                     </div>
                 </div>
                 <div class="balance-info">
-                    <span>账户余额 {{ accountBalance }} 元</span>
-                    <span>本次打赏 {{ selectedReward }} 元</span>
+                    <span>账户余额 {{ accountBalance }} 币</span>
+                    <span>本次打赏 {{ selectedReward }} 币</span>
                 </div>
                 <button class="confirm-reward-btn" @click="confirmReward">
                     确认打赏
@@ -402,8 +404,8 @@
                 <div class="insufficient-content">
                     <p class="insufficient-message">账户余额不足</p>
                     <div class="amount-info">
-                        <span>本次打赏 {{ selectedReward }} 元</span>
-                        <span>账户余额 {{ accountBalance }} 元·还差 {{ (selectedReward - accountBalance).toFixed(2) }} 元</span>
+                        <span>本次打赏 {{ selectedReward }} 币</span>
+                        <span>账户余额 {{ accountBalance }} 币·还差 {{ (selectedReward - accountBalance).toFixed(2) }} 币</span>
                     </div>
                     <div class="quick-payment">
                         <button class="recharge-btn" @click="goToRecharge">去充值</button>
@@ -440,7 +442,7 @@
                     style="position: absolute; right: 20px;">&times;</button>
             </div>
             <div class="purchase-content">
-                <p>本章节价格为 ￥{{ selectedChapter.calculatedPrice }}</p>
+                <p>本章节价格为 {{ selectedChapter.calculatedPrice }}币</p>
             </div>
             <button class="confirm-reward-btn" @click="purchase_Chapter">
                 确认购买
@@ -457,8 +459,8 @@
             <div class="purchase-insufficient-content">
                 <p class="purchase-insufficient-message">账户余额不足，无法购买本章节</p>
                 <div class="purchase-amount-info">
-                    <span>章节价格：{{ selectedChapter.calculatedPrice }}元</span>
-                    <span>当前余额：{{ accountBalance }}元</span>
+                    <span>章节价格：{{ selectedChapter.calculatedPrice }}币</span>
+                    <span>当前余额：{{ accountBalance }}币</span>
                 </div>
                 <div class="purchase-action-buttons">
                     <button class="purchase-recharge-btn" @click="goToRecharge">立即充值</button>
@@ -476,7 +478,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { getChapter, getNovelChaptersWithoutContent } from '@/API/Chapter_API';
 import { addOrUpdateCollect } from '@/API/Collect_API'
 import { getWholePurchaseStatus } from '@/API/Transaction_API'
-import { getReaderBalance, getReader } from '@/API/Reader_API';
+import { getReaderBalance, getReader, addOrUpdateRecentReading } from '@/API/Reader_API';
 import { rewardNovel } from '@/API/Reward_API';
 import { getTopLikedCommentsByChapter, createComment, getComment } from '@/API/Comment_API';
 import { getRepliesByParentId, addCommentReply } from '@/API/CommentReply_API';
@@ -513,14 +515,14 @@ const likedComments = ref(new Set()); // 存储已点赞的评论ID
 const topN = ref(10); // 获取点赞数前10的评论
 const expandedReplies = ref(new Set());
 const rewardOptions = [
-    { value: 1, label: '1元' },
-    { value: 10, label: '10元' },
-    { value: 50, label: '50元' },
-    { value: 100, label: '100元' },
-    { value: 200, label: '200元' },
-    { value: 1000, label: '1千元' },
-    { value: 5000, label: '5千元' },
-    { value: 10000, label: '1万元' }
+    { value: 1, label: '1币' },
+    { value: 10, label: '10币' },
+    { value: 50, label: '50币' },
+    { value: 100, label: '100币' },
+    { value: 200, label: '200币' },
+    { value: 1000, label: '1千币' },
+    { value: 5000, label: '5千币' },
+    { value: 10000, label: '1万币' }
 ];
 
 function goToLogin() {
@@ -666,7 +668,7 @@ async function changeChapter(num) {
             return;
         }
         // 检查章节购买状态
-        if (nextChapter.isCharged === '是' && !nextChapter.hasPurchased) {
+        if (nextChapter.status === '已发布' && nextChapter.isCharged === '是' && !nextChapter.hasPurchased) {
             // 显示购买弹窗
             selectedChapter.value = nextChapter;
             showPurchaseDialog.value = true;
@@ -687,7 +689,18 @@ async function changeChapter(num) {
         );
         comments.value = []; // 清空评论列表
         showComments.value = false; // 切换章节时隐藏评论
-        router.push('/Novels/reader');
+
+        // 添加或更新阅读记录（使用实际阅读的章节ID）
+        try {
+            await addOrUpdateRecentReading(
+                reader_state.readerId,      // 读者ID
+                selectNovelState.novelId,  // 小说ID
+                nextChapterId            // 实际阅读的章节ID
+            );
+        } catch (historyError) {
+            console.error("记录阅读历史失败:", historyError);
+        }
+
         scrollToTop();
     } catch (error) {
         console.error('切换章节失败:', error);
@@ -846,7 +859,7 @@ const purchase_Chapter = async () => {
 const goToChapter = async (chapter) => {
     try {
         // 如果是收费章节且未购买，显示购买弹窗
-        if (chapter.isCharged === '是' && !chapter.hasPurchased) {
+        if (chapter.status === '已发布' && chapter.isCharged === '是' && !chapter.hasPurchased) {
             selectedChapter.value = chapter;
             showPurchaseDialog.value = true;
             return;
@@ -866,6 +879,18 @@ const goToChapter = async (chapter) => {
         comments.value = []; // 清空评论列表
         showComments.value = false; // 切换章节时隐藏评论
         showCatalog.value = false;
+
+        // 添加或更新阅读记录（使用实际阅读的章节ID）
+        try {
+            await addOrUpdateRecentReading(
+                reader_state.readerId,      // 读者ID
+                selectNovelState.novelId,  // 小说ID
+                chapter.chapterId            // 实际阅读的章节ID
+            );
+        } catch (historyError) {
+            console.error("记录阅读历史失败:", historyError);
+        }
+
         scrollToTop();
     } catch (error) {
         console.error('打开章节失败:', error);
@@ -930,7 +955,7 @@ const confirmReward = async () => {
             amount: currentvalue
         });
         reader_state.balance -= currentvalue;
-        toast(`成功打赏 ${currentvalue} 元`, {
+        toast(`成功打赏 ${currentvalue} 币`, {
             type: "success",
             dangerouslyHTMLString: true
         });
@@ -1105,6 +1130,7 @@ const submitComment = async () => {
             createTime: new Date().toISOString()
         });
         // 添加到评论列表
+        await getReaderInfo(response.readerId);
         comments.value.unshift(response);
         newComment.value = '';
         toast("评论成功", {
@@ -1152,6 +1178,7 @@ const submitReply = async (parentCommentId) => {
             status: "通过",
             createTime: new Date().toISOString()
         });
+        await getReaderInfo(commentResponse.readerId);
         // 2. 创建回复关系
         await addCommentReply({
             commentId: commentResponse.commentId,
@@ -2374,8 +2401,19 @@ button.active {
 
 .vip-tag {
     position: absolute;
-    right: 12px;
+    right: 10px;
     background: linear-gradient(135deg, #f1a73f, #ff5e00);
+    color: #222;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.free-tag {
+    position: absolute;
+    right: 10px;
+    background: linear-gradient(135deg, #3ff1d9, #48ff00);
     color: #222;
     font-size: 11px;
     padding: 2px 8px;

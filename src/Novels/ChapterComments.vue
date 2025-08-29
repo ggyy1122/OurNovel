@@ -269,6 +269,7 @@ const submitComment = async () => {
             status: "通过",
             createTime: new Date().toISOString()
         });
+        await getReaderInfo(response.readerId);
         comments.value.unshift({
             ...response,
             replies: [],
@@ -311,6 +312,7 @@ const submitReply = async (parentCommentId) => {
             status: "通过",
             createTime: new Date().toISOString()
         });
+        await getReaderInfo(commentResponse.readerId);
         await addCommentReply({
             commentId: commentResponse.commentId,
             preComId: parentCommentId,
