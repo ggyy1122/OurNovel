@@ -1054,7 +1054,7 @@ const getReaderInfo = async (readerId) => {
 
 // 获取读者头像
 const getReaderAvatar = (readerId) => {
-    return 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + (readersCache.value[readerId]?.avatarUrl || 'a3dc347b-45dd-4d89-8b9d-65b75477ee3d.jpg')
+    return 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + (readersCache.value[readerId]?.avatarUrl || 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg')
 };
 
 // 获取读者名称

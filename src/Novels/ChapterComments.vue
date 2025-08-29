@@ -211,7 +211,7 @@ const getReaderInfo = async (readerId) => {
 };
 
 const getReaderAvatar = (readerId) => {
-    const defaultAvatar = 'a3dc347b-45dd-4d89-8b9d-65b75477ee3d.jpg';
+    const defaultAvatar = 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg';
     return `https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/${readersCache.value[readerId]?.avatarUrl || defaultAvatar}`;
 };
 

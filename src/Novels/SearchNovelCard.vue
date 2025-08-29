@@ -1,7 +1,7 @@
 <template>
     <div class="novel-card">
         <div class="cover-container">
-            <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + (novel.coverUrl || 'a3dc347b-45dd-4d89-8b9d-65b75477ee3d.jpg')"
+            <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + (novel.coverUrl || 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg')"
                 :alt="novel.novelName" class="cover-image" @click="handle_NovelInfro" />
             <div class="score-badge" v-if="novel.score > 0">
                 ★ {{ novel.score.toFixed(1) }}
@@ -211,8 +211,8 @@ async function handleRead() {
         router.push('/Novels/reader');
     } catch (error) {
         console.error("阅读失败:", error);
-        toast("无法获取章节内容", {
-            "type": "error",
+        toast("暂无第1章", {
+            "type": "info",
             "dangerouslyHTMLString": true
         });
     }

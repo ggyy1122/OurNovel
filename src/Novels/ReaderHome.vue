@@ -219,12 +219,12 @@ const maskedPhone = computed(() => {
 // 格式化头像
 const avatarUrl = computed(() =>
     'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' +
-    (reader.value.avatarUrl || '07850080-e498-47a4-8d3a-fd94fb47e561.jpg')
+    (reader.value.avatarUrl || 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg')
 )
 // 格式化背景图
 const backgroundUrl = computed(() =>
     'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' +
-    (reader.value.backgroundUrl || '3234ee21-39dc-400a-a811-693b420587a3.png')
+    (reader.value.backgroundUrl || 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg')
 )
 
 // 性别显示文本

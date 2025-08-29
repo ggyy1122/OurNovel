@@ -1,7 +1,7 @@
 <template>
     <div class="reader-card">
         <div class="reader-info">
-            <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + (reader.avatarUrl || '07850080-e498-47a4-8d3a-fd94fb47e561.jpg')"
+            <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + (reader.avatarUrl || 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg')"
                 alt="读者头像" class="avatar" @click="goReaderHome" />
             <div class="details">
                 <h3 @click="goReaderHome">{{ reader.readerName }}</h3>
