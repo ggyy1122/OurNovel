@@ -6,6 +6,7 @@ import { deleteNovel, submitNovelEdit } from '@/API/Novel_API'
 import { getCategoriesByNovel } from '@/API/NovelCategory_API'
 import { uploadNovelCover } from '@/API/Novel_Cover_API'
 import { getCommentCountByNovel } from '@/API/Comment_API'
+import { getNovel } from '@/API/Novel_API'
 
 export function useNovel() {
   const route = useRoute()
@@ -49,6 +50,54 @@ export function useNovel() {
     { value: '封禁', label: '封禁' }
   ]
 
+// 从API获取小说信息
+const fetchNovelFromAPI = async (novelId) => {
+  try {
+    const response = await getNovel(novelId);
+    
+    if (!response) {
+      throw new Error('找不到该小说');
+    }
+    
+    // 统一数据结构映射
+    const fetchedNovel = {
+      novel_id: response.novelId,
+      author_id: response.authorId,
+      novel_name: response.novelName || '未命名小说',
+      cover_url: response.coverUrl ? novelsStore.getFullCoverUrl(response.coverUrl) : 'https://ftp.bmp.ovh/imgs/2019/11/06800705be93b1bb.png',
+      status: novelsStore.mapStatus(response.status),
+      introduction: response.introduction || '暂无简介',
+      total_word_count: response.totalWordCount || 0,
+      chapter_count: response.chapterCount || 0,
+      score: response.score || 0,
+      create_time: response.createTime,
+      view_count: response.viewCount || 0,
+      recommend_count: response.recommendCount || 0,
+      collected_count: response.collectedCount || 0,
+      total_price: response.totalPrice || 0
+    };
+    
+    if (isMounted) {
+      
+      novel.value = {
+        ...fetchedNovel,
+        categories: [],
+        comment_count: 0
+      };
+      await Promise.all([
+        fetchCategories(novelId),
+        fetchCommentCount(novelId)
+      ])
+      // 设置当前小说到持久化存储
+      novelsStore.setCurrentNovel(novel.value);
+    }
+    
+    return fetchedNovel;
+  } catch (error) {
+    console.error('从API获取小说失败:', error);
+    throw error;
+  }
+};
   // 获取小说评论数
   const fetchCommentCount = async (novelId) => {
     try {
@@ -219,6 +268,7 @@ export function useNovel() {
         introduction: novel.value.introduction,
         status: novel.value.status,
       });
+      console.log("小说水水水水水"+novel.value.novel_name)
 
       if (fileInput.value?.files?.length > 0) {
         const coverFile = fileInput.value.files[0];
@@ -271,6 +321,7 @@ export function useNovel() {
     
     // 方法
     fetchNovel,
+    fetchNovelFromAPI,
     enterEditMode,
     cancelChanges,
     triggerFileInput,
