@@ -149,24 +149,67 @@ namespace OurNovel.Services
             if (original == null)
                 return -1;
 
-            var newNovel = new Novel
+            // 情况1：原小说还在待审核，直接更新原小说
+            if (original.Status == "待审核")
             {
-                AuthorId = original.AuthorId,
-                NovelName = edited.NovelName ?? original.NovelName,
-                Introduction = edited.Introduction ?? original.Introduction,
-                CoverUrl = edited.CoverUrl ?? original.CoverUrl,
-                Score = edited.Score ?? original.Score,
-                TotalWordCount = edited.TotalWordCount ?? original.TotalWordCount,
-                RecommendCount = edited.RecommendCount ?? original.RecommendCount,
-                CollectedCount = edited.CollectedCount ?? original.CollectedCount,
-                Status = "待审核",
-                CreateTime = DateTime.Now,
-                OriginalNovelId = originalNovelId,
-                TotalPrice = edited.TotalPrice ?? original.TotalPrice
-            };
+                original.NovelName = edited.NovelName ?? original.NovelName;
+                original.Introduction = edited.Introduction ?? original.Introduction;
+                original.CoverUrl = edited.CoverUrl ?? original.CoverUrl;
+                original.Score = edited.Score ?? original.Score;
+                original.TotalWordCount = edited.TotalWordCount ?? original.TotalWordCount;
+                original.RecommendCount = edited.RecommendCount ?? original.RecommendCount;
+                original.CollectedCount = edited.CollectedCount ?? original.CollectedCount;
+                original.CreateTime = DateTime.Now;
+                original.TotalPrice = edited.TotalPrice ?? original.TotalPrice;
 
-            await _repository.AddAsync(newNovel);
-            return newNovel.NovelId;
+                await _context.SaveChangesAsync();
+                return original.NovelId;
+            }
+
+            // 情况2：原小说已发布，检查是否已有副本
+            // 查找是否已有副本
+            var existingCopy = await _context.Novels
+                .FirstOrDefaultAsync(n => n.OriginalNovelId == originalNovelId);
+
+            if (existingCopy != null)
+            {
+                // 更新副本
+                existingCopy.NovelName = edited.NovelName ?? original.NovelName;
+                existingCopy.Introduction = edited.Introduction ?? original.Introduction;
+                existingCopy.CoverUrl = edited.CoverUrl ?? original.CoverUrl;
+                existingCopy.Score = edited.Score ?? original.Score;
+                existingCopy.TotalWordCount = edited.TotalWordCount ?? original.TotalWordCount;
+                existingCopy.RecommendCount = edited.RecommendCount ?? original.RecommendCount;
+                existingCopy.CollectedCount = edited.CollectedCount ?? original.CollectedCount;
+                existingCopy.Status = "待审核";
+                existingCopy.CreateTime = DateTime.Now;
+                existingCopy.TotalPrice = edited.TotalPrice ?? original.TotalPrice;
+
+                await _context.SaveChangesAsync();
+                return existingCopy.NovelId;
+            }
+            else
+            {
+                // 新增副本
+                var newNovel = new Novel
+                {
+                    AuthorId = original.AuthorId,
+                    NovelName = edited.NovelName ?? original.NovelName,
+                    Introduction = edited.Introduction ?? original.Introduction,
+                    CoverUrl = edited.CoverUrl ?? original.CoverUrl,
+                    Score = edited.Score ?? original.Score,
+                    TotalWordCount = edited.TotalWordCount ?? original.TotalWordCount,
+                    RecommendCount = edited.RecommendCount ?? original.RecommendCount,
+                    CollectedCount = edited.CollectedCount ?? original.CollectedCount,
+                    Status = "待审核",
+                    CreateTime = DateTime.Now,
+                    OriginalNovelId = originalNovelId,
+                    TotalPrice = edited.TotalPrice ?? original.TotalPrice
+                };
+
+                await _repository.AddAsync(newNovel);
+                return newNovel.NovelId;
+            }
         }
 
         /// <summary>

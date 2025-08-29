@@ -94,29 +94,22 @@ namespace OurNovel.Controllers
         /// 修改小说信息
         /// </summary>
         [HttpPost("submit-edit")]
-        public async Task<IActionResult> SubmitEdit([FromQuery] int originalNovelId, [FromBody] NovelEditDto edited)
+        public async Task<IActionResult> SubmitEdit([FromQuery] int originalNovelId, [FromBody] NovelEditDto editedDto)
         {
             var original = await _novelService.GetByIdAsync(originalNovelId);
             if (original == null) return NotFound("原小说不存在");
 
-            var newNovel = new Novel
+            var newNovelId = await _novelService.SubmitNovelEditAsync(originalNovelId, new Novel
             {
-                AuthorId = original.AuthorId,
-                NovelName = edited.NovelName ?? original.NovelName,
-                Introduction = edited.Introduction ?? original.Introduction,
-                CoverUrl = edited.CoverUrl ?? original.CoverUrl,
-                Score = original.Score,
-                TotalWordCount = original.TotalWordCount,
-                RecommendCount = original.RecommendCount,
-                CollectedCount = original.CollectedCount,
-                Status = "待审核",
-                CreateTime = original.CreateTime,
-                OriginalNovelId = originalNovelId,
-                TotalPrice = original.TotalPrice
-            };
+                NovelName = editedDto.NovelName,
+                Introduction = editedDto.Introduction,
+                CoverUrl = editedDto.CoverUrl
+            });
 
-            await _novelService.AddAsync(newNovel);
-            return Ok(new { message = "提交修改成功，等待审核", newNovelId = newNovel.NovelId });
+            if (newNovelId == -1)
+                return BadRequest("修改失败");
+
+            return Ok(new { message = "提交修改成功，等待审核", novelId = newNovelId });
         }
 
 
