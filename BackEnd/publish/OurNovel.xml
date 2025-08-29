@@ -1,0 +1,1715 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OurNovel</name>
+    </assembly>
+    <members>
+        <member name="T:OurNovel.Controllers.AuthorController">
+            <summary>
+            作者控制器，继承基类控制器，实现对 Author 实体的 CRUD 操作，并支持头像上传
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.AuthorController.UploadAvatar(System.Int32,Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            上传作者头像，并更新头像URL
+            </summary>
+            <param name="authorId">作者ID</param>
+            <param name="avatarFile">头像文件</param>
+            <returns>头像URL</returns>
+        </member>
+        <member name="M:OurNovel.Controllers.AuthorController.GetNovelCount(System.Int32)">
+            <summary>
+            小说统计
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.AuthorController.GetTotalWordCount(System.Int32)">
+            <summary>
+            字数统计
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:OurNovel.Controllers.AuthorController.GetRegisterDays(System.Int32)" -->
+        <member name="M:OurNovel.Controllers.AuthorController.GetAuthorNovels(System.Int32)">
+            <summary>
+            根据作者 ID 获取该作者的所有小说
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.AuthorController.GetAuthorNovelWithScreening(System.Int32)">
+            <summary>
+            根据作者 ID 获取该作者的筛选为‘连载和完结’的小说
+            </summary>
+        </member>
+        <member name="T:OurNovel.Controllers.AuthorIncomeController">
+            <summary>
+            作者收入控制器，提供收入记录查询接口
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.AuthorIncomeController.GetIncomesByAuthor(System.Int64)">
+            <summary>
+            获取作者的所有收入记录
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.AuthorIncomeController.GetTotalIncome(System.Int64)">
+            <summary>
+            获取作者的总收入金额
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "T:OurNovel.Controllers.BaseController`2" -->
+        <member name="M:OurNovel.Controllers.BaseController`2.Options">
+            <summary>
+            处理 CORS 预检请求（OPTIONS）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.BaseController`2.GetAll">
+            <summary>
+            获取所有实体数据
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.BaseController`2.GetById(`1)">
+            <summary>
+            根据主键获取单个实体
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.BaseController`2.Create(`0)">
+            <summary>
+            添加实体
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.BaseController`2.Update(`1,`0)">
+            <summary>
+            更新实体
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.BaseController`2.Delete(`1)">
+            <summary>
+            删除实体
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.CategoryController.Options">
+            <summary>
+            处理 CORS 预检请求（OPTIONS）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.CategoryController.GetAll">
+            <summary>
+            获取所有实体数据
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.CategoryController.Create(OurNovel.Models.Category)">
+            <summary>
+            添加实体
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.CategoryController.GetById(System.String)">
+            <summary>
+            根据主键获取单个实体
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.CategoryController.Update(System.String,OurNovel.Models.Category)">
+            <summary>
+            重写PUT接口，支持“重命名”逻辑
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.CategoryController.Delete(System.String)">
+            <summary>
+            删除实体
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.CategoryController.RenameCategory(System.String,System.String)">
+            <summary>
+            单独的改名接口（可选，放到最后）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.CategoryController.GetEntityId(OurNovel.Models.Category)">
+            <summary>
+            重写获取主键，使用 CategoryName 作为主键
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.ChapterController.GetChaptersByNovel(System.Int32)">
+            <summary>
+            获取指定小说下的所有章节
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.ChapterController.GetChapters(System.Int32)">
+            <summary>
+            新：获取小说的所有章节
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.ChapterController.GetChapter(System.Int32,System.Int32)">
+            <summary>
+            获取指定章节
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.ChapterController.Create(OurNovel.Models.Chapter)">
+            <summary>
+            添加章节（正文直接通过 Content 属性提交）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.ChapterController.Update(System.Int32,System.Int32,OurNovel.Models.Chapter)">
+            <summary>
+            更新章节
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.ChapterController.Delete(System.Int32,System.Int32)">
+            <summary>
+            删除章节
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.ChapterController.ReviewChapter(System.Int32,System.Int32,System.String,System.Int32,System.String)">
+            <summary>
+            审核章节
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.ChapterManagementController.GetLogs(System.Int32,System.Int32)">
+            <summary>
+            获取指定章节的管理日志列表
+            GET: api/ChapterManagement/logs/{chapterId}
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.ChapterManagementController.GetAllLogs">
+            <summary>
+            获取所有章节的管理日志列表
+            GET: api/ChapterManagement/logs/all
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.CommentManagementController.GetLogs(System.Int32)">
+            <summary>
+            获取指定评论的管理日志列表（包含管理员信息，时间倒序）
+            GET: api/CommentManagement/logs/{commentId}
+            </summary>
+            <param name="commentId">评论ID</param>
+            <returns>管理日志列表</returns>
+        </member>
+        <member name="M:OurNovel.Controllers.CommentManagementController.GetAllNovelLogs">
+            <summary>
+            获取所有评论的管理日志列表
+            GET: api/CommentManagement/logs/all
+            </summary>
+            <returns>管理日志列表</returns>
+        </member>
+        <member name="M:OurNovel.Controllers.CommentReplyController.AddReply(CommentReply)">
+            <summary>
+            添加一条评论回复
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.CommentReplyController.GetReplyByCommentId(System.Int32)">
+            <summary>
+            根据评论ID获取它的回复关系
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.CommentReplyController.GetRepliesByParentId(System.Int32)">
+            <summary>
+            获取某条评论下的所有直接回复
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.CommentReplyController.GetAllReplies">
+            <summary>
+            获取所有评论回复联系集
+            </summary>
+        </member>
+        <member name="T:OurNovel.Controllers.CommentsController">
+            <summary>
+            评论控制器，继承基础控制器，实现对 Comment 实体的 CRUD 操作和扩展功能
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.CommentsController.SetStatus(System.Int32,System.String,System.Int32,System.String)">
+            <summary>
+            设置评论状态（如“通过”或“封禁”）
+            </summary>
+            <param name="commentId">评论 ID</param>
+            <param name="status">目标状态</param>
+            <returns>操作结果</returns>
+        </member>
+        <member name="M:OurNovel.Controllers.CommentsController.GetByChapter(System.Int32,System.Int32)">
+            <summary>
+            获取某章节下所有通过审核的评论
+            </summary>
+            <param name="chapterId">章节 ID</param>
+            <returns>评论列表</returns>
+        </member>
+        <member name="M:OurNovel.Controllers.CommentsController.GetByNovel(System.Int32)">
+            <summary>
+            获取某小说下所有通过审核的评论
+            </summary>
+            <param name="novelId">小说 ID</param>
+            <returns>评论列表</returns>
+        </member>
+        <member name="M:OurNovel.Controllers.CommentsController.DeleteRecursive(System.Int32)">
+            <summary>
+            递归删除评论及其所有子评论
+            </summary>
+            <param name="commentId">评论 ID</param>
+            <returns>操作结果</returns>
+        </member>
+        <member name="M:OurNovel.Controllers.CommentsController.GetTopLevelComments(System.Int32)">
+            <summary>
+            获取小说所有章节的第一级评论
+            </summary>
+            <param name="novelId">小说id</param>
+            <returns></returns>
+        </member>
+        <member name="M:OurNovel.Controllers.CommentsController.GetTopNTopLevelCommentsByLikes(System.Int32,System.Int32)">
+            <summary>
+            获取小说所有章节的第一级评论的点赞数排行
+            </summary>
+            <param name="novelId">小说id</param>
+            <param name="topN">前几名</param>
+            <returns></returns>
+        </member>
+        <member name="M:OurNovel.Controllers.CommentsController.GetTopLevelCommentsByChapter(System.Int32,System.Int32)">
+            <summary>
+            获取指定章节的第一级评论（不作为回复的评论）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.CommentsController.GetTopLikedTopLevelCommentsByChapter(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            获取指定章节的第一级评论的点赞数排行
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.CommentsController.GetCommentCountByNovel(System.Int32)">
+            <summary>
+            根据小说ID获取所有评论数量
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.CommentsController.GetCommentsByReaderId(System.Int32)">
+            <summary>
+            根据读者ID获取其发布的评论及父/子评论
+            </summary>
+            <param name="readerId">读者ID</param>
+        </member>
+        <member name="T:OurNovel.Controllers.LikesController">
+            <summary>
+            点赞控制器，提供对评论点赞与取消点赞的操作
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.LikesController.Like(System.Int32,System.Int32)">
+            <summary>
+            给指定评论点赞
+            </summary>
+            <param name="commentId">评论 ID</param>
+            <param name="readerId">读者 ID</param>
+            <returns>操作结果</returns>
+        </member>
+        <member name="M:OurNovel.Controllers.LikesController.Unlike(System.Int32,System.Int32)">
+            <summary>
+            取消点赞某条评论
+            </summary>
+            <param name="commentId">评论 ID</param>
+            <param name="readerId">读者 ID</param>
+            <returns>操作结果</returns>
+        </member>
+        <member name="M:OurNovel.Controllers.LikesController.IsLiked(System.Int32,System.Int32)">
+            <summary>
+            检查读者是否已点赞某条评论
+            </summary>
+            <param name="commentId">评论 ID</param>
+            <param name="readerId">读者 ID</param>
+            <returns>是否已点赞</returns>
+        </member>
+        <member name="M:OurNovel.Controllers.LikesController.GetLikeCount(System.Int32)">
+            <summary>
+            获取某条评论的点赞数量
+            </summary>
+            <param name="commentId">评论 ID</param>
+            <returns>点赞数</returns>
+        </member>
+        <member name="M:OurNovel.Controllers.LikesController.GetAllLikes">
+            <summary>
+            获取所有点赞记录
+            </summary>
+            <returns>点赞记录列表</returns>
+        </member>
+        <member name="M:OurNovel.Controllers.LogController.RegisterAuthor(OurNovel.DTOs.AuthorRegisterDto)">
+            <summary>
+            作者注册接口（传入 AuthorName + Password）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.LogController.LoginAuthor(OurNovel.DTOs.AuthorRegisterDto)">
+            <summary>
+            作者登录接口，返回 JWT Token
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.LogController.ResetPassword(OurNovel.DTOs.AuthorRegisterDto)">
+            <summary>
+            重置作者密码，不判断是否与原密码相同，类似忘记密码处理 提供用户名和新密码）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.LogController.ChangePassword(AuthorChangePasswordDto)">
+            <summary>
+            重置作者密码，判断是否与原密码相同（提供用户名和新密码）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.LogController.Logout">
+            <summary>
+            登出接口（前端清除 token 即可）
+            </summary>
+        </member>
+        <member name="T:OurNovel.Controllers.LogManagerController">
+            <summary>
+            管理员登录、注册与认证相关接口控制器
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.LogManagerController.RegisterManager(OurNovel.DTOs.ManagerRegisterDto)">
+            <summary>
+            管理员注册接口（传入 ManagerName + Password）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.LogManagerController.LoginManager(OurNovel.DTOs.ManagerRegisterDto)">
+            <summary>
+            管理员登录接口，验证用户名和密码，返回 JWT Token
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.LogManagerController.ResetPassword(OurNovel.DTOs.ManagerRegisterDto)">
+            <summary>
+            重置管理员密码（若用户名存在则更新密码，否则返回错误信息）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.LogManagerController.Logout">
+            <summary>
+            管理员登出接口（JWT 无状态，前端清除 Token 即可）
+            </summary>
+        </member>
+        <member name="T:OurNovel.Controllers.LogReaderController">
+            <summary>
+            读者登录注册及认证控制器
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.LogReaderController.RegisterReader(OurNovel.DTOs.ReaderRegisterDto)">
+            <summary>
+            读者注册接口（传入 ReaderName + Password）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.LogReaderController.LoginReader(OurNovel.DTOs.ReaderRegisterDto)">
+            <summary>
+            读者登录接口，验证用户名和密码，返回 JWT Token
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.LogReaderController.ResetPassword(OurNovel.DTOs.ReaderRegisterDto)">
+            <summary>
+            重置密码接口：传入用户名和新密码，若用户存在则更新密码
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.LogReaderController.Logout">
+            <summary>
+            登出接口（JWT 无状态，前端只需清除 Token 即可）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.ManagementController.GetByManagerId(System.Int32)">
+            <summary>
+            根据管理员ID筛选管理记录
+            </summary>
+        </member>
+        <member name="T:OurNovel.Controllers.ManagerController">
+            <summary>
+            Manager 控制器，继承通用基类控制器，提供基本的 CRUD 接口
+            </summary>
+        </member>
+        <member name="T:OurNovel.Controllers.NovelCategoryController">
+            <summary>
+            一本小说可以属于多个分类（修仙、热血、穿越），一个分类可以包含多部小说
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.NovelCategoryController.Add(System.Int32,System.String)">
+            <summary>
+              添加小说与分类关系 （例如 小说1 → 加入“修仙”）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.NovelCategoryController.Delete(System.Int32,System.String)">
+            <summary>
+              删除小说与分类关系 （例如 小说1 → 删除“修仙”）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.NovelCategoryController.GetAll">
+            <summary>
+            获取所有小说与分类的关系（例如：小说1 → 修仙、小说2 → 热血）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.NovelCategoryController.GetCategories(System.Int32)">
+            <summary>
+            获取某本小说的全部分类 
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.NovelCategoryController.GetNovels(System.String)">
+            <summary>
+            获取某个分类下的所有小说
+            </summary>
+        </member>
+        <member name="T:OurNovel.Controllers.NovelController">
+            <summary>
+            小说控制器，继承基类控制器，实现对 Novel 实体的 CRUD 操作
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.NovelController.CreateNovel(System.Int32,System.String,System.String)">
+            <summary>
+            创建小说（简化字段）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.NovelController.ReviewNovel(System.Int32,System.String,System.Int32,System.String)">
+            <summary>
+            审核小说
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.NovelController.UploadAvatar(System.Int32,Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            上传小说封面，并更新封面URL
+            </summary>
+            <param name="novelId">小说ID</param>
+            <param name="coverFile">封面文件</param>
+            <returns>封面URL</returns>
+        </member>
+        <member name="M:OurNovel.Controllers.NovelController.SubmitEdit(System.Int32,OurNovel.DTOs.NovelEditDto)">
+            <summary>
+            修改小说信息
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.NovelController.GetTotalWordCount(System.Int32)">
+            <summary>
+            返回小说总字数
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.NovelController.GetRecommendCount(System.Int32)">
+            <summary>
+            返回小说推荐数
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.NovelController.GetCollectCount(System.Int32)">
+            <summary>
+            返回小说收藏数
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.NovelController.GetLatestPublishedChapter(System.Int32)">
+            <summary>
+            获取小说最新已发布章节的ID和发布时间
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.NovelController.GetPublishedNovels">
+            <summary>
+            获取所有已发布的小说（Status == "连载" 或 "完结"）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.NovelController.GetAllNovels(System.Int32,System.Int32)">
+            <summary>
+            获取所有已发布的小说（分页，按novelID顺序）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.NovelController.GetPublishedNovels(System.Int32,System.Int32,System.String,System.Nullable{System.Int64},System.Nullable{System.Int64},System.Nullable{System.Boolean})">
+            <summary>
+            获取已发布小说（分页 + 条件筛选，按 NovelId 顺序）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.NovelManagementController.GetLogs(System.Int32)">
+            <summary>
+            获取指定小说的管理日志列表（包含管理员信息，时间倒序）
+            GET: api/NovelManagement/logs/{novelId}
+            </summary>
+            <param name="novelId">小说ID</param>
+            <returns>管理日志列表</returns>
+        </member>
+        <member name="M:OurNovel.Controllers.NovelManagementController.GetAllNovelLogs">
+            <summary>
+            获取所有小说的管理日志列表
+            GET: api/NovelManagement/logs/all
+            </summary>
+            <returns>管理日志列表</returns>
+        </member>
+        <member name="T:OurNovel.Controllers.PurchaseController">
+            <summary>
+            章节购买控制器，处理读者购买章节请求
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.PurchaseController.Purchase(OurNovel.DTOs.ChapterPurchaseDto)">
+            <summary>
+            用户购买章节
+            </summary>
+            <param name="dto">包含 ReaderId, NovelId, ChapterId 的购买请求</param>
+            <returns>购买结果</returns>
+        </member>
+        <member name="M:OurNovel.Controllers.PurchaseController.CheckPurchase(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            查询某个读者是否已购买指定小说章节
+            </summary>
+            <param name="readerId">读者ID</param>
+            <param name="novelId">小说ID</param>
+            <param name="chapterId">章节ID</param>
+            <returns>是否已购买</returns>
+        </member>
+        <member name="T:OurNovel.Controllers.RankingController">
+            <summary>
+            排行榜单
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.RankingController.GetTopCollectedAsync(System.Int32,System.String)">
+            <summary>
+            获取收藏榜单前 n 名
+            </summary>
+            <param name="topN">前几名</param>
+            <param name="status">小说状态筛选（可选）："连载"、"完结"</param>
+            <returns>收藏榜单</returns>
+        </member>
+        <member name="M:OurNovel.Controllers.RankingController.GetRecommendRanking(System.Int32,System.String)">
+            <summary>
+            获取推荐榜单前 n 名
+            </summary>
+            <param name="top">前几名</param>
+            <param name="status">小说状态筛选（可选）："连载"、"完结"</param>
+            <returns>推荐榜单</returns>
+        </member>
+        <member name="M:OurNovel.Controllers.RankingController.GetScoreRanking(System.Int32,System.String)">
+            <summary>
+            获取评分榜单前 n 名
+            </summary>
+            <param name="top">前几名</param>
+            <param name="status">小说状态筛选（可选）："连载"、"完结"</param>
+            <returns>评分榜单</returns>
+        </member>
+        <member name="T:OurNovel.Controllers.ReaderController">
+            <summary>
+            读者控制器，继承基类控制器，实现对 Reader 实体的 CRUD 操作
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.ReaderController.UploadAvatar(System.Int32,Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            上传读者头像，并更新头像URL
+            </summary>
+            <param name="readerId">读者ID</param>
+            <param name="avatarFile">头像文件</param>
+            <returns>头像URL</returns>
+        </member>
+        <member name="M:OurNovel.Controllers.ReaderController.GetBalance(System.Int32)">
+            <summary>
+            获取读者余额
+            </summary>
+            <param name="readerId">读者ID</param>
+        </member>
+        <member name="T:OurNovel.Controllers.RecentReadingsController">
+            <summary>
+            读者最近阅读
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.RecentReadingsController.AddOrUpdate(System.Int32,System.Int32)">
+            <summary>
+            添加或更新读者最近阅读记录
+            </summary>
+            <param name="readerId">读者ID</param>
+            <param name="novelId">小说ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:OurNovel.Controllers.RecentReadingsController.Delete(System.Int32,System.Int32)">
+            <summary>
+            删除指定读者的某本小说的最近阅读记录
+            </summary>
+            <param name="readerId">读者ID</param>
+            <param name="novelId">小说ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:OurNovel.Controllers.RecentReadingsController.GetByReaderId(System.Int32)">
+            <summary>
+            获取指定读者的最近阅读记录列表，按时间降序排列
+            </summary>
+            <param name="readerId">读者ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:OurNovel.Controllers.ReportsController.ReportComment(System.Int32,System.Int32,System.String)">
+            <summary>
+            举报评论
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.ReportsController.ProcessReport(System.Int32,System.String,System.Int32,System.String)">
+            <summary>
+            处理举报
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.ReportManagementController.GetReportManagementLogs(System.Int32)">
+            <summary>
+            获取指定举报的所有管理处理日志（含管理员信息）
+            </summary>
+            <param name="reportId">举报ID</param>
+            <returns>管理日志列表</returns>
+        </member>
+        <member name="M:OurNovel.Controllers.ReportManagementController.GetAllNovelLogs">
+            <summary>
+            获取所有举报的管理日志列表
+            GET: api/NovelManagement/logs/all
+            </summary>
+            <returns>管理日志列表</returns>
+        </member>
+        <member name="M:OurNovel.Controllers.ReportManagementController.GetReportsWithLogsByReader(System.Int32)">
+            <summary>
+            获取指定读者发布的所有举报及其管理处理进度
+            </summary>
+            <param name="readerId">读者ID</param>
+            <returns>举报列表及处理进度</returns>
+        </member>
+        <member name="T:OurNovel.Controllers.RewardController">
+            <summary>
+            打赏控制器，处理用户打赏行为
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.RewardController.Reward(OurNovel.DTOs.RewardRequestDto)">
+            <summary>
+            用户发起打赏
+            </summary>
+            <param name="dto">打赏请求信息（包含 readerId, novelId, amount）</param>
+            <returns>打赏结果</returns>
+        </member>
+        <member name="M:OurNovel.Controllers.StatisticsController.GetTotalNovelsCount">
+            <summary>
+            获取总小说数
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.StatisticsController.GetTotalAuthorsCount">
+            <summary>
+            获取作者总数
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.StatisticsController.GetTotalReadersCount">
+            <summary>
+            获取读者总数
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.StatisticsController.GetPendingChaptersCount">
+            <summary>
+            获取待审核章节数  “首次审核”+“审核中”
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.StatisticsController.GetPendingNovelsCount">
+            <summary>
+            获取待审核小说数 “待审核”
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.StatisticsController.GetPendingReportsCount">
+            <summary>
+            获取待处理举报数 “未处理”
+            </summary>
+        </member>
+        <member name="M:OurNovel.Controllers.WholePurchaseController.PurchaseWholeNovel(OurNovel.DTOs.WholePurchaseDto)">
+            <summary>
+            整本小说买断接口
+            </summary>
+            <param name="dto">包含 ReaderId 和 NovelId 的买断请求</param>
+            <returns>购买结果（成功与否 + 消息）</returns>
+        </member>
+        <member name="M:OurNovel.Controllers.WholePurchaseController.CheckWholePurchaseStatus(System.Int32,System.Int32)">
+            <summary>
+            查询读者是否已整本买断某小说
+            </summary>
+            <param name="readerId">读者ID</param>
+            <param name="novelId">小说ID</param>
+            <returns>是否买断结果</returns>
+        </member>
+        <member name="T:OurNovel.Data.AppDbContext">
+            <summary>
+            应用程序的数据库上下文类，继承自 EF Core 的 DbContext
+            用于定义数据库连接和表映射
+            </summary>
+        </member>
+        <member name="M:OurNovel.Data.AppDbContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions{OurNovel.Data.AppDbContext})">
+            <summary>
+            构造函数，接收配置好的 DbContextOptions 并传递给基类
+            </summary>
+            <param name="options">数据库上下文配置项</param>
+        </member>
+        <member name="M:OurNovel.Data.AppDbContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <summary>
+            配置实体和数据库表结构映射关系的方法
+            </summary>
+            <param name="modelBuilder">用于构建模型的 ModelBuilder 对象</param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "T:OurNovel.Data.Configurations.AuthorConfiguration" -->
+        <member name="M:OurNovel.Data.Configurations.AuthorConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{OurNovel.Models.Author})">
+            <summary>
+            配置 Author 实体对应的数据库表结构
+            </summary>
+            <param name="entity">实体构建器，用于配置字段属性和关系</param>
+        </member>
+        <member name="T:OurNovel.Data.Configurations.AuthorIncomeConfiguration">
+            <summary>
+            AuthorIncome 实体的表结构配置
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "T:OurNovel.Data.Configurations.CategoryConfiguration" -->
+        <member name="T:OurNovel.Data.Configurations.ChapterConfiguration">
+            <summary>
+            Chapter 实体类的数据库配置（通过 Fluent API）
+            </summary>
+        </member>
+        <member name="T:OurNovel.Data.Configurations.CommentsConfiguration">
+            <summary>
+            Comment 实体类的 Fluent API 配置
+            </summary>
+        </member>
+        <member name="T:OurNovel.Data.Configurations.ManagementConfiguration">
+            <summary>
+            Management 实体的数据库表配置类
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "T:OurNovel.Data.Configurations.ManagerConfiguration" -->
+        <member name="M:OurNovel.Data.Configurations.ManagerConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{OurNovel.Models.Manager})">
+            <summary>
+            配置 Manager 实体对应的数据库表结构
+            </summary>
+            <param name="entity">实体构建器，用于配置字段属性和关系</param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "T:OurNovel.Data.Configurations.NovelConfiguration" -->
+        <member name="M:OurNovel.Data.Configurations.NovelConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{OurNovel.Models.Novel})">
+            <summary>
+            配置 Novel 实体对应的数据库表结构
+            </summary>
+            <param name="entity">实体构建器，用于配置字段属性和关系</param>
+        </member>
+        <member name="T:OurNovel.Data.Configurations.PurchaseConfiguration">
+            <summary>
+            Purchase 实体类的数据库配置（通过 Fluent API）
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "T:OurNovel.Data.Configurations.ReaderConfiguration" -->
+        <member name="M:OurNovel.Data.Configurations.ReaderConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{OurNovel.Models.Reader})">
+            <summary>
+            配置 Reader 实体对应的数据库表结构
+            </summary>
+            <param name="entity">实体构建器，用于配置字段属性和关系</param>
+        </member>
+        <member name="T:OurNovel.Data.Configurations.ReportConfiguration">
+            <summary>
+            Report 实体类的数据库配置
+            </summary>
+        </member>
+        <member name="T:OurNovel.Data.Configurations.RewardConfiguration">
+            <summary>
+            Reward 实体的表结构配置
+            </summary>
+        </member>
+        <member name="T:OurNovel.Data.Configurations.TransactionConfiguration">
+            <summary>
+            Transaction 实体类的数据库配置
+            对应 Oracle 的 MAIN_USER.TRANSACTION 表
+            </summary>
+        </member>
+        <member name="T:OurNovel.Data.Configurations.WholePurchaseConfiguration">
+            <summary>
+            WholePurchase 实体类的数据库配置（通过 Fluent API）
+            </summary>
+        </member>
+        <member name="T:OurNovel.Models.LikesConfiguration">
+            <summary>
+            Like 实体的数据库配置类，配置其表结构、主键和关联关系。
+            </summary>
+        </member>
+        <member name="M:OurNovel.Models.LikesConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{OurNovel.Models.Like})">
+            <summary>
+            配置 Like 实体与数据库表的映射关系。
+            </summary>
+            <param name="builder">实体构建器</param>
+        </member>
+        <member name="T:OurNovel.Models.Chapter">
+            <summary>
+            章节实体类，使用复合主键（NovelId + ChapterId）
+            </summary>
+        </member>
+        <member name="P:OurNovel.Models.Chapter.NovelId">
+            所属小说ID（复合主键之一）
+        </member>
+        <member name="P:OurNovel.Models.Chapter.Novel">
+            外键导航属性：章节所属小说（必须存在）
+        </member>
+        <member name="P:OurNovel.Models.Chapter.ChapterId">
+            章节编号（复合主键之一）
+        </member>
+        <member name="P:OurNovel.Models.Chapter.Title">
+            标题，最大长度40，不能为空
+        </member>
+        <member name="P:OurNovel.Models.Chapter.Content">
+            章节内容（长文本）
+        </member>
+        <member name="P:OurNovel.Models.Chapter.WordCount">
+            字数，不能为空
+        </member>
+        <member name="P:OurNovel.Models.Chapter.PricePerKilo">
+            千字单价，默认0.50，保留两位小数
+        </member>
+        <member name="P:OurNovel.Models.Chapter.CalculatedPrice">
+            计算价格，自动计算（非映射字段）
+        </member>
+        <member name="P:OurNovel.Models.Chapter.IsCharged">
+            是否收费：是/否
+        </member>
+        <member name="P:OurNovel.Models.Chapter.PublishTime">
+            发布时间
+        </member>
+        <member name="P:OurNovel.Models.Chapter.Status">
+            状态：草稿/首次审核/审核中/已发布/封禁（默认草稿）
+        </member>
+        <member name="T:OurNovel.Models.Transaction">
+            <summary>
+            表示用户的交易记录实体
+            </summary>
+        </member>
+        <member name="T:OurNovel.DTOs.AuthorRegisterDto">
+            <summary>
+            作者注册请求 DTO
+            </summary>
+        </member>
+        <member name="T:OurNovel.DTOs.WholePurchaseDto">
+            <summary>
+            整本小说买断请求数据传输对象
+            </summary>
+        </member>
+        <member name="T:OurNovel.Repositories.IRepository`2">
+            <summary>
+            泛型仓储接口，定义常用的增删查改方法
+            </summary>
+        </member>
+        <member name="T:OurNovel.Repositories.Repository`2">
+            <summary>
+            泛型仓储基类，封装对数据库表的通用CRUD操作
+            </summary>
+            <typeparam name="T">实体类型（如Reader、Post）</typeparam>
+            <typeparam name="TKey">实体主键类型（如int、string）</typeparam>
+        </member>
+        <member name="M:OurNovel.Repositories.Repository`2.#ctor(OurNovel.Data.AppDbContext)">
+            <summary>
+            构造函数，通过依赖注入获取数据库上下文
+            </summary>
+            <param name="context">数据库上下文实例</param>
+        </member>
+        <member name="M:OurNovel.Repositories.Repository`2.GetAllAsync">
+            <summary>
+            异步获取所有实体记录
+            </summary>
+            <returns>实体集合（IEnumerable）</returns>
+        </member>
+        <member name="M:OurNovel.Repositories.Repository`2.AddAsync(`0)">
+            <summary>
+            异步添加新实体到数据库
+            </summary>
+            <param name="entity">要添加的实体对象</param>
+        </member>
+        <member name="M:OurNovel.Repositories.Repository`2.UpdateAsync(`0)">
+            <summary>
+            异步更新现有实体
+            </summary>
+            <param name="entity">要更新的实体对象</param>
+        </member>
+        <member name="M:OurNovel.Repositories.Repository`2.GetByIdAsync(`1)">
+            <summary>
+            异步根据主键ID查询单个实体
+            </summary>
+            <param name="id">主键值</param>
+            <returns>找到的实体或null</returns>
+        </member>
+        <member name="M:OurNovel.Repositories.Repository`2.DeleteAsync(`1)">
+            <summary>
+            异步根据主键ID删除实体
+            </summary>
+            <param name="id">主键值</param>
+        </member>
+        <member name="T:OurNovel.Services.AuthorService">
+            <summary>
+            Author 服务，继承基础服务，并扩展注册逻辑
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.AuthorService.RegisterAsync(System.String,System.String)">
+            <summary>
+            注册作者：AuthorName 唯一，密码将加密存储
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.AuthorService.ResetPasswordAsync(System.String,System.String)">
+            <summary>
+            重置密码（按用户名）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.AuthorService.GetAllAuthors">
+            <summary>
+            获取所有作者（用于登录查找）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.AuthorService.GetByAuthorName(System.String)">
+            <summary>
+            按用户名查找作者（可选辅助方法）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.AuthorService.GetNovelCountByAuthorIdAsync(System.Int32)">
+            <summary>
+            按作者id统计其小说总数
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.AuthorService.GetTotalWordCountByAuthorIdAsync(System.Int32)">
+            <summary>
+            按作者id统计其字数总数
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.AuthorService.GetAuthorRegisterDaysAsync(System.Int32)">
+            <summary>
+            计算作者注册总天数
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.AuthorService.GetNovelsByAuthorIdAsync(System.Int32)">
+            <summary>
+            根据作者 ID 获取该作者的所有小说
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.AuthorService.GetNovelsByAuthorIdWithScreeningAsync(System.Int32)">
+            <summary>
+            根据作者 ID 获取该作者的筛选为‘连载和完结’的小说
+            </summary>
+        </member>
+        <member name="T:OurNovel.Services.BaseService`2">
+            <summary>
+            泛型基础服务，封装常规增删查改
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.BaseService`2.#ctor(OurNovel.Repositories.IRepository{`0,`1})">
+            <summary>
+            构造函数，注入仓储实例
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.BaseService`2.GetAllAsync">
+            <summary>
+            获取所有实体记录
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.BaseService`2.AddAsync(`0)">
+            <summary>
+            添加新实体
+            </summary>
+            <param name="entity">要添加的实体对象</param>
+        </member>
+        <member name="M:OurNovel.Services.BaseService`2.UpdateAsync(`0)">
+            <summary>
+            更新现有实体
+            </summary>
+            <param name="entity">要更新的实体对象</param>
+        </member>
+        <member name="M:OurNovel.Services.BaseService`2.GetByIdAsync(`1)">
+            <summary>
+            根据主键ID获取单个实体
+            </summary>
+            <param name="id">实体主键ID</param>
+        </member>
+        <member name="M:OurNovel.Services.BaseService`2.DeleteAsync(`1)">
+            <summary>
+            根据主键ID删除实体
+            </summary>
+            <param name="id">要删除的实体主键ID</param>
+        </member>
+        <member name="T:OurNovel.Services.CategoryService">
+            <summary>
+            Category 服务，继承基础服务，可扩展自定义业务
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.ChapterManagementService.RecordManagementAsync(System.Int32,System.String,System.Int32,System.Int32)">
+            <summary>
+            记录管理员对章节的管理操作（管理记录 + 桥表关联）
+            </summary>
+            <param name="managerId">管理员ID</param>
+            <param name="result">操作结果说明，如“通过”或“封禁”</param>
+            <param name="novelId">小说ID</param>
+            <param name="chapterId">章节ID</param>
+        </member>
+        <member name="M:OurNovel.Services.ChapterManagementService.GetManagementLogsByNovelAndChapterAsync(System.Int32,System.Int32)">
+            <summary>
+            根据小说ID、章节ID获取该章节的所有管理日志
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.ChapterManagementService.GetAllChapterManagementLogsAsync">
+            <summary>
+            获取所有章节的管理日志
+            </summary>
+            <returns>ChapterManagement 列表</returns>
+        </member>
+        <member name="M:OurNovel.Services.ChapterService.ReviewChapterAsync(System.Int32,System.Int32,System.String,System.Int32,System.String)">
+            <summary>
+            审核章节，修改状态为“已发布”或“封禁”
+            </summary>
+        </member>
+        <member name="T:OurNovel.Services.CommentManagementService">
+            <summary>
+            CommentsManagementService：专注于记录管理员对评论的管理日志和维护桥表关联
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.CommentManagementService.RecordManagementAsync(System.Int32,System.String,System.Int32)">
+            <summary>
+            记录管理员对评论的管理操作（管理记录 + 桥表关联）
+            </summary>
+            <param name="managerId">管理员ID</param>
+            <param name="result">操作结果说明，如“通过审核”或“封禁处理”</param>
+            <param name="commentId">评论ID</param>
+        </member>
+        <member name="M:OurNovel.Services.CommentManagementService.GetManagementLogsByCommentIdAsync(System.Int32)">
+            <summary>
+            根据评论ID获取该评论的所有管理日志（含管理员信息）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.CommentManagementService.GetAllCommentManagementLogsAsync">
+            <summary>
+            获取所有评论的管理日志
+            </summary>
+            <returns>CommentManagement 列表</returns>
+        </member>
+        <member name="T:OurNovel.Services.CommentsService">
+            <summary>
+            CommentsService：评论业务逻辑类，继承基础服务，带管理日志写入
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.CommentsService.SetCommentStatusAsync(System.Int32,System.String,System.Int32,System.String)">
+            <param name="commentId">评论ID</param>
+            <param name="status">状态（通过/封禁）</param>
+            <param name="managerId">操作管理员ID</param>
+        </member>
+        <member name="M:OurNovel.Services.CommentsService.LikeCommentAsync(System.Int32)">
+            <summary>
+            点赞评论：将评论的 Likes 加一
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.CommentsService.DeleteCommentRecursivelyAsync(System.Int32)">
+            <summary>
+            递归删除指定评论及其所有子评论（包括评论回复关系）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.CommentsService.CollectChildCommentIds(System.Int32,System.Collections.Generic.List{CommentReply},System.Collections.Generic.List{System.Int32})">
+            <summary>
+            递归获取所有子评论 ID
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.CommentsService.GetTopLevelCommentsByNovelAsync(System.Int32)">
+            <summary>
+            获取指定小说所有章节的第一级评论（即不作为回复的评论）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.CommentsService.GetTopNTopLevelCommentsByLikesAsync(System.Int32,System.Int32)">
+            <summary>
+            获取小说所有章节的第一级评论的点赞数排行
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.CommentsService.GetTopLevelCommentsByChapterAsync(System.Int32,System.Int32)">
+            <summary>
+            获取指定章节的第一级评论
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.CommentsService.GetTopNTopLevelCommentsByLikesByChapterAsync(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            获取指定章节的第一级评论点赞数排行
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.CommentsService.GetCommentCountByNovelAsync(System.Int32)">
+            <summary>
+            根据小说ID获取所有评论数量
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.ICommentReplyService.DeleteByCommentIdAsync(System.Int32)">
+            <summary>
+            删除评论及其所有回复，包括所有层级的子回复
+            </summary>
+            <param name="commentId">评论 ID</param>
+        </member>
+        <member name="T:OurNovel.Services.Interfaces.IOssService">
+            <summary>
+            OSS服务接口定义
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.Interfaces.IOssService.UploadFileAsync(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            异步上传文件到OSS
+            </summary>
+            <param name="file">要上传的文件</param>
+            <returns>返回文件在OSS上的访问URL</returns>
+        </member>
+        <member name="M:OurNovel.Services.Interfaces.IOssService.DeleteFile(System.String)">
+            <summary>
+            从OSS删除文件
+            </summary>
+            <param name="fileName">要删除的文件名</param>
+        </member>
+        <member name="P:OurNovel.Services.Interfaces.IPaymentProvider.ProviderName">
+            <summary>
+            支付提供者名称(如Alipay、WeChatPay)
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.Interfaces.IPaymentProvider.CreatePaymentAsync(OurNovel.DTOs.PaymentRequest)">
+            <summary>
+            创建支付
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.Interfaces.IPaymentProvider.VerifyNotificationAsync(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            验证支付通知
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.Interfaces.IPaymentProvider.ProcessNotificationAsync(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            处理支付通知
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.Interfaces.IPaymentProvider.QueryPaymentStatusAsync(System.String)">
+            <summary>
+            查询支付状态
+            </summary>
+        </member>
+        <member name="T:OurNovel.Services.LikesService">
+            <summary>
+            Likes 服务类，实现对评论点赞功能的相关业务逻辑。
+            提供点赞、取消点赞、判断是否已点赞、获取点赞数和获取所有点赞记录等方法。
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.LikesService.#ctor(ILikesRepository,OurNovel.Repositories.IRepository{Comment,System.Int32})">
+            <summary>
+            构造函数，注入点赞仓储和评论仓储接口
+            </summary>
+            <param name="likesRepository">点赞仓储接口</param>
+            <param name="commentRepository">评论仓储接口</param>
+        </member>
+        <member name="M:OurNovel.Services.LikesService.LikeAsync(System.Int32,System.Int32)">
+            <summary>
+            给指定评论点赞（避免重复点赞）
+            同时将评论的 Likes 数字段加一
+            </summary>
+            <param name="commentId">评论 ID</param>
+            <param name="readerId">读者 ID</param>
+        </member>
+        <member name="M:OurNovel.Services.LikesService.UnlikeAsync(System.Int32,System.Int32)">
+            <summary>
+            取消对指定评论的点赞
+            同时将评论的 Likes 数字段减一（不能小于 0）
+            </summary>
+            <param name="commentId">评论 ID</param>
+            <param name="readerId">读者 ID</param>
+        </member>
+        <member name="M:OurNovel.Services.LikesService.IsLikedAsync(System.Int32,System.Int32)">
+            <summary>
+            判断读者是否已点赞某条评论
+            </summary>
+            <param name="commentId">评论 ID</param>
+            <param name="readerId">读者 ID</param>
+            <returns>布尔值，表示是否点赞</returns>
+        </member>
+        <member name="M:OurNovel.Services.LikesService.GetLikeCountAsync(System.Int32)">
+            <summary>
+            获取某条评论的点赞数量
+            </summary>
+            <param name="commentId">评论 ID</param>
+            <returns>点赞数量</returns>
+        </member>
+        <member name="M:OurNovel.Services.LikesService.GetAllLikesAsync">
+            <summary>
+            获取所有点赞记录（适用于后台管理或统计分析）
+            </summary>
+            <returns>点赞实体集合</returns>
+        </member>
+        <member name="T:OurNovel.Services.ManagerService">
+            <summary>
+            Manager 服务，继承通用服务基类，可扩展登录/注册逻辑
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.NovelCategoryService.#ctor(OurNovel.Repositories.INovelCategoryRepository)">
+            <summary>
+            一本小说可以属于多个分类（修仙、热血、穿越），一个分类可以包含多部小说
+            </summary>
+            <param name="repository"></param>
+        </member>
+        <member name="M:OurNovel.Services.NovelCategoryService.AddAsync(System.Int32,System.String)">
+            <summary>
+              添加小说与分类关系 （例如 小说1 → 加入“修仙”）
+            </summary>
+            <param name="novelId"></param>
+            <param name="categoryName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:OurNovel.Services.NovelCategoryService.DeleteAsync(System.Int32,System.String)">
+            <summary>
+              删除小说与分类关系 （例如 小说1 → 删除“修仙”）
+            </summary>
+            <param name="novelId"></param>
+            <param name="categoryName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:OurNovel.Services.NovelCategoryService.GetAllAsync">
+            <summary>
+            获取所有分类及小说
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:OurNovel.Services.NovelCategoryService.GetCategoriesByNovelIdAsync(System.Int32)">
+            <summary>
+            获取某本小说的全部分类 
+            </summary>
+            <param name="novelId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:OurNovel.Services.NovelCategoryService.GetNovelsByCategoryAsync(System.String)">
+            <summary>
+            获取某个分类下的所有小说
+            </summary>
+            <param name="categoryName"></param>
+            <returns></returns>
+        </member>
+        <member name="T:OurNovel.Services.NovelManagementService">
+            <summary>
+            管理员操作日志服务，专注记录对小说的管理操作日志及桥表
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.NovelManagementService.RecordManagementAsync(System.Int32,System.String,System.Int32)">
+            <summary>
+            记录管理员对小说的操作日志
+            </summary>
+            <param name="managerId">管理员ID</param>
+            <param name="result">操作结果描述（如“审核通过”、“封禁”）</param>
+            <param name="novelId">被操作小说ID</param>
+        </member>
+        <member name="M:OurNovel.Services.NovelManagementService.GetManagementLogsByNovelIdAsync(System.Int32)">
+            <summary>
+            根据小说ID获取该小说所有管理日志列表（含管理员信息）
+            </summary>
+            <param name="novelId">小说ID</param>
+            <returns>管理日志列表</returns>
+        </member>
+        <member name="M:OurNovel.Services.NovelManagementService.GetAllNovelManagementLogsAsync">
+            <summary>
+            获取所有小说的管理日志
+            </summary>
+            <returns>NovelManagement 列表</returns>
+        </member>
+        <member name="T:OurNovel.Services.NovelService">
+            <summary>
+            Novel 服务，继承基础服务，如有特殊业务再扩展
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.NovelService.CreateNovelAsync(System.Int32,System.String,System.String)">
+            <summary>
+            创建小说
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.NovelService.ReviewNovelAsync(System.Int32,System.String,System.Int32,System.String)">
+            <summary>
+            审核小说，修改状态为“连载”或“封禁”
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.NovelService.GetTopCollectedNovelsAsync(System.Int32,System.String)">
+            <summary>
+            获取收藏榜单
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.NovelService.GetTopRecommendedNovelsAsync(System.Int32,System.String)">
+            <summary>
+            获取推荐榜单
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.NovelService.GetTopScoredNovelsAsync(System.Int32,System.String)">
+            <summary>
+            获取评分榜单
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.NovelService.GetNovelPropertyAsync``1(System.Int32,System.Linq.Expressions.Expression{System.Func{OurNovel.Models.Novel,``0}},``0)">
+            <summary>
+            根据小说ID获取指定的字符串类型属性值
+            </summary>
+            <param name="novelId">要查询的小说ID</param>
+            <param name="propertySelector">属性选择器，指定要获取的字符串类型属性</param>
+        </member>
+        <member name="M:OurNovel.Services.NovelService.SubmitNovelEditAsync(System.Int32,OurNovel.Models.Novel)">
+            <summary>
+            修改小说信息
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.NovelService.GetLatestPublishedChapterInfoAsync(System.Int32)">
+            <summary>
+            小说最新章节
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.NovelService.GetPublishedNovelsAsync">
+            <summary>
+            获取所有连载或完结的小说
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.NovelService.GetNovelsByPageAsync(System.Int32,System.Int32)">
+            <summary>
+            获取所有已发布的小说（分页，按novelID顺序）
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.NovelService.GetNovelsAsync(System.Int32,System.Int32,System.String,System.Nullable{System.Int64},System.Nullable{System.Int64},System.Nullable{System.Boolean})">
+            <summary>
+            获取小说列表（支持分类、字数区间、是否完结等条件 + 分页）
+            </summary>
+        </member>
+        <member name="T:OurNovel.Services.OSS.OssService">
+            <summary>
+            OSS服务实现类
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.OSS.OssService.#ctor(Microsoft.Extensions.Options.IOptions{OurNovel.Services.OSS.OssConfig})">
+            <summary>
+            构造函数，通过依赖注入获取配置
+            </summary>
+            <param name="config">OSS配置项</param>
+        </member>
+        <member name="M:OurNovel.Services.OSS.OssService.UploadFileAsync(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            异步上传文件到OSS
+            </summary>
+            <param name="file">要上传的文件</param>
+            <returns>返回文件在OSS上的访问URL</returns>
+        </member>
+        <member name="M:OurNovel.Services.OSS.OssService.DeleteFile(System.String)">
+            <summary>
+            从OSS删除文件
+            </summary>
+            <param name="fileName">要删除的文件名</param>
+        </member>
+        <member name="T:OurNovel.Services.AlipayService">
+            <summary>
+            支付宝支付服务
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.AlipayService.CreatePagePay(System.String,System.Decimal,System.String,System.String,System.String)">
+            <summary>
+            创建电脑网站支付
+            </summary>
+            <param name="outTradeNo">商户订单号</param>
+            <param name="totalAmount">订单金额</param>
+            <param name="subject">订单标题</param>
+            <param name="notifyUrl">异步通知地址</param>
+            <param name="returnUrl">同步跳转地址</param>
+            <returns>支付页面HTML或错误信息</returns>
+        </member>
+        <member name="M:OurNovel.Services.ReaderService.GetBalanceById(System.Int32)">
+            <summary>
+            根据读者ID获取余额（精确到decimal）
+            </summary>
+        </member>
+        <member name="T:OurNovel.Services.RechargeService">
+            <summary>
+            充值服务，封装充值业务逻辑
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.RechargeService.RechargeAsync(OurNovel.DTOs.RechargeRequestDto)">
+            <summary>
+            用户执行充值行为：创建交易，更新余额
+            </summary>
+        </member>
+        <member name="T:OurNovel.Services.ReportService">
+            <summary>
+            举报服务，处理评论举报相关逻辑
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.ReportService.ReportCommentAsync(System.Int32,System.Int32,System.String)">
+            <summary>
+            举报某条评论
+            </summary>
+            <param name="commentId">被举报的评论ID</param>
+            <param name="readerId">举报人ID</param>
+            <param name="reason">举报原因</param>
+        </member>
+        <member name="M:OurNovel.Services.ReportService.ProcessReportAsync(System.Int32,System.String,System.Int32,System.String)">
+            <summary>
+            处理举报：更新进度状态
+            </summary>
+            <param name="reportId">举报ID</param>
+            <param name="progress">处理进度：成功、失败、未处理</param>
+        </member>
+        <member name="T:OurNovel.Services.RewardService">
+            <summary>
+            打赏服务，封装打赏业务逻辑
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.RewardService.RewardAsync(OurNovel.DTOs.RewardRequestDto)">
+            <summary>
+            用户执行打赏行为：创建交易，扣余额，写入打赏表和作者收入表
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.StatisticsService.GetTotalNovelsCountAsync">
+            <summary>
+            获取总小说数
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.StatisticsService.GetTotalAuthorsCountAsync">
+            <summary>
+            获取作者总数
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.StatisticsService.GetTotalReadersCountAsync">
+            <summary>
+            获取读者总数
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.StatisticsService.GetPendingChaptersCountAsync">
+            <summary>
+            获取待审核章节数
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.StatisticsService.GetPendingNovelsCountAsync">
+            <summary>
+            获取待审核小说数
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.StatisticsService.GetPendingReportsCountAsync">
+            <summary>
+            获取待处理举报数
+            </summary>
+        </member>
+        <member name="M:OurNovel.Services.WholePurchaseService.PurchaseWholeNovelAsync(OurNovel.DTOs.WholePurchaseDto)">
+            <summary>
+            整本小说买断方法
+            </summary>
+        </member>
+        <member name="T:CollectController">
+            <summary>
+            实现读者收藏小说
+            </summary>
+        </member>
+        <member name="M:CollectController.AddOrUpdate(System.Int32,System.Int32,System.String)">
+            <summary>
+            添加或更新收藏记录（更新 IsPublic ）
+            </summary>
+            <param name="novelId">小说 ID</param>
+            <param name="readerId">读者 ID</param>
+            <param name="isPublic">是否公开（"yes" 或 "no"）</param>
+            <returns>操作成功提示</returns>
+        </member>
+        <member name="M:CollectController.Delete(System.Int32,System.Int32)">
+            <summary>
+            取消收藏（删除一条收藏记录）
+            </summary>
+            <param name="novelId">小说 ID</param>
+            <param name="readerId">读者 ID</param>
+            <returns>操作成功提示</returns>
+        </member>
+        <member name="M:CollectController.GetByReader(System.Int32)">
+            <summary>
+            获取某个读者收藏的所有小说记录
+            </summary>
+            <param name="readerId">读者 ID</param>
+            <returns>该读者收藏的 Collect 列表</returns>
+        </member>
+        <member name="M:CollectController.GetByNovel(System.Int32)">
+            <summary>
+            获取某部小说被哪些读者收藏
+            </summary>
+            <param name="novelId">小说 ID</param>
+            <returns>收藏该小说的 Collect 列表</returns>
+        </member>
+        <member name="M:CollectController.GetAll">
+            <summary>
+            获取所有收藏记录
+            </summary>
+            <returns>所有 Collect 实体列表</returns>
+        </member>
+        <member name="T:RateController">
+            <summary>
+            实现读者对小说评分
+            </summary>
+        </member>
+        <member name="M:RateController.Add(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            添加评分（不可更新，已存在则报错）
+            </summary>
+            <param name="novelId">小说 ID</param>
+            <param name="readerId">读者 ID</param>
+            <param name="score">评分值（0 到 10 之间）</param>
+            <returns>操作结果</returns>
+        </member>
+        <member name="M:RateController.Delete(System.Int32,System.Int32)">
+            <summary>
+            删除评分记录
+            </summary>
+            <param name="novelId">小说 ID</param>
+            <param name="readerId">读者 ID</param>
+            <returns>操作结果</returns>
+        </member>
+        <member name="M:RateController.GetByNovel(System.Int32)">
+            <summary>
+            获取某本小说的全部评分记录
+            </summary>
+            <param name="novelId">小说 ID</param>
+            <returns>该小说的评分列表</returns>
+        </member>
+        <member name="M:RateController.GetByReader(System.Int32)">
+            <summary>
+            获取某位读者对小说的评分记录
+            </summary>
+            <param name="readerId">读者 ID</param>
+            <returns>该读者的评分记录</returns>
+        </member>
+        <member name="M:RateController.GetAll">
+            <summary>
+            获取全部评分记录
+            </summary>
+            <returns>所有评分数据</returns>
+        </member>
+        <member name="M:RechargeController.StartRecharge(OurNovel.DTOs.RechargeRequestDto)">
+            <summary>
+            发起充值并返回支付URL
+            </summary>
+        </member>
+        <member name="M:RechargeController.HandleAlipayNotify">
+            <summary>
+            支付宝异步通知（后台调用）
+            </summary>
+        </member>
+        <member name="T:RecommendController">
+            <summary>
+            实现读者推荐小说（附加推荐理由）
+            </summary>
+        </member>
+        <member name="M:RecommendController.Add(System.Int32,System.Int32,System.String)">
+            <summary>
+            推荐小说（新增一条推荐记录）
+            </summary>
+            <param name="novelId">小说 ID</param>
+            <param name="readerId">读者 ID</param>
+            <param name="reason">推荐理由（可选）</param>
+            <returns>操作成功提示</returns>
+        </member>
+        <member name="M:RecommendController.Delete(System.Int32,System.Int32)">
+            <summary>
+            取消推荐（删除一条推荐记录）
+            </summary>
+            <param name="novelId">小说 ID</param>
+            <param name="readerId">读者 ID</param>
+            <returns>操作成功提示</returns>
+        </member>
+        <member name="M:RecommendController.GetByReader(System.Int32)">
+            <summary>
+            获取某个读者推荐的所有小说
+            </summary>
+            <param name="readerId">读者 ID</param>
+            <returns>该读者推荐记录列表</returns>
+        </member>
+        <member name="M:RecommendController.GetByNovel(System.Int32)">
+            <summary>
+            获取某部小说被哪些读者推荐
+            </summary>
+            <param name="novelId">小说 ID</param>
+            <returns>推荐该小说的 Recommend 列表</returns>
+        </member>
+        <member name="M:RecommendController.GetAll">
+            <summary>
+            获取所有推荐记录
+            </summary>
+            <returns>所有 Recommend 实体列表</returns>
+        </member>
+        <member name="M:SearchController.SearchNovels(System.String)">
+            <summary>
+            通过小说名模糊搜索小说
+            </summary>
+            <param name="keyword">搜索关键词</param>
+            <returns>搜索结果</returns>
+        </member>
+        <member name="M:SearchController.SearchAuthors(System.String)">
+            <summary>
+            通过作者名模糊搜索作者
+            </summary>
+        </member>
+        <member name="M:SearchController.SearchReaders(System.String)">
+            <summary>
+            通过读者名模糊搜索读者
+            </summary>
+        </member>
+        <member name="T:CommentManagementConfiguration">
+            <summary>
+            CommentManagement 实体类的数据库配置
+            </summary>
+        </member>
+        <member name="T:NovelManagementConfiguration">
+            <summary>
+            NovelManagement 实体类的数据库配置
+            </summary>
+        </member>
+        <member name="P:WholePurchase.ReaderId">
+            <summary>
+            WholePurchase：整本小说买断记录
+            </summary>
+        </member>
+        <member name="M:IRecentReadingsRepository.AddOrUpdateAsync(OurNovel.Models.RecentReadings)">
+            <summary>
+            添加或更新读者最近阅读记录（如果已有该读者-小说组合则更新时间，否则新增）
+            </summary>
+        </member>
+        <member name="M:IRecentReadingsRepository.DeleteAsync(System.Int32,System.Int32)">
+            <summary>
+            删除指定读者的某本小说的最近阅读记录
+            </summary>
+        </member>
+        <member name="M:IRecentReadingsRepository.GetByReaderIdAsync(System.Int32)">
+            <summary>
+            获取指定读者的最近阅读记录列表，按时间降序排列
+            </summary>
+        </member>
+        <member name="T:LikesRepository">
+            <summary>
+            Likes 仓储实现类，负责对点赞（Like）实体的数据库操作。
+            提供增删改查、按评论统计点赞数等方法。
+            </summary>
+        </member>
+        <member name="M:LikesRepository.#ctor(OurNovel.Data.AppDbContext)">
+            <summary>
+            构造函数，初始化数据库上下文和实体集合
+            </summary>
+            <param name="context">应用数据库上下文</param>
+        </member>
+        <member name="M:LikesRepository.GetByIdAsync(System.ValueTuple{System.Int32,System.Int32})">
+            <summary>
+            根据评论 ID 和读者 ID 获取点赞记录
+            </summary>
+            <param name="id">元组 (CommentId, ReaderId)</param>
+            <returns>对应的 Like 实体或 null</returns>
+        </member>
+        <member name="M:LikesRepository.GetLikeCountByCommentIdAsync(System.Int32)">
+            <summary>
+            获取某条评论的点赞数量
+            </summary>
+            <param name="commentId">评论 ID</param>
+            <returns>点赞数量</returns>
+        </member>
+        <member name="M:LikesRepository.AddAsync(OurNovel.Models.Like)">
+            <summary>
+            添加新的点赞记录
+            </summary>
+            <param name="entity">Like 实体</param>
+        </member>
+        <member name="M:LikesRepository.DeleteAsync(System.ValueTuple{System.Int32,System.Int32})">
+            <summary>
+            删除指定的点赞记录
+            </summary>
+            <param name="id">元组 (CommentId, ReaderId)</param>
+        </member>
+        <member name="M:LikesRepository.UpdateAsync(OurNovel.Models.Like)">
+            <summary>
+            更新点赞实体（一般不常用）
+            </summary>
+            <param name="entity">Like 实体</param>
+        </member>
+        <member name="M:LikesRepository.GetAllAsync">
+            <summary>
+            获取所有点赞记录（通常用于后台管理或分析）
+            </summary>
+            <returns>所有 Like 实体的集合</returns>
+        </member>
+        <member name="M:NovelRepository.GetNovelPropertyAsync``1(System.Int32,System.Linq.Expressions.Expression{System.Func{OurNovel.Models.Novel,``0}})">
+            <summary>
+            根据小说ID获取小说某个属性
+            </summary>
+        </member>
+        <member name="M:AuthorSearchService.SearchAuthorsAsync(System.String)">
+            <summary>
+            根据作者名执行模糊搜索，支持中英文数字
+            </summary>
+        </member>
+        <member name="M:ReaderSearchService.SearchReadersAsync(System.String)">
+            <summary>
+            通过读者姓名模糊搜索读者（使用 Oracle Text CONTAINS）
+            </summary>
+        </member>
+        <member name="M:ReportManagementService.RecordManagementAsync(System.String,System.Int32,System.Int32)">
+            <summary>
+            记录管理员对举报的管理操作（管理日志 + 桥表关联）
+            </summary>
+            <param name="managerId">管理员ID</param>
+            <param name="result">操作结果说明，如“举报审核通过”或“举报无效”</param>
+            <param name="reportId">举报ID</param>
+        </member>
+        <member name="M:ReportManagementService.GetAllReportManagementLogsAsync">
+            <summary>
+            获取所有举报的管理日志
+            </summary>
+            <returns>ReportManagement 列表</returns>
+        </member>
+    </members>
+</doc>

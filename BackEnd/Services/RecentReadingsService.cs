@@ -12,12 +12,13 @@ public class RecentReadingsService : IRecentReadingsService
         _repository = repository;
     }
 
-    public async Task AddOrUpdateAsync(int readerId, int novelId)
+    public async Task AddOrUpdateAsync(int readerId, int novelId, int chapterId)
     {
         var entity = new RecentReadings
         {
             ReaderId = readerId,
             NovelId = novelId,
+            ChapterId = chapterId,
             RecentReadingTime = System.DateTime.Now
         };
         await _repository.AddOrUpdateAsync(entity);
@@ -32,5 +33,10 @@ public class RecentReadingsService : IRecentReadingsService
     {
         return await _repository.GetByReaderIdAsync(readerId);
     }
-}
 
+    public async Task<int> GetLastReadChapterIdAsync(int readerId, int novelId)
+    {
+        var record = await _repository.GetByReaderAndNovelAsync(readerId, novelId);
+        return record?.ChapterId ?? 1;   // 如果没有阅读记录，返回首章ID 1
+    }
+}

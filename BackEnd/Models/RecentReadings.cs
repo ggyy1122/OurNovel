@@ -22,5 +22,7 @@ namespace OurNovel.Models
         [Column("RECENT_READING_TIME")]
         public DateTime RecentReadingTime { get; set; }
 
+        [Column("CHAPTER_ID")]
+        public int? ChapterId { get; set; } // 改为可空int
     }
 }

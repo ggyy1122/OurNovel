@@ -25,16 +25,20 @@ namespace OurNovel.Controllers
         /// </summary>
         /// <param name="readerId">读者ID</param>
         /// <param name="novelId">小说ID</param>
+        /// <param name="chapterId">章节ID（可选，默认为1）</param>
         /// <returns></returns>
         [HttpPost("add-or-update")]
-        public async Task<IActionResult> AddOrUpdate([FromQuery] int readerId, [FromQuery] int novelId)
+        public async Task<IActionResult> AddOrUpdate(
+            [FromQuery] int readerId,
+            [FromQuery] int novelId,
+            [FromQuery] int chapterId = 1)
         {
-            if (readerId <= 0 || novelId <= 0)
+            if (readerId <= 0 || novelId <= 0 || chapterId <= 0)
             {
-                return BadRequest("无效的 readerId 或 novelId");
+                return BadRequest("无效的 readerId、novelId 或 chapterId");
             }
 
-            await _recentReadingsService.AddOrUpdateAsync(readerId, novelId);
+            await _recentReadingsService.AddOrUpdateAsync(readerId, novelId, chapterId);
             return Ok("添加或更新成功");
         }
 
@@ -71,6 +75,24 @@ namespace OurNovel.Controllers
 
             var list = await _recentReadingsService.GetByReaderIdAsync(readerId);
             return Ok(list);
+        }
+
+        /// <summary>
+        /// 获取读者最近阅读的章节ID
+        /// </summary>
+        /// <param name="readerId">读者ID</param>
+        /// <param name="novelId">小说ID</param>
+        /// <returns>最近阅读的章节ID，如果没有记录则返回1（首章）</returns>
+        [HttpGet("last-read-chapter")]
+        public async Task<ActionResult<int>> GetLastReadChapterId([FromQuery] int readerId, [FromQuery] int novelId)
+        {
+            if (readerId <= 0 || novelId <= 0)
+            {
+                return BadRequest("无效的 readerId 或 novelId");
+            }
+
+            var chapterId = await _recentReadingsService.GetLastReadChapterIdAsync(readerId, novelId);
+            return Ok(chapterId);
         }
     }
 }

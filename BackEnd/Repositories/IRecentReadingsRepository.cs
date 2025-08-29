@@ -1,4 +1,4 @@
-﻿using OurNovel.Models;
+﻿﻿using OurNovel.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -19,4 +19,8 @@ public interface IRecentReadingsRepository
     /// </summary>
     Task<IEnumerable<RecentReadings>> GetByReaderIdAsync(int readerId);
 
+    /// <summary>
+    /// 根据读者ID和小说ID获取最近阅读记录
+    /// </summary>
+    Task<RecentReadings?> GetByReaderAndNovelAsync(int readerId, int novelId);
 }

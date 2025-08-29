@@ -25,9 +25,14 @@ namespace OurNovel.Data.Configurations
                    .HasForeignKey(rr => rr.NovelId)
                    .OnDelete(DeleteBehavior.Cascade);
 
-            // 配置 RecentReadingTime 列，如果有额外配置需求，可以补充
+            // 配置 RecentReadingTime 列
             builder.Property(rr => rr.RecentReadingTime)
                    .IsRequired();
+
+            // 配置 ChapterId 列
+            builder.Property(rr => rr.ChapterId)
+                   .IsRequired()
+                   .HasDefaultValue(1);
         }
     }
 }
