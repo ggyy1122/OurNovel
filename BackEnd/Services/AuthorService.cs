@@ -152,7 +152,7 @@ namespace OurNovel.Services
         public async Task<List<Novel>> GetNovelsByAuthorIdAsync(int authorId)
         {
             return await _context.Novels
-                .Where(n => n.AuthorId == authorId)
+                .Where(n => n.AuthorId == authorId && n.OriginalNovelId == -1)
                 .OrderBy(n => n.NovelId)
                 .ToListAsync();
         }

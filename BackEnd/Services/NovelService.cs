@@ -264,9 +264,6 @@ namespace OurNovel.Services
             };
         }
 
-
-
-
         /// <summary>
         /// 上传小说封面，并更新封面地址ַ
         /// </summary>
