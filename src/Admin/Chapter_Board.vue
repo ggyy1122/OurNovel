@@ -8,64 +8,53 @@
       <span>加载中...</span>
     </div>
 
-   <!-- 章节表格 -->
-<table v-else class="chapter-table">
-  <thead>
-    <tr>
-      <th>小说ID</th>
-      <th>章节ID</th> <!-- 新增 -->
-      <th>章节标题</th>
-      <th>操作</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr v-for="chapter in chapters" :key="`${chapter.novelId}-${chapter.chapterId}`">
-      <td>{{ chapter.novelId }}</td>
-      <td>{{ chapter.chapterId }}</td> <!-- 新增 -->
-      <td>{{ chapter.title }}</td>
-      <td>
-        <button @click="goToContent(chapter)">查看内容</button>
-        <button @click="approveChapter(chapter)">审核通过</button>
-        <button @click="rejectChapter(chapter)" class="btn-reject">审核不通过</button>
-      </td>
-    </tr>
-    <tr v-if="chapters.length === 0 && !loading">
-      <td colspan="4" style="text-align: center; color: #888;">暂无待审核章节</td>
-    </tr>
-  </tbody>
-   </table>
+    <table v-else class="chapter-table">
+      <thead>
+        <tr>
+          <th>小说ID</th>
+          <th>章节ID</th>
+          <th>章节标题</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="chapter in chapters" :key="`${chapter.novelId}-${chapter.chapterId}`">
+          <td>{{ chapter.novelId }}</td>
+          <td>{{ chapter.chapterId }}</td>
+          <td>{{ chapter.title }}</td>
+          <td>
+            <button @click="goToContent(chapter)">查看内容</button>
+            <button @click="approveChapter(chapter)">审核通过</button>
+            <button @click="rejectChapter(chapter)" class="btn-reject">审核不通过</button>
+          </td>
+        </tr>
+        <tr v-if="chapters.length === 0 && !loading">
+          <td colspan="4" style="text-align: center; color: #888;">暂无待审核章节</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { getAllChapters, reviewChapter } from '@/API/ChapterManage_API'
-
+import { getAllChapters, reviewChapter } from '@/API/Chapter_API.js'
 import { current_state } from '@/stores/index'
 import { storeToRefs } from 'pinia'
+
+const router = useRouter()
+const chapters = ref([])
+const loading = ref(false)
 
 const currentState = current_state()
 const { id: managerID } = storeToRefs(currentState)
 
-const router = useRouter()
-const chapters = ref([])
-const loading = ref(false)  // 加载状态
-
-// 获取所有章节，筛选未审核章节（首次审核/审核中）
 const fetchChapters = async () => {
   loading.value = true
   try {
     const res = await getAllChapters()
-    chapters.value = res.filter(c =>
-      c.status === '首次审核' || c.status === '审核中'
-    ).map(c => ({
-      novelId: c.novelId,
-      chapterId: c.chapterId,
-      title: c.title,
-      content: c.content,
-      status: c.status
-    }))
+    chapters.value = res.filter(c => c.status === '首次审核' || c.status === '审核中')
   } catch (err) {
     console.error('获取未审核章节失败:', err)
     alert('加载章节数据失败，请检查网络或权限。')
@@ -82,27 +71,19 @@ const goToContent = (chapter) => {
     params: {
       novel_id: chapter.novelId,
       chapter_id: chapter.chapterId
-    },
-    query: {
-      title: chapter.title,
-      content: chapter.content
     }
   })
 }
 
 const approveChapter = async (chapter) => {
   const result = prompt(`请输入审核备注（通过原因等）:`)
-  if (result === null) return // 取消时不操作
-
-  if (!managerID.value) {
-    alert('未检测到管理员身份，请重新登录')
-    return
-  }
+  if (result === null) return
+  if (!managerID.value) { alert('未检测到管理员身份，请重新登录'); return }
 
   try {
     await reviewChapter(chapter.novelId, chapter.chapterId, '已发布', managerID.value, result)
     alert(`已审核通过：「${chapter.title}」`)
-    removeChapter(chapter)
+    chapters.value = chapters.value.filter(c => c.chapterId !== chapter.chapterId || c.novelId !== chapter.novelId)
   } catch (err) {
     console.error('审核通过失败:', err)
     alert('操作失败，请重试')
@@ -112,28 +93,18 @@ const approveChapter = async (chapter) => {
 const rejectChapter = async (chapter) => {
   const result = prompt(`请输入审核不通过原因（封禁原因等）:`)
   if (result === null) return
-  if (!managerID.value) {
-    alert('未检测到管理员身份，请重新登录')
-    return
-  }
+  if (!managerID.value) { alert('未检测到管理员身份，请重新登录'); return }
 
-  const confirmed = confirm(`确定将「${chapter.title}」标记为审核不通过（封禁）吗？`)
-  if (!confirmed) return
+  if (!confirm(`确定将「${chapter.title}」标记为审核不通过（封禁）吗？`)) return
 
   try {
     await reviewChapter(chapter.novelId, chapter.chapterId, '封禁', managerID.value, result)
     alert(`章节「${chapter.title}」已封禁`)
-    removeChapter(chapter)
+    chapters.value = chapters.value.filter(c => c.chapterId !== chapter.chapterId || c.novelId !== chapter.novelId)
   } catch (err) {
     console.error('封禁失败:', err)
     alert('操作失败，请重试')
   }
-}
-
-const removeChapter = (chapter) => {
-  chapters.value = chapters.value.filter(
-    c => !(c.novelId === chapter.novelId && c.chapterId === chapter.chapterId)
-  )
 }
 </script>
 
@@ -185,7 +156,6 @@ button:hover {
   background-color: #90555f;
 }
 
-/* 加载动画样式 */
 .loading-indicator {
   display: flex;
   align-items: center;
@@ -206,8 +176,6 @@ button:hover {
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 </style>
