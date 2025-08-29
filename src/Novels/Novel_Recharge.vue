@@ -54,7 +54,7 @@
                         <span class="amount-desc">({{ amount.points*100 }}虚拟币)</span>
                     </button>
                     <div class="amount-btn custom" :class="{ active: selectedAmount === 'custom' }">
-                        <span>其它金额 ¥</span>
+                        <span>其它金额 </span>
                         <input type="number" v-model="customAmount" placeholder="输入金额" @focus="selectCustomAmount"
                             class="custom-input" />
                         <span class="amount-desc">（{{ customAmount*100 || 0 }}虚拟币）</span>

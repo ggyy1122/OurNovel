@@ -27,7 +27,7 @@
               <span v-else-if="chapter.status === '审核中'" class="banned-tag">【审核中】</span>
             </span>
             <span v-if="chapter.isCharged === '是'" class="charged">
-              <span v-if="!chapter.hasPurchased && !hasPurchased" class="lock-icon">
+              <span v-if="chapter.status === '已发布' && !chapter.hasPurchased && !hasPurchased" class="lock-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="16" height="16">
                   <path fill="currentColor"
                     d="M224 448a32 32 0 0 0-32 32v384a32 32 0 0 0 32 32h576a32 32 0 0 0 32-32V480a32 32 0 0 0-32-32zm0-64h576a96 96 0 0 1 96 96v384a96 96 0 0 1-96 96H224a96 96 0 0 1-96-96V480a96 96 0 0 1 96-96">
@@ -63,7 +63,7 @@
             <button class="close-btn" @click="showPurchaseModal = false">×</button>
           </div>
           <div class="modal-body">
-            <p>本书整本价格为 <strong>￥{{ selectNovelState.totalPrice }}</strong></p>
+            <p>本书整本价格为 <strong>{{ selectNovelState.totalPrice }}币</strong></p>
           </div>
           <div class="modal-footer">
             <button class="confirm-btn" @click="confirmPurchase">确认购买</button>
@@ -79,9 +79,9 @@
           <div class="insufficient-content">
             <p class="insufficient-message">账户余额不足</p>
             <div class="amount-info">
-              <span>本次购买 {{ selectNovelState.totalPrice }} 元</span>
-              <span>账户余额 {{ readerStore.balance }} 元·还差 {{ (selectNovelState.totalPrice - readerStore.balance) }}
-                元</span>
+              <span>本次购买 {{ selectNovelState.totalPrice }} 币</span>
+              <span>账户余额 {{ readerStore.balance }} 币·还差 {{ (selectNovelState.totalPrice - readerStore.balance) }}
+                币</span>
             </div>
             <div class="quick-payment">
               <button class="recharge-btn" @click="goToRecharge">去充值</button>
@@ -116,8 +116,8 @@
           <div class="purchase-insufficient-content">
             <p class="purchase-insufficient-message">账户余额不足，无法购买本章节</p>
             <div class="purchase-amount-info">
-              <span>章节价格：{{ selectedChapter.calculatedPrice }}元</span>
-              <span>当前余额：{{ readerStore.balance }}元</span>
+              <span>章节价格：{{ selectedChapter.calculatedPrice }}币</span>
+              <span>当前余额：{{ readerStore.balance }}币</span>
             </div>
             <div class="purchase-action-buttons">
               <button class="purchase-recharge-btn" @click="goToRecharge">立即充值</button>
@@ -299,7 +299,7 @@ function isDisabled(chapter) {
 async function handleChapterClick(chapter) {
   try {
     // 如果是收费章节且未购买，显示购买弹窗
-    if (chapter.isCharged === '是' && !chapter.hasPurchased && !hasPurchased.value) {
+    if (chapter.status === '已发布' && chapter.isCharged === '是' && !chapter.hasPurchased && !hasPurchased.value) {
       selectedChapter.value = chapter;
       showChapterPurchaseDialog.value = true;
       return;
@@ -390,7 +390,8 @@ async function selectChapter(chapterId) {
     try {
       await addOrUpdateRecentReading(
         readerStore.readerId,      // 读者ID
-        selectNovelState.novelId    // 小说ID
+        selectNovelState.novelId,   // 小说ID
+        chapterId            // 实际阅读的章节ID
       );
     } catch (historyError) {
       console.error("记录阅读历史失败:", historyError);

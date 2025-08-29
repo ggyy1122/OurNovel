@@ -120,7 +120,7 @@ export function uploadReaderAvatar(readerId, avatarFile) {
     const formData = new FormData();
     formData.append('readerId', readerId);
     formData.append('avatarFile', avatarFile);
-    
+
     return request({
         url: '/api/Reader/UploadAvatar',
         method: 'post',
@@ -161,12 +161,30 @@ export function getReportsWithLogsByReader(readerId) {
  * @returns {Promise<any>} 
  */
 export function getRecentReadingsByReaderId(readerId) {
-  return request({
-    url: '/api/RecentReadings/list',
-    method: 'get',
-    params: { readerId }
-  })
+    return request({
+        url: '/api/RecentReadings/list',
+        method: 'get',
+        params: { readerId }
+    })
 }
+
+/**
+ * 获取读者最近阅读的章节ID
+ * @param {number} readerId - 读者ID
+ * @param {number} novelId - 小说ID
+ * @returns {Promise<any>} 最近阅读的章节ID，如果没有记录则返回1（首章）
+ */
+export function getLastReadChapterId(readerId, novelId) {
+    return request({
+        url: '/api/RecentReadings/last-read-chapter',
+        method: 'get',
+        params: {
+            readerId,
+            novelId
+        }
+    });
+}
+
 /**
  * 删除指定读者的某本小说的最近阅读记录
  * @param {number} readerId - 读者 ID
@@ -174,29 +192,31 @@ export function getRecentReadingsByReaderId(readerId) {
  * @returns {Promise<any>}
  */
 export function deleteRecentReading(readerId, novelId) {
-  return request({
-    url: '/api/RecentReadings/delete',
-    method: 'delete',
-    params: {
-      readerId,
-      novelId
-    }
-  });
+    return request({
+        url: '/api/RecentReadings/delete',
+        method: 'delete',
+        params: {
+            readerId,
+            novelId
+        }
+    });
 }
 
 /**
  * 添加或更新指定读者的某本小说的最近阅读记录
  * @param {number} readerId - 读者 ID
  * @param {number} novelId - 小说 ID
+ * @param {number} chapterId - 章节 ID（可选，默认为1）
  * @returns {Promise<any>}
  */
-export function addOrUpdateRecentReading(readerId, novelId) {
-  return request({
-    url: '/api/RecentReadings/add-or-update',
-    method: 'post',
-    params: {
-      readerId,
-      novelId
-    }
-  });
+export function addOrUpdateRecentReading(readerId, novelId, chapterId = 1) {
+    return request({
+        url: '/api/RecentReadings/add-or-update',
+        method: 'post',
+        params: {
+            readerId,
+            novelId,
+            chapterId
+        }
+    });
 }

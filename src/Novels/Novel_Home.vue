@@ -416,44 +416,68 @@ const femaleTranslateX = computed(() => {
     return (6 - visibleFemaleCount.value) * 12.5
 })
 
-// 获取小说数据
+// 获取小说数据（优化版）
 const fetchFeaturedNovels = async () => {
     try {
         // 获取男频小说
-        const malePromises = maleNovelIds.map(id => getNovel(id))
-        const maleResults = await Promise.all(malePromises)
-        // 筛选男频小说：只保留'连载'或'完结'状态的小说，并限制最多6个
-        const filteredMaleNovels = await Promise.all(
-            maleResults
-                .filter(novel => novel && (novel.status === '连载' || novel.status === '完结'))
-                .slice(0, 6)
-                .map(async novel => {
+        const maleResults = await Promise.allSettled(maleNovelIds.map(id => getNovel(id)))
+        // 筛选有效的男频小说
+        const validMaleNovels = maleResults
+            .filter(result => result.status === 'fulfilled' && result.value)
+            .map(result => result.value)
+            .filter(novel => novel && (novel.status === '连载' || novel.status === '完结'))
+        // 获取作者信息并构建男频小说列表
+        const maleNovelsWithAuthors = await Promise.allSettled(
+            validMaleNovels.slice(0, 6).map(async novel => {
+                try {
                     const author = await getAuthor(novel.authorId)
                     return {
                         ...novel,
-                        authorName: author.authorName || '未知作者'
+                        authorName: author?.authorName || '未知作者'
                     }
-                })
+                } catch (error) {
+                    console.error(`获取作者信息失败 (ID: ${novel.authorId}):`, error)
+                    return {
+                        ...novel,
+                        authorName: '未知作者'
+                    }
+                }
+            })
         )
-        maleNovels.value = filteredMaleNovels
+        // 过滤掉失败的项目
+        maleNovels.value = maleNovelsWithAuthors
+            .filter(result => result.status === 'fulfilled')
+            .map(result => result.value)
 
         // 获取女频小说
-        const femalePromises = femaleNovelIds.map(id => getNovel(id))
-        const femaleResults = await Promise.all(femalePromises)
-        // 筛选女频小说：只保留'连载'或'完结'状态的小说，并限制最多6个
-        const filteredFemaleNovels = await Promise.all(
-            femaleResults
-                .filter(novel => novel && (novel.status === '连载' || novel.status === '完结'))
-                .slice(0, 6)
-                .map(async novel => {
+        const femaleResults = await Promise.allSettled(femaleNovelIds.map(id => getNovel(id)))
+        // 筛选有效的女频小说
+        const validFemaleNovels = femaleResults
+            .filter(result => result.status === 'fulfilled' && result.value)
+            .map(result => result.value)
+            .filter(novel => novel && (novel.status === '连载' || novel.status === '完结'))
+        // 获取作者信息并构建女频小说列表
+        const femaleNovelsWithAuthors = await Promise.allSettled(
+            validFemaleNovels.slice(0, 6).map(async novel => {
+                try {
                     const author = await getAuthor(novel.authorId)
                     return {
                         ...novel,
-                        authorName: author.authorName || '未知作者'
+                        authorName: author?.authorName || '未知作者'
                     }
-                })
+                } catch (error) {
+                    console.error(`获取作者信息失败 (ID: ${novel.authorId}):`, error)
+                    return {
+                        ...novel,
+                        authorName: '未知作者'
+                    }
+                }
+            })
         )
-        femaleNovels.value = filteredFemaleNovels
+        // 过滤掉失败的项目
+        femaleNovels.value = femaleNovelsWithAuthors
+            .filter(result => result.status === 'fulfilled')
+            .map(result => result.value)
     } catch (error) {
         console.error('获取精选小说数据失败:', error)
     }
@@ -471,8 +495,12 @@ const showMoreFemale = () => {
 
 const fetchAuthors = async () => {
     try {
-        const authorPromises = authorIds.map(id => getAuthor(id))
-        authors.value = await Promise.all(authorPromises)
+        const authorResults = await Promise.allSettled(
+            authorIds.map(id => getAuthor(id))
+        )
+        authors.value = authorResults
+            .filter(result => result.status === 'fulfilled' && result.value)
+            .map(result => result.value)
     } catch (error) {
         console.error('获取作者数据失败:', error)
     }
@@ -480,12 +508,14 @@ const fetchAuthors = async () => {
 
 const fetchNovels = async () => {
     try {
-        const novelPromises = novelIds.map(id => getNovel(id))
-        const allNovels = await Promise.all(novelPromises)
-        // 筛选小说：只保留'连载'或'完结'状态的小说
-        novels.value = allNovels.filter(novel =>
-            novel && (novel.status === '连载' || novel.status === '完结')
+        const novelResults = await Promise.allSettled(
+            novelIds.map(id => getNovel(id))
         )
+        // 筛选小说：只保留成功获取且状态为'连载'或'完结'的小说
+        novels.value = novelResults
+            .filter(result => result.status === 'fulfilled' && result.value)
+            .map(result => result.value)
+            .filter(novel => novel && (novel.status === '连载' || novel.status === '完结'))
     } catch (error) {
         console.error('获取小说数据失败:', error)
     }
