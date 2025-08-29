@@ -6,21 +6,16 @@
       <div v-for="comment in comments" :key="comment.commentId" class="comment-card">
         <div class="comment-header">
           <!-- 替换 👤 为头像，其它不动 -->
-          <div class="avatar">
-            <img
-              :src="getReaderAvatar(comment.readerId)"
-              alt="用户头像"
-              class="user-avatar"
-              @error="handleAvatarError"
-            />
+          <div class="avatar" @click="goReaderHome(comment.readerId)">
+            <img :src="getReaderAvatar(comment.readerId)" alt="用户头像" class="user-avatar" @error="handleAvatarError" />
           </div>
 
           <div class="comment-info">
-            <h3 class="comment-title">{{ comment.title }}</h3>
+            <h3 class="comment-title" @click="goReaderHome(comment.readerId)">{{ getReaderName(comment.readerId) }}</h3>
             <p class="comment-subtitle">
               第 {{ comment.chapterId }} 章 · {{ formatTime(comment.createTime) }}
-              <!-- 如需显示昵称，可取消注释： -->
-              <!-- · {{ getReaderName(comment.readerId) }} -->
+              <br />
+              {{ comment.title }}
             </p>
           </div>
 
@@ -48,7 +43,14 @@ import { getReader } from '@/API/Reader_API'  // 使用你已有的 API
 import { SelectNovel_State, readerState } from '@/stores/index'
 import 'vue3-toastify/dist/index.css'
 import { toast } from 'vue3-toastify'
+// 在 script 部分添加路由导入和函数
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
+
+function goReaderHome(readerId) {
+  router.push(`/reader/${readerId}`)
+}
 // ✅ 用 ES 模块导入兜底头像（避免 require 在 Vite 下问题）
 import defaultAvatar from '@/assets/logo.png'
 
@@ -66,7 +68,7 @@ const readersMap = ref(new Map())
 // 如果后端 avatarUrl 只返回 Key（文件名），用它拼完整 URL
 const OSS_BASE = 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/'
 
-// 把任意 avatar 字段格式化成“可直接 <img :src> 的完整 URL”
+// 把任意 avatar 字段格式化成"可直接 <img :src> 的完整 URL"
 function formatAvatarUrl(raw) {
   if (!raw) return defaultAvatar
   if (/^https?:\/\//i.test(raw)) return raw               // 已是 http(s)
@@ -137,6 +139,10 @@ function getReaderAvatar(id) {
   return readersMap.value.get(id)?.avatarUrl || defaultAvatar
 }
 
+// 添加获取读者名称的函数
+function getReaderName(id) {
+  return readersMap.value.get(id)?.readerName || `读者${id}`
+}
 
 function handleAvatarError(e) {
   e.target.src = defaultAvatar
@@ -151,7 +157,7 @@ function formatTime(isoString) {
 <style scoped>
 .comment-section {
   padding: 24px;
-  background:  #edf1f1ff;
+  background: #edf1f1ff;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
 }
@@ -198,7 +204,14 @@ function formatTime(isoString) {
   overflow: hidden;
   margin-right: 12px;
   flex-shrink: 0;
+  cursor: pointer;
+  transition: transform 0.2s ease;
 }
+
+.avatar:hover {
+  transform: scale(1.1);
+}
+
 .user-avatar {
   width: 100%;
   height: 100%;
@@ -215,6 +228,10 @@ function formatTime(isoString) {
   font-weight: 600;
   margin: 0;
   color: #333;
+}
+
+.comment-title:hover {
+  color: #f0940a;
 }
 
 .comment-subtitle {

@@ -40,6 +40,7 @@ import { getAuthor } from '@/API/Author_API'
 import { addOrUpdateCollect } from '@/API/Collect_API'
 import { getChapter } from '@/API/Chapter_API';
 import { checkPurchase } from '@/API/Purchase_API';
+import { addOrUpdateRecentReading, getLastReadChapterId } from '@/API/Reader_API';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 const selectNovelState = SelectNovel_State();
@@ -120,23 +121,49 @@ async function handle() {
 async function handleRead() {
     try {
         await handle();
-        const response = await getChapter(props.novel.novelId, 1);
-        if (response.status !== '已发布') {
-            toast("第1章未发布!", {
+        // 获取用户上次阅读的章节ID，如果没有记录则返回1
+        let chapterIdToRead = 1;
+        try {
+            const lastReadResponse = await getLastReadChapterId(
+                reader_state.readerId,
+                selectNovelState.novelId
+            );
+            chapterIdToRead = lastReadResponse || 1;
+        } catch (error) {
+            console.warn("获取阅读历史失败，使用默认第1章:", error);
+            chapterIdToRead = 1;
+        }
+        let response = await getChapter(props.novel.novelId, chapterIdToRead);
+        if (response.status === '首次审核' || response.status === '草稿') {
+            toast(`暂无第${chapterIdToRead}章`, {
                 "type": "info",
                 "dangerouslyHTMLString": true
             });
-            return;
+            // 如果目标章节不存在，尝试获取第1章
+            if (chapterIdToRead !== 1) {
+                try {
+                    const firstChapterResponse = await getChapter(props.novel.novelId, 1);
+                    if (firstChapterResponse.status !== '首次审核' && firstChapterResponse.status !== '草稿') {
+                        chapterIdToRead = 1;
+                        response = firstChapterResponse;
+                    }
+                } catch (fallbackError) {
+                    console.error("获取第1章也失败:", fallbackError);
+                    return;
+                }
+            } else {
+                return;
+            }
         }
         // 检查章节购买状态
-        if (response.isCharged === '是') {
+        if (response.status === '已发布' && response.isCharged === '是') {
             const purchaseStatus = await checkPurchase(
                 reader_state.readerId,
                 selectNovelState.novelId,
-                1
+                chapterIdToRead
             );
             if (!purchaseStatus?.hasPurchased) {
-                toast("第1章需要购买后才能阅读", {
+                toast(`第${chapterIdToRead}章需要购买后才能阅读`, {
                     "type": "info",
                     "dangerouslyHTMLString": true
                 });
@@ -154,12 +181,23 @@ async function handleRead() {
             response.publishTime,
             response.status
         );
+        // 添加或更新阅读记录
+        try {
+            await addOrUpdateRecentReading(
+                reader_state.readerId,      // 读者ID
+                selectNovelState.novelId,   // 小说ID
+                chapterIdToRead             // 实际阅读的章节ID
+            );
+        } catch (historyError) {
+            console.error("记录阅读历史失败:", historyError);
+        }
         router.push('/Novels/reader');
     } catch (error) {
-        toast("章节加载失败：第1章不存在！", {
-            "type": "info",
+        console.error("阅读失败:", error);
+        toast("无法获取章节内容", {
+            "type": "error",
             "dangerouslyHTMLString": true
-        })
+        });
     }
 }
 //作品主页

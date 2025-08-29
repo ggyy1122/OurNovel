@@ -28,7 +28,7 @@
                         </div>
                         <div class="detail-row">
                             <span class="detail-label">账号余额：</span>
-                            <span class="detail-value">{{ accountBalance }}</span>
+                            <span class="detail-value">{{ accountBalance }}虚拟币</span>
                         </div>
                     </div>
                 </div>
@@ -51,13 +51,13 @@
                         :class="['amount-btn', { active: selectedAmount === amount.value }]"
                         @click="selectAmount(amount.value)">
                         <span class="amount-val">¥{{ amount.value }}</span>
-                        <span class="amount-desc">({{ amount.points }}起点币)</span>
+                        <span class="amount-desc">({{ amount.points*100 }}虚拟币)</span>
                     </button>
                     <div class="amount-btn custom" :class="{ active: selectedAmount === 'custom' }">
-                        <span>其它金额 ¥</span>
+                        <span>其它金额 </span>
                         <input type="number" v-model="customAmount" placeholder="输入金额" @focus="selectCustomAmount"
                             class="custom-input" />
-                        <span class="amount-desc">（{{ customAmount || 0 }}起点币）</span>
+                        <span class="amount-desc">（{{ customAmount*100 || 0 }}虚拟币）</span>
                     </div>
                 </div>
             </div>
@@ -88,22 +88,23 @@
 </template>
 
 <script setup>
-import { ref, computed,onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { startRecharge } from '@/API/Recharge_API'
 import { readerState } from '@/stores/index'
 import { useRouter } from 'vue-router'
 import { toast } from "vue3-toastify"
 import "vue3-toastify/dist/index.css"
-import {getReaderBalance} from '@/API/Reader_API';
+import { getReaderBalance } from '@/API/Reader_API';
 
 const reader_state = readerState()
 const router = useRouter()
 const fixedAmounts = [
-    { value: 10, points: 1000 },
-    { value: 20, points: 2000 },
-    { value: 30, points: 3000 },
-    { value: 50, points: 5000 },
-    { value: 100, points: 10000 }
+    { value: 10, points: 10 },
+    { value: 20, points: 20 },
+    { value: 50, points: 50 },
+    { value: 100, points: 100 },
+    { value: 200, points: 200 },
+    { value: 500, points: 500 }
 ]
 const selectedAmount = ref(fixedAmounts[0].value)
 const customAmount = ref('')
@@ -128,15 +129,15 @@ function selectCustomAmount() {
 function handle_return() {
     router.back()
 }
-const fetchReaderBalance=async()=>{
-  try {
-    const response = await getReaderBalance(reader_state.readerId)
-    accountBalance.value = response.data?.balance || response?.balance|| 0
-   console.log('获取用户余额:', accountBalance.value)
-  } catch (error) {
-    console.error('获取用户余额失败:', error)
-     accountBalance.value = 0
-  }
+const fetchReaderBalance = async () => {
+    try {
+        const response = await getReaderBalance(reader_state.readerId)
+        accountBalance.value = response.data?.balance || response?.balance || 0
+        console.log('获取用户余额:', accountBalance.value)
+    } catch (error) {
+        console.error('获取用户余额失败:', error)
+        accountBalance.value = 0
+    }
 }
 async function handlePayment() {
     if (!agreed.value) {
@@ -160,9 +161,9 @@ async function handlePayment() {
         toast("充值失败，请稍后重试！", { type: "error", dangerouslyHTMLString: true })
     }
 }
- onMounted(() => {
-      fetchReaderBalance(); // 页面挂载后立即执行
-    });
+onMounted(() => {
+    fetchReaderBalance(); // 页面挂载后立即执行
+});
 
 
 </script>

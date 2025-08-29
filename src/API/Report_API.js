@@ -61,13 +61,14 @@ export function reportComment(commentId, readerId, reason) {
  * @param {number} managerId - 管理员ID
  * @returns {Promise<Object>} 返回操作结果
  */
-export function processReport(reportId, progress, managerId) {
+export function processReport(reportId, progress, managerId,result) {
     return request({
         url: `/api/report/${reportId}/process`,
         method: 'post',
         params: {
-            progress,
-            managerId
+            progress:progress,
+            managerId:managerId,
+            result:result
         }
     })
 }

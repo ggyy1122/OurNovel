@@ -3,7 +3,6 @@
         <!-- 顶部导航栏 -->
         <header class="admin-header">
             <h2>小说阅读平台管理系统</h2>
-            <button @click="logout">退出登录</button>
         </header>
 
        <!-- 侧边导航栏 -->
@@ -11,15 +10,19 @@
       <button @click="sidebar.toggleCollapse" class="toggle-btn">
         {{ sidebar.isCollapsed ? '>' : '<' }}
       </button>
-      <div class="logo">{{ sidebar.isCollapsed ? 'L' : 'LOGO' }}</div>
+      <div class="logo"><i class="fas fa-flag-checkered"></i></div>
       <nav><!--nav表示导航链接-->
           <router-link to="/Admin/Admin_Layout/dashboard" class="submenu-link">
-            <i class="icon-dash"></i>
-            <span v-if="!sidebar.isCollapsed">仪表盘</span>
+            <i class="fas fa-table menu-icon"></i>
+            <span v-if="!sidebar.isCollapsed">数据统计</span>
+          </router-link>
+          <router-link to="/Admin/Admin_Layout/users" class="submenu-link">
+            <i class="fas fa-users menu-icon"></i>
+            <span v-if="!sidebar.isCollapsed">用户管理</span>
           </router-link>
         <div class="menu-item-with-children">
           <div class="menu-parent" @click="toggleMenu('novel_managent')">
-            <i class="icon-novel"></i>
+            <i class="fas fa-book-open menu-icon"></i>
             <span v-if="!sidebar.isCollapsed">小说管理</span>
             <span v-if="!sidebar.isCollapsed" class="arrow">{{ openMenus.includes('novel_managent') ? '▼' : '▶' }}</span>
           </div>
@@ -34,25 +37,22 @@
             <span>封禁</span></router-link>
           </div>
         </div>
-            <router-link to="/Admin/Admin_Layout/users" class="submenu-link">
-            <i class="icon-user"></i>
-            <span v-if="!sidebar.isCollapsed">用户管理</span>
+          <router-link to="/Admin/Admin_Layout/category_manage" class="submenu-link">
+            <i class="fas fa-globe menu-icon"></i>
+            <span v-if="!sidebar.isCollapsed">分类管理</span>
           </router-link>
-            <router-link to="/Admin/Admin_Layout/chapterboard" class="submenu-link">
-            <i class="icon-review"></i>
-            <span v-if="!sidebar.isCollapsed">待审核章节管理</span>
+          <router-link to="/Admin/Admin_Layout/chapterboard" class="submenu-link">
+            <i class="fas fa-file-signature menu-icon"></i>
+            <span v-if="!sidebar.isCollapsed">章节管理</span>
           </router-link>
-        <div class="menu-item-with-children">
-          <div class="menu-parent" @click="toggleMenu('complaint_management')">
-            <i class="icon-report"></i>
+          <router-link to="/Admin/Admin_Layout/complaint_management/unprocessed" class="submenu-link">
+            <i class="fas fa-volume-off menu-icon"></i>
             <span v-if="!sidebar.isCollapsed">举报处理</span>
-            <span v-if="!sidebar.isCollapsed" class="arrow">{{ openMenus.includes('complaint_management') ? '▼' : '▶' }}</span>
-          </div>
-          <div v-if="openMenus.includes('complaint_management') && !sidebar.isCollapsed" class="submenu">
-            <router-link to="/Admin/Admin_Layout/complaint_management/unprocessed" class="submenu-link" @click="class_id = 0"><span>待处理</span></router-link>
-            <router-link to="/Admin/Admin_Layout/complaint_management/processed" class="submenu-link" @click="class_id = 0"><span>已处理</span></router-link>
-          </div>
-        </div>
+          </router-link>
+          <router-link to="/Admin/Admin_Layout" class="submenu-link" @click="logout">
+            <i class="fas fa-gear menu-icon"></i>
+            <span v-if="!sidebar.isCollapsed" @click="logout">退出登录</span>
+          </router-link>
       </nav>
     </div>
 
@@ -188,12 +188,7 @@ function toggleMenu(menuKey) {
   margin-right: 10px;
 }
 
-/* 图标样式 - 可以使用实际图标库如Font Awesome */
-.icon-novel::before { content: "📚"; }
-.icon-report::before { content: "🔈"; }
-.icon-user::before { content: "👤"; }
-.icon-review::before { content: "✅"; }
-.icon-dash::before { content: "📊"; }
+
 
 .menu-item-with-children .menu-parent {
   display: flex;
@@ -208,7 +203,7 @@ function toggleMenu(menuKey) {
   padding-left: 30px;
 }
 .submenu-link:hover {
-  background: #4d82d2;
+  background: #c7f2ff;
 }
 .submenu nav a.router-link-exact-active {
   background: #42b983;/* Vue Router 当前激活路由的高亮色 */
@@ -233,5 +228,12 @@ function toggleMenu(menuKey) {
 }
 .off:hover {
   background: #2c3e50;
+}
+
+.menu-icon {
+  width: 24px;
+  text-align: center;
+  margin-right: 12px;
+  font-size: 16px;
 }
 </style>

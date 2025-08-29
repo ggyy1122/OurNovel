@@ -272,7 +272,7 @@
             </thead>
             <tbody>
                 <tr v-for="update in recentUpdates" :key="update.title + update.chapter">
-                    <td>《{{ update.title }}》</td>
+                    <td @click="goToNovel(update.novelId)" class="novel-author1">《{{ update.title }}》</td>
                     <td>{{ update.chapter }}</td>
                     <td @click="goAuthorHome1(update.authorId)" class="novel-author1">{{ update.author }}</td>
                     <td>{{ update.time }}</td>
@@ -319,14 +319,13 @@
                     <div class="zh-footer-block-row">
                         <span>邮箱：jubao@hanhai.com</span>
                     </div>
-                    <a href="https://www.zongheng.com/#" target="_blank" class="image-link">
-                        <img src="https://revo.zongheng.com/comm/2024/db1faa95.png" class="zh-footer-logo"
-                            alt="瀚海文学网" />
+                    <a target="_blank" class="image-link">
+                        <img src="@/assets/logo.png" class="zh-footer-logo" alt="TJ小说网" />
                     </a>
                 </div>
             </div>
             <div class="zh-footer-links">
-                作者投稿、商务合作、关于瀚海、友情链接、联系我们、诚聘英才、法律声明、帮助中心、隐私政策、社区规范、发展历程、投诉指引、用户协议
+                作者投稿、商务合作、关于TJ、友情链接、联系我们、诚聘英才、法律声明、帮助中心、隐私政策、社区规范、发展历程、投诉指引、用户协议
             </div>
             <div class="zh-footer-divider"></div>
             <div class="zh-footer-copy">
@@ -355,25 +354,27 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { getAuthor } from '@/API/Author_API'
-import { getNovel } from '@/API/Novel_API'
+import { getNovel, getFilteredNovels } from '@/API/Novel_API'
 import { SelectNovel_State } from '@/stores/index'
 import { useRouter } from 'vue-router'
 import { getChapter, getChapterLogs } from '@/API/Chapter_API'
-import { getNovelsByCategory } from '@/API/NovelCategory_API'
 import { getCollectRanking, getRecommendRanking, getScoreRanking } from '@/API/Ranking_API'
 import { getAllCategories } from '@/API/Category_API'
-
+// 导入数据
+import {
+    carouselItems_data,
+    carouselNovels_data,
+    announcements_data,
+    featuredNovelIds,
+    authorIds,
+    novelIds
+} from '@/stores/novelHomeData.js'
 
 const router = useRouter()
 const selectNovelState = SelectNovel_State()
 
 // Banner数据
-const carouselItems = ref([
-    { image: require('@/assets/1.jpg'), title: 'TJ中文网', description: '匠心打磨好作品' },
-    { image: require('@/assets/2.jpg'), title: '热门小说推荐', description: '最新签约作品' },
-    { image: require('@/assets/3.jpeg'), title: '作家专区', description: '点击进入 >' },
-    { image: require('@/assets/4.jpg'), title: 'TJ中文网', description: '匠心打磨好作品' }
-])
+const carouselItems = ref(carouselItems_data)
 
 const authors = ref([])
 const novels = ref([])
@@ -387,8 +388,8 @@ const rankingLists = [
 ]
 
 // 精选部分
-const maleNovelIds = [166, 167, 168, 169, 170, 222] // 男频小说ID (固定6个)
-const femaleNovelIds = [169, 170, 222, 263, 183, 462] // 女频小说ID (固定6个)
+const maleNovelIds = featuredNovelIds.male // 男频精选小说ID
+const femaleNovelIds = featuredNovelIds.female // 女频精选小说ID
 const maleNovels = ref([])
 const femaleNovels = ref([])
 const splitPosition = ref(75) // 初始分割线位置(75%表示显示6男2女)
@@ -415,30 +416,68 @@ const femaleTranslateX = computed(() => {
     return (6 - visibleFemaleCount.value) * 12.5
 })
 
-// 获取小说数据
+// 获取小说数据（优化版）
 const fetchFeaturedNovels = async () => {
     try {
         // 获取男频小说
-        const malePromises = maleNovelIds.map(id => getNovel(id))
-        const maleResults = await Promise.all(malePromises)
-        maleNovels.value = await Promise.all(maleResults.map(async novel => {
-            const author = await getAuthor(novel.authorId)
-            return {
-                ...novel,
-                authorName: author.authorName || '未知作者'
-            }
-        }))
+        const maleResults = await Promise.allSettled(maleNovelIds.map(id => getNovel(id)))
+        // 筛选有效的男频小说
+        const validMaleNovels = maleResults
+            .filter(result => result.status === 'fulfilled' && result.value)
+            .map(result => result.value)
+            .filter(novel => novel && (novel.status === '连载' || novel.status === '完结'))
+        // 获取作者信息并构建男频小说列表
+        const maleNovelsWithAuthors = await Promise.allSettled(
+            validMaleNovels.slice(0, 6).map(async novel => {
+                try {
+                    const author = await getAuthor(novel.authorId)
+                    return {
+                        ...novel,
+                        authorName: author?.authorName || '未知作者'
+                    }
+                } catch (error) {
+                    console.error(`获取作者信息失败 (ID: ${novel.authorId}):`, error)
+                    return {
+                        ...novel,
+                        authorName: '未知作者'
+                    }
+                }
+            })
+        )
+        // 过滤掉失败的项目
+        maleNovels.value = maleNovelsWithAuthors
+            .filter(result => result.status === 'fulfilled')
+            .map(result => result.value)
 
         // 获取女频小说
-        const femalePromises = femaleNovelIds.map(id => getNovel(id))
-        const femaleResults = await Promise.all(femalePromises)
-        femaleNovels.value = await Promise.all(femaleResults.map(async novel => {
-            const author = await getAuthor(novel.authorId)
-            return {
-                ...novel,
-                authorName: author.authorName || '未知作者'
-            }
-        }))
+        const femaleResults = await Promise.allSettled(femaleNovelIds.map(id => getNovel(id)))
+        // 筛选有效的女频小说
+        const validFemaleNovels = femaleResults
+            .filter(result => result.status === 'fulfilled' && result.value)
+            .map(result => result.value)
+            .filter(novel => novel && (novel.status === '连载' || novel.status === '完结'))
+        // 获取作者信息并构建女频小说列表
+        const femaleNovelsWithAuthors = await Promise.allSettled(
+            validFemaleNovels.slice(0, 6).map(async novel => {
+                try {
+                    const author = await getAuthor(novel.authorId)
+                    return {
+                        ...novel,
+                        authorName: author?.authorName || '未知作者'
+                    }
+                } catch (error) {
+                    console.error(`获取作者信息失败 (ID: ${novel.authorId}):`, error)
+                    return {
+                        ...novel,
+                        authorName: '未知作者'
+                    }
+                }
+            })
+        )
+        // 过滤掉失败的项目
+        femaleNovels.value = femaleNovelsWithAuthors
+            .filter(result => result.status === 'fulfilled')
+            .map(result => result.value)
     } catch (error) {
         console.error('获取精选小说数据失败:', error)
     }
@@ -454,14 +493,14 @@ const showMoreFemale = () => {
     showMale.value = false
 }
 
-
-
-
 const fetchAuthors = async () => {
     try {
-        const authorIds = [62, 201, 123]
-        const authorPromises = authorIds.map(id => getAuthor(id))
-        authors.value = await Promise.all(authorPromises)
+        const authorResults = await Promise.allSettled(
+            authorIds.map(id => getAuthor(id))
+        )
+        authors.value = authorResults
+            .filter(result => result.status === 'fulfilled' && result.value)
+            .map(result => result.value)
     } catch (error) {
         console.error('获取作者数据失败:', error)
     }
@@ -469,9 +508,14 @@ const fetchAuthors = async () => {
 
 const fetchNovels = async () => {
     try {
-        const novelIds = [166, 167, 168, 169, 170, 222, 263, 183, 462]
-        const novelPromises = novelIds.map(id => getNovel(id))
-        novels.value = await Promise.all(novelPromises)
+        const novelResults = await Promise.allSettled(
+            novelIds.map(id => getNovel(id))
+        )
+        // 筛选小说：只保留成功获取且状态为'连载'或'完结'的小说
+        novels.value = novelResults
+            .filter(result => result.status === 'fulfilled' && result.value)
+            .map(result => result.value)
+            .filter(novel => novel && (novel.status === '连载' || novel.status === '完结'))
     } catch (error) {
         console.error('获取小说数据失败:', error)
     }
@@ -611,27 +655,23 @@ const goToSlide = (index) => {
 const books = ref([])
 
 async function fetchHistoryNovels() {
-    const novels = await getNovelsByCategory('历史')
+    const novels = await getFilteredNovels(1, 6, '历史', null, null, null)
     if (!novels || novels.length === 0) {
         books.value = []
         return
     }
-
-    const filtered = novels.filter(n => n.status === '连载' || n.status === '完结').slice(0, 5)
-
+    const filtered = novels.items
     const detailedBooks = await Promise.all(
         filtered.map(async (novel) => {
             try {
                 const detail = await getNovel(novel.novelId)
                 let authorName = '未知作者'
-
                 try {
                     const author = await getAuthor(detail.authorId)
                     authorName = author.authorName || '未知作者'
                 } catch (error) {
                     console.warn('获取作者失败:', error)
                 }
-
                 return {
                     novelId: novel.novelId,
                     authorId: detail.authorId,
@@ -644,8 +684,6 @@ async function fetchHistoryNovels() {
                     recommendCount: detail.recommendCount,
                     collectedCount: detail.collectedCount,
                     totalPrice: detail.totalPrice,
-
-
                     title: detail.novelName,
                     author: authorName,
                     status: detail.status,
@@ -674,7 +712,6 @@ async function fetchHistoryNovels() {
             }
         })
     )
-
     books.value = detailedBooks
 }
 
@@ -685,17 +722,17 @@ const recentUpdates = ref([])
 async function fetchRecentUpdates() {
     const logsRes = await getChapterLogs()
     if (!logsRes || !logsRes.data) return
-
     const sortedLogs = logsRes.data
         .sort((a, b) => new Date(b.time) - new Date(a.time))
-        .slice(0, 6)
-
+        .slice(0, 10)
     const updates = await Promise.all(sortedLogs.map(async log => {
         try {
             const novel = await getNovel(log.novelId)
+            if (novel.status !== '连载' && novel.status !== '完结') return null
             const chapter = await getChapter(log.novelId, log.chapterId)
             const author = await getAuthor(novel.authorId)
             return {
+                novelId: novel.novelId,
                 title: novel.novelName || '未知小说',
                 authorId: novel.authorId,
                 author: author.authorName || '未知作者',
@@ -714,13 +751,7 @@ const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-const carouselNovels = [
-    { novelId: 170, novelName: '如意姑娘的', coverUrl: require('@/assets/side1.jpg') },
-    { novelId: 170, novelName: '写给鼹鼠先生的情', coverUrl: require('@/assets/side2.jpg') },
-    { novelId: 170, novelName: '问九卿', coverUrl: require('@/assets/side3.jpg') },
-    { novelId: 170, novelName: '昭娇', coverUrl: require('@/assets/side4.jpg') },
-    { novelId: 170, novelName: '岁时来仪', coverUrl: require('@/assets/side5.jpg') }
-]
+const carouselNovels = ref(carouselNovels_data)
 
 const currentBanner = ref(2) // 默认显示第三个
 
@@ -739,26 +770,19 @@ const goToNovel = async (novelId) => {
     }
 }
 
-const announcements = [
-    { text: '[资讯] 书写抗战精神作品联展', link: 'https://mp.weixin.qq.com/s/4VeBev9GGxihH5MNVevfSg?mpshare=1&scene=1&srcid=0801zDxRpMpTTwRpb8djZYXr&sharer_shareinfo=467c009cbe86e604c7fb12947fa1170b&sharer_shareinfo_first=467c009cbe86e604c7fb12947fa1170b#wechat_redirect', type: 'news' },
-    { text: '[公告] 《听说你喜欢我》原著', link: 'https://www.hongxiu.com/book/3756981504436501', type: 'notice' },
-    { text: '[资讯] 25年绿书签行动来啦', link: 'https://mp.weixin.qq.com/s/c1G3OQ6-lWh5qwQ-sejJcg', type: 'news' },
-    { text: '[公告] 25年作家福利已上线', link: 'https://write.qq.com/portal/college/editordetail?gender=2&typeid=75457244950928251&idx=75460605762836001', type: 'notice' },
-    { text: '[公告] “风起国潮”二期征文', link: 'https://write.qq.com/portal/dashboard/actarticleDetail?id=665', type: 'notice' },
-    { text: '[公告] 红袖大神段寻新书来袭', link: 'https://www.hongxiu.com/book/32553967803686009', type: 'notice' }
-]
+const announcements = ref(announcements_data)
 
 const fetchRankings = async () => {
     try {
-        const [collectRes, recommendRes, scoreRes] = await Promise.all([
+        [
+            collectRanking.value,
+            recommendRanking.value,
+            scoreRanking.value
+        ] = await Promise.all([
             getCollectRanking(10),
             getRecommendRanking(10),
             getScoreRanking(10)
-        ])
-        // 过滤掉"待审核"和"封禁"状态的小说
-        collectRanking.value = collectRes.filter(novel => novel.status === '连载' || novel.status === '完结')
-        recommendRanking.value = recommendRes.filter(novel => novel.status === '连载' || novel.status === '完结')
-        scoreRanking.value = scoreRes.filter(novel => novel.status === '连载' || novel.status === '完结')
+        ]);
     } catch (error) {
         console.error('获取排行榜数据失败:', error)
     }
@@ -778,10 +802,10 @@ const hoverCategory = ref(null)
 const fetchCategories = async () => {
     try {
         const allCategories = await getAllCategories()
-        // 随机排序并取前15个
+        // 随机排序并取前20个
         categories.value = allCategories
             .sort(() => Math.random() - 0.5)
-            .slice(0, 15)
+            .slice(0, 20)
     } catch (error) {
         console.error('获取分类数据失败:', error)
     }
@@ -812,7 +836,7 @@ onMounted(async () => {
     fetchRankings()
     fetchFeaturedNovels()
     timer = setInterval(() => {
-        currentBanner.value = (currentBanner.value + 1) % carouselNovels.length
+        currentBanner.value = (currentBanner.value + 1) % carouselNovels.value.length
     }, 3500)
 })
 
@@ -1915,6 +1939,7 @@ watch(novelCurrent, startNovelAutoPlay)
 .zh-footer {
     background: #f7f8fa;
     margin-top: 64px;
+    margin-bottom: 20px;
     padding: 36px 0 0 0;
     font-size: 16px;
     color: #333;
