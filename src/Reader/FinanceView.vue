@@ -134,9 +134,9 @@
         v-for="record in paginatedRecords" 
         :key="record.transactionId"
       >
-        <td class="amount-cell">{{ record.ConsumeAmount }}</td>
+        <td class="amount-cell">{{ record.consumeAmount }}</td>
         <td>{{ record.novelTitle }}</td>
-        <td>{{ record.ChapterId }}</td>
+        <td>{{ record.chapterId }}</td>
         <td>{{ formatDate(record.consumeTime) }}</td>
       </tr>
     </tbody>

@@ -28,7 +28,7 @@
                         </div>
                         <div class="detail-row">
                             <span class="detail-label">账号余额：</span>
-                            <span class="detail-value">{{ accountBalance }}币</span>
+                            <span class="detail-value">{{ accountBalance }}虚拟币</span>
                         </div>
                     </div>
                 </div>
@@ -50,14 +50,14 @@
                     <button v-for="amount in fixedAmounts" :key="amount.value"
                         :class="['amount-btn', { active: selectedAmount === amount.value }]"
                         @click="selectAmount(amount.value)">
-                        <span class="amount-val">{{ amount.value }}币</span>
-                        <span class="amount-desc"> ({{ amount.points }}元)</span>
+                        <span class="amount-val">¥{{ amount.value }}</span>
+                        <span class="amount-desc">({{ amount.points*100 }}虚拟币)</span>
                     </button>
                     <div class="amount-btn custom" :class="{ active: selectedAmount === 'custom' }">
                         <span>其它金额 </span>
                         <input type="number" v-model="customAmount" placeholder="输入金额" @focus="selectCustomAmount"
                             class="custom-input" />
-                        <span class="amount-desc">币 ({{ customAmount || 0 }}元)</span>
+                        <span class="amount-desc">（{{ customAmount*100 || 0 }}虚拟币）</span>
                     </div>
                 </div>
             </div>
