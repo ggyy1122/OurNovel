@@ -48,7 +48,7 @@
               <span class="status" :class="chapter.status">
                 {{ chapter.status === '首次审核' ? '审核中' : getStatusText(chapter.status) }}
               </span>
-              <span class="price">¥{{ chapter.calculated_price }}</span>
+              <span class="price">¥{{ chapter.calculated_price/100 }}</span>
               <span class="publish-time" v-if="chapter.status === '已发布'">
                 {{ formatDate(chapter.publish_time) }}
               </span>
@@ -111,15 +111,15 @@
             <div class="word-count">字数: {{ activeChapter.word_count }}</div>
             <!-- 价格设置 -->
             <div class="price-setting">
-              <label>每千字价格: ¥</label>
+              <label>每千字价格（虚拟币）: </label>
               <input 
                 type="number" 
                 v-model="activeChapter.price_per_kilo" 
                 min="0" 
-                step="0.01"
+                step="1"
                 @input="updateCalculatedPrice"
               >
-              <span class="final-price">最终价格: ¥{{ activeChapter.calculated_price }}</span>
+              <span class="final-price">最终价格: {{ activeChapter.calculated_price }}虚拟币（合人民币¥{{ activeChapter.calculated_price/100 }}）</span>
             </div>
             <!-- 收费设置 -->
             <div class="charge-setting">
@@ -240,7 +240,6 @@ const confirmDeleteChapter = (chapter) => {
   } finally {
     console.groupEnd();
   }
-  
 };
 
 </script>

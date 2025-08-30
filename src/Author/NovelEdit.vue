@@ -1,5 +1,6 @@
 <template>
   <div class="edit-page">
+    
     <!-- 返回按钮 -->
     <button type="button" class="back-btn " @click="goBack">
       返回书籍
@@ -121,6 +122,7 @@
               <div class="upload-notice">
                 <h3>注意</h3>
                 <ul class="notice-list">
+                  <li>对于处于连载或完结状态的小说，修改上传信息后需经管理员审核方可生效。</li>
                   <li>请确保上传的图片及其字体等不侵犯任何人权益，如有侵权须自行承担赔偿等责任！</li>
                   <li>上传600x800像素、不超过5M的JPG/JPEG图片；</li>
                   <li>作品封面应显示作品名和笔名；</li>
@@ -146,18 +148,23 @@
           <button type="button" class="cancel-btn" @click="cancelChanges">
             取消
           </button>
-          <button type="submit" class="submit-btn" @click.prevent="saveNovel">
+          <button type="submit" class="submit-btn" @click.prevent="handleSave">
             保存更改
           </button>
         </template>
       </div>
+      <!-- 提示框 -->
+    <div v-if="alert.show" class="custom-alert" :class="alert.type">
+      {{ alert.message }}
+      <button @click="hideAlert">×</button>
+    </div>
     </form>
   </div>
 </template>
 
 <script setup>
 // 导入小说状态管理
-import { computed } from 'vue'
+import { computed,ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useNovel } from '@/stores/CurrentNovel'
 // 解构需要的状态和方法
@@ -176,9 +183,40 @@ const {
 //返回上一级
 const router = useRouter()  // 先获取实例
 const goBack = () => {
-  router.go(-1)              // 再调用方法
+  router.go(-1)             
+}
+// 提示框状态
+const alert = ref({
+  show: false,
+  message: '',
+  type: 'success' // 'success' 或 'error'
+})
+
+// 显示提示框
+const showAlert = (message, type = 'success') => {
+  alert.value = {
+    show: true,
+    message,
+    type
+  }
+  // 10秒后自动隐藏
+  setTimeout(hideAlert, 10000)
 }
 
+// 隐藏提示框
+const hideAlert = () => {
+  alert.value.show = false
+}
+
+// 修改保存方法
+const handleSave = async () => {
+  const result = await saveNovel()
+  if (result.success) {
+    showAlert(result.message, 'success')
+  } else {
+    showAlert(result.message, 'error')
+  }
+}
 // 只显示连载和完结两个状态选项
 const filteredStatusOptions = computed(() => {
   return statusOptions.filter(option => 
@@ -493,5 +531,63 @@ textarea {
 /* 提交按钮悬停效果 */
 .submit-btn:hover {
   background-color: #27ae60;
+}
+
+/* 提示框样式 */
+.custom-alert {
+  position: fixed;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);   
+  padding: 15px 20px;
+  border-radius: 4px;
+  color: white;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  animation: slideIn 0.3s, fadeOut 0.5s 8.5s forwards;
+}
+
+.custom-alert.success {
+  background-color: #4CAF50;
+}
+
+.custom-alert.error {
+  background-color: #F44336;
+}
+
+.custom-alert button {
+  margin-left: 15px;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.custom-alert button:hover {
+  opacity: 1;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 </style>

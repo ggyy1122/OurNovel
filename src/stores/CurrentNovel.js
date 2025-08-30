@@ -268,8 +268,7 @@ const fetchNovelFromAPI = async (novelId) => {
         introduction: novel.value.introduction,
         status: novel.value.status,
       });
-      console.log("小说水水水水水"+novel.value.novel_name)
-
+      
       if (fileInput.value?.files?.length > 0) {
         const coverFile = fileInput.value.files[0];
         
@@ -286,10 +285,12 @@ const fetchNovelFromAPI = async (novelId) => {
       // 更新本地存储并重新获取评论数
       await novelsStore.fetchNovels();
       await fetchCommentCount(novel.value.novel_id);
+      return { success: true, message: '修改成功，连载/完结作品的修改需审核生效' };
       
     } catch (error) {
       console.error('保存失败:', error);
-      throw error;
+      
+      return { success: false, message: '保存失败: ' + error.message };
     }
   }
 

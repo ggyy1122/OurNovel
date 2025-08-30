@@ -219,7 +219,7 @@ export const ChaptersStore = defineStore('chaptersStore', {
           title: `第${nextChapterId}章 `,
           content: null,
           word_count: 0,
-          price_per_kilo: 0.5,
+          price_per_kilo: 50,
           calculated_price: 0,
           is_charged: "是",
           status: "草稿",
@@ -318,7 +318,7 @@ export const ChaptersStore = defineStore('chaptersStore', {
       if (!this.activeChapter) return
       this.activeChapter.calculated_price = 
         Math.round((this.activeChapter.word_count / 1000) * 
-        this.activeChapter.price_per_kilo * 100) / 100
+        this.activeChapter.price_per_kilo )
     },
     
     // 更新字数
