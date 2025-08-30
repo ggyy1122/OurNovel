@@ -1000,13 +1000,15 @@ const fetchComments = async () => {
             // 获取该评论的所有回复
             const replies = await getRepliesByParentId(comment.commentId);
             // 获取回复的完整内容
-            const fullReplies = await Promise.all(replies.map(async reply => {
-                const replyContent = await getComment(reply.commentId);
-                return {
-                    ...replyContent,
-                    commentLevel: reply.commentLevel
-                };
-            }));
+            const fullReplies = (
+                await Promise.all(replies.map(async reply => {
+                    const replyContent = await getComment(reply.commentId);
+                    return {
+                        ...replyContent,
+                        commentLevel: reply.commentLevel
+                    };
+                }))
+            ).filter(r => r.status === '通过');
             // 预加载读者信息
             await getReaderInfo(comment.readerId);
             await Promise.all(fullReplies.map(reply => getReaderInfo(reply.readerId)));

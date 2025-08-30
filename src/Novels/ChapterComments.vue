@@ -157,13 +157,15 @@ const fetchComments = async () => {
         const response = await getTopLevelCommentsByChapter(novelId, chapterId);
         const processedComments = await Promise.all(response.map(async comment => {
             const replies = await getRepliesByParentId(comment.commentId);
-            const fullReplies = await Promise.all(replies.map(async reply => {
-                const replyContent = await getComment(reply.commentId);
-                return {
-                    ...replyContent,
-                    commentLevel: reply.commentLevel
-                };
-            }));
+            const fullReplies = (
+                await Promise.all(replies.map(async reply => {
+                    const replyContent = await getComment(reply.commentId);
+                    return {
+                        ...replyContent,
+                        commentLevel: reply.commentLevel
+                    };
+                }))
+            ).filter(r => r.status === '通过');
             await getReaderInfo(comment.readerId);
             await Promise.all(fullReplies.map(reply => getReaderInfo(reply.readerId)));
             if (state.isloggedin) {
