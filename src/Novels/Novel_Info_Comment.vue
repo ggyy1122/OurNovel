@@ -51,9 +51,8 @@ const router = useRouter()
 function goReaderHome(readerId) {
   router.push(`/reader/${readerId}`)
 }
-// ✅ 用 ES 模块导入兜底头像（避免 require 在 Vite 下问题）
-import defaultAvatar from '@/assets/logo.png'
 
+const defaultAvatar = 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/e165315c-da2b-42c9-b3cf-c0457d168634.jpg';
 const selectNovelState = SelectNovel_State()
 const readerStore = readerState()
 const readerId = readerStore.readerId

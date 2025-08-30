@@ -221,7 +221,7 @@
             <div class="author-card" v-for="(author, idx) in authors" :key="author.authorId"
                 :class="['card-bg-' + (idx % 3)]">
                 <div class="author-avatar">
-                    <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + (author.avatarUrl || '07850080-e498-47a4-8d3a-fd94fb47e561.jpg')"
+                    <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + (author.avatarUrl || 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg')"
                         :alt="author.authorName" class="avatar-img" @click="goAuthorHome(author)" />
                 </div>
                 <h3 class="author-name" @click="goAuthorHome(author)">{{ author.authorName }}</h3>
@@ -241,7 +241,7 @@
                     <div v-for="(novel, idx) in visibleNovels" :key="novel.novelId" class="novel-carousel-item"
                         :class="{ active: idx === centerIndex }" @mouseenter="hoverIndex = idx"
                         @mouseleave="hoverIndex = null" @click="handleNovelClick(novel)">
-                        <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + (novel.coverUrl || '2e66b6aa-0b46-4391-9e99-15f4cc5c112e.jpg')"
+                        <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + (novel.coverUrl || 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg')"
                             :alt="novel.novelName" class="novel-cover" />
                         <p class="novel-title">{{ novel.novelName }}</p>
                         <transition name="fade">
