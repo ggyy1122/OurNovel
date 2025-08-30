@@ -5,7 +5,9 @@
       <h1>作者收益中心</h1>
       <div class="total-income">
         <span class="label">累计收益：</span>
-        <span class="value">{{ formatCurrency(totalIncome) }}</span>
+        <span class="value">{{ formatCurrency(totalIncome) }} &nbsp;&nbsp;&nbsp;</span>
+        <span class="label">合人民币：</span>
+        <span class="value">¥{{totalIncome/100}}</span>
       </div>
     </div>
 
@@ -466,11 +468,9 @@ export default {
     },
     formatCurrency(amount) {
       return amount.toLocaleString('zh-CN', {
-        style: 'currency',
-        currency: 'CNY',
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
-      })
+      })+' 虚拟币';
     },
     formatDateTime(dateString) {
       if (!dateString) return ''
