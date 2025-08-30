@@ -1000,13 +1000,15 @@ const fetchComments = async () => {
             // 获取该评论的所有回复
             const replies = await getRepliesByParentId(comment.commentId);
             // 获取回复的完整内容
-            const fullReplies = await Promise.all(replies.map(async reply => {
-                const replyContent = await getComment(reply.commentId);
-                return {
-                    ...replyContent,
-                    commentLevel: reply.commentLevel
-                };
-            }));
+            const fullReplies = (
+                await Promise.all(replies.map(async reply => {
+                    const replyContent = await getComment(reply.commentId);
+                    return {
+                        ...replyContent,
+                        commentLevel: reply.commentLevel
+                    };
+                }))
+            ).filter(r => r.status === '通过');
             // 预加载读者信息
             await getReaderInfo(comment.readerId);
             await Promise.all(fullReplies.map(reply => getReaderInfo(reply.readerId)));
@@ -1054,7 +1056,7 @@ const getReaderInfo = async (readerId) => {
 
 // 获取读者头像
 const getReaderAvatar = (readerId) => {
-    return 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + (readersCache.value[readerId]?.avatarUrl || 'a3dc347b-45dd-4d89-8b9d-65b75477ee3d.jpg')
+    return 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + (readersCache.value[readerId]?.avatarUrl || 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg')
 };
 
 // 获取读者名称

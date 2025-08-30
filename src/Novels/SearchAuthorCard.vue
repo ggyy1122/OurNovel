@@ -1,7 +1,7 @@
 <template>
     <div class="author-card">
         <div class="author-info">
-            <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + (author.avatarUrl || '07850080-e498-47a4-8d3a-fd94fb47e561.jpg')"
+            <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + (author.avatarUrl || 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg')"
                 alt="作者头像" class="avatar" @click="goAuthorHome" />
             <div class="details">
                 <h3 @click="goAuthorHome">{{ author.authorName }}</h3>

@@ -157,13 +157,15 @@ const fetchComments = async () => {
         const response = await getTopLevelCommentsByChapter(novelId, chapterId);
         const processedComments = await Promise.all(response.map(async comment => {
             const replies = await getRepliesByParentId(comment.commentId);
-            const fullReplies = await Promise.all(replies.map(async reply => {
-                const replyContent = await getComment(reply.commentId);
-                return {
-                    ...replyContent,
-                    commentLevel: reply.commentLevel
-                };
-            }));
+            const fullReplies = (
+                await Promise.all(replies.map(async reply => {
+                    const replyContent = await getComment(reply.commentId);
+                    return {
+                        ...replyContent,
+                        commentLevel: reply.commentLevel
+                    };
+                }))
+            ).filter(r => r.status === '通过');
             await getReaderInfo(comment.readerId);
             await Promise.all(fullReplies.map(reply => getReaderInfo(reply.readerId)));
             if (state.isloggedin) {
@@ -211,7 +213,7 @@ const getReaderInfo = async (readerId) => {
 };
 
 const getReaderAvatar = (readerId) => {
-    const defaultAvatar = 'a3dc347b-45dd-4d89-8b9d-65b75477ee3d.jpg';
+    const defaultAvatar = 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg';
     return `https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/${readersCache.value[readerId]?.avatarUrl || defaultAvatar}`;
 };
 

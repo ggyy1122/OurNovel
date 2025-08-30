@@ -700,8 +700,8 @@ async function handleRead() {
     router.push('/Novels/reader');
   } catch (error) {
     console.error("阅读失败:", error);
-    toast("无法获取章节内容", {
-      "type": "error",
+    toast("暂无第1章", {
+      "type": "info",
       "dangerouslyHTMLString": true
     });
   }
@@ -734,12 +734,28 @@ const submitRecommend = async () => {
     isRecommended.value = true
     showRecommendDialog.value = false
 
+    const novelData = {
+      novelId: selectNovelState.novelId,
+      authorId: selectNovelState.authorId,
+      novelName: selectNovelState.novelName,
+      introduction: selectNovelState.introduction,
+      createTime: selectNovelState.createTime,
+      coverUrl: selectNovelState.coverUrl,
+      score: selectNovelState.score,
+      totalWordCount: selectNovelState.totalWordCount,
+      recommendCount: selectNovelState.recommendCount,
+      collectedCount: selectNovelState.collectedCount,
+      status: selectNovelState.status,
+      originalNovelId: selectNovelState.originalNovelId,
+      totalPrice: selectNovelState.totalPrice
+    };
+
     //  更新推荐列表（安全方式）
     const newRecommendBooks = [
       ...ReaderState.recommendBooks, // 解构原有数组
       {
         novelId: selectNovelState.novelId,
-        novel: selectNovelState, // 保存完整作品信息
+        novel: novelData, // 保存完整作品信息
         readerId: ReaderState.readerId,
         reason: recommendReason.value,
         recommendTime: new Date().toISOString()
