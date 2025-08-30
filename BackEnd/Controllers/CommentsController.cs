@@ -134,7 +134,8 @@ namespace OurNovel.Controllers
         public async Task<IActionResult> GetTopLevelCommentsByChapter(int novelId, int chapterId)
         {
             var comments = await _commentsService.GetTopLevelCommentsByChapterAsync(novelId, chapterId);
-            return Ok(comments);
+            var result = comments.Where(c => c.Status == "通过");
+            return Ok(result);
         }
 
         /// <summary>
@@ -144,7 +145,8 @@ namespace OurNovel.Controllers
         public async Task<IActionResult> GetTopLikedTopLevelCommentsByChapter(int novelId, int chapterId, int topN)
         {
             var comments = await _commentsService.GetTopNTopLevelCommentsByLikesByChapterAsync(novelId, chapterId, topN);
-            return Ok(comments);
+            var result = comments.Where(c => c.Status == "通过");
+            return Ok(result);
         }
         /// <summary>
         /// 根据小说ID获取所有评论数量
