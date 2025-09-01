@@ -55,7 +55,7 @@
             </div>
             <button type="submit" class="login-btn">登录</button>
         </form>
-        <div class="signup-tip">
+        <div class="signup-tip" v-if="state.value !== 2">
             还没有账号？<a href="#" @click.prevent="register">立即注册</a>
         </div>
     </div>
@@ -125,7 +125,8 @@ const handleLogin = async () => {
                     readerDetails.isRecommendVisible,
                     response_collect,
                     response_recommend,
-                    response_readHistory
+                    response_readHistory,
+                    password.value
                 );
                 router.push('/Novels/Novel_Layout/home');
             } else if (state.value === 1) { // 作者

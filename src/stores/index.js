@@ -53,6 +53,7 @@ export const readerState = defineStore('reader', {
         favoriteBooks: [],    // 收藏书籍
         recommendBooks: [],    // 推荐书籍
         //你还想记录什么属性可以加
+        true_password: ""  // 真实密码，修改密码时用于验证旧密码
     }),
     persist: true,  //持久化存储
     getters: {
@@ -75,7 +76,7 @@ export const readerState = defineStore('reader', {
         readHistoryCount: (state) => state.readHistory.length,
     },
     actions: {
-        initializeReader(id, name, password, phone, gender, balance, avatarUrl, backgroundUrl, isCollectVisible, isRecommendVisible, favoriteBooks, recommendBooks, readHistory) {
+        initializeReader(id, name, password, phone, gender, balance, avatarUrl, backgroundUrl, isCollectVisible, isRecommendVisible, favoriteBooks, recommendBooks, readHistory, true_password) {
             this.readerId = id || 0;
             this.readerName = name || "";
             this.password = password || "";
@@ -90,6 +91,7 @@ export const readerState = defineStore('reader', {
             this.favoriteBooks = favoriteBooks || []; // 初始化收藏书籍
             this.recommendBooks = recommendBooks || []; // 初始化推荐书籍
             this.readHistory = readHistory || []; // 初始化阅读历史
+            this.true_password = true_password || "";
             this.isloggedin = true;
             this.lastLoginTime = new Date().toISOString(); // 设置最近登录时间
         },
@@ -110,6 +112,7 @@ export const readerState = defineStore('reader', {
             this.readHistory = [];
             this.favoriteBooks = [];
             this.recommendBooks = [];
+            this.true_password = "";
         },
         isFavorite(novelId) {
             return this.favoriteBooks.some(item =>
