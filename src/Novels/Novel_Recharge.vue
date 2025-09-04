@@ -51,13 +51,13 @@
                         :class="['amount-btn', { active: selectedAmount === amount.value }]"
                         @click="selectAmount(amount.value)">
                         <span class="amount-val">¥{{ amount.value }}</span>
-                        <span class="amount-desc">({{ amount.points*100 }}虚拟币)</span>
+                        <span class="amount-desc">({{ amount.points * 100 }}虚拟币)</span>
                     </button>
                     <div class="amount-btn custom" :class="{ active: selectedAmount === 'custom' }">
                         <span>其它金额 </span>
                         <input type="number" v-model="customAmount" placeholder="输入金额" @focus="selectCustomAmount"
                             class="custom-input" />
-                        <span class="amount-desc">（{{ customAmount*100 || 0 }}虚拟币）</span>
+                        <span class="amount-desc">（{{ customAmount * 100 || 0 }}虚拟币）</span>
                     </div>
                 </div>
             </div>
@@ -127,7 +127,12 @@ function selectCustomAmount() {
     selectedAmount.value = 'custom'
 }
 function handle_return() {
-    router.back()
+    // 如果是新窗口打开的，则关闭当前窗口
+    if (window.opener) {
+        window.close();
+    } else {
+        router.back();
+    }
 }
 const fetchReaderBalance = async () => {
     try {
