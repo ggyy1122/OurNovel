@@ -905,16 +905,21 @@ const goToChapter = async (chapter) => {
 const getFormattedContent = () => {
     // 检查章节状态
     if (selectNovelState.cha_status === '封禁') {
-        fontSize.value = 30;
         return '<div style="text-align: center; padding: 50px; color: #f56c6c;">该章节已封禁，无法查看内容</div>';
     } else if (selectNovelState.cha_status === '审核中') {
-        fontSize.value = 30;
         return '<div style="text-align: center; padding: 50px; color: #e6a23c;">该章节正在审核中，请稍后再试</div>';
     }
-    // 正常章节显示内容
-    fontSize.value = 18;
     return formatContent(selectNovelState.cha_content);
 };
+
+watch(() => selectNovelState.cha_status, (newStatus) => {
+    if (newStatus === '封禁' || newStatus === '审核中') {
+        fontSize.value = 30;
+    } else {
+        fontSize.value = 18;
+    }
+});
+
 
 // 添加计算属性来判断是否禁用评论和听书
 const isChapterDisabled = computed(() => {
