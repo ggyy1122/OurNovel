@@ -5,7 +5,8 @@
             <div class="carousel" @mouseenter="pauseAutoPlay" @mouseleave="resumeAutoPlay">
                 <div class="carousel-inner" :style="{ transform: `translateX(-${currentIndex * 100}%)` }">
                     <div class="carousel-item" v-for="(item, index) in carouselItems" :key="index">
-                        <img :src="item.image" :alt="item.title" class="carousel-image" />
+                        <img :src="item.image" :alt="item.title" class="carousel-image" loading="lazy"
+                            @load="handleImageLoad" />
                         <div class="carousel-caption">
                             <h3>{{ item.title }}</h3>
                             <p>{{ item.description }}</p>
@@ -31,7 +32,8 @@
                 <div class="carousel-imgs">
                     <div v-for="(novel, idx) in carouselNovels" :key="novel.novelId" class="carousel-img-item"
                         :class="{ active: idx === currentBanner }" @click="goToNovel(novel.novelId)">
-                        <img :src="novel.coverUrl" class="banner-img" :alt="novel.novelName" />
+                        <img :src="novel.coverUrl" class="banner-img" :alt="novel.novelName" loading="lazy"
+                            @load="handleImageLoad" />
                     </div>
                 </div>
                 <div class="carousel-titles">
@@ -111,7 +113,8 @@
                         </div>
                         <img v-if="list.data.value[0].coverUrl"
                             :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + list.data.value[0].coverUrl"
-                            class="rank-top-img" :alt="list.data.value[0].novelName" />
+                            class="rank-top-img" :alt="list.data.value[0].novelName" loading="lazy"
+                            @load="handleImageLoad" />
                     </li>
                     <!-- 2-10名普通展示 -->
                     <li v-for="(item, index) in list.data.value.slice(1, 10)" :key="item.novelId" class="rank-item"
@@ -145,7 +148,8 @@
                             :class="{ 'hidden': index < hiddenMaleCount }"
                             :style="{ pointerEvents: index < hiddenMaleCount ? 'none' : 'auto' }">
                             <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + novel.coverUrl"
-                                class="novel-cover2" @click="handleNovelClick(novel)" />
+                                class="novel-cover2" @click="handleNovelClick(novel)" loading="lazy"
+                                @load="handleImageLoad" />
                             <div class="novel-info">
                                 <h3 class="novel-name" @click="handleNovelClick(novel)">{{ novel.novelName }}</h3>
                                 <p class="novel-author" @click="goAuthorHome1(novel.authorId)">{{ novel.authorName }}
@@ -160,7 +164,8 @@
                             :class="{ 'hidden': index >= visibleFemaleCount }"
                             :style="{ pointerEvents: index >= visibleFemaleCount ? 'none' : 'auto' }">
                             <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + novel.coverUrl"
-                                class="novel-cover2" @click="handleNovelClick(novel)" />
+                                class="novel-cover2" @click="handleNovelClick(novel)" loading="lazy"
+                                @load="handleImageLoad" />
                             <div class="novel-info">
                                 <h3 class="novel-name" @click="handleNovelClick(novel)">{{ novel.novelName }}</h3>
                                 <p class="novel-author" @click="goAuthorHome1(novel.authorId)">{{ novel.authorName }}
@@ -186,7 +191,7 @@
         <div class="single-image-container">
             <a href="https://activity.zongheng.com/activity/zhengwen/detail/384?forceMode=1" target="_blank"
                 class="image-link">
-                <img src="@/assets/logo2.png" alt="征文" class="single-image" />
+                <img src="@/assets/logo2.png" alt="征文" class="single-image" loading="lazy" @load="handleImageLoad" />
             </a>
         </div>
 
@@ -201,7 +206,8 @@
                 <li v-for="book in books" :key="book.novelId" class="novel-item">
                     <div class="cover-wrapper">
                         <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + book.cover"
-                            class="novel-cover1" @click="handleNovelClick(book)" />
+                            class="novel-cover1" @click="handleNovelClick(book)" loading="lazy"
+                            @load="handleImageLoad" />
                     </div>
                     <div class="novel-info">
                         <h4 class="novel-title1" @click="handleNovelClick(book)">{{ book.title }}</h4>
@@ -222,7 +228,8 @@
                 :class="['card-bg-' + (idx % 3)]">
                 <div class="author-avatar">
                     <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + (author.avatarUrl || 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg')"
-                        :alt="author.authorName" class="avatar-img" @click="goAuthorHome(author)" />
+                        :alt="author.authorName" class="avatar-img" @click="goAuthorHome(author)" loading="lazy"
+                        @load="handleImageLoad" />
                 </div>
                 <h3 class="author-name" @click="goAuthorHome(author)">{{ author.authorName }}</h3>
                 <p class="author-join-date">{{ author.registerTime }}加入TJ</p>
@@ -242,7 +249,7 @@
                         :class="{ active: idx === centerIndex }" @mouseenter="hoverIndex = idx"
                         @mouseleave="hoverIndex = null" @click="handleNovelClick(novel)">
                         <img :src="'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + (novel.coverUrl || 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg')"
-                            :alt="novel.novelName" class="novel-cover" />
+                            :alt="novel.novelName" class="novel-cover" loading="lazy" @load="handleImageLoad" />
                         <p class="novel-title">{{ novel.novelName }}</p>
                         <transition name="fade">
                             <div v-if="hoverIndex === idx" class="novel-intro">
@@ -320,7 +327,8 @@
                         <span>邮箱：jubao@hanhai.com</span>
                     </div>
                     <a target="_blank" class="image-link">
-                        <img src="@/assets/logo.png" class="zh-footer-logo" alt="TJ小说网" />
+                        <img src="@/assets/logo.png" class="zh-footer-logo" alt="TJ小说网" loading="lazy"
+                            @load="handleImageLoad" />
                     </a>
                 </div>
             </div>
@@ -340,10 +348,12 @@
                 本站所收录小说作品、社区话题、书库评论均属其个人行为,不代表本站立场。
             </div>
             <div class="zh-footer-badges">
-                <a href="https://www.bjjubao.org.cn/" target="_blank" class="image-link">
+                <a href="https://www.bjjubao.org.cn/" target="_blank" class="image-link" loading="lazy"
+                    @load="handleImageLoad">
                     <img src="https://revo.zongheng.com/comm/2024/e9875cc7.png" alt="上海市违法和不良信息举报" />
                 </a>
-                <a href="https://www.12377.cn/" target="_blank" class="image-link">
+                <a href="https://www.12377.cn/" target="_blank" class="image-link" loading="lazy"
+                    @load="handleImageLoad">
                     <img src="https://revo.zongheng.com/comm/2024/04dce8a2.png" alt="中央网信办违法和不良信息举报中心" />
                 </a>
             </div>
@@ -373,9 +383,38 @@ import {
 const router = useRouter()
 const selectNovelState = SelectNovel_State()
 
+// 全局缓存对象
+const globalCache = {
+    novel: new Map(),
+    author: new Map(),
+    category: new Map(),
+    ranking: new Map(),
+    chapter: new Map(),
+    chapterLogs: new Map(),
+    filteredNovels: new Map()
+}
+
+// 带缓存的API调用函数
+const cachedApiCall = async (cacheKey, apiFunction, ...args) => {
+    // 生成唯一的缓存键
+    const key = `${cacheKey}:${JSON.stringify(args)}`
+    // 检查缓存中是否存在
+    if (globalCache[cacheKey].has(key)) {
+        return globalCache[cacheKey].get(key)
+    }
+    try {
+        const result = await apiFunction(...args)
+        // 缓存结果
+        globalCache[cacheKey].set(key, result)
+        return result
+    } catch (error) {
+        console.error(`API调用失败 (${cacheKey}):`, error)
+        throw error
+    }
+}
+
 // Banner数据
 const carouselItems = ref(carouselItems_data)
-
 const authors = ref([])
 const novels = ref([])
 const collectRanking = ref([])
@@ -416,72 +455,75 @@ const femaleTranslateX = computed(() => {
     return (6 - visibleFemaleCount.value) * 12.5
 })
 
-// 获取小说数据（优化版）
+// 获取小说数据（使用缓存）
 const fetchFeaturedNovels = async () => {
     try {
-        // 获取男频小说
-        const maleResults = await Promise.allSettled(maleNovelIds.map(id => getNovel(id)))
-        // 筛选有效的男频小说
-        const validMaleNovels = maleResults
-            .filter(result => result.status === 'fulfilled' && result.value)
-            .map(result => result.value)
-            .filter(novel => novel && (novel.status === '连载' || novel.status === '完结'))
-        // 获取作者信息并构建男频小说列表
-        const maleNovelsWithAuthors = await Promise.allSettled(
-            validMaleNovels.slice(0, 6).map(async novel => {
-                try {
-                    const author = await getAuthor(novel.authorId)
-                    return {
-                        ...novel,
-                        authorName: author?.authorName || '未知作者'
+        // 并行获取男频和女频小说
+        const [maleResults, femaleResults] = await Promise.all([
+            Promise.all(
+                maleNovelIds.map(async id => {
+                    return cachedApiCall('novel', getNovel, id)
+                })
+            ),
+            Promise.all(
+                femaleNovelIds.map(async id => {
+                    return cachedApiCall('novel', getNovel, id)
+                })
+            )
+        ]);
+        // 处理男频小说
+        const validMaleNovels = await Promise.all(
+            maleResults
+                .filter(novel => novel && (novel.status === '连载' || novel.status === '完结'))
+                .slice(0, 6)
+                .map(async novel => {
+                    try {
+                        const authorName = await cachedApiCall('author', getAuthor, novel.authorId)
+                            .then(author => author?.authorName || '未知作者')
+                            .catch(() => '未知作者')
+                        return {
+                            ...novel,
+                            authorName
+                        };
+                    } catch {
+                        return {
+                            ...novel,
+                            authorName: '未知作者'
+                        };
                     }
-                } catch (error) {
-                    console.error(`获取作者信息失败 (ID: ${novel.authorId}):`, error)
-                    return {
-                        ...novel,
-                        authorName: '未知作者'
+                })
+        );
+        // 处理女频小说
+        const validFemaleNovels = await Promise.all(
+            femaleResults
+                .filter(novel => novel && (novel.status === '连载' || novel.status === '完结'))
+                .slice(0, 6)
+                .map(async novel => {
+                    try {
+                        const authorName = await cachedApiCall('author', getAuthor, novel.authorId)
+                            .then(author => author?.authorName || '未知作者')
+                            .catch(() => '未知作者')
+                        return {
+                            ...novel,
+                            authorName
+                        };
+                    } catch {
+                        return {
+                            ...novel,
+                            authorName: '未知作者'
+                        };
                     }
-                }
-            })
-        )
-        // 过滤掉失败的项目
-        maleNovels.value = maleNovelsWithAuthors
-            .filter(result => result.status === 'fulfilled')
-            .map(result => result.value)
-
-        // 获取女频小说
-        const femaleResults = await Promise.allSettled(femaleNovelIds.map(id => getNovel(id)))
-        // 筛选有效的女频小说
-        const validFemaleNovels = femaleResults
-            .filter(result => result.status === 'fulfilled' && result.value)
-            .map(result => result.value)
-            .filter(novel => novel && (novel.status === '连载' || novel.status === '完结'))
-        // 获取作者信息并构建女频小说列表
-        const femaleNovelsWithAuthors = await Promise.allSettled(
-            validFemaleNovels.slice(0, 6).map(async novel => {
-                try {
-                    const author = await getAuthor(novel.authorId)
-                    return {
-                        ...novel,
-                        authorName: author?.authorName || '未知作者'
-                    }
-                } catch (error) {
-                    console.error(`获取作者信息失败 (ID: ${novel.authorId}):`, error)
-                    return {
-                        ...novel,
-                        authorName: '未知作者'
-                    }
-                }
-            })
-        )
-        // 过滤掉失败的项目
-        femaleNovels.value = femaleNovelsWithAuthors
-            .filter(result => result.status === 'fulfilled')
-            .map(result => result.value)
+                })
+        );
+        // 更新数据
+        maleNovels.value = validMaleNovels;
+        femaleNovels.value = validFemaleNovels;
     } catch (error) {
-        console.error('获取精选小说数据失败:', error)
+        console.error('获取精选小说数据失败:', error);
+        maleNovels.value = maleNovels.value || [];
+        femaleNovels.value = femaleNovels.value || [];
     }
-}
+};
 
 const showMoreMale = () => {
     splitPosition.value = 75 // 显示6男2女
@@ -496,7 +538,7 @@ const showMoreFemale = () => {
 const fetchAuthors = async () => {
     try {
         const authorResults = await Promise.allSettled(
-            authorIds.map(id => getAuthor(id))
+            authorIds.map(id => cachedApiCall('author', getAuthor, id))
         )
         authors.value = authorResults
             .filter(result => result.status === 'fulfilled' && result.value)
@@ -509,7 +551,7 @@ const fetchAuthors = async () => {
 const fetchNovels = async () => {
     try {
         const novelResults = await Promise.allSettled(
-            novelIds.map(id => getNovel(id))
+            novelIds.map(id => cachedApiCall('novel', getNovel, id))
         )
         // 筛选小说：只保留成功获取且状态为'连载'或'完结'的小说
         novels.value = novelResults
@@ -524,8 +566,8 @@ const fetchNovels = async () => {
 const handleNovelClick = async (novel) => {
     try {
         console.log('点击小说:', novel)
-        // 获取作者信息
-        const response = await getAuthor(novel.authorId)
+        // 获取作者信息（使用缓存）
+        const response = await cachedApiCall('author', getAuthor, novel.authorId)
         // 更新store中的小说信息
         selectNovelState.resetNovel(
             novel.novelId,
@@ -649,13 +691,12 @@ const prevSlide = () => {
 const goToSlide = (index) => {
     currentIndex.value = index
 }
+
 //历史征文
-
-
 const books = ref([])
 
 async function fetchHistoryNovels() {
-    const novels = await getFilteredNovels(1, 6, '历史', null, null, null)
+    const novels = await cachedApiCall('filteredNovels', getFilteredNovels, 1, 6, '历史', null, null, null)
     if (!novels || novels.length === 0) {
         books.value = []
         return
@@ -664,10 +705,10 @@ async function fetchHistoryNovels() {
     const detailedBooks = await Promise.all(
         filtered.map(async (novel) => {
             try {
-                const detail = await getNovel(novel.novelId)
+                const detail = await cachedApiCall('novel', getNovel, novel.novelId)
                 let authorName = '未知作者'
                 try {
-                    const author = await getAuthor(detail.authorId)
+                    const author = await cachedApiCall('author', getAuthor, detail.authorId)
                     authorName = author.authorName || '未知作者'
                 } catch (error) {
                     console.warn('获取作者失败:', error)
@@ -716,21 +757,20 @@ async function fetchHistoryNovels() {
 }
 
 //更新
-
 const recentUpdates = ref([])
 
 async function fetchRecentUpdates() {
-    const logsRes = await getChapterLogs()
+    const logsRes = await cachedApiCall('chapterLogs', getChapterLogs)
     if (!logsRes || !logsRes.data) return
     const sortedLogs = logsRes.data
         .sort((a, b) => new Date(b.time) - new Date(a.time))
         .slice(0, 10)
     const updates = await Promise.all(sortedLogs.map(async log => {
         try {
-            const novel = await getNovel(log.novelId)
+            const novel = await cachedApiCall('novel', getNovel, log.novelId)
             if (novel.status !== '连载' && novel.status !== '完结') return null
-            const chapter = await getChapter(log.novelId, log.chapterId)
-            const author = await getAuthor(novel.authorId)
+            const chapter = await cachedApiCall('chapter', getChapter, log.novelId, log.chapterId)
+            const author = await cachedApiCall('author', getAuthor, novel.authorId)
             return {
                 novelId: novel.novelId,
                 title: novel.novelName || '未知小说',
@@ -763,7 +803,7 @@ function setBanner(idx) {
 
 const goToNovel = async (novelId) => {
     try {
-        const response = await getNovel(novelId)
+        const response = await cachedApiCall('novel', getNovel, novelId)
         handleNovelClick(response)
     } catch (error) {
         console.error('处理失败:', error)
@@ -779,14 +819,15 @@ const fetchRankings = async () => {
             recommendRanking.value,
             scoreRanking.value
         ] = await Promise.all([
-            getCollectRanking(10),
-            getRecommendRanking(10),
-            getScoreRanking(10)
+            cachedApiCall('ranking', getCollectRanking, 10),
+            cachedApiCall('ranking', getRecommendRanking, 10),
+            cachedApiCall('ranking', getScoreRanking, 10)
         ]);
     } catch (error) {
         console.error('获取排行榜数据失败:', error)
     }
 }
+
 //去排行榜
 const goToRankings = (type) => {
     router.push({
@@ -801,7 +842,7 @@ const hoverCategory = ref(null)
 // 获取分类数据
 const fetchCategories = async () => {
     try {
-        const allCategories = await getAllCategories()
+        const allCategories = await cachedApiCall('category', getAllCategories)
         // 随机排序并取前20个
         categories.value = allCategories
             .sort(() => Math.random() - 0.5)
@@ -824,6 +865,11 @@ const goToAllCategories = () => {
     router.push('/Novels/Novel_Layout/category')
 }
 
+// 图片加载完成处理
+const handleImageLoad = (event) => {
+    event.target.classList.add('loaded');
+};
+
 onMounted(async () => {
     fetchCategories()
     startAutoPlay()
@@ -844,6 +890,8 @@ onUnmounted(() => {
     pauseAutoPlay()
     stopNovelAutoPlay()
     clearInterval(timer)
+    // 清空缓存（可选）
+    Object.values(globalCache).forEach(cache => cache.clear())
 })
 watch(novelCurrent, startNovelAutoPlay)
 </script>
@@ -852,6 +900,16 @@ watch(novelCurrent, startNovelAutoPlay)
 .novel-home {
     width: 100%;
     margin: 0 auto;
+}
+
+/* 添加渐显动画 */
+img[loading="lazy"] {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+img.loaded {
+    opacity: 1;
 }
 
 .carousel-container {
