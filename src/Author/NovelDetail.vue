@@ -91,6 +91,52 @@
           <p class="stat-value">{{ novel.score }}</p>
         </router-link>
       </div>
+      
+        <div class="management-logs-container">
+          <div class="logs-header">
+            <h3>审核记录</h3>
+            <div class="header-actions">
+              <span class="total-count">共 {{ logs.length }} 条记录</span>
+            </div>
+          </div>
+
+          <div class="logs-body">
+            <div v-if="loadingLogs" class="loading-state">
+              <i class="el-icon-loading"></i> 加载中...
+            </div>
+
+            <div v-else-if="logs.length === 0" class="empty-state">
+              <i class="el-icon-document"></i>
+              <p>暂无审核记录</p>
+            </div>
+
+            <div v-else class="logs-table">
+              <div class="log-row header">
+                <div class="cell time">操作时间</div>
+                <div class="cell manager">管理员</div>
+                <div class="cell action">操作内容</div>
+              </div>
+              
+              <!-- 只展示最近5条记录 -->
+              <div class="log-scroll">
+                <div v-for="log in logs.slice(0, 5)" 
+                    :key="log.managementId" 
+                    class="log-row">
+                  <div class="cell time">{{ log.time }}</div>
+                  <div class="cell manager">{{ log.managerName }}</div>
+                  <div class="cell action">{{ log.result }}</div>
+                </div>
+              </div>
+              
+              <!-- 当记录超过5条时显示提示 -->
+              <div v-if="logs.length > 5" class="show-more-tip">
+                仅显示最近5条记录
+              </div>
+            </div>
+          </div>
+        </div>
+
+
     </div>
 
     <!-- 删除确认对话框 -->
@@ -110,7 +156,8 @@
 <script setup>
 // 导入小说状态
 import { useNovel } from '@/stores/CurrentNovel'
-import { onMounted } from 'vue'
+import { onMounted,ref } from 'vue'
+import { getNovelManagementLogs } from '@/API/NovelManagement_API'
 const {
   novel,             
   showDeleteDialog,   
@@ -121,9 +168,27 @@ const {
   fetchNovelFromAPI      
 } = useNovel()
 
+const logs = ref([])
+const loadingLogs = ref(false)
+
+const fetchLogs = async () => {
+  try {
+    loadingLogs.value = true
+    const res = await getNovelManagementLogs(novel.value.novel_id)
+    if (res.success) {
+      logs.value = res.data
+    }
+  } catch (error) {
+    console.error('获取管理记录失败', error)
+  } finally {
+    loadingLogs.value = false
+  }
+}
+
 onMounted(() => {
   if (novel.value.novel_id) {
     fetchNovelFromAPI(novel.value.novel_id)
+    fetchLogs()
   }
 })
 
@@ -437,5 +502,138 @@ const formatDateTime = (dateString) => {
   background-color: #e74c3c;
   color: white;
   border: none;
+}/* 管理记录容器 */
+.management-logs-container {
+  margin-top: 30px;
+  border: 1px solid #ebeef5;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* 头部样式 */
+.logs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #ebeef5;
+}
+
+.logs-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #303133;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.total-count {
+  font-size: 13px;
+  color: #909399;
+}
+
+/* 内容区域 */
+.logs-body {
+  background-color: #fff;
+}
+
+/* 加载状态 */
+.loading-state {
+  padding: 30px;
+  text-align: center;
+  color: #909399;
+  font-size: 14px;
+}
+
+.loading-state i {
+  font-size: 18px;
+  margin-right: 8px;
+}
+
+/* 空状态 */
+.empty-state {
+  padding: 40px 20px;
+  text-align: center;
+  color: #c0c4cc;
+}
+
+.empty-state i {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* 表格样式 */
+.logs-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.log-row {
+  display: flex;
+  padding: 12px 20px;
+  border-bottom: 1px solid #ebeef5;
+}
+
+.log-row.header {
+  background-color: #f5f7fa;
+  font-weight: 500;
+  color: #303133;
+}
+
+.log-row:last-child {
+  border-bottom: none;
+}
+
+.cell {
+  padding: 0 10px;
+}
+
+.cell.time {
+  width: 180px;
+  flex-shrink: 0;
+}
+
+.cell.manager {
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.cell.action {
+  flex-grow: 1;
+}
+
+/* 滚动区域 */
+.log-scroll {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* 滚动条样式 */
+.log-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.log-scroll::-webkit-scrollbar-thumb {
+  background-color: #c1c1c1;
+  border-radius: 3px;
+}
+
+.log-scroll::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+}
+.show-more-tip{
+  margin: auto;
 }
 </style>
