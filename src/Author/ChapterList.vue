@@ -52,6 +52,13 @@
               <span class="publish-time" v-if="chapter.status === '已发布'">
                 {{ formatDate(chapter.publish_time) }}
               </span>
+              <!-- 添加查看审核记录按钮 -->
+              <button 
+                class="view-logs-btn"
+                @click.stop="viewAuditLogs(chapter)"
+              >
+                审核记录
+              </button>
             </div>
             <!-- 删除按钮 -->
             <button 
@@ -151,15 +158,46 @@
         </div>
       </div>
     </div>
+
+    <!-- 审核记录对话框 -->
+    <div v-if="showLogsDialog" class="logs-dialog">
+      <div class="dialog-content">
+        <div class="dialog-header">
+          <h3>章节审核记录</h3>
+          <button class="close-btn" @click="showLogsDialog = false">×</button>
+        </div>
+        
+        <div v-if="loadingLogs" class="loading-state">
+          <i class="el-icon-loading"></i> 加载中...
+        </div>
+        
+        <div v-else-if="managementLogs.length === 0" class="empty-state">
+          暂无审核记录
+        </div>
+        
+        <div v-else class="logs-container">
+          <div class="log-item" v-for="log in managementLogs.slice(0, 5)" :key="log.ManagementId">
+            <div class="log-time">{{ log.time }}</div>
+            <div class="log-manager">管理员: {{ log.managerName }}</div>
+            <div class="log-result">处理结果: {{ log.result }}</div>
+          </div>
+          
+          <div v-if="managementLogs.length > 5" class="logs-tip">
+            仅显示最近5条记录（共{{ managementLogs.length }}条）
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { computed,onMounted} from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router'
 import { useNovel } from '@/stores/CurrentNovel'
 import { ChaptersStore } from '@/stores/Chapters'
 import { storeToRefs } from 'pinia'
+import { getChapterManagementLogs } from '@/API/ChapterManagement_API'
 
 // 获取小说和章节相关状态和方法
 const { novel } = useNovel()
@@ -184,9 +222,13 @@ const {
   saveChapter
 } = chaptersStore
 
+// 审核记录相关状态
+const managementLogs = ref([])
+const loadingLogs = ref(false)
+const showLogsDialog = ref(false)
+
 // 返回上一级
 const router = useRouter()
-
 
 onMounted(async () => {
   try {
@@ -196,9 +238,11 @@ onMounted(async () => {
     router.push('/error') // 跳转到错误页面
   }
 })
+
 const goBack = () => {
   router.go(-1)
 }
+
 // 换行空格
 const handleEnterKey = (event) => {
   if (event.key === 'Enter') {
@@ -218,6 +262,7 @@ const handleEnterKey = (event) => {
     }, 0);
   }
 };
+
 // 选择章节
 const selectChapter = (chapter) => {
   console.log('点击章节:', chapter) 
@@ -242,6 +287,37 @@ const confirmDeleteChapter = (chapter) => {
   }
 };
 
+// 获取章节管理日志
+const fetchManagementLogs = async (chapterId) => {
+  try {
+    loadingLogs.value = true
+    const res = await getChapterManagementLogs(chapterId, novel.value.novel_id)
+    
+    // 关键修改：即使HTTP状态码为404，只要业务逻辑返回success:false且message为'未找到相关管理日志'
+    if (res.status === 404 && res.data && res.data.success === false && res.data.message === '未找到相关管理日志') {
+      managementLogs.value = []
+      showLogsDialog.value = true
+    } 
+    else if (res.success) {
+      managementLogs.value = res.data
+      showLogsDialog.value = true
+    }
+    
+  } catch (error) {
+    console.error('获取管理记录失败:', error)
+    managementLogs.value = []
+    showLogsDialog.value = true
+  } finally {
+    loadingLogs.value = false
+  }
+}
+
+// 查看审核记录
+const viewAuditLogs = (chapter) => {
+  if (chapter.chapter_id) {
+    fetchManagementLogs(chapter.chapter_id)
+  }
+}
 </script>
 
 <style scoped>
@@ -270,7 +346,6 @@ const confirmDeleteChapter = (chapter) => {
   transition: all 0.3s;
   z-index: 1;
 }
-
 
 /* 页面头部样式 */
 .page-header {
@@ -366,6 +441,7 @@ const confirmDeleteChapter = (chapter) => {
   font-size: 12px;
   color: #666;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 /* 状态文本样式 */
@@ -408,7 +484,20 @@ const confirmDeleteChapter = (chapter) => {
   border-radius: 50%;
 }
 
+/* 查看审核记录按钮样式 */
+.view-logs-btn {
+  background: none;
+  border: none;
+  color: #3498db;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0;
+  text-decoration: underline;
+}
 
+.view-logs-btn:hover {
+  color: #2980b9;
+}
 
 /* 编辑区域样式 */
 .editor-area {
@@ -582,6 +671,7 @@ const confirmDeleteChapter = (chapter) => {
 .charge-setting select:disabled {
   background-color: #f5f5f5;
 }
+
 /* 删除对话框样式 */
 .delete-dialog {
   position: fixed;
@@ -640,5 +730,79 @@ const confirmDeleteChapter = (chapter) => {
   background-color: #e74c3c;
   color: white;
   border: none;
+}
+
+/* 审核记录对话框样式 */
+.logs-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+}
+
+.logs-dialog .dialog-content {
+  background-color: white;
+  width: 600px;
+  max-height: 70vh;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #999;
+}
+
+.logs-container {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.log-item {
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.log-item:last-child {
+  border-bottom: none;
+}
+
+.log-time {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.log-manager {
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.log-result {
+  color: #444;
+}
+
+.loading-state, .empty-state {
+  text-align: center;
+  padding: 30px;
+  color: #999;
 }
 </style>

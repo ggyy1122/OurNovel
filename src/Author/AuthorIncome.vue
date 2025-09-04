@@ -466,11 +466,9 @@ export default {
         this.currentPage++
       }
     },
-    formatCurrency(amount) {
-      return amount.toLocaleString('zh-CN', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      })+' 虚拟币';
+   formatCurrency(amount) {
+      const integerAmount = Math.round(amount)
+      return integerAmount.toLocaleString('zh-CN') + ' 虚拟币'
     },
     formatDateTime(dateString) {
       if (!dateString) return ''
