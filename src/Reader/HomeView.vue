@@ -4,16 +4,16 @@
     <div class="user-profile">
       <div class="profile-header">
        <div class="avatar">
-          <img :src="reader_state.formattedAvatarUrl || defaultAvatar" alt="用户头像" class="user-avatar">
+          <img :src="reader_state.formattedAvatarUrl || defaultAvatar" alt="用户头像" class="user-avatar" @click="goReaderHome">
         </div>
         <div class="user-info">
 
          
           <div class="name-and-buttons">
-    <h2 class="username">{{ reader_state.readerName }}</h2>
+    <h2 class="username" @click="goReaderHome">{{ reader_state.readerName }}</h2>
     <div class="action-buttons">
       <button class="edit-btn"  @click="goToSelfInformation">编辑资料</button>
-      <button class="page-btn">个人主页</button>
+      <button class="page-btn" @click="goReaderHome">个人主页</button>
     </div>
   </div>
           <div class="user-level">
@@ -98,6 +98,10 @@ const fetchReaderBalance=async()=>{
      accountBalance.value = 0
   }
 }
+//个人主页
+function goReaderHome() {
+    router.push(`/reader/${reader_state.readerId}`);
+}
 // 跳转到个人信息页
 const goToSelfInformation = () => {
   router.push('/UserHome/self-information') 
@@ -157,6 +161,10 @@ watch(
   margin-right: 20px;
 }
 
+.avatar:hover {
+    transform: scale(1.05);
+}
+
 .avatar img {
   width: 100%;
   height: 100%;
@@ -177,6 +185,9 @@ watch(
 .username {
   margin: 0; /* 移除默认外边距 */
   font-size: 20px;
+}
+.username:hover {
+    color: #f0940a;
 }
 
 .action-buttons {

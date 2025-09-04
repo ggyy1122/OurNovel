@@ -23,7 +23,7 @@
             :class="{ 'input-error': phoneError }" />
           <span class="char-counter">{{ phone.length }}/11</span>
         </div>
-        <div v-if="phoneError" class="error-message">请输入11位有效的手机号码</div>
+        <div v-if="phoneError" class="error-message1">请输入11位有效的手机号码</div>
       </div>
 
       <div>
@@ -36,6 +36,91 @@
 
       <button type="submit" :disabled="phoneError">保存修改</button>
     </form>
+
+    <!-- 修改密码区域 -->
+    <div class="password-change-section">
+      <h3>修改密码</h3>
+      <button class="change-password-btn" @click="showPasswordModal = true">
+        修改密码
+      </button>
+    </div>
+    <!-- 修改密码模态框 -->
+    <div v-if="showPasswordModal" class="modal-overlay">
+      <div class="password-modal">
+        <h3>修改密码</h3>
+        <form @submit.prevent="changePassword">
+          <div class="input-group">
+            <input :type="showOldPassword ? 'text' : 'password'" v-model="oldPassword" placeholder="请输入原密码"
+              class="modal-input" />
+            <span class="input-eye" @click="showOldPassword = !showOldPassword">
+              <svg v-if="!showOldPassword" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="20"
+                height="20">
+                <path fill="currentColor"
+                  d="M512 160c320 0 512 352 512 352S832 864 512 864 0 512 0 512s192-352 512-352m0 64c-225.28 0-384.128 208.064-436.8 288 52.608 79.872 211.456 288 436.8 288 225.28 0 384.128-208.064 436.8-288-52.608-79.872-211.456-288-436.8-288zm0 64a224 224 0 1 1 0 448 224 224 0 0 1 0-448m0 64a160.192 160.192 0 0 0-160 160c0 88.192 71.744 160 160 160s160-71.808 160-160-71.744-160-160-160">
+                </path>
+              </svg>
+              <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="20" height="20">
+                <path fill="currentColor"
+                  d="M876.8 156.8c0-9.6-3.2-16-9.6-22.4-6.4-6.4-12.8-9.6-22.4-9.6-9.6 0-16 3.2-22.4 9.6L736 220.8c-64-32-137.6-51.2-224-60.8-160 16-288 73.6-377.6 176C44.8 438.4 0 496 0 512s48 73.6 134.4 176c22.4 25.6 44.8 48 73.6 67.2l-86.4 89.6c-6.4 6.4-9.6 12.8-9.6 22.4 0 9.6 3.2 16 9.6 22.4 6.4 6.4 12.8 9.6 22.4 9.6 9.6 0 16-3.2 22.4-9.6l704-710.4c3.2-6.4 6.4-12.8 6.4-22.4Zm-646.4 528c-76.8-70.4-128-128-153.6-172.8 28.8-48 80-105.6 153.6-172.8C304 272 400 230.4 512 224c64 3.2 124.8 19.2 176 44.8l-54.4 54.4C598.4 300.8 560 288 512 288c-64 0-115.2 22.4-160 64s-64 96-64 160c0 48 12.8 89.6 35.2 124.8L256 707.2c-9.6-6.4-19.2-16-25.6-22.4Zm140.8-96c-12.8-22.4-19.2-48-19.2-76.8 0-44.8 16-83.2 48-112 32-28.8 67.2-48 112-48 28.8 0 54.4 6.4 73.6 19.2zM889.599 336c-12.8-16-28.8-28.8-41.6-41.6l-48 48c73.6 67.2 124.8 124.8 150.4 169.6-28.8 48-80 105.6-153.6 172.8-73.6 67.2-172.8 108.8-284.8 115.2-51.2-3.2-99.2-12.8-140.8-28.8l-48 48c57.6 22.4 118.4 38.4 188.8 44.8 160-16 288-73.6 377.6-176C979.199 585.6 1024 528 1024 512s-48.001-73.6-134.401-176Z">
+                </path>
+                <path fill="currentColor"
+                  d="M511.998 672c-12.8 0-25.6-3.2-38.4-6.4l-51.2 51.2c28.8 12.8 57.6 19.2 89.6 19.2 64 0 115.2-22.4 160-64 41.6-41.6 64-96 64-160 0-32-6.4-64-19.2-89.6l-51.2 51.2c3.2 12.8 6.4 25.6 6.4 38.4 0 44.8-16 83.2-48 112-32 28.8-67.2 48-112 48Z">
+                </path>
+              </svg>
+            </span>
+          </div>
+          <div v-if="oldPasswordError" class="error-message">原密码不正确</div>
+
+          <div class="input-group">
+            <input :type="showNewPassword ? 'text' : 'password'" v-model="newPassword" placeholder="请输入新密码"
+              class="modal-input" />
+            <span class="input-eye" @click="showNewPassword = !showNewPassword">
+              <svg v-if="!showNewPassword" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="20"
+                height="20">
+                <path fill="currentColor"
+                  d="M512 160c320 0 512 352 512 352S832 864 512 864 0 512 0 512s192-352 512-352m0 64c-225.28 0-384.128 208.064-436.8 288 52.608 79.872 211.456 288 436.8 288 225.28 0 384.128-208.064 436.8-288-52.608-79.872-211.456-288-436.8-288zm0 64a224 224 0 1 1 0 448 224 224 0 0 1 0-448m0 64a160.192 160.192 0 0 0-160 160c0 88.192 71.744 160 160 160s160-71.808 160-160-71.744-160-160-160">
+                </path>
+              </svg>
+              <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="20" height="20">
+                <path fill="currentColor"
+                  d="M876.8 156.8c0-9.6-3.2-16-9.6-22.4-6.4-6.4-12.8-9.6-22.4-9.6-9.6 0-16 3.2-22.4 9.6L736 220.8c-64-32-137.6-51.2-224-60.8-160 16-288 73.6-377.6 176C44.8 438.4 0 496 0 512s48 73.6 134.4 176c22.4 25.6 44.8 48 73.6 67.2l-86.4 89.6c-6.4 6.4-9.6 12.8-9.6 22.4 0 9.6 3.2 16 9.6 22.4 6.4 6.4 12.8 9.6 22.4 9.6 9.6 0 16-3.2 22.4-9.6l704-710.4c3.2-6.4 6.4-12.8 6.4-22.4Zm-646.4 528c-76.8-70.4-128-128-153.6-172.8 28.8-48 80-105.6 153.6-172.8C304 272 400 230.4 512 224c64 3.2 124.8 19.2 176 44.8l-54.4 54.4C598.4 300.8 560 288 512 288c-64 0-115.2 22.4-160 64s-64 96-64 160c0 48 12.8 89.6 35.2 124.8L256 707.2c-9.6-6.4-19.2-16-25.6-22.4Zm140.8-96c-12.8-22.4-19.2-48-19.2-76.8 0-44.8 16-83.2 48-112 32-28.8 67.2-48 112-48 28.8 0 54.4 6.4 73.6 19.2zM889.599 336c-12.8-16-28.8-28.8-41.6-41.6l-48 48c73.6 67.2 124.8 124.8 150.4 169.6-28.8 48-80 105.6-153.6 172.8-73.6 67.2-172.8 108.8-284.8 115.2-51.2-3.2-99.2-12.8-140.8-28.8l-48 48c57.6 22.4 118.4 38.4 188.8 44.8 160-16 288-73.6 377.6-176C979.199 585.6 1024 528 1024 512s-48.001-73.6-134.401-176Z">
+                </path>
+                <path fill="currentColor"
+                  d="M511.998 672c-12.8 0-25.6-3.2-38.4-6.4l-51.2 51.2c28.8 12.8 57.6 19.2 89.6 19.2 64 0 115.2-22.4 160-64 41.6-41.6 64-96 64-160 0-32-6.4-64-19.2-89.6l-51.2 51.2c3.2 12.8 6.4 25.6 6.4 38.4 0 44.8-16 83.2-48 112-32 28.8-67.2 48-112 48Z">
+                </path>
+              </svg>
+            </span>
+          </div>
+
+          <div class="input-group">
+            <input :type="showConfirmPassword ? 'text' : 'password'" v-model="confirmPassword" placeholder="请再次输入新密码"
+              class="modal-input" />
+            <span class="input-eye" @click="showConfirmPassword = !showConfirmPassword">
+              <svg v-if="!showConfirmPassword" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="20"
+                height="20">
+                <path fill="currentColor"
+                  d="M512 160c320 0 512 352 512 352S832 864 512 864 0 512 0 512s192-352 512-352m0 64c-225.28 0-384.128 208.064-436.8 288 52.608 79.872 211.456 288 436.8 288 225.28 0 384.128-208.064 436.8-288-52.608-79.872-211.456-288-436.8-288zm0 64a224 224 0 1 1 0 448 224 224 0 0 1 0-448m0 64a160.192 160.192 0 0 0-160 160c0 88.192 71.744 160 160 160s160-71.808 160-160-71.744-160-160-160">
+                </path>
+              </svg>
+              <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="20" height="20">
+                <path fill="currentColor"
+                  d="M876.8 156.8c0-9.6-3.2-16-9.6-22.4-6.4-6.4-12.8-9.6-22.4-9.6-9.6 0-16 3.2-22.4 9.6L736 220.8c-64-32-137.6-51.2-224-60.8-160 16-288 73.6-377.6 176C44.8 438.4 0 496 0 512s48 73.6 134.4 176c22.4 25.6 44.8 48 73.6 67.2l-86.4 89.6c-6.4 6.4-9.6 12.8-9.6 22.4 0 9.6 3.2 16 9.6 22.4 6.4 6.4 12.8 9.6 22.4 9.6 9.6 0 16-3.2 22.4-9.6l704-710.4c3.2-6.4 6.4-12.8 6.4-22.4Zm-646.4 528c-76.8-70.4-128-128-153.6-172.8 28.8-48 80-105.6 153.6-172.8C304 272 400 230.4 512 224c64 3.2 124.8 19.2 176 44.8l-54.4 54.4C598.4 300.8 560 288 512 288c-64 0-115.2 22.4-160 64s-64 96-64 160c0 48 12.8 89.6 35.2 124.8L256 707.2c-9.6-6.4-19.2-16-25.6-22.4Zm140.8-96c-12.8-22.4-19.2-48-19.2-76.8 0-44.8 16-83.2 48-112 32-28.8 67.2-48 112-48 28.8 0 54.4 6.4 73.6 19.2zM889.599 336c-12.8-16-28.8-28.8-41.6-41.6l-48 48c73.6 67.2 124.8 124.8 150.4 169.6-28.8 48-80 105.6-153.6 172.8-73.6 67.2-172.8 108.8-284.8 115.2-51.2-3.2-99.2-12.8-140.8-28.8l-48 48c57.6 22.4 118.4 38.4 188.8 44.8 160-16 288-73.6 377.6-176C979.199 585.6 1024 528 1024 512s-48.001-73.6-134.401-176Z">
+                </path>
+                <path fill="currentColor"
+                  d="M511.998 672c-12.8 0-25.6-3.2-38.4-6.4l-51.2 51.2c28.8 12.8 57.6 19.2 89.6 19.2 64 0 115.2-22.4 160-64 41.6-41.6 64-96 64-160 0-32-6.4-64-19.2-89.6l-51.2 51.2c3.2 12.8 6.4 25.6 6.4 38.4 0 44.8-16 83.2-48 112-32 28.8-67.2 48-112 48Z">
+                </path>
+              </svg>
+            </span>
+          </div>
+          <div v-if="confirmPasswordError" class="error-message">两次输入的密码不一致</div>
+
+          <div class="modal-actions">
+            <button type="button" class="cancel-btn" @click="closePasswordModal">取消</button>
+            <button type="submit" :disabled="passwordChangeDisabled">确认修改</button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <!-- 账号注销区域 -->
     <div class="account-deletion">
@@ -66,9 +151,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { readerState } from '@/stores/index'
 import { updateReader, uploadReaderAvatar, deleteReader } from '@/API/Reader_API'
+import { resetReaderPassword } from '@/API/Log_API'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 import { useRouter } from 'vue-router'
@@ -85,9 +171,39 @@ const apiResponseAvatar = ref(null)
 const defaultAvatar = 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg'
 const showDeleteConfirm = ref(false)
 
+// 密码修改相关
+const showPasswordModal = ref(false)
+const showOldPassword = ref(false)
+const showNewPassword = ref(false)
+const showConfirmPassword = ref(false)
+const oldPassword = ref('')
+const newPassword = ref('')
+const confirmPassword = ref('')
+const oldPasswordError = ref(false)
+
 // 计算属性验证电话号码
 const phoneError = computed(() => {
   return phone.value && phone.value.length !== 11
+})
+
+// 计算属性验证确认密码
+const confirmPasswordError = computed(() => {
+  return newPassword.value !== confirmPassword.value && confirmPassword.value !== ''
+})
+
+// 计算属性判断密码修改按钮是否禁用
+const passwordChangeDisabled = computed(() => {
+  return !oldPassword.value || !newPassword.value || !confirmPassword.value ||
+    confirmPasswordError.value || oldPasswordError.value
+})
+
+// 监听原密码变化，验证是否正确
+watch(oldPassword, (newVal) => {
+  if (newVal && store.true_password) {
+    oldPasswordError.value = newVal !== store.true_password
+  } else {
+    oldPasswordError.value = false
+  }
 })
 
 function getFormattedAvatarUrl(avatarUrl) {
@@ -179,6 +295,47 @@ async function saveReaderChanges() {
     avatarPreviewUrl.value = getFormattedAvatarUrl(store.avatarUrl)
   } catch (error) {
     toast.error('修改失败，请稍后再试')
+  }
+}
+
+// 关闭密码修改模态框
+function closePasswordModal() {
+  showPasswordModal.value = false
+  // 清空表单
+  oldPassword.value = ''
+  newPassword.value = ''
+  confirmPassword.value = ''
+  oldPasswordError.value = false
+}
+
+// 修改密码功能
+async function changePassword() {
+  if (newPassword.value !== confirmPassword.value) {
+    toast.error('两次输入的密码不一致')
+    return
+  }
+  if (oldPassword.value !== store.true_password) {
+    toast.error('原密码不正确')
+    return
+  }
+  try {
+    const dto = {
+      readerName: store.readerName,
+      password: newPassword.value
+    }
+    const response = await resetReaderPassword(dto)
+    if (response) {
+      toast.success('密码修改成功')
+      // 更新store中的密码
+      store.true_password = newPassword.value
+      // 关闭模态框
+      closePasswordModal()
+    } else {
+      toast.error('密码修改失败')
+    }
+  } catch (error) {
+    toast.error('密码修改失败，请稍后再试')
+    console.error('修改密码错误:', error)
   }
 }
 
@@ -281,15 +438,18 @@ label {
 }
 
 input[type="text"],
+input[type="password"],
 select {
   padding: 10px 12px;
   border: 1px solid #ddd;
   border-radius: 8px;
   font-size: 1em;
   transition: border-color 0.3s, box-shadow 0.3s;
+  width: 60%;
 }
 
 input[type="text"]:focus,
+input[type="password"]:focus,
 select:focus {
   border-color: #ed424b;
   box-shadow: 0 0 5px rgba(247, 142, 72, 0.3);
@@ -302,6 +462,13 @@ select:focus {
 }
 
 .error-message {
+  color: #ff4d4f;
+  font-size: 0.85em;
+  margin-top: 5px;
+  text-align: center;
+}
+
+.error-message1 {
   color: #ff4d4f;
   font-size: 0.85em;
   margin-top: 5px;
@@ -338,14 +505,13 @@ button[type="submit"] {
   font-size: 18px;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.1s;
-  margin-bottom: 30px;
 }
 
-button[type="submit"]:hover:not(:disabled) {
+button[type="submit"]:hover {
   background-color: #f05e74;
 }
 
-button[type="submit"]:active:not(:disabled) {
+button[type="submit"]:active {
   transform: scale(0.98);
 }
 
@@ -354,42 +520,38 @@ button[type="submit"]:disabled {
   cursor: not-allowed;
 }
 
-/* 账号注销区域样式 */
-.account-deletion {
-  margin-top: 40px;
-  padding: 20px;
-  border-top: 1px solid #eaeaea;
-  text-align: center;
+/* 修改密码区域样式 */
+.password-change-section {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
 }
 
-.account-deletion h3 {
-  color: #ff4d4f;
+.password-change-section h3 {
+  color: #ed424b;
   margin-bottom: 15px;
 }
 
-.account-deletion p {
-  color: #666;
-  margin-bottom: 20px;
-  font-size: 0.9em;
-  line-height: 1.5;
-}
-
-.delete-account-btn {
-  padding: 12px 24px;
-  background-color: #ff4d4f;
+.change-password-btn {
+  padding: 10px 20px;
+  background-color: #ed424b;
   color: white;
   border: none;
   border-radius: 8px;
-  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.3s;
+  font-weight: 500;
+  transition: background-color 0.3s, transform 0.1s;
 }
 
-.delete-account-btn:hover {
-  background-color: #d9363e;
+.change-password-btn:hover {
+  background-color: #f05e74;
 }
 
-/* 确认对话框样式 */
+.change-password-btn:active {
+  transform: scale(0.98);
+}
+
+/* 模态框样式 */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -403,29 +565,156 @@ button[type="submit"]:disabled {
   z-index: 1000;
 }
 
-.confirmation-dialog {
-  background: white;
+.password-modal {
+  background-color: white;
   padding: 25px;
   border-radius: 12px;
-  max-width: 450px;
   width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.password-modal h3 {
+  color: #ed424b;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 10px 40px 10px 40px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.8em;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  display: block;
+  margin: 0 auto;
+}
+
+.modal-input:focus {
+  border-color: #ed424b;
+  box-shadow: 0 0 5px rgba(247, 142, 72, 0.3);
+  outline: none;
+}
+
+.input-eye {
+  position: absolute;
+  right: 75px;
+  top: 60%;
+  transform: translateY(-50%);
+  color: #888;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+.modal-actions button[type="submit"] {
+  background-color: #ed424b;
+  color: white;
+  width: 48%;
+}
+
+.modal-actions button[type="submit"]:hover {
+  background-color: #f05e74;
+}
+
+.modal-actions button[type="submit"]:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.cancel-btn {
+  background-color: #f0f0f0;
+  color: #555;
+  width: 48%;
+}
+
+.cancel-btn:hover {
+  background-color: #e0e0e0;
+}
+
+/* 账号注销区域样式 */
+.account-deletion {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.account-deletion h3 {
+  color: #ed424b;
+  margin-bottom: 10px;
+}
+
+.account-deletion p {
+  color: #666;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+.delete-account-btn {
+  padding: 10px 20px;
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+.delete-account-btn:hover {
+  background-color: #ff7875;
+}
+
+.delete-account-btn:active {
+  transform: scale(0.98);
+}
+
+/* 确认对话框样式 */
+.confirmation-dialog {
+  background-color: white;
+  padding: 25px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 .confirmation-dialog h3 {
-  color: #ff4d4f;
+  color: #ed424b;
   margin-bottom: 15px;
+  text-align: center;
 }
 
 .confirmation-dialog p {
+  color: #666;
   margin-bottom: 15px;
-  color: #333;
+  line-height: 1.5;
 }
 
 .confirmation-dialog ul {
+  color: #666;
   margin-bottom: 20px;
   padding-left: 20px;
-  color: #666;
 }
 
 .confirmation-dialog li {
@@ -434,35 +723,29 @@ button[type="submit"]:disabled {
 
 .dialog-actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 12px;
+  justify-content: space-between;
 }
 
-.cancel-btn {
+.dialog-actions button {
   padding: 10px 20px;
-  background-color: #f0f0f0;
-  color: #333;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.cancel-btn:hover {
-  background-color: #e0e0e0;
+  font-weight: 500;
+  transition: background-color 0.3s, transform 0.1s;
 }
 
 .confirm-delete-btn {
-  padding: 10px 20px;
   background-color: #ff4d4f;
   color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+  width: 48%;
 }
 
 .confirm-delete-btn:hover {
-  background-color: #d9363e;
+  background-color: #ff7875;
+}
+
+.confirm-delete-btn:active {
+  transform: scale(0.98);
 }
 </style>
