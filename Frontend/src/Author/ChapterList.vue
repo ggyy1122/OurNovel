@@ -48,7 +48,7 @@
               <span class="status" :class="chapter.status">
                 {{ chapter.status === '首次审核' ? '审核中' : getStatusText(chapter.status) }}
               </span>
-              <span class="price">¥{{ chapter.calculated_price/100 }}</span>
+              <span class="price">¥{{ (chapter.calculated_price/100).toFixed(2) }}</span>
               <span class="publish-time" v-if="chapter.status === '已发布'">
                 {{ formatDate(chapter.publish_time) }}
               </span>
@@ -125,8 +125,9 @@
                 min="0" 
                 step="1"
                 @input="updateCalculatedPrice"
+                @change="validatePrice"
               >
-              <span class="final-price">最终价格: {{ activeChapter.calculated_price }}虚拟币（合人民币¥{{ activeChapter.calculated_price/100 }}）</span>
+              <span class="final-price">最终价格: {{ Math.round(activeChapter.calculated_price) }}虚拟币（合人民币¥{{ (activeChapter.calculated_price/100).toFixed(2) }}）</span>
             </div>
             <!-- 收费设置 -->
             <div class="charge-setting">
@@ -243,6 +244,16 @@ onMounted(async () => {
     router.push('/error') // 跳转到错误页面
   }
 })
+//定价有效确认
+const validatePrice = () => {
+  if (activeChapter.value) {
+    activeChapter.value.price_per_kilo = Math.round(activeChapter.value.price_per_kilo);
+    if (activeChapter.value.price_per_kilo < 0) {
+      activeChapter.value.price_per_kilo = 0;
+    }
+    updateCalculatedPrice();
+  }
+};
 
 const goBack = () => {
   router.go(-1)

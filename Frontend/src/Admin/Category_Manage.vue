@@ -1,431 +1,358 @@
 <template>
-  <div v-if="loading" class="loading-indicator">
-      <div class="spinner"></div>
-      <span>加载中...</span>
-  </div>
-  <div v-else>
-    <div class="category-manager">
-      <ul class="category-list">
-        <li v-for="cat in categories" :key="cat.id">
-          <div class="category-item"> <!-- 添加一个外层容器 -->
-            <div class="border-style-8">
-              <div class="content">
-                <span>{{ cat.categoryName }}</span>
-              </div>
+  <div class="category-manager">
+    <!-- 加载状态 -->
+    <div v-if="loading" class="loading-wrapper">
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <span>加载中...</span>
+      </div>
+    </div>
+
+    <div v-else>
+      <!-- 标题移出内容框 -->
+      <h2 class="section-title">分类管理</h2>
+      
+      <!-- 内容区域 -->
+      <div class="content-wrapper">
+        <!-- 分类列表 -->
+        <div class="category-list">
+          <div v-for="cat in categories" :key="cat.id" class="category-card">
+            <div class="category-info">
+              <span class="category-name">{{ cat.categoryName }}</span>
             </div>
-            <div class="icon-container"> <!-- 修改类名并添加样式 -->
-              <i class="fas fa-pen edit-icon" title="编辑" @click="showModal=true;index=2;name=cat.categoryName"></i>
-              <i class="fas fa-minus minus-icon" title="删除" @click="name=cat.categoryName;deleteMyCategory()"></i>
+            <div class="category-actions">
+              <button 
+                @click="showModal=true;index=2;name=cat.categoryName"
+                class="action-button edit-button"
+              >
+                <svg class="icon" viewBox="0 0 24 24">
+                  <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                </svg>
+              </button>
+              <button 
+                @click="name=cat.categoryName;deleteMyCategory()"
+                class="action-button delete-button"
+              >
+                <svg class="icon" viewBox="0 0 24 24">
+                  <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                </svg>
+              </button>
             </div>
           </div>
-        </li>
-      </ul>
-      <!-- 可扩展：添加新分类按钮等 -->
-       <button class="btn-animate btn-animate__surround" @click="showModal=true;index=1">
-        <span>添加新分类</span>
-      </button>
+        </div>
 
-        <!-- result的输入框 -->
-    <div v-if="showModal" class="modal-overlay">
-      <div class="modal-content">
-        <h3>请输入分类名称</h3>
-        <input 
-          v-model="inputValue" 
-          @keyup.enter="confirmInput"
-          placeholder="请输入内容"
-          class="modal-input"
+        <!-- 添加按钮 -->
+        <button 
+          @click="showModal=true;index=1" 
+          class="add-category-button"
         >
-        <div class="modal-buttons">
-          <button @click="confirmInput" class="confirm-btn">确定</button>
-          <button @click="cancelInput" class="cancel-btn">取消</button>
+          <svg class="add-icon" viewBox="0 0 24 24">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+          </svg>
+          <span>添加分类</span>
+        </button>
+
+        <!-- 模态框 -->
+        <div v-if="showModal" class="modal-overlay" @click.self="cancelInput">
+          <div class="modal-container">
+            <div class="modal-header">
+              <h3 class="modal-title">分类名称</h3>
+              <button @click="cancelInput" class="modal-close-button">
+                <svg viewBox="0 0 24 24">
+                  <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                </svg>
+              </button>
+            </div>
+            <div class="modal-body">
+              <input
+                v-model="inputValue"
+                @keyup.enter="confirmInput"
+                placeholder="请输入分类名称"
+                class="modal-input"
+                autofocus
+              >
+            </div>
+            <div class="modal-footer">
+              <button @click="cancelInput" class="modal-button cancel-button">取消</button>
+              <button @click="confirmInput" class="modal-button confirm-button">确认</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    </div>
   </div>
-
 </template>
 
-<script setup>
-import { ref,onMounted } from 'vue';
-import{getAllCategories,createCategory,renameCategory,deleteCategory} from '@/API/Category_API'
-import{getNovelsByCategory} from '@/API/NovelCategory_API'
 
-const loading = ref(false)  // 加载状态
-const categories=ref([])
-const getCategoryData=async () => {
-  loading.value = true
+<script setup>
+import { ref, onMounted } from 'vue';
+import { getAllCategories, createCategory, renameCategory, deleteCategory } from '@/API/Category_API';
+import { getNovelsByCategory } from '@/API/NovelCategory_API';
+
+const loading = ref(false);
+const categories = ref([]);
+const getCategoryData = async () => {
+  loading.value = true;
   try {
-    const response = await getAllCategories()
-    if(response){
-      categories.value  = response
+    const response = await getAllCategories();
+    if (response) {
+      categories.value = response;
     }
   } catch (error) {
-    console.error('获取分类数据失败:', error)
+    console.error('获取分类数据失败:', error);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
-
-
+};
 
 onMounted(() => {
-  getCategoryData() // 页面加载时调用 store 方法
-})
+  getCategoryData();
+});
 
-const index=ref(0)
-const showModal = ref(false)//result的输入框
+const index = ref(0);
+const showModal = ref(false);
 const inputValue = ref('');
 const result = ref('');
-const name=ref('');
+const name = ref('');
 
 const isRepeat = (newName) => {
-  // 去除首尾空格并转为小写进行比较（可选，根据需求）
   return categories.value.some(category => 
     category.categoryName === newName
   );
 };
 
-
 const confirmInput = () => {
   if (!inputValue.value.trim()) {
     alert('请输入有效的内容');
-  }
-  else if(isRepeat(inputValue.value.trim())){
+  } else if (isRepeat(inputValue.value.trim())) {
     alert('分类名已存在，请重新输入');
     inputValue.value = '';
-  } 
-  else{
+  } else {
     result.value = inputValue.value.trim();
     inputValue.value = '';
     showModal.value = false;
-    if(index.value===1){
+    if (index.value === 1) {
       addCategory();
-    }
-    else if(index.value===2){
+    } else if (index.value === 2) {
       editCategory();
     }
   }
 };
-
-
 
 const cancelInput = () => {
   showModal.value = false;
   inputValue.value = '';
 };
 
-
-
-
-//调用api对分类进行操作
-const addCategory =async () => {
-  // 添加分类的逻辑
-  loading.value = true // 开始加载
+const addCategory = async () => {
+  loading.value = true;
   try {
-      const newData={
-        categoryName: result.value
-      }
-      await createCategory(newData);
-      getCategoryData();
-    } catch (error) {
-      console.error('添加分类失败:', error);
-      alert('添加分类失败，请重试。');
-    }finally {
-    loading.value = false // 结束加载
-  }
-
-};
-
-const editCategory = async() => {
-  // 编辑分类的逻辑
-  loading.value = true // 开始加载
-  try {
-      await renameCategory(name.value,result.value);
-      getCategoryData();
-    } catch (error) {
-      console.error('编辑分类失败:', error);
-      alert('编辑分类失败，请重试。');
-    }finally {
-    loading.value = false // 结束加载
+    const newData = {
+      categoryName: result.value
+    };
+    await createCategory(newData);
+    getCategoryData();
+  } catch (error) {
+    console.error('添加分类失败:', error);
+    alert('添加分类失败，请重试。');
+  } finally {
+    loading.value = false;
   }
 };
 
-const deleteMyCategory = async() => {
-  // 删除分类的逻辑
-  loading.value = true // 开始加载
+const editCategory = async () => {
+  loading.value = true;
   try {
-      const response=await getNovelsByCategory(name.value);
-      if(response && response.length>0){
-        alert('该分类下存在小说，无法删除');
-        return;
-      }
-      await deleteCategory(name.value);
-      getCategoryData();
-    } catch (error) {
-      console.error('删除分类失败:', error);
-      alert('删除分类失败，请重试。');
-    }finally {
-    loading.value = false // 结束加载
+    await renameCategory(name.value, result.value);
+    getCategoryData();
+  } catch (error) {
+    console.error('编辑分类失败:', error);
+    alert('编辑分类失败，请重试。');
+  } finally {
+    loading.value = false;
   }
 };
 
-
+const deleteMyCategory = async () => {
+  loading.value = true;
+  try {
+    const response = await getNovelsByCategory(name.value);
+    if (response && response.length > 0) {
+      alert('该分类下存在小说，无法删除');
+      return;
+    }
+    await deleteCategory(name.value);
+    getCategoryData();
+  } catch (error) {
+    console.error('删除分类失败:', error);
+    alert('删除分类失败，请重试。');
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
 
+
 <style scoped>
-/* 加载动画样式 */
-.loading-indicator {
+/* 基础样式 */
+.category-manager {
+  font-family: 'Segoe UI', 'PingFang SC', sans-serif;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* 标题样式 */
+.section-title {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  padding-left: 0.5rem;
+}
+
+/* 加载动画 */
+.loading-wrapper {
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 10px;
-  margin: 20px 0;
-  color: #666;
-  font-size: 16px;
+  align-items: center;
+  height: 300px;
+}
+
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .spinner {
-  width: 24px;
-  height: 24px;
-  border: 3px solid #ccc;
-  border-top-color: #486482;
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(0, 123, 255, 0.2);
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  border-top-color: #007bff;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 1rem;
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
-.category-manager {
-  max-width: 800px;
-  margin: 30px auto;
-  padding: 20px;
-  background: #eee;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px #eee;
+/* 内容区域 */
+.content-wrapper {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
 }
+
+/* 分类列表 */
 .category-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.category-card {
   display: flex;
-  flex-wrap: wrap;
-  gap: 24px; /* 增大间距 */
-  padding: 0;
-  margin: 0;
-  list-style: none;
-  justify-content: flex-start;
-  margin-left:30px;
-  margin-top:20px;
-}
-.category-list li {
-  background: transparent; /* 确保列表项背景透明 */
-}
-@keyframes rotate {
-  100% {
-    transform: rotate(1turn);
-  }
-}
-
-.border-style-8 {
-  position: relative;
-  overflow: hidden;
-  /* 可以在这里添加一些基础样式，如边框半径 */
-
-  border-radius: 5px; /* 圆角 */
-
-  padding: 5px 24px; /* 上下左右内边距一致，上下10px，左右24px */
-  min-width: 130px;
-  height: 44px; /* 细长效果，固定高度 */
-  flex: 0 0 calc(20% - 16px); /* 一行五个分类，减去间距 */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-end; /* 右对齐 */
-  margin-bottom: 5px;
-  margin-right:10px;
-  transition: transform 0.2s cubic-bezier(.4,0,.2,1); /* 添加平滑过渡 */
-  z-index: 1;
-}
-.border-style-8:hover {
-  transform: scale(1.06); /* 鼠标悬停时放大 */
-  background-image:linear-gradient(135deg,#FFD26F 15%,#3677FF 100%)
-}
-
-.border-style-8::before {
-  content: "";
-  position: absolute;
-  left: -50%;
-  top: -50%;
-  width: 200%;
-  height: 200%;
-  border-radius: 5px;
-  background-image: conic-gradient(transparent, #f90, transparent 30%);
-  background-position: 0 0;
-  background-repeat: no-repeat;
-  animation: rotate 2s linear infinite;
-  z-index: -2;
-}
-
-.border-style-8::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: calc(100% - 10px);
-  height: calc(100% - 10px);
-  z-index: -1;
-  background-image:linear-gradient(135deg,#edcb82 15%,#668de2 100%);
-  border-radius: 5px;
-}
-
-.border-style-8 > .content {
-  padding: 10px;
-}
-
-.border-style-8 > .content span {
-  font-size: 18px;
-  font-weight: bold;
-
-  color: #333;
-}
-
-button {
-  background: #409eff;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  padding: 4px 12px;
-  cursor: pointer;
-}
-button:hover {
-  background: #66b1ff;
-}
-
-.category-item {
-  display: flex; /* 水平排列 */
-  align-items: center; /* 垂直居中 */
-  gap: 0px; /* 设置两个元素之间的间距 */
-}
-
-.icon-container {
-  display: flex;
-  flex-direction: column; /* 竖直排列 */
-  gap: 8px; /* 图标之间的垂直间距 */
-  margin-right:30px;
-}
-
-.edit-icon {
-  font-size: 15px; /* 图标大小 */
-  color: #666; /* 图标颜色 */
-  transition: color 0.3s ease;
-  cursor: pointer;
-}
-
-.edit-icon:hover {
-  color: #409eff; /* 悬停颜色 */
-}
-
-.minus-icon {
-  font-size: 15px; /* 图标大小 */
-  color: #666; /* 图标颜色 */
-  transition: color 0.3s ease;
-  cursor: pointer;
-}
-
-.minus-icon:hover {
-  color: #ff4d4f; /* 悬停颜色 */
-}
-
-
-.btn-animate {
-  margin-left:600px;
-  margin-top:30px;
-  margin-bottom:30px;
-  position:relative;
-  width: 130px;
-  height: 40px;
-  line-height: 40px;
-  border: none;
-  border-radius: 5px;
-  background-image:radial-gradient(#Fff 10%,#3677FF 120%);
-  color: #fff;
-  text-align: center;
-}
-
-.btn-animate__surround::before, 
-.btn-animate__surround::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  top: 0;
-  background: #027efb;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
   transition: all 0.3s ease;
+  border: 1px solid #eee;
 }
 
-.btn-animate__surround::before {
-  height: 0%;
-  width: 2px;
+.category-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: #007bff;
 }
 
-.btn-animate__surround::after {
-  width: 0%;
-  height: 2px;
+.category-name {
+  font-size: 1rem;
+  color: #333;
+  font-weight: 500;
 }
 
-.btn-animate__surround:hover {
+.category-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
   background: transparent;
 }
 
-.btn-animate__surround:hover::before {
-  height: 100%;
+.action-button:hover {
+  transform: scale(1.1);
 }
 
-.btn-animate__surround:hover::after {
+.edit-button:hover {
+  background: rgba(0, 123, 255, 0.1);
+}
+
+.delete-button:hover {
+  background: rgba(220, 53, 69, 0.1);
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+  fill: #666;
+}
+
+.edit-button .icon {
+  fill: #486482;
+}
+
+.delete-button .icon {
+  fill: #90555f;
+}
+
+/* 添加按钮 */
+.add-category-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   width: 100%;
+  padding: 0.75rem;
+  background: #486482;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
 }
 
-.btn-animate__surround > span {
-  display: block;
-  color:rgb(22, 18, 12);
-  font-size:15px;
-  font-weight: 600;
+.add-category-button:hover {
+  background: #486482;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
 }
 
-.btn-animate__surround > span:hover {
-  color: #027efb;
+.add-icon {
+  width: 20px;
+  height: 20px;
+  fill: white;
 }
 
-.btn-animate__surround > span:hover::before {
-  height: 100%;
-}
-
-.btn-animate__surround > span:hover::after {
-  width: 100%;
-}
-
-.btn-animate__surround > span::before, 
-.btn-animate__surround > span::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  background: #027efb;
-  transition: all 0.3s ease;
-}
-
-.btn-animate__surround > span::before {
-  width: 2px;
-  height: 0%;
-}
-
-.btn-animate__surround > span::after {
-  width: 0%;
-  height: 2px;
-}
-
+/* 模态框 */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -434,40 +361,121 @@ button:hover {
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 1000;
+  backdrop-filter: blur(4px);
 }
 
-.modal-content {
+.modal-container {
   background: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 300px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.modal-close-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.modal-close-button:hover {
+  background: #f5f5f5;
+}
+
+.modal-close-button svg {
+  width: 20px;
+  height: 20px;
+  fill: #666;
+}
+
+.modal-body {
+  padding: 1.5rem;
 }
 
 .modal-input {
   width: 100%;
-  padding: 8px;
-  margin: 15px 0;
+  padding: 0.75rem 1rem;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border 0.3s;
 }
 
-.modal-buttons {
+.modal-input:focus {
+  outline: none;
+  border-color:#486482;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+}
+
+.modal-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #eee;
+  gap: 0.75rem;
 }
 
-.confirm-btn {
-  background-color: #42b983;
+.modal-button {
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancel-button {
+  background: #f8f9fa;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.cancel-button:hover {
+  background: #e9ecef;
+}
+
+.confirm-button {
+  background: #486482;
   color: white;
+  border: 1px solid #486482;
 }
 
-.cancel-btn {
-  background-color: #f0f0f0;
+.confirm-button:hover {
+  background:#3a5169;
+  border-color: #486482;
 }
-
 </style>
