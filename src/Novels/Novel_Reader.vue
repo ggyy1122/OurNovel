@@ -345,7 +345,9 @@
                     }" @click="goToChapter(chapter)">
                         <div class="card-content">
                             <span class="chapter-number">第{{ chapter.chapterId }}章</span>
-                            <span class="ca_chapter-title">{{ chapter.title }}</span>
+                            <span class="ca_chapter-title">
+                                {{ chapter.title.length > 10 ? chapter.title.slice(0, 10) + '…' : chapter.title }}
+                            </span>
                             <span class="chapter-status">{{ chapter.status }}</span>
                             <span v-if="chapter.isCharged === '是'" class="vip-tag">收费</span>
                             <span v-else class="free-tag">免费</span>
@@ -2352,6 +2354,7 @@ button.active {
     background: rgba(255, 255, 255, 0.7);
     border-radius: 12px;
     padding: 16px;
+    height: 20px;
     cursor: pointer;
     transition: all 0.2s;
     position: relative;
@@ -2408,7 +2411,7 @@ button.active {
 
 .vip-tag {
     position: absolute;
-    right: 10px;
+    right: 1px;
     background: linear-gradient(135deg, #f1a73f, #ff5e00);
     color: #222;
     font-size: 11px;
@@ -2419,7 +2422,7 @@ button.active {
 
 .free-tag {
     position: absolute;
-    right: 10px;
+    right: 1px;
     background: linear-gradient(135deg, #3ff1d9, #48ff00);
     color: #222;
     font-size: 11px;
@@ -2430,7 +2433,7 @@ button.active {
 
 .chapter-status {
     position: absolute;
-    left: 215px;
+    left: 240px;
     background: rgba(141, 240, 54, 0.8);
     color: #222;
     font-size: 11px;
@@ -2441,7 +2444,7 @@ button.active {
 
 .current-badge {
     position: absolute;
-    right: 54px;
+    right: 40px;
     background: #ffd100;
     color: #222;
     font-size: 11px;
@@ -2452,7 +2455,7 @@ button.active {
 
 .lock-overlay {
     position: absolute;
-    right: 80px;
+    right: 65px;
     bottom: 7px;
     display: flex;
     flex-direction: column;
