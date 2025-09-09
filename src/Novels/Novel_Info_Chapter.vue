@@ -99,7 +99,7 @@
               style="position: absolute; right: 20px;">&times;</button>
           </div>
           <div class="purchase-content">
-            <p>本章节价格为 ￥{{ selectedChapter.calculatedPrice }}</p>
+            <p>本章节价格为 {{ selectedChapter.calculatedPrice }}虚拟币</p>
           </div>
           <button class="confirm-reward-btn" @click="purchase_Chapter">
             确认购买

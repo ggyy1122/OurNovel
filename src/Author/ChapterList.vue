@@ -42,7 +42,7 @@
             @click="selectChapter(chapter)"
           >
             <!-- 章节信息 -->
-            <div class="chapter-title">{{ chapter.title }}</div>
+            <div class="chapter-title">第{{chapter.chapter_id}}章 {{ chapter.title }}</div>
             <div class="chapter-meta">
               <span class="word-count">{{ chapter.word_count }}字</span>
               <span class="status" :class="chapter.status">
@@ -89,7 +89,7 @@
               <button 
                 class="save-btn" 
                 @click="saveChapter" 
-                :disabled=" activeChapter.status === '已发布'"
+                :disabled=" activeChapter.status === '已发布' || isTitleEmpty"
               >
                 保存
               </button>
@@ -98,7 +98,7 @@
                 class="status-btn" 
                 :class="activeChapter.status"
                 @click="toggleChapterStatus"
-                :disabled="!canChangeStatus"
+                :disabled="!canChangeStatus || isTitleEmpty"
               >
                 {{ getStatusButtonText(activeChapter.status) }}
               </button>
@@ -229,6 +229,11 @@ const showLogsDialog = ref(false)
 
 // 返回上一级
 const router = useRouter()
+
+// 添加计算属性检查标题是否为空
+const isTitleEmpty = computed(() => {
+  return !activeChapter.value?.title?.trim();
+});
 
 onMounted(async () => {
   try {
