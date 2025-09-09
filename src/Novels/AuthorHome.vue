@@ -233,7 +233,6 @@ const joinDateStr = computed(() => {
     box-shadow: 0 2px 8px #e7e7e7;
     margin: 0 auto 32px auto;
     padding: 32px 40px 24px 32px;
-    height: 120px;
     display: flex;
     flex-direction: column;
     justify-content: center;

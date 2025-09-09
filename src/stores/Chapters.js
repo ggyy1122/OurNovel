@@ -216,7 +216,7 @@ export const ChaptersStore = defineStore('chaptersStore', {
         }
         const newChapter = {
           novel_id: novelId,
-          title: `第${nextChapterId}章 `,
+          title: "无",
           content: null,
           word_count: 0,
           price_per_kilo: 50,
