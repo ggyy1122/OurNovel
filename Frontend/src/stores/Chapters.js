@@ -331,7 +331,7 @@ export const ChaptersStore = defineStore('chaptersStore', {
         .split(/\s+/)
         .filter(word => word.length > 0)
       
-      this.activeChapter.word_count = chineseChars.length + otherWords.length
+      this.activeChapter.word_count = Math.max(0, Math.floor(chineseChars.length + otherWords.length));
       this.updateCalculatedPrice()
     },
     
