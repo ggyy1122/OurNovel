@@ -75,7 +75,11 @@ namespace OurNovel.Services
                     original.NovelName = novel.NovelName;
                     original.Introduction = novel.Introduction;
                     original.CoverUrl = novel.CoverUrl;
-                    original.CreateTime = novel.CreateTime;
+                    //original.CreateTime = novel.CreateTime;
+                    if (original.Status == "封禁")
+                    {
+                        original.Status = "连载";
+                    }
 
                     await _repository.UpdateAsync(original);
                     await _repository.DeleteAsync(novel.NovelId); // 删除临时稿
