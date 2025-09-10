@@ -51,7 +51,7 @@ namespace OurNovel.Controllers
                 c.IsCharged,
                 c.PublishTime,
                 c.Status,
-                CalculatedPrice = Math.Round((c.WordCount / 1000m) * c.PricePerKilo, 2)
+                CalculatedPrice = Math.Round((c.WordCount / 1000m) * c.PricePerKilo, 0)
             });
 
             return Ok(result);
