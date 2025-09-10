@@ -40,7 +40,7 @@ namespace OurNovel.Models
         /// 计算价格，自动计算（非映射字段）
         [NotMapped]
         public decimal CalculatedPrice =>
-            Math.Round((WordCount / 1000m) * PricePerKilo, 2);
+            Math.Round((WordCount / 1000m) * PricePerKilo, 0);
 
         /// 是否收费：是/否
         public string? IsCharged { get; set; }
