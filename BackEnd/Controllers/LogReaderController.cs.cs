@@ -11,7 +11,7 @@ using OurNovel.Data;
 namespace OurNovel.Controllers
 {
     /// <summary>
-    /// ¶ÁÕßµÇÂ¼×¢²á¼°ÈÏÖ¤¿ØÖÆÆ÷
+    /// è¯»è€…ç™»å½•æ³¨å†Œä¸è®¤è¯ç›¸å…³æ¥å£
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
@@ -29,16 +29,16 @@ namespace OurNovel.Controllers
         }
 
         /// <summary>
-        /// ¶ÁÕß×¢²á½Ó¿Ú£¨´«Èë ReaderName + Password£©
+        /// æ³¨å†Œæ¥å£ï¼Œå‚æ•°ä¸º ReaderName + Password + Phoneï¼Œè¿”å›æ³¨å†Œç»“æœ
         /// </summary>
         [HttpPost("register-reader")]
-        public async Task<IActionResult> RegisterReader([FromBody] ReaderRegisterDto dto)
+        public async Task<IActionResult> RegisterReader([FromBody] ReaderRegisterDtoWithPhone dto)
         {
-            return await _readerService.RegisterAsync(dto.ReaderName, dto.Password);
+            return await _readerService.RegisterAsync(dto.ReaderName, dto.Password, dto.Phone);
         }
 
         /// <summary>
-        /// ¶ÁÕßµÇÂ¼½Ó¿Ú£¬ÑéÖ¤ÓÃ»§ÃûºÍÃÜÂë£¬·µ»Ø JWT Token
+        /// è¯»è€…ç™»å½•æ¥å£ï¼ŒéªŒè¯ç”¨æˆ·åå¯†ç ï¼Œè¿”å› JWT Token
         /// </summary>
         [HttpPost("login-reader")]
         public IActionResult LoginReader([FromBody] ReaderRegisterDto dto)
@@ -47,12 +47,12 @@ namespace OurNovel.Controllers
                 .FirstOrDefault(r => r.ReaderName == dto.ReaderName);
 
             if (reader == null)
-                return Unauthorized("ÓÃ»§Ãû²»´æÔÚ");
+                return Unauthorized("ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
 
             if (!PasswordHasher.VerifyPassword(dto.Password, reader.Password))
-                return Unauthorized("ÃÜÂë´íÎó");
+                return Unauthorized("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
 
-            // Éú³É JWT Token
+            // ï¿½ï¿½ï¿½ï¿½ JWT Token
             var claims = new[]
             {
                 new Claim(ClaimTypes.Name, reader.ReaderName),
@@ -79,7 +79,7 @@ namespace OurNovel.Controllers
         }
 
         /// <summary>
-        /// ÖØÖÃÃÜÂë½Ó¿Ú£º´«ÈëÓÃ»§ÃûºÍĞÂÃÜÂë£¬ÈôÓÃ»§´æÔÚÔò¸üĞÂÃÜÂë
+        /// é‡ç½®å¯†ç æ¥å£ï¼Œå‚æ•°ä¸ºç”¨æˆ·åå’Œæ–°å¯†ç ï¼Œè¿”å›é‡ç½®ç»“æœ
         /// </summary>
         [HttpPost("reset-reader-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ReaderRegisterDto dto)
@@ -88,12 +88,12 @@ namespace OurNovel.Controllers
         }
 
         /// <summary>
-        /// µÇ³ö½Ó¿Ú£¨JWT ÎŞ×´Ì¬£¬Ç°¶ËÖ»ĞèÇå³ı Token ¼´¿É£©
+        /// ç™»å‡ºæ¥å£ï¼ŒJWT ä¸ºæ— çŠ¶æ€ï¼Œå½“å‰ä»…å‰ç«¯åˆ é™¤ Token å³å¯
         /// </summary>
         [HttpPost("logout")]
         public IActionResult Logout()
         {
-            return Ok("Ç°¶ËÇëÇå³ı JWT Token£¬±¾½Ó¿ÚÎªÎŞ×´Ì¬ÍË³ö");
+            return Ok("Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ JWT Tokenï¿½ï¿½ï¿½ï¿½ï¿½Ó¿ï¿½Îªï¿½ï¿½×´Ì¬ï¿½Ë³ï¿½");
         }
     }
 }

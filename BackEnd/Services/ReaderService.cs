@@ -21,7 +21,7 @@ namespace OurNovel.Services
             _context = context;
         }
 
-        public async Task<IActionResult> RegisterAsync(string readerName, string password)
+        public async Task<IActionResult> RegisterAsync(string readerName, string password ,string Phone)
         {
             if (_context.Readers.Count(r => r.ReaderName == readerName) > 0)
             {
@@ -36,6 +36,7 @@ namespace OurNovel.Services
             {
                 ReaderName = readerName,
                 Password = hashedPassword,
+                Phone = Phone,
                 Balance = 0
             };
 
