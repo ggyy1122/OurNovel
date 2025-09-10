@@ -197,6 +197,7 @@ export function logoutManager() {
  * @typedef {Object} ReaderRegisterDto
  * @property {string} readerName - 读者名称
  * @property {string} password - 密码
+ * @property {string} phone - 电话号码
  */
 
 /**
@@ -221,7 +222,8 @@ export function registerReader(dto) {
         },
         data: {
             readerName: dto.readerName,
-            password: dto.password
+            password: dto.password,
+            phone: dto.phone
         }
     })
 }
