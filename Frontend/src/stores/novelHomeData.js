@@ -1,31 +1,31 @@
 // Banner轮播数据
 export const carouselItems_data = [
-    { image: require('@/assets/1.jpg'), title: 'TJ中文网', description: '匠心打磨好作品' },
+    { image: require('@/assets/1.jpg'), title: 'TJ小说网', description: '匠心打磨好作品' },
     { image: require('@/assets/2.jpg'), title: '热门小说推荐', description: '最新签约作品' },
     { image: require('@/assets/3.jpeg'), title: '作家专区', description: '点击进入 >' },
-    { image: require('@/assets/4.jpg'), title: 'TJ中文网', description: '匠心打磨好作品' }
+    { image: require('@/assets/4.jpg'), title: 'TJ小说网', description: '匠心打磨好作品' }
 ]
 
 // 精选小说ID
 export const featuredNovelIds = {
-    male: [783, 789, 782, 781, 783, 789, 782, 781], // 男频小说ID
-    female: [783, 789, 782, 781, 783, 789, 782, 781] // 女频小说ID
+    male: [812, 810, 814, 782, 783, 807, 789, 811, 815, 816], // 男频小说ID
+    female: [806, 795, 781, 813, 796, 799, 805] // 女频小说ID
 }
 
 // 作者ID列表
 export const authorIds = [462, 461, 123]
 
 // 小说ID列表
-export const novelIds = [166, 167, 168, 169, 183, 222, 263, 422, 783, 789, 782, 781]
+export const novelIds = [807, 789, 811, 815, 816, 813, 812, 806]
 
 
 // 专栏轮播小说数据
 export const carouselNovels_data = [
-    { novelId: 789, novelName: '如意姑娘的', coverUrl: require('@/assets/side1.jpg') },
-    { novelId: 789, novelName: '写给鼹鼠先生的情', coverUrl: require('@/assets/side2.jpg') },
-    { novelId: 789, novelName: '问九卿', coverUrl: require('@/assets/side3.jpg') },
-    { novelId: 789, novelName: '昭娇', coverUrl: require('@/assets/side4.jpg') },
-    { novelId: 789, novelName: '岁时来仪', coverUrl: require('@/assets/side5.jpg') }
+    { novelId: 820, novelName: '如意姑娘的', coverUrl: require('@/assets/side1.jpg') },
+    { novelId: 823, novelName: '写给鼹鼠先生的情', coverUrl: require('@/assets/side2.jpg') },
+    { novelId: 821, novelName: '问九卿', coverUrl: require('@/assets/side3.jpg') },
+    { novelId: 819, novelName: '昭娇', coverUrl: require('@/assets/side4.jpg') },
+    { novelId: 822, novelName: '岁时来仪', coverUrl: require('@/assets/side5.jpg') }
 ]
 
 // 公告数据

@@ -32,6 +32,31 @@ export const current_state = defineStore('state', {
     }
 })
 
+//作者信息
+export const authorState = defineStore('author', {
+    state: () => ({
+        id: 0
+    }),
+    persist: true,  //持久化存储
+    actions: {
+        setAuthorId(id) {
+            this.id = id || 0;
+        }
+    }
+})
+
+//管理员信息
+export const managerState = defineStore('manager', {
+    state: () => ({
+        id: 0
+    }),
+    persist: true,  //持久化存储
+    actions: {
+        setManagerId(id) {
+            this.id = id || 0;
+        }
+    }
+})
 
 export const readerState = defineStore('reader', {
     state: () => ({

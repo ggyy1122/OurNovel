@@ -5,7 +5,7 @@
 
     <div v-if="firstChapter" class="chapter-content">
       <h3>第一章</h3>
-      <div class="content">{{ firstChapter }}</div>
+      <div class="content" v-html="formatChapterContent(firstChapter)"></div>
 
       <!-- 添加的继续阅读按钮 -->
       <div class="continue-reading-container">
@@ -84,6 +84,27 @@ const router = useRouter()
 // 购买相关状态
 const showChapterPurchaseDialog = ref(false)
 const showChapterInsufficientDialog = ref(false)
+
+
+
+// 格式化章节内容（返回HTML）
+const formatChapterContent = (content) => {
+  if (!content) return '';
+  // 清理所有空白字符
+  const cleanedContent = content
+    .replace(/^[\s\u3000\t]+/gm, '')      // 移除行首空白
+    .replace(/[\s\u3000\t]+$/gm, '')      // 移除行尾空白
+    .replace(/[\s\u3000\t]{2,}/g, ' ')    // 多个连续空白替换为单个空格
+    .replace(/\n{3,}/g, '\n\n')           // 多个连续换行替换为两个
+    .trim();
+  // 按换行分割段落
+  const paragraphs = cleanedContent.split('\n');
+  // 使用p标签包裹每个段落，实现统一缩进
+  return paragraphs
+    .filter(p => p.trim().length > 0)
+    .map(p => `<p>${p}</p>`)
+    .join('');
+};
 
 // 处理继续阅读按钮点击
 const handleContinueReading = async () => {
@@ -266,8 +287,22 @@ watch(
 }
 
 .content {
-  white-space: pre-line;
-  line-height: 1.6;
+  line-height: 1.8;
+  word-break: break-word;
+  text-indent: 2em;
+}
+
+.content p {
+  margin: 0 0 1.2em 0;
+  text-indent: 2em;
+}
+
+.content p:first-child {
+  margin-top: 0;
+}
+
+.content p:last-child {
+  margin-bottom: 0;
 }
 
 .continue-reading-container {
@@ -295,6 +330,10 @@ watch(
   .introduction-section {
     width: 95%;
     max-width: none;
+  }
+
+  .content p {
+    text-indent: 1.5em;
   }
 }
 
