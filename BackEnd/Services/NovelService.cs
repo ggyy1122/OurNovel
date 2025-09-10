@@ -159,14 +159,33 @@ namespace OurNovel.Services
                 original.TotalWordCount = edited.TotalWordCount ?? original.TotalWordCount;
                 original.RecommendCount = edited.RecommendCount ?? original.RecommendCount;
                 original.CollectedCount = edited.CollectedCount ?? original.CollectedCount;
-                original.CreateTime = DateTime.Now;
+                //original.CreateTime = DateTime.Now;
                 original.TotalPrice = edited.TotalPrice ?? original.TotalPrice;
 
                 await _context.SaveChangesAsync();
                 return original.NovelId;
             }
 
-            // 情况2：原小说已发布，检查是否已有副本
+            // 情况2：仅修改小说状态
+            if ((original.Status == "连载" || original.Status == "完结")
+                && !string.IsNullOrEmpty(edited.Status))
+            {
+                bool nameSame = (edited.NovelName ?? original.NovelName) == original.NovelName;
+                bool introSame = (edited.Introduction ?? original.Introduction) == original.Introduction;
+                bool coverSame = (edited.CoverUrl ?? original.CoverUrl) == original.CoverUrl;
+
+                if (nameSame && introSame && coverSame)
+                {
+                    // 只修改状态
+                    original.Status = edited.Status;
+                    //original.CreateTime = DateTime.Now;
+                    await _context.SaveChangesAsync();
+                    return original.NovelId;
+                }
+                // 否则继续走副本逻辑
+            }
+
+            // 情况3：原小说已发布，检查是否已有副本
             // 查找是否已有副本
             var existingCopy = await _context.Novels
                 .FirstOrDefaultAsync(n => n.OriginalNovelId == originalNovelId);
@@ -182,7 +201,7 @@ namespace OurNovel.Services
                 existingCopy.RecommendCount = edited.RecommendCount ?? original.RecommendCount;
                 existingCopy.CollectedCount = edited.CollectedCount ?? original.CollectedCount;
                 existingCopy.Status = "待审核";
-                existingCopy.CreateTime = DateTime.Now;
+                existingCopy.CreateTime = original.CreateTime;
                 existingCopy.TotalPrice = edited.TotalPrice ?? original.TotalPrice;
 
                 await _context.SaveChangesAsync();
@@ -202,7 +221,7 @@ namespace OurNovel.Services
                     RecommendCount = edited.RecommendCount ?? original.RecommendCount,
                     CollectedCount = edited.CollectedCount ?? original.CollectedCount,
                     Status = "待审核",
-                    CreateTime = DateTime.Now,
+                    CreateTime = original.CreateTime,
                     OriginalNovelId = originalNovelId,
                     TotalPrice = edited.TotalPrice ?? original.TotalPrice
                 };

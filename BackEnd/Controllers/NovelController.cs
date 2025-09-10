@@ -103,7 +103,8 @@ namespace OurNovel.Controllers
             {
                 NovelName = editedDto.NovelName,
                 Introduction = editedDto.Introduction,
-                CoverUrl = editedDto.CoverUrl
+                CoverUrl = editedDto.CoverUrl,
+                Status = editedDto.Status
             });
 
             if (newNovelId == -1)
