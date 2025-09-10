@@ -217,8 +217,14 @@ const handleSave = async () => {
     showAlert(result.message, 'error')
   }
 }
-// 只显示连载和完结两个状态选项
+
+const originalStatus = ref(novel.value.status)
+
+// 修改过滤状态选项的计算属性
 const filteredStatusOptions = computed(() => {
+  if (originalStatus.value === '封禁' || originalStatus.value === '待审核') {
+    return statusOptions.filter(option => option.value === '连载')
+  }
   return statusOptions.filter(option => 
     option.value === '连载' || option.value === '完结'
   )
