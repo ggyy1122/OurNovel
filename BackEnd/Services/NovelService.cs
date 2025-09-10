@@ -153,8 +153,8 @@ namespace OurNovel.Services
             if (original == null)
                 return -1;
 
-            // 情况1：原小说还在待审核，直接更新原小说
-            if (original.Status == "待审核")
+            // 情况1：原小说待审核，或被封禁，直接更新原小说
+            if (original.Status == "待审核" || original.Status == "封禁")
             {
                 original.NovelName = edited.NovelName ?? original.NovelName;
                 original.Introduction = edited.Introduction ?? original.Introduction;
@@ -165,6 +165,7 @@ namespace OurNovel.Services
                 original.CollectedCount = edited.CollectedCount ?? original.CollectedCount;
                 //original.CreateTime = DateTime.Now;
                 original.TotalPrice = edited.TotalPrice ?? original.TotalPrice;
+                original.Status = "待审核";
 
                 await _context.SaveChangesAsync();
                 return original.NovelId;
