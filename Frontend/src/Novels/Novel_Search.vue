@@ -397,6 +397,7 @@ const performSearch = async () => {
     font-weight: bold;
     margin-bottom: 5px;
     color: #000;
+    font-size: 18px;
 }
 
 .user-info p:last-child {
@@ -412,6 +413,7 @@ const performSearch = async () => {
 
 .dropdown-item {
     display: block;
+    font-weight: bold;
     padding: 8px 15px;
     color: #333;
     text-decoration: none;

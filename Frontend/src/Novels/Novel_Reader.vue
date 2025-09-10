@@ -2209,6 +2209,7 @@ button.active {
     font-weight: bold;
     margin-bottom: 5px;
     color: #000;
+    font-size: 18px;
 }
 
 .user-info p:last-child {
@@ -2228,6 +2229,7 @@ button.active {
     color: #333;
     text-decoration: none;
     font-size: 14px;
+    font-weight: bold;
 }
 
 .dropdown-item:hover {

@@ -7,7 +7,13 @@
                 <h3 @click="goAuthorHome">{{ author.authorName }}</h3>
                 <p class="meta">已创作 {{ authorRegisterDays.registerDays }} 天</p>
                 <p class="meta">联系方式 : {{ maskedPhone }}</p>
-                <p class="meta">简介 : {{ author.introduction || 'Ta还有点神秘哦~' }}</p>
+                <p class="meta">
+                    简介 : {{
+                        (author.introduction && author.introduction.length > 37)
+                            ? author.introduction.slice(0, 37) + '...'
+                            : (author.introduction || 'Ta还有点神秘哦~')
+                    }}
+                </p>
             </div>
         </div>
         <div class="stats">

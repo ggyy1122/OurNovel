@@ -5,7 +5,11 @@
             <div class="carousel" @mouseenter="pauseAutoPlay" @mouseleave="resumeAutoPlay">
                 <div class="carousel-inner" :style="{ transform: `translateX(-${currentIndex * 100}%)` }">
                     <div class="carousel-item" v-for="(item, index) in carouselItems" :key="index">
-                        <img :src="item.image" :alt="item.title" class="carousel-image" loading="lazy"
+                        <a v-if="item.link" :href="item.link" target="_blank" rel="noopener noreferrer">
+                            <img :src="item.image" :alt="item.title" class="carousel-image" loading="lazy"
+                                @load="handleImageLoad" />
+                        </a>
+                        <img v-else :src="item.image" :alt="item.title" class="carousel-image" loading="lazy"
                             @load="handleImageLoad" />
                         <div class="carousel-caption">
                             <h3>{{ item.title }}</h3>
@@ -232,7 +236,7 @@
                         @load="handleImageLoad" />
                 </div>
                 <h3 class="author-name" @click="goAuthorHome(author)">{{ author.authorName }}</h3>
-                <p class="author-join-date">{{ author.registerTime }}加入TJ</p>
+                <p class="author-join-date">{{ author.registerTime?.slice(0, 10) }} 加入TJ</p>
                 <p class="author-bio">{{ author.introduction }}</p>
             </div>
         </div>

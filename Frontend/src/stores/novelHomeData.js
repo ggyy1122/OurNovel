@@ -1,19 +1,19 @@
 // Banner轮播数据
 export const carouselItems_data = [
-    { image: require('@/assets/1.jpg'), title: 'TJ小说网', description: '匠心打磨好作品' },
-    { image: require('@/assets/2.jpg'), title: '热门小说推荐', description: '最新签约作品' },
-    { image: require('@/assets/3.jpeg'), title: '作家专区', description: '点击进入 >' },
-    { image: require('@/assets/4.jpg'), title: 'TJ小说网', description: '匠心打磨好作品' }
+    { image: require('@/assets/1.jpg'), title: '热门小说推荐', description: '最新签约作品', link: 'https://www.qimao.com/shuku/195409/' },
+    { image: require('@/assets/2.jpg'), title: '作家专区', description: '点击进入 >', link: 'https://zuozhe.qimao.com/front/custom-activity/2' },
+    { image: require('@/assets/3.jpeg'), title: '热门玄幻', description: '炸裂登场', link: 'https://www.qimao.com/shuku/215243/' },
+    { image: require('@/assets/4.jpg'), title: 'TJ小说网', description: '匠心打磨好作品', link: 'https://www.qimao.com/activity/zhengwen/detail/429?forceMode=1' }
 ]
 
 // 精选小说ID
 export const featuredNovelIds = {
-    male: [812, 810, 814, 782, 783, 807, 789, 811, 815, 816], // 男频小说ID
+    male: [812, 810, 814, 782, 783, 807, 789], // 男频小说ID
     female: [806, 795, 781, 813, 796, 799, 805] // 女频小说ID
 }
 
 // 作者ID列表
-export const authorIds = [462, 461, 123]
+export const authorIds = [462, 461, 485]
 
 // 小说ID列表
 export const novelIds = [807, 789, 811, 815, 816, 813, 812, 806]
