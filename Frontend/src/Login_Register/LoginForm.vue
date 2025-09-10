@@ -64,7 +64,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { current_state, readerState } from '@/stores/index';
+import { current_state, readerState, authorState,managerState } from '@/stores/index';
 import { loginAuthor, loginManager, loginReader } from '@/API/Log_API';
 import { getReader, getRecentReadingsByReaderId } from '@/API/Reader_API';
 import { getCollectsByReader } from '@/API/Collect_API';
@@ -75,6 +75,8 @@ import "vue3-toastify/dist/index.css";
 
 const state = current_state();
 const reader_state = readerState();
+const author_state = authorState();
+const manager_state = managerState();
 
 const username = ref("");
 const password = ref("");
@@ -136,6 +138,7 @@ const handleLogin = async () => {
                 });
                 saveToken(response.token, response.authorName, response.authorId);
                 state.setUserInfo(response.authorName, response.authorId); // 存入 Pinia
+                author_state.setAuthorId(response.authorId);
                 router.push('/author/novels');
             } else if (state.value === 2) { // 管理员
                 response = await loginManager({
@@ -144,6 +147,7 @@ const handleLogin = async () => {
                 });
                 saveToken(response.token, response.managerName, response.managerId);
                 state.setUserInfo(response.managerName, response.managerId); // 存入 Pinia
+                manager_state.setManagerId(response.managerId);
                 router.push('/Admin/Admin_Layout/dashboard');
             }
             console.log('登录成功', response.data);
