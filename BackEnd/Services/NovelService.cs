@@ -186,13 +186,17 @@ namespace OurNovel.Services
                     await _context.SaveChangesAsync();
                     return original.NovelId;
                 }
-                // 否则继续走副本逻辑
             }
 
             // 情况3：原小说已发布，检查是否已有副本
             // 查找是否已有副本
             var existingCopy = await _context.Novels
                 .FirstOrDefaultAsync(n => n.OriginalNovelId == originalNovelId);
+
+            if (original.Status == "连载" || original.Status == "完结")
+            {
+                original.Status = edited.Status;
+            }
 
             if (existingCopy != null)
             {
