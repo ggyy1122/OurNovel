@@ -506,6 +506,7 @@ const genderText = computed(() => {
     font-weight: bold;
     margin-bottom: 5px;
     color: #000;
+    font-size: 18px;
 }
 
 .user-info p:last-child {
@@ -525,6 +526,7 @@ const genderText = computed(() => {
     color: #333;
     text-decoration: none;
     font-size: 14px;
+    font-weight: bold;
 }
 
 .dropdown-item:hover {

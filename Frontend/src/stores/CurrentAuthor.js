@@ -2,7 +2,7 @@
 import { reactive } from 'vue'
 import { getAuthor, updateAuthor,deleteAuthor } from '@/API/Author_API'
 import { uploadAuthorAvatar } from '@/API/Author_Avatar_API'
-import { current_state } from './index'
+import { authorState } from './index'
 import { changeAuthorPassword } from '@/API/Log_API'
 
 export const authorStore = reactive({
@@ -42,7 +42,7 @@ export const authorStore = reactive({
     this.error = null
   
     try {
-      const authorId = current_state().id
+      const authorId = authorState().id
       const response = await getAuthor(authorId)
       
       // 根据API响应映射字段
@@ -63,7 +63,7 @@ export const authorStore = reactive({
       
       // 失败时回退
       this.currentAuthor = {
-        author_id: current_state().id,
+        author_id: authorState().id,
         author_name: '加载失败',
         phone: '',
         password: this.currentAuthor?.password || '',

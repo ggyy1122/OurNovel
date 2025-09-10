@@ -54,7 +54,7 @@
           <td>{{ user.name }}</td>
           <td>{{ user.phone }}</td>
           <td v-if="userType === 'reader'">{{ user.gender }}</td>
-          <td v-else>{{ user.income }} 元</td>
+          <td v-else>{{ user.income/100 }} 元</td>
           <td>
             <button class="btn-delete" @click="deleteUser(user.id)">删除</button>
           </td>

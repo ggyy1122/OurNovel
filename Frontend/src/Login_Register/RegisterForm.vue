@@ -333,7 +333,8 @@ const handleRegister = async () => {
         if (state.value === 0) { // 读者注册
             response = await registerReader({
                 readerName: username.value,
-                password: password.value
+                password: password.value,
+                phone: phone.value
             });
         } else if (state.value === 1) { // 作者注册
             response = await registerAuthor({

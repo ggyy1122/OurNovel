@@ -646,6 +646,7 @@ onUnmounted(() => {
     font-weight: bold;
     margin-bottom: 5px;
     color: #000;
+    font-size: 18px;
 }
 
 .user-info p:last-child {
@@ -661,6 +662,7 @@ onUnmounted(() => {
 
 .dropdown-item {
     display: block;
+    font-weight: bold;
     padding: 8px 15px;
     color: #333;
     text-decoration: none;
@@ -689,6 +691,20 @@ onUnmounted(() => {
 .sticky-header-content .dropdown-menu {
     top: 100%;
     right: -10px;
+}
+
+.sticky-header-content .user-info p:first-child {
+    font-size: 18px !important;
+    font-weight: bold !important;
+}
+
+.sticky-header-content .user-info p:last-child {
+    font-size: 12px !important;
+}
+
+.sticky-header-content .dropdown-item {
+    font-size: 14px !important;
+    padding: 6px 12px !important;
 }
 
 /* 回到顶部按钮样式 */

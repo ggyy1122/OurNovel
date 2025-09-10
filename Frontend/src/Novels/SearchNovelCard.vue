@@ -225,8 +225,8 @@ async function handle_NovelInfro() {
 }
 
 const truncatedIntroduction = computed(() => {
-    return props.novel.introduction && props.novel.introduction.length > 25
-        ? props.novel.introduction.substring(0, 25) + '...'
+    return props.novel.introduction && props.novel.introduction.length > 35
+        ? props.novel.introduction.substring(0, 35) + '...'
         : props.novel.introduction || '暂无简介';
 });
 

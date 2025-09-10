@@ -1339,15 +1339,25 @@ const stopSpeaking = () => {
     }
 };
 
-// 使用时可以指定空格数量，如：
-// formatContent(content, 4);  // 4个空格
-// formatContent(content, 6);  // 6个空格
-const formatContent = (content, spaceCount = 7) => {  // 默认7个空格，可自定义
+// 最佳的内容格式化函数
+const formatContent = (content) => {
     if (!content) return '';
-    const paragraphs = content.split('\n');
-    // 根据spaceCount生成对应数量的空格
-    const spaces = '&nbsp;'.repeat(spaceCount);
-    return paragraphs.map(p => `${spaces}${p}`).join('<br>'.repeat(2));
+    // 彻底清理所有空白字符
+    const cleanedContent = content
+        // 移除所有行首空白（包括全角空格、半角空格、制表符等）
+        .replace(/^[\s\u3000\t]+/gm, '')
+        // 移除所有行尾空白
+        .replace(/[\s\u3000\t]+$/gm, '')
+        // 将段落内的多个连续空白替换为单个半角空格
+        .replace(/[\s\u3000\t]{2,}/g, ' ')
+        // 处理多个连续换行（保留段落分隔）
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+    const paragraphs = cleanedContent.split('\n');
+    return paragraphs
+        .filter(p => p.trim().length > 0)
+        .map(p => `<p>${p}</p>`)
+        .join('');
 };
 
 // 监听弹窗打开时刷新余额
@@ -1603,9 +1613,18 @@ onUnmounted(() => {
 .novel-content {
     font-size: 18px;
     color: #222;
-    line-height: 1.7;
-    white-space: pre-line !important;
+    line-height: 1.8;
     word-break: break-word;
+    text-indent: 2em;
+}
+
+.novel-content p {
+    margin: 0 0 1.2em 0;
+    text-indent: 2em;
+}
+
+.novel-content p:first-child {
+    margin-top: 0;
 }
 
 /* 购买弹窗样式*/
@@ -2190,6 +2209,7 @@ button.active {
     font-weight: bold;
     margin-bottom: 5px;
     color: #000;
+    font-size: 18px;
 }
 
 .user-info p:last-child {
@@ -2209,6 +2229,7 @@ button.active {
     color: #333;
     text-decoration: none;
     font-size: 14px;
+    font-weight: bold;
 }
 
 .dropdown-item:hover {
