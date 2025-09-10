@@ -623,7 +623,7 @@ const viewAuditLogs = (chapter) => {
   resize: none;
   font-family: inherit;
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 2;
   text-indent: 2em;
   white-space: pre-wrap;
 }
