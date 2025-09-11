@@ -38,8 +38,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getTopLikedComments } from '@/API/Comment_API'
-import { likeComment, unlikeComment, isLiked } from '@/API/Likes_API'
-import { getReader } from '@/API/Reader_API'  // 使用你已有的 API
+import { likeComment, unlikeComment, isLiked as checkIsLiked } from '@/API/Likes_API'
+import { getReader } from '@/API/Reader_API'  
 import { SelectNovel_State, readerState } from '@/stores/index'
 import 'vue3-toastify/dist/index.css'
 import { toast } from 'vue3-toastify'
@@ -89,14 +89,17 @@ onMounted(async () => {
   try {
     const response = await getTopLikedComments(novelId, 10)
     comments.value = Array.isArray(response) ? response : []
-
-    // 点赞状态
     for (const c of comments.value) {
-      const res = await isLiked(c.commentId, readerId)
-      if (res?.isLiked === true || res === true) likedCommentIds.value.add(c.commentId)
+      try {
+        const isLikedRes = await checkIsLiked(c.commentId, readerId)
+        if (isLikedRes?.isLiked === true || isLikedRes === true || isLikedRes?.liked === true) {
+          likedCommentIds.value.add(c.commentId)
+        }
+      } catch (error) {
+        console.error(`检查评论 ${c.commentId} 点赞状态失败:`, error)
+      }
     }
-
-    // 批量补齐头像/昵称（用 getReader）
+    // 批量补齐头像/昵称
     const ids = Array.from(new Set(comments.value.map(c => c.readerId))).filter(Boolean)
     await Promise.all(ids.map(async (id) => {
       if (readersMap.value.has(id)) return

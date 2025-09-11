@@ -2,19 +2,23 @@
   <div class="home-view">
     <div class="page-back-container">
       <div class="collects-container">
-        <h2>我的推荐</h2>
+        <div class="header-row">
+          <h2>我的推荐</h2>
+          <div class="visibility-control">
+            <label>推荐是否可见：</label>
+            <select v-model="isRecommendVisible" @change="updateRecommendVisibility">
+              <option value="是">是</option>
+              <option value="否">否</option>
+            </select>
+          </div>
+        </div>
         <div v-if="loading" class="loading">加载中...</div>
         <div v-else-if="error" class="error">{{ error }}</div>
         <div v-else>
           <div v-if="recommends.length === 0" class="empty">暂无推荐内容</div>
           <ul class="collect-list">
-            <li
-              v-for="item in recommends"
-              :key="item.novelId"
-              class="collect-item"
-              :class="{ selected: selectedNovelId === item.novel.novelId }"
-              @click="toggleSelect(item.novel.novelId)"
-            >
+            <li v-for="item in recommends" :key="item.novelId" class="collect-item"
+              :class="{ selected: selectedNovelId === item.novel.novelId }" @click="toggleSelect(item.novel.novelId)">
               <img :src="item.novel.fullCoverUrl" alt="封面" class="cover" />
               <div class="collect-info">
                 <h3 class="novel-name">{{ item.novel.novelName }}</h3>
@@ -39,18 +43,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount,computed } from 'vue'
-import { readerState } from '@/stores/index'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { readerState, SelectNovel_State } from '@/stores/index'
 import { getRecommendsByReader, deleteRecommend } from '@/API/Recommend_API'
 import { getAuthor } from '@/API/Author_API'
 import { useRouter } from 'vue-router'
-import { SelectNovel_State } from '@/stores/index'
+import { updateReader } from '@/API/Reader_API'
 
 const selectNovelState = SelectNovel_State()
 const router = useRouter()
 
 const store = readerState()
-
+const isRecommendVisible = ref(store.isRecommendVisible || '是')
 const recommends = computed(() => store.recommendBooks)
 const loading = ref(false)
 const error = ref(null)
@@ -140,30 +144,30 @@ function toggleSelect(novelId) {
 // 查看详情
 async function viewDetail(item) {
   try {
-        const response = await getAuthor(item.novel.authorId);
-        selectNovelState.resetNovel(
-            item.novel.novelId,
-            item.novel.authorId,
-            item.novel.novelName,
-            item.novel.introduction,
-            item.novel.createTime,
-            item.novel.coverUrl,
-            item.novel.score,
-            item.novel.totalWordCount,
-            item.novel.recommendCount,
-            item.novel.collectedCount,
-            item.novel.status,
-            item.novel.totalPrice,
-            response.authorName,
-            response.phone,
-            response.avatarUrl,
-            response.registerTime,
-            response.introduction
-        );
-    } catch (error) {
-        console.error('处理失败:', error);
-    }
-    router.push('/Novels/Novel_Info/home');
+    const response = await getAuthor(item.novel.authorId);
+    selectNovelState.resetNovel(
+      item.novel.novelId,
+      item.novel.authorId,
+      item.novel.novelName,
+      item.novel.introduction,
+      item.novel.createTime,
+      item.novel.coverUrl,
+      item.novel.score,
+      item.novel.totalWordCount,
+      item.novel.recommendCount,
+      item.novel.collectedCount,
+      item.novel.status,
+      item.novel.totalPrice,
+      response.authorName,
+      response.phone,
+      response.avatarUrl,
+      response.registerTime,
+      response.introduction
+    );
+  } catch (error) {
+    console.error('处理失败:', error);
+  }
+  router.push('/Novels/Novel_Info/home');
 }
 
 function handleClickOutside(event) {
@@ -172,7 +176,33 @@ function handleClickOutside(event) {
   }
 }
 
+// 更新推荐可见性
+async function updateRecommendVisibility() {
+  try {
+    const updateData = {
+      readerId: store.readerId,
+      readerName: store.readerName,
+      password: store.password,
+      phone: store.phone,
+      gender: store.gender,
+      isCollectVisible: store.isCollectVisible,
+      isRecommendVisible: isRecommendVisible.value,
+      balance: store.balance,
+      avatarUrl: store.avatarUrl,
+      backgroundUrl: store.backgroundUrl,
+    }
+
+    await updateReader(store.readerId, updateData)
+    store.isRecommendVisible = isRecommendVisible.value
+    alert('推荐可见性已更新')
+  } catch (error) {
+    console.error('更新推荐可见性失败:', error)
+    alert('更新失败，请稍后再试')
+  }
+}
+
 onMounted(() => {
+  isRecommendVisible.value = store.isRecommendVisible || '是'
   fetchRecommends()
   window.addEventListener('click', handleClickOutside)
 })
@@ -187,6 +217,31 @@ onBeforeUnmount(() => {
   padding: 0;
 }
 
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.visibility-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.visibility-control label {
+  font-weight: 600;
+  font-size: 18px;
+  margin-bottom: 0;
+}
+
+.visibility-control select {
+  padding: 4px 6px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 18px;
+}
 
 .collects-container {
   max-width: 900px;
@@ -203,7 +258,9 @@ onBeforeUnmount(() => {
   border-bottom: 1px solid #eee;
 }
 
-.loading, .error, .empty {
+.loading,
+.error,
+.empty {
   text-align: center;
   font-size: 18px;
   margin: 20px 0;
@@ -292,7 +349,7 @@ onBeforeUnmount(() => {
   right: 0;
   bottom: 0;
   backdrop-filter: blur(4px);
-  background-color: rgba(0,0,0,0.3);
+  background-color: rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
   justify-content: center;
