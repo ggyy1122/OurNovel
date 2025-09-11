@@ -11,11 +11,11 @@
         </div>
         <div class="stats">
             <div class="stat-item">
-                <span class="stat-value">{{ reader.isCollectVisible === '是' ? '公开' : '私密' }}</span>
+                <span class="stat-value">{{ reader.isCollectVisible === '否' ? '私密' : '公开' }}</span>
                 <span class="stat-label">收藏状态</span>
             </div>
             <div class="stat-item">
-                <span class="stat-value">{{ reader.isRecommendVisible === '是' ? '公开' : '私密' }}</span>
+                <span class="stat-value">{{ reader.isRecommendVisible === '否' ? '私密' : '公开' }}</span>
                 <span class="stat-label">推荐状态</span>
             </div>
         </div>

@@ -1,7 +1,16 @@
 <template>
   <div class="page-back-container">
     <div class="collects-container">
-      <h2>我的收藏</h2>
+      <div class="header-row">
+        <h2>我的收藏</h2>
+        <div class="visibility-control">
+          <label>收藏是否可见：</label>
+          <select v-model="isCollectVisible" @change="updateCollectVisibility">
+            <option value="是">是</option>
+            <option value="否">否</option>
+          </select>
+        </div>
+      </div>
       <div v-if="loading" class="loading">加载中...</div>
       <div v-else-if="error" class="error">{{ error }}</div>
       <div v-else>
@@ -49,15 +58,16 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
-import { readerState } from '@/stores/index'
+import { readerState, SelectNovel_State } from '@/stores/index'
 import { getCollectsByReader, deleteCollect, addOrUpdateCollect } from '@/API/Collect_API'
 import { getAuthor } from '@/API/Author_API'
 import { useRouter } from 'vue-router'
-import { SelectNovel_State } from '@/stores/index'
+import { updateReader } from '@/API/Reader_API'
 
 const selectNovelState = SelectNovel_State()
 const router = useRouter()
 const store = readerState()
+const isCollectVisible = ref(store.isCollectVisible || '是')
 
 const collects = computed(() => store.favoriteBooks)
 const loading = ref(false)
@@ -198,9 +208,32 @@ async function confirmPublic(choice) {
   }
 }
 
-
+// 更新收藏可见性
+async function updateCollectVisibility() {
+  try {
+    const updateData = {
+      readerId: store.readerId,
+      readerName: store.readerName,
+      password: store.password,
+      phone: store.phone,
+      gender: store.gender,
+      isCollectVisible: isCollectVisible.value,
+      isRecommendVisible: store.isRecommendVisible,
+      balance: store.balance,
+      avatarUrl: store.avatarUrl,
+      backgroundUrl: store.backgroundUrl,
+    }
+    await updateReader(store.readerId, updateData)
+    store.isCollectVisible = isCollectVisible.value
+    alert('收藏可见性已更新')
+  } catch (error) {
+    console.error('更新收藏可见性失败:', error)
+    alert('更新失败，请稍后再试')
+  }
+}
 
 onMounted(() => {
+  isCollectVisible.value = store.isCollectVisible || '是'
   fetchCollects()
   window.addEventListener('click', handleClickOutside)
 })
@@ -230,6 +263,32 @@ onBeforeUnmount(() => {
 
 .error {
   color: #d9534f;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.visibility-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.visibility-control label {
+  font-weight: 600;
+  font-size: 18px;
+  margin-bottom: 0;
+}
+
+.visibility-control select {
+  padding: 4px 6px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 18px;
 }
 
 .collect-list {
