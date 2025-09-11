@@ -38,14 +38,14 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getAllChapters, reviewChapter } from '@/API/Chapter_API.js'
-import { current_state } from '@/stores/index'
+import { managerState } from '@/stores/index'
 import { storeToRefs } from 'pinia'
 
 const router = useRouter()
 const chapters = ref([])
 const loading = ref(false)
 
-const currentState = current_state()
+const currentState = managerState()
 const { id: managerID } = storeToRefs(currentState)
 
 const fetchChapters = async () => {
