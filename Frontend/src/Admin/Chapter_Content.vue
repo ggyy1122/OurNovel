@@ -5,8 +5,7 @@
     <div v-if="loading">加载中...</div>
 
     <div v-else-if="chapter">
-      <p><strong>小说ID：</strong>{{ chapter.novelId }}</p>
-      <p><strong>章节ID：</strong>{{ chapter.chapterId }}</p>
+      <p><strong>小说名称：</strong>{{ chapter.novelName }}</p>
       <p><strong>章节标题：</strong>{{ chapter.title }}</p>
 
       <div class="content-box">
@@ -103,7 +102,6 @@ const rejectChapter = async () => {
     alert('操作失败，请重试')
   }
 }
-
 </script>
 
 <style scoped>
@@ -148,5 +146,3 @@ const rejectChapter = async () => {
 .btn-reject { background-color: #ad7079; }
 .btn-reject:hover { background-color: #90555f; }
 </style>
-
-
