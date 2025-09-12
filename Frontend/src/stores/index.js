@@ -69,8 +69,8 @@ export const readerState = defineStore('reader', {
         balance: 0,
         avatarUrl: "",      //头像不用这个，用下面的formattedAvatarUrl,加了前缀
         backgroundUrl: "",  //背景图不用这个，用下面的formattedBackgroundUrl,加了前缀
-        isCollectVisible: null,
-        isRecommendVisible: null,
+        isCollectVisible: '是',
+        isRecommendVisible: '是',
         //扩展属性
         lastLoginTime: null, // 最近登录时间
         isloggedin: false,    // 是否已登录，貌似没用
@@ -110,8 +110,8 @@ export const readerState = defineStore('reader', {
             this.balance = balance || 0;
             this.avatarUrl = avatarUrl || "";
             this.backgroundUrl = backgroundUrl || "";
-            this.isCollectVisible = isCollectVisible || null;
-            this.isRecommendVisible = isRecommendVisible || null;
+            this.isCollectVisible = isCollectVisible || '是';
+            this.isRecommendVisible = isRecommendVisible || '是';
 
             this.favoriteBooks = favoriteBooks || []; // 初始化收藏书籍
             this.recommendBooks = recommendBooks || []; // 初始化推荐书籍

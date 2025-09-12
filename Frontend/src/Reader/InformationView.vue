@@ -1,14 +1,26 @@
 <template>
   <div class="edit-container">
     <h2>修改个人信息</h2>
-    <div class="avatar-upload">
-      <img
-        :src="avatarPreviewUrl.startsWith('blob:') ? avatarPreviewUrl : 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + avatarPreviewUrl"
-        alt="头像预览" class="avatar-image" />
-      <label class="upload-button">
-        选择头像
-        <input type="file" accept="image/*" @change="handleAvatarChange" hidden />
-      </label>
+    <div class="upload-row">
+      <div class="avatar-upload">
+        <img
+          :src="avatarPreviewUrl.startsWith('blob:') ? avatarPreviewUrl : 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + avatarPreviewUrl"
+          alt="头像预览" class="avatar-image" />
+        <label class="upload-button">
+          选择头像
+          <input type="file" accept="image/*" @change="handleAvatarChange" hidden />
+        </label>
+      </div>
+      <!-- 背景上传区域 -->
+      <div class="background-upload">
+        <img
+          :src="backgroundPreviewUrl.startsWith('blob:') ? backgroundPreviewUrl : 'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' + backgroundPreviewUrl"
+          alt="背景预览" class="background-image" />
+        <label class="upload-button">
+          选择背景
+          <input type="file" accept="image/*" @change="handleBackgroundChange" hidden />
+        </label>
+      </div>
     </div>
     <form @submit.prevent="saveReaderChanges">
       <div>
@@ -31,6 +43,22 @@
         <select v-model="gender">
           <option value="男">男</option>
           <option value="女">女</option>
+        </select>
+      </div>
+
+      <div>
+        <label>收藏是否可见：</label>
+        <select v-model="isCollectVisible">
+          <option value="是">是</option>
+          <option value="否">否</option>
+        </select>
+      </div>
+
+      <div>
+        <label>推荐是否可见：</label>
+        <select v-model="isRecommendVisible">
+          <option value="是">是</option>
+          <option value="否">否</option>
         </select>
       </div>
 
@@ -170,6 +198,11 @@ const avatarPreviewUrl = ref('')
 const apiResponseAvatar = ref(null)
 const defaultAvatar = 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg'
 const showDeleteConfirm = ref(false)
+const isCollectVisible = ref('是')
+const isRecommendVisible = ref('是')
+const backgroundFile = ref(null)
+const backgroundPreviewUrl = ref('')
+const defaultBackground = 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg'
 
 // 密码修改相关
 const showPasswordModal = ref(false)
@@ -250,11 +283,35 @@ async function uploadAvatar() {
   }
 }
 
+// 背景变更处理函数
+function handleBackgroundChange(event) {
+  backgroundFile.value = event.target.files[0]
+  if (backgroundFile.value) {
+    backgroundPreviewUrl.value = URL.createObjectURL(backgroundFile.value)
+  } else {
+    backgroundPreviewUrl.value = ''
+  }
+}
+
+// 格式化背景URL的函数
+function getFormattedBackgroundUrl(backgroundUrl) {
+  if (!backgroundUrl || backgroundUrl.trim() === '') {
+    return defaultBackground
+  }
+  if (backgroundUrl.startsWith('http://') || backgroundUrl.startsWith('https://')) {
+    return backgroundUrl
+  }
+  return backgroundUrl
+}
+
 onMounted(() => {
   readerName.value = store.readerName || ''
   phone.value = store.phone || ''
   gender.value = store.gender || '男'
+  isCollectVisible.value = store.isCollectVisible || '是'
+  isRecommendVisible.value = store.isRecommendVisible || '是'
   avatarPreviewUrl.value = getFormattedAvatarUrl(store.avatarUrl)
+  backgroundPreviewUrl.value = getFormattedBackgroundUrl(store.backgroundUrl)
 })
 
 async function saveReaderChanges() {
@@ -286,6 +343,8 @@ async function saveReaderChanges() {
     balance: store.balance,
     avatarUrl: store.avatarUrl,
     backgroundUrl: store.backgroundUrl,
+    isCollectVisible: isCollectVisible.value,
+    isRecommendVisible: isRecommendVisible.value
   }
 
   try {
@@ -387,11 +446,6 @@ label {
   color: #555;
 }
 
-.avatar-upload {
-  margin-bottom: 20px;
-  text-align: left;
-}
-
 .avatar-image {
   width: 100px;
   height: 100px;
@@ -472,6 +526,29 @@ select:focus {
   color: #ff4d4f;
   font-size: 0.85em;
   margin-top: 5px;
+}
+
+.upload-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.avatar-upload,
+.background-upload {
+  flex: 1;
+  text-align: center;
+}
+
+.background-image {
+  width: 100%;
+  height: 130px;
+  border-radius: 8px;
+  object-fit: cover;
+  margin-bottom: 10px;
+  border: 2px solid #ed424b;
+  display: block;
 }
 
 /* 字符计数器样式 */

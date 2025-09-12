@@ -25,32 +25,11 @@ import LoginForm from '@/Login_Register/LoginForm.vue'
 import RegisterForm from '@/Login_Register/RegisterForm.vue'
 import L_R from '@/Login_Register/L_R.vue'
 import Novel_Reader from '@/Novels/Novel_Reader.vue'
-import Author_api_test from '@/API_Test/Author_Test.vue'
-import Comment_api_test from '@/API_Test/Comment_Test.vue'
 import ResetForm from '@/Login_Register/ResetForm.vue'
-import Novel_api_test from '@/API_Test/Novel_Test.vue'
-import Collect_api_test from '@/API_Test/Collect_Test.vue'
-import Rate_api_test from '@/API_Test/Rate_Test.vue'
-import Category_api_test from '@/API_Test/Category_Test.vue'
-import NovelCategory_api_test from '@/API_Test/NovelCategory_Test.vue'
-import Chapter_api_test from '@/API_Test/Chapter_Test.vue'
-import Reader_api_test from '@/API_Test/Reader_Test.vue'
 import Novel_Info from '@/Novels/Novel_Info.vue'
 import Novel_Info_home from '@/Novels/Novel_Info_home.vue'
 import Novel_Info_Comment from '@/Novels/Novel_Info_Comment.vue'
 import Novel_Info_Chapter from '@/Novels/Novel_Info_Chapter.vue'
-import Recommend_api_test from '@/API_Test/Recommend_Test.vue'
-import AuthorIncome_api_test from '@/API_Test/AuthorIncome_Test.vue'
-import Likes_api_test from '@/API_Test/Likes_Test.vue'
-import Manager_api_test from '@/API_Test/Manager_Test.vue'
-import Purchase_api_test from '@/API_Test/Purchase_Test.vue'
-import Ranking_api_test from '@/API_Test/Ranking_Test.vue'
-import Report_api_test from '@/API_Test/Report_Test.vue'
-import Reward_api_test from '@/API_Test/Reward_Test.vue'
-import CommentReply_api_test from '@/API_Test/CommentReply_Test.vue'
-import Transaction_api_test from '@/API_Test/Transaction_Test.vue'
-import Recharge_api_test from '@/API_Test/Recharge_Test.vue'
-import Search_api_test from '@/API_Test/Search_Test.vue'
 import AuthorHome from '@/Novels/AuthorHome.vue'
 import Novel_Recharge from '@/Novels/Novel_Recharge.vue'
 import ReaderHome from '@/Novels/ReaderHome.vue'
@@ -71,8 +50,8 @@ import RecomendList from '@/Author/RecomendList.vue'
 import CollectList from '@/Author/CollectList.vue'
 import CommentList from '@/Author/CommentList.vue'
 //主页
-import MainLayout  from '@/Reader/MainLayout.vue'
-import HomeView  from '@/Reader/HomeView.vue'
+import MainLayout from '@/Reader/MainLayout.vue'
+import HomeView from '@/Reader/HomeView.vue'
 import FinanceView from '@/Reader/FinanceView.vue'
 import BookshelfView from '@/Reader/BookShelf.vue'
 import CommentView from '@/Reader/CommentView.vue'
@@ -90,112 +69,6 @@ const routes = [
         path: '/',
         name: 'Home',
         component: Home
-    },
-    {
-        path: '/Comment_api_test',
-        name: 'Comment_api_test',
-        component: Comment_api_test
-    },
-    {
-        path: '/Author_api_test',
-        name: 'Author_api_test',
-        component: Author_api_test
-    },
-    {
-        path: '/Novel_api_test',
-        name: 'Novel_api_test',
-        component: Novel_api_test
-    },
-    {
-        path: '/Collect_api_test',
-        name: 'Collect_api_test',
-        component: Collect_api_test
-    },
-    {
-        path: '/Rate_api_test',
-        name: 'Rate_api_test',
-        component: Rate_api_test
-    },
-    {
-        path: '/Category_api_test',
-        name: 'Category_api_test',
-        component: Category_api_test
-    },
-    {
-        path: '/NovelCategory_api_test',
-        name: 'NovelCategory_api_test',
-        component: NovelCategory_api_test
-    },
-    {
-        path: '/Chapter_api_test',
-        name: 'Chapter_api_test',
-        component: Chapter_api_test
-    },
-    {
-        path: '/Reader_api_test',
-        name: 'Reader_api_test',
-        component: Reader_api_test
-
-    },
-    {
-        path: '/Recommend_api_test',
-        name: 'Recommend_api_test',
-        component: Recommend_api_test
-    },
-    {
-        path: '/AuthorIncome_api_test',
-        name: 'AuthorIncome_api_test',
-        component: AuthorIncome_api_test
-    },
-    {
-        path: '/Likes_api_test',
-        name: 'Likes_api_test',
-        component: Likes_api_test
-    },
-    {
-        path: '/Manager_api_test',
-        name: 'Manager_api_test',
-        component: Manager_api_test
-    },
-    {
-        path: '/Purchase_api_test',
-        name: 'Purchase_api_test',
-        component: Purchase_api_test
-    },
-    {
-        path: '/Ranking_api_test',
-        name: 'Ranking_api_test',
-        component: Ranking_api_test
-    },
-    {
-        path: '/Report_api_test',
-        name: 'Report_api_test',
-        component: Report_api_test
-    },
-    {
-        path: '/Reward_api_test',
-        name: 'Reward_api_test',
-        component: Reward_api_test
-    },
-    {
-        path: '/CommentReply_api_test',
-        name: 'CommentReply_api_test',
-        component: CommentReply_api_test
-    },
-    {
-        path: '/Transaction_api_test',
-        name: 'Transaction_api_test',
-        component: Transaction_api_test
-    },
-    {
-        path: '/Recharge_api_test',
-        name: 'Recharge_api_test',
-        component: Recharge_api_test
-    },
-    {
-        path: '/Search_api_test',
-        name: 'Search_api_test',
-        component: Search_api_test
     },
     {
         path: '/L_R',
@@ -236,7 +109,7 @@ const routes = [
                 path: 'users',
                 component: Users_Board
             },
-           {
+            {
                 path: 'chapterboard',
                 name: 'ChapterBoard',
                 component: Chapter_Board
@@ -252,12 +125,12 @@ const routes = [
                 path: 'novel_managent',
                 name: 'novel_managent',// 路由的唯一标识
                 children: [
-                    {path: 'ToBeReviewed_Novels', name: 'ToBeReviewed_Novels', component: ToBeReviewed_Novels} ,
-                    {path: 'Serial_Novels', name: 'Serial_Novels', component: Serial_Novels} ,
-                    {path: 'Finish_Novels', name: 'Finish_Novels', component: Finish_Novels} ,
-                    {path: 'Ban_Novels', name: 'Ban_Novels', component: Ban_Novels} ,
+                    { path: 'ToBeReviewed_Novels', name: 'ToBeReviewed_Novels', component: ToBeReviewed_Novels },
+                    { path: 'Serial_Novels', name: 'Serial_Novels', component: Serial_Novels },
+                    { path: 'Finish_Novels', name: 'Finish_Novels', component: Finish_Novels },
+                    { path: 'Ban_Novels', name: 'Ban_Novels', component: Ban_Novels },
                     { path: 'novelInfo', name: 'novel-detail', component: NovelDetailView },
-                    {path:'novel_create',name:'novel_create',component:NovelCreate}
+                    { path: 'novel_create', name: 'novel_create', component: NovelCreate }
                 ]
             },
             {
@@ -270,13 +143,13 @@ const routes = [
             },
             {
                 path: 'comment_detail',
-                name:'comment_detail',
+                name: 'comment_detail',
                 component: Comment_detail
             },
             {
-                path:'category_manage',
-                name:'category_manage',
-                component:CategoryManage
+                path: 'category_manage',
+                name: 'category_manage',
+                component: CategoryManage
             }
         ]
     },
@@ -455,84 +328,84 @@ const routes = [
             },
         ]
     },
-   // 首页路由组
-  {
-    path: '/UserHome',
-    component: MainLayout,
-    props: { sidebarType: 'home' },
-    children: [
-      {
-        path: '',
-        name: 'home',
-        component: HomeView,
-        meta: { sidebarItem: 'home' }
-      },
-      {
-        path: 'finance',
-        name: 'home-finance',
-        component: FinanceView,
-        meta: { sidebarItem: 'finance' }
-      },
-      {
-        path: 'comment',
-        name: 'home-comment',
-        component: CommentView,
-        meta: { sidebarItem: 'comment' }
-      },
-      {
-        path: 'self-information',
-        name: 'home-self-information',
-        component: InformationView,
-        meta: { sidebarItem: 'self-information' }
-      },
-    ]
-  },
-  // 书架路由组
-  {
-    path: '/BookShelf',
-    component: MainLayout,
-    props: { sidebarType: 'bookshelf' },
-    children: [
-      {
-        path: '',
-        name: 'bookshelf',
-        component: BookshelfView,
-        meta: { sidebarItem: 'books' }
-      },
-      {
-        path: 'Recommend',
-        name: 'recommend',
-        component: RecommendView,
-        meta: { sidebarItem: 'recommend' }
-      },
-       {
-        path: 'Collect',
-        name: 'collect',
-        component: CollectView,
-        meta: { sidebarItem: 'collect' }
-      },
-       {
-        path: 'History',
-        name: 'history',
-        component: HistoryView,
-        meta: { sidebarItem: 'history' }
-      }
-    ]
-  },
-  // 消息中心路由组
-   {
-    path: '/MessageCenter',
-    component: MainLayout,
-    props: { sidebarType: 'messagecenter' },
-    children: [
-      {
-        path: '',
-        name: 'messagecenter',
-        component: MessageCenterView,
-        meta: { sidebarItem: 'messagecenter' }
-      }
-    ]
-  }
+    // 首页路由组
+    {
+        path: '/UserHome',
+        component: MainLayout,
+        props: { sidebarType: 'home' },
+        children: [
+            {
+                path: '',
+                name: 'home',
+                component: HomeView,
+                meta: { sidebarItem: 'home' }
+            },
+            {
+                path: 'finance',
+                name: 'home-finance',
+                component: FinanceView,
+                meta: { sidebarItem: 'finance' }
+            },
+            {
+                path: 'comment',
+                name: 'home-comment',
+                component: CommentView,
+                meta: { sidebarItem: 'comment' }
+            },
+            {
+                path: 'self-information',
+                name: 'home-self-information',
+                component: InformationView,
+                meta: { sidebarItem: 'self-information' }
+            },
+        ]
+    },
+    // 书架路由组
+    {
+        path: '/BookShelf',
+        component: MainLayout,
+        props: { sidebarType: 'bookshelf' },
+        children: [
+            {
+                path: '',
+                name: 'bookshelf',
+                component: BookshelfView,
+                meta: { sidebarItem: 'books' }
+            },
+            {
+                path: 'Recommend',
+                name: 'recommend',
+                component: RecommendView,
+                meta: { sidebarItem: 'recommend' }
+            },
+            {
+                path: 'Collect',
+                name: 'collect',
+                component: CollectView,
+                meta: { sidebarItem: 'collect' }
+            },
+            {
+                path: 'History',
+                name: 'history',
+                component: HistoryView,
+                meta: { sidebarItem: 'history' }
+            }
+        ]
+    },
+    // 消息中心路由组
+    {
+        path: '/MessageCenter',
+        component: MainLayout,
+        props: { sidebarType: 'messagecenter' },
+        children: [
+            {
+                path: '',
+                name: 'messagecenter',
+                component: MessageCenterView,
+                meta: { sidebarItem: 'messagecenter' }
+            }
+        ]
+    }
 ]
 
 const router = createRouter({
