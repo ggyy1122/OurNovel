@@ -71,6 +71,7 @@
             <div class="input-wrapper">
               <textarea 
                 rows="6" 
+                maxlength="500"
                 v-model="novel.introduction" 
                 :disabled="!editMode"
                 :class="{ 'disabled-input': !editMode }"
