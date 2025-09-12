@@ -52,6 +52,31 @@ namespace OurNovel.Controllers
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
+        /// <summary>
+        /// 上传读者背景，并更新背景URL
+        /// </summary>
+        /// <param name="readerId">读者ID</param>
+        /// <param name="bgFile">头像文件</param>
+        /// <returns>头像URL</returns>
+        [HttpPost("UploadBackGround")]
+        [Consumes("multipart/form-data")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> UploadBackGround([FromForm] int readerId, [FromForm] IFormFile bgFile)
+        {
+            try
+            {
+                var avatarUrl = await _imageResourceService.UploadImageAsync<Reader, int>(
+                  readerId,
+                  bgFile,
+                  "BackgroundUrl",
+                  _readerRepository);
+                return Ok(new { success = true, avatarUrl });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
 
         /// <summary>
         /// 获取读者余额
