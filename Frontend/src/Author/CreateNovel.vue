@@ -59,6 +59,7 @@
         <label>简介 <span class="required">*</span></label>
         <textarea 
           rows="5" 
+          maxlength="500"
           v-model="form.introduction" 
           placeholder="请输入作品简介"
           @blur="validateField('introduction')"

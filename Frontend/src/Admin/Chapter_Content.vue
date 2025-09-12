@@ -34,6 +34,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getChapter, reviewChapter } from '@/API/Chapter_API.js'
+import { getNovel } from '@/API/Novel_API.js'
 import { current_state } from '@/stores/index'
 import { storeToRefs } from 'pinia'
 
@@ -51,6 +52,16 @@ onMounted(async () => {
 
   try {
     const data = await getChapter(novelId, chapterId)
+
+    // 获取小说名称
+    try {
+      const novel = await getNovel(novelId)
+      data.novelName = novel.novelName
+    } catch (e) {
+      console.error(`获取小说名称失败 novelId=${novelId}`, e)
+      data.novelName = '未知小说'
+    }
+
     chapter.value = data
   } catch (err) {
     if (err.response && err.response.status === 404) {
@@ -76,7 +87,7 @@ const approveChapter = async () => {
 
   try {
     await reviewChapter(chapter.value.novelId, chapter.value.chapterId, '已发布', managerID.value, result)
-    alert(`章节「${chapter.value.title || '未知标题'}」已审核通过`)
+    alert(`章节「${chapter.value.novelName} - ${chapter.value.title || '未知标题'}」已审核通过`)
     goBack()
   } catch (err) {
     console.error('审核通过失败:', err)
@@ -91,11 +102,11 @@ const rejectChapter = async () => {
   const result = prompt('请输入审核不通过原因（封禁原因等）:')
   if (result === null) return
 
-  if (!confirm(`确定将「${chapter.value.title || '未知标题'}」标记为审核不通过（封禁）吗？`)) return
+  if (!confirm(`确定将「${chapter.value.novelName} - ${chapter.value.title || '未知标题'}」标记为审核不通过（封禁）吗？`)) return
 
   try {
     await reviewChapter(chapter.value.novelId, chapter.value.chapterId, '封禁', managerID.value, result)
-    alert(`章节「${chapter.value.title || '未知标题'}」已封禁`)
+    alert(`章节「${chapter.value.novelName} - ${chapter.value.title || '未知标题'}」已封禁`)
     goBack()
   } catch (err) {
     console.error('封禁失败:', err)

@@ -18,7 +18,7 @@
       </thead>
       <tbody>
         <tr v-for="chapter in chapters" :key="`${chapter.novelId}-${chapter.chapterId}`">
-          <td>{{ chapter.novelName }}</td>
+          <td>{{ chapter.novelName || '加载中...' }}</td>
           <td>{{ chapter.title }}</td>
           <td>
             <button @click="goToContent(chapter)">查看内容</button>
@@ -38,6 +38,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getAllChapters, reviewChapter } from '@/API/Chapter_API.js'
+import { getNovel } from '@/API/Novel_API.js'
 import { managerState } from '@/stores/index'
 import { storeToRefs } from 'pinia'
 
@@ -53,7 +54,22 @@ const fetchChapters = async () => {
   try {
     const res = await getAllChapters()
     // 只取待审核的章节
-    chapters.value = res.filter(c => c.status === '首次审核' || c.status === '审核中')
+    const pendingChapters = res.filter(c => c.status === '首次审核' || c.status === '审核中')
+
+    // 并行获取小说名称
+    const chaptersWithNames = await Promise.all(
+      pendingChapters.map(async (c) => {
+        try {
+          const novel = await getNovel(c.novelId)
+          return { ...c, novelName: novel.novelName }
+        } catch (e) {
+          console.error(`获取小说名称失败 novelId=${c.novelId}`, e)
+          return { ...c, novelName: '未知小说' }
+        }
+      })
+    )
+
+    chapters.value = chaptersWithNames
   } catch (err) {
     console.error('获取未审核章节失败:', err)
     alert('加载章节数据失败，请检查网络或权限。')
@@ -81,7 +97,7 @@ const approveChapter = async (chapter) => {
 
   try {
     await reviewChapter(chapter.novelId, chapter.chapterId, '已发布', managerID.value, result)
-    alert(`已审核通过：「${chapter.title}」`)
+    alert(`已审核通过：「${chapter.novelName} - ${chapter.title}」`)
     chapters.value = chapters.value.filter(c => c.chapterId !== chapter.chapterId || c.novelId !== chapter.novelId)
   } catch (err) {
     console.error('审核通过失败:', err)
@@ -94,11 +110,11 @@ const rejectChapter = async (chapter) => {
   if (result === null) return
   if (!managerID.value) { alert('未检测到管理员身份，请重新登录'); return }
 
-  if (!confirm(`确定将「${chapter.title}」标记为审核不通过（封禁）吗？`)) return
+  if (!confirm(`确定将「${chapter.novelName} - ${chapter.title}」标记为审核不通过（封禁）吗？`)) return
 
   try {
     await reviewChapter(chapter.novelId, chapter.chapterId, '封禁', managerID.value, result)
-    alert(`章节「${chapter.title}」已封禁`)
+    alert(`章节「${chapter.novelName} - ${chapter.title}」已封禁`)
     chapters.value = chapters.value.filter(c => c.chapterId !== chapter.chapterId || c.novelId !== chapter.novelId)
   } catch (err) {
     console.error('封禁失败:', err)
