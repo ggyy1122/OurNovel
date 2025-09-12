@@ -28,7 +28,7 @@ TJ Novels — The integrated hub for creation, management, and reading.
 
 TJ小说网: 集创作、管理与阅读于一体的综合家园。
 
-![](.assets/reader-intro.png)
+![](.assets/intro.png)
 
 > ***Relevant course***  
 >
