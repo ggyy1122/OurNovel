@@ -131,6 +131,27 @@ export function uploadReaderAvatar(readerId, avatarFile) {
     })
 }
 
+/**
+ * 上传读者背景
+ * @param {number} readerId - 读者ID
+ * @param {FormData} backgroundFile - 背景文件
+ * @returns {Promise<{success: boolean, backgroundUrl: string}>}
+ */
+export function uploadReaderBackground(readerId, backgroundFile) {
+    const formData = new FormData();
+    formData.append('readerId', readerId);
+    formData.append('bgFile', backgroundFile);
+
+    return request({
+        url: '/api/Reader/UploadBackGround',
+        method: 'post',
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        },
+        data: formData
+    })
+}
+
 /** 
  * 获取读者余额
  * @param {number} readerId - 读者ID

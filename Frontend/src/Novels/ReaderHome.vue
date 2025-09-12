@@ -224,7 +224,7 @@ const avatarUrl = computed(() =>
 // 格式化背景图
 const backgroundUrl = computed(() =>
     'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' +
-    (reader.value.backgroundUrl || 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg')
+    (reader.value.backgroundUrl || 'e26001d0-badc-4d6f-b7ef-e5ebe47642f0.png')
 )
 
 // 性别显示文本
@@ -261,7 +261,7 @@ const genderText = computed(() => {
     align-items: center;
     z-index: 2;
     position: relative;
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.6);
     padding: 15px;
     border-radius: 8px;
     max-width: 80%;

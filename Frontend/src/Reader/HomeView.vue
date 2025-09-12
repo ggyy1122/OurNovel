@@ -1,7 +1,9 @@
 <template>
   <div class="home-view">
     <!-- 用户信息栏 -->
-    <div class="user-profile">
+    <div class="user-profile" :style="{ 'background-image': 'url(' + backgroundUrl + ')' }">
+      <div class="profile-overlay"></div>
+      <div class="profile-content">
       <div class="profile-header">
        <div class="avatar">
           <img :src="reader_state.formattedAvatarUrl || defaultAvatar" alt="用户头像" class="user-avatar" @click="goReaderHome">
@@ -38,6 +40,7 @@
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
 
@@ -80,7 +83,7 @@
 
 <script setup>
 import { readerState } from '@/stores/index'
-import { watch,onMounted,ref  } from 'vue'
+import { watch,onMounted,ref,computed  } from 'vue'
 import { useRouter } from 'vue-router'
 import {getReaderBalance} from '@/API/Reader_API';
 const reader_state = readerState();  //当前用户对象
@@ -98,6 +101,10 @@ const fetchReaderBalance=async()=>{
      accountBalance.value = 0
   }
 }
+const backgroundUrl = computed(() =>
+  'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' +
+  (reader_state.backgroundUrl || 'e26001d0-badc-4d6f-b7ef-e5ebe47642f0.png')
+)
 //个人主页
 function goReaderHome() {
     router.push(`/reader/${reader_state.readerId}`);
@@ -141,11 +148,31 @@ watch(
 }
 
 .user-profile {
-  background-color: white;
-  border-radius: 0; /* 移除圆角 */
-  padding: 20px;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #e7e7e7;
   margin-bottom: 20px;
-  box-shadow: none; /* 移除阴影 */
+  overflow: hidden;
+  min-height: 200px;
+}
+
+.profile-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.6);
+  z-index: 1;
+}
+
+.profile-content {
+  position: relative;
+  z-index: 2;
+  padding: 20px;
 }
 
 .profile-header {
@@ -243,7 +270,7 @@ watch(
 }
 
 .user-type {
-  color: #666;
+  color: #222;
   font-size: 14px;
 }
 
@@ -252,7 +279,7 @@ watch(
   align-items: center;
   margin-bottom: 15px;
   font-size: 14px;
-  color: #666;
+  color: #222;
 }
 
 .progress-bar {
@@ -280,13 +307,13 @@ watch(
 
 .stat-item span {
   display: block;
-  color: #999;
+  color: #111;
   font-size: 12px;
 }
 
 .stat-item strong {
   font-size: 16px;
-  color: #333;
+  color: #111;
 }
 
 .data-cards {

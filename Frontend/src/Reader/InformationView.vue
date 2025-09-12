@@ -181,7 +181,7 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { readerState } from '@/stores/index'
-import { updateReader, uploadReaderAvatar, deleteReader } from '@/API/Reader_API'
+import { updateReader, uploadReaderAvatar, uploadReaderBackground, deleteReader } from '@/API/Reader_API'
 import { resetReaderPassword } from '@/API/Log_API'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
@@ -195,14 +195,13 @@ const phone = ref('')
 const gender = ref('男')
 const avatarFile = ref(null)
 const avatarPreviewUrl = ref('')
-const apiResponseAvatar = ref(null)
 const defaultAvatar = 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg'
 const showDeleteConfirm = ref(false)
 const isCollectVisible = ref('是')
 const isRecommendVisible = ref('是')
 const backgroundFile = ref(null)
 const backgroundPreviewUrl = ref('')
-const defaultBackground = 'e165315c-da2b-42c9-b3cf-c0457d168634.jpg'
+const defaultBackground = 'e26001d0-badc-4d6f-b7ef-e5ebe47642f0.png'
 
 // 密码修改相关
 const showPasswordModal = ref(false)
@@ -268,7 +267,6 @@ async function uploadAvatar() {
   try {
     if (!avatarFile.value) throw new Error('请选择头像文件')
     const response = await uploadReaderAvatar(store.readerId, avatarFile.value)
-    apiResponseAvatar.value = response
     if (response.success && response.avatarUrl) {
       const url = response.avatarUrl
       const fileName = url.split('/').pop()
@@ -290,6 +288,25 @@ function handleBackgroundChange(event) {
     backgroundPreviewUrl.value = URL.createObjectURL(backgroundFile.value)
   } else {
     backgroundPreviewUrl.value = ''
+  }
+}
+
+// 上传背景函数
+async function uploadBackground() {
+  try {
+    if (!backgroundFile.value) throw new Error('请选择背景文件')
+    const response = await uploadReaderBackground(store.readerId, backgroundFile.value)
+    if (response.success && response.avatarUrl) {
+      const url = response.avatarUrl
+      const fileName = url.split('/').pop()
+      store.backgroundUrl = fileName
+      backgroundPreviewUrl.value = url
+      toast.success('背景上传成功')
+    } else {
+      toast.error('背景上传失败，接口返回异常')
+    }
+  } catch (error) {
+    toast.error('上传背景失败')
   }
 }
 
@@ -334,6 +351,10 @@ async function saveReaderChanges() {
     await uploadAvatar()
   }
 
+  if (backgroundFile.value) {
+    await uploadBackground()
+  }
+
   const updateData = {
     readerId: store.readerId,
     readerName: readerName.value,
@@ -352,6 +373,7 @@ async function saveReaderChanges() {
     toast.success('修改成功')
     Object.assign(store, updateData)
     avatarPreviewUrl.value = getFormattedAvatarUrl(store.avatarUrl)
+    backgroundPreviewUrl.value = getFormattedBackgroundUrl(store.backgroundUrl)
   } catch (error) {
     toast.error('修改失败，请稍后再试')
   }
@@ -535,9 +557,13 @@ select:focus {
   margin-bottom: 20px;
 }
 
-.avatar-upload,
+.avatar-upload {
+  flex: 2;
+  text-align: center;
+}
+
 .background-upload {
-  flex: 1;
+  flex: 5;
   text-align: center;
 }
 
