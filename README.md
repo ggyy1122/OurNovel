@@ -22,6 +22,10 @@
 
 TJ小说网
 
+## 项目网址
+
+[🚀 TJ小说网,开始你的小说之旅！](http://115.29.190.190:80/)
+
 ## 项目简介
 
 TJ Novels — The integrated hub for creation, management, and reading.
@@ -54,3 +58,97 @@ $ npm run serve
 $ cd Backend
 $ dotnet run
 ```
+
+
+
+## 项目界面
+
+### 1.登录注册页面
+
+![](assets/log.png)
+
+### 2.读者端
+
+#### ①首页
+
+![](assets/home1.png)
+
+![](assets/home2.png)
+
+![](assets/home3.png)
+
+![](assets/home4.png)
+
+![](assets/home5.png)
+
+#### ②分类页
+
+![](assets/category1.png)
+
+#### ③排行页
+
+![](assets/rank.png)
+
+#### ④个人主页
+
+![](assets/person1.png)
+
+![](assets/person2.png)
+
+![](assets/person3.png)
+
+![](assets/person4.png)
+
+![](assets/person5.png)
+
+#### ⑤充值页
+
+![](assets/recharge.png)
+
+#### ⑥展示页
+
+![](assets/show1.png)
+
+![](assets/show2.png)
+
+#### ⑦书籍详情页
+
+![](assets/book1.png)
+
+![](assets/book2.png)
+
+![](assets/book3.png)
+
+![](assets/book4.png)
+
+![](assets/book5.png)
+
+### 3.作者端
+
+![](assets/author1.png)
+
+![](assets/author2.png)
+
+![](assets/author3.png)
+
+![](assets/author4.png)
+
+![](assets/author5.png)
+
+![](assets/author6.png)
+
+![](assets/author7.png)
+
+### 4.管理员端
+
+![](assets/manager1.png)
+
+![](assets/manager2.png)
+
+![](assets/manager3.png)
+
+![](assets/manager4.png)
+
+![](assets/manager5.png)
+
+![](assets/manager6.png)
