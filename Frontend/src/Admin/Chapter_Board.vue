@@ -22,8 +22,8 @@
           <td>{{ chapter.title }}</td>
           <td>
             <button @click="goToContent(chapter)">查看内容</button>
-            <button @click="approveChapter(chapter)">审核通过</button>
-            <button @click="rejectChapter(chapter)" class="btn-reject">审核不通过</button>
+            <button @click="showModal=true;index=chapter.chapterId;noindex=chapter.novelId;ar=1">审核通过</button>
+            <button @click="showModal=true;index=chapter.chapterId;noindex=chapter.novelId;ar=2" class="btn-reject">审核不通过</button>
           </td>
         </tr>
         <tr v-if="chapters.length === 0 && !loading">
@@ -31,6 +31,22 @@
         </tr>
       </tbody>
     </table>
+     <!-- result的输入框 -->
+    <div v-if="showModal" class="modal-overlay">
+      <div class="modal-content">
+        <h3>请输入审核备注</h3>
+        <input 
+          v-model="inputValue" 
+          @keyup.enter="confirmInput"
+          placeholder="请输入内容"
+          class="modal-input"
+        >
+        <div class="modal-buttons">
+          <button @click="approveChapter()" class="confirm-btn">确定</button>
+          <button @click=" showModal=false;inputValue=''" class="cancel-btn">取消</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -90,37 +106,38 @@ const goToContent = (chapter) => {
   })
 }
 
-const approveChapter = async (chapter) => {
-  const result = prompt(`请输入审核备注（通过原因等）:`)
-  if (result === null) return
-  if (!managerID.value) { alert('未检测到管理员身份，请重新登录'); return }
-
+const showModal=ref(false)
+const index=ref(0)
+const noindex=ref(0)
+const inputValue = ref('');
+const result = ref('');
+const ar=ref(0)
+const approveChapter = async () => {
+ if (inputValue.value.trim()) {
+    result.value = inputValue.value;
+    showModal.value = false;
+    inputValue.value = '';
+  }
+  else {
+    alert('请输入有效的内容');
+    return;
+  }
   try {
-    await reviewChapter(chapter.novelId, chapter.chapterId, '已发布', managerID.value, result)
-    alert(`已审核通过：「${chapter.novelName} - ${chapter.title}」`)
-    chapters.value = chapters.value.filter(c => c.chapterId !== chapter.chapterId || c.novelId !== chapter.novelId)
+    if(ar.value===1){
+          await reviewChapter(noindex.value,index.value, '已发布', managerID.value, result.value)
+          chapters.value = chapters.value.filter(c => c.chapterId !== index.value || c.novelId !== noindex.value)
+    }
+    else{
+            await reviewChapter(noindex.value,index.value, '封禁', managerID.value, result.value)
+            chapters.value = chapters.value.filter(c => c.chapterId !== index.value || c.novelId !== noindex.value)
+    }
   } catch (err) {
-    console.error('审核通过失败:', err)
+    console.error('审核失败:', err)
     alert('操作失败，请重试')
   }
 }
 
-const rejectChapter = async (chapter) => {
-  const result = prompt(`请输入审核不通过原因（封禁原因等）:`)
-  if (result === null) return
-  if (!managerID.value) { alert('未检测到管理员身份，请重新登录'); return }
 
-  if (!confirm(`确定将「${chapter.novelName} - ${chapter.title}」标记为审核不通过（封禁）吗？`)) return
-
-  try {
-    await reviewChapter(chapter.novelId, chapter.chapterId, '封禁', managerID.value, result)
-    alert(`章节「${chapter.novelName} - ${chapter.title}」已封禁`)
-    chapters.value = chapters.value.filter(c => c.chapterId !== chapter.chapterId || c.novelId !== chapter.novelId)
-  } catch (err) {
-    console.error('封禁失败:', err)
-    alert('操作失败，请重试')
-  }
-}
 </script>
 
 <style scoped>
@@ -192,5 +209,48 @@ button:hover {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal-input {
+  width: 100%;
+  padding: 8px;
+  margin: 15px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.confirm-btn {
+  background-color: #42b983;
+  color: white;
+}
+
+.cancel-btn {
+  background-color: #f0f0f0;
 }
 </style>

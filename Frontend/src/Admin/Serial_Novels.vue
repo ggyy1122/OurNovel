@@ -86,7 +86,7 @@
       <!-- result的输入框 -->
     <div v-if="showModal" class="modal-overlay">
       <div class="modal-content">
-        <h3>请输入result</h3>
+        <h3>请输入审核备注</h3>
         <input 
           v-model="inputValue" 
           @keyup.enter="confirmInput"

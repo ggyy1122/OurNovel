@@ -23,8 +23,6 @@
     </div>
 
     <div class="buttons" v-if="chapter">
-      <button class="btn-approve" @click="approveChapter">审核通过</button>
-      <button class="btn-reject" @click="rejectChapter">审核不通过</button>
       <button class="btn-back" @click="goBack">返回</button>
     </div>
   </div>
@@ -33,18 +31,17 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getChapter, reviewChapter } from '@/API/Chapter_API.js'
+import { getChapter } from '@/API/Chapter_API.js'
 import { getNovel } from '@/API/Novel_API.js'
-import { current_state } from '@/stores/index'
-import { storeToRefs } from 'pinia'
+
 
 const route = useRoute()
 const router = useRouter()
 const chapter = ref(null)
 const loading = ref(true)
 
-const currentState = current_state()
-const { id: managerID } = storeToRefs(currentState)
+
+
 
 onMounted(async () => {
   const novelId = Number(route.params.novel_id)
@@ -78,41 +75,7 @@ onMounted(async () => {
 
 const goBack = () => router.back()
 
-const approveChapter = async () => {
-  if (!chapter.value) return
-  if (!managerID.value) { alert('未检测到管理员身份，请重新登录'); return }
 
-  const result = prompt('请输入审核备注（通过原因等）:')
-  if (result === null) return
-
-  try {
-    await reviewChapter(chapter.value.novelId, chapter.value.chapterId, '已发布', managerID.value, result)
-    alert(`章节「${chapter.value.novelName} - ${chapter.value.title || '未知标题'}」已审核通过`)
-    goBack()
-  } catch (err) {
-    console.error('审核通过失败:', err)
-    alert('操作失败，请重试')
-  }
-}
-
-const rejectChapter = async () => {
-  if (!chapter.value) return
-  if (!managerID.value) { alert('未检测到管理员身份，请重新登录'); return }
-
-  const result = prompt('请输入审核不通过原因（封禁原因等）:')
-  if (result === null) return
-
-  if (!confirm(`确定将「${chapter.value.novelName} - ${chapter.value.title || '未知标题'}」标记为审核不通过（封禁）吗？`)) return
-
-  try {
-    await reviewChapter(chapter.value.novelId, chapter.value.chapterId, '封禁', managerID.value, result)
-    alert(`章节「${chapter.value.novelName} - ${chapter.value.title || '未知标题'}」已封禁`)
-    goBack()
-  } catch (err) {
-    console.error('封禁失败:', err)
-    alert('操作失败，请重试')
-  }
-}
 </script>
 
 <style scoped>

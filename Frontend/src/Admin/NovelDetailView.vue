@@ -11,12 +11,6 @@
          返回列表
       </button>
       <!-- 删除小说按钮 -->
-      <button 
-      @click="confirmDelete" 
-      class="delete-btn"
-      >
-        删除小说
-      </button>
     </div>
     
 
@@ -113,11 +107,11 @@
                     : chapter.status === '审核中'
                     ? (index=1,showModal=true)
                     : chapter.status === '已发布'
-                    ? deleteChapterById(chapter.chapterId)
+                    ? confirmDelete()
                     : chapter.status === '封禁'
-                    ? deleteChapterById(chapter.chapterId)
+                    ? confirmDelete()
                     :null
-                " @click="showModal=true"
+                " 
               >
                 {{
                   chapter.status === '首次审核' ? chapterOp[1].firstReview :
@@ -146,7 +140,7 @@
     <!-- result的输入框 -->
     <div v-if="showModal" class="modal-overlay">
       <div class="modal-content">
-        <h3>请输入result</h3>
+        <h3>请输入审核备注</h3>
         <input 
           v-model="inputValue" 
           @keyup.enter="confirmInput"
@@ -175,7 +169,7 @@ const route = useRoute()
 //----------------------------------------------------------------------------------------------------------------
 //通过API由novelId获取单个小说的具体数据
 import { getNovel } from '@/API/Novel_API'
-import { getChaptersByNovel } from '@/API/Chapter_API'
+import { getChaptersByNovel,deleteChapter } from '@/API/Chapter_API'
 import{getCategoriesByNovel} from '@/API/NovelCategory_API'
 import { current_state } from '@/stores/index'
 import { storeToRefs } from 'pinia'
@@ -344,11 +338,21 @@ function nextPage() {//上一页
 }
 //----------------------------------------------------------------------------------------------------------------
 const confirmDelete = () => {
-  if(confirm('确定要删除这本小说吗？此操作不可恢复！')) {
+  if(confirm('确定要删除该章节吗？此操作不可恢复！')) {
     // 执行删除逻辑
     console.log('删除小说操作');
-    // 实际项目中这里应该是调用API删除
-    // deleteNovel(novelId).then(() => { ... })
+    deleteChapter(route.query.id, chapterIndex.value) .then(() => {
+      console.log('章节删除成功')
+      closeAllMenus()
+      chapters.value = chapters.value.filter(chapter => chapter.chapterId !== chapterIndex.value)
+    })
+    .catch(err => {
+      console.error('章节删除失败:', err)
+    })
+    .finally(() => {
+      loading.value = false
+    })
+
   }
 };
 
