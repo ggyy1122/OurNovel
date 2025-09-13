@@ -49,7 +49,7 @@
       <div class="card">
         <div class="card-content">
           <div class="card-title">账户余额</div>
-          <div class="card-value">{{accountBalance}}起点币</div>
+          <div class="card-value">{{accountBalance}}虚拟币</div>
           <button class="card-button" @click="showRecharge">充值</button>
         </div>
       </div>

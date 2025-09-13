@@ -59,14 +59,14 @@
         <label>简介 <span class="required">*</span></label>
         <textarea 
           rows="5" 
-          maxlength="500"
+          maxlength="200"
           v-model="form.introduction" 
           placeholder="请输入作品简介"
           @blur="validateField('introduction')"
         ></textarea>
         <span class="error-message" v-if="errors.introduction">{{ errors.introduction }}</span>
         <!-- 字数统计 -->
-        <div class="word-count">{{ form.introduction.length }}/500</div>
+        <div class="word-count">{{ form.introduction.length }}/200</div>
       </div>
       
       <!-- 封面上传组 -->
@@ -263,8 +263,8 @@ export default {
       if (field === 'introduction') {
         if (!this.form.introduction.trim()) {
           this.errors.introduction = '简介不能为空'
-        } else if (this.form.introduction.length > 500) {
-          this.errors.introduction = '简介不能超过500字'
+        } else if (this.form.introduction.length > 200) {
+          this.errors.introduction = '简介不能超过200字'
         } else {
           this.errors.introduction = ''
         }
