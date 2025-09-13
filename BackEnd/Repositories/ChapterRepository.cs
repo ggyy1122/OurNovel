@@ -50,7 +50,9 @@ namespace OurNovel.Repositories
         }
         public async Task<IEnumerable<Chapter>> GetAllAsync()
         {
-            return await _context.Chapters.ToListAsync();
+            return await _context.Chapters
+                                 .Where(c => c.Status == "首次审核" || c.Status == "审核中")
+                                 .ToListAsync();
         }
 
         public async Task<Novel?> GetNovelByIdAsync(int novelId)

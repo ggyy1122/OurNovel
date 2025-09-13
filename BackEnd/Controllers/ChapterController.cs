@@ -15,6 +15,9 @@ namespace OurNovel.Controllers
             _chapterService = chapterService;
         }
 
+        /// <summary>
+        /// 获取所有"首次审核"、"审核中"的章节
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
