@@ -201,7 +201,7 @@ const isCollectVisible = ref('是')
 const isRecommendVisible = ref('是')
 const backgroundFile = ref(null)
 const backgroundPreviewUrl = ref('')
-const defaultBackground = 'e26001d0-badc-4d6f-b7ef-e5ebe47642f0.png'
+const defaultBackground = '415116fc-fb23-48f8-96c9-12a99de76e7d.jpg'
 
 // 密码修改相关
 const showPasswordModal = ref(false)
@@ -272,7 +272,6 @@ async function uploadAvatar() {
       const fileName = url.split('/').pop()
       store.avatarUrl = fileName
       avatarPreviewUrl.value = url
-      toast.success('头像上传成功')
     } else {
       toast.error('头像上传失败，接口返回异常')
     }
@@ -301,7 +300,6 @@ async function uploadBackground() {
       const fileName = url.split('/').pop()
       store.backgroundUrl = fileName
       backgroundPreviewUrl.value = url
-      toast.success('背景上传成功')
     } else {
       toast.error('背景上传失败，接口返回异常')
     }

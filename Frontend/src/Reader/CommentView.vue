@@ -85,6 +85,8 @@
 import { onMounted, ref } from 'vue'
 import { getCommentsByReaderId, deleteCommentRecursive } from '@/API/Comment_API' // 你的新API
 import { readerState } from '@/stores/index'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
 const store = readerState()
 const readerId = store.readerId
@@ -121,7 +123,7 @@ async function handleDelete(commentId) {
     userComments.value = userComments.value.filter(c => c.parentComment.commentId !== commentId)
     if (expandedCommentId.value === commentId) expandedCommentId.value = null
   } catch (err) {
-    alert('删除失败，请稍后重试')
+    toast.error('删除失败，请稍后重试')
     console.error(err)
   }
 }

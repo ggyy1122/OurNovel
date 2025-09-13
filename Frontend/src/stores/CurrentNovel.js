@@ -7,6 +7,8 @@ import { getCategoriesByNovel } from '@/API/NovelCategory_API'
 import { uploadNovelCover } from '@/API/Novel_Cover_API'
 import { getCommentCountByNovel } from '@/API/Comment_API'
 import { getNovel } from '@/API/Novel_API'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
 export function useNovel() {
   const route = useRoute()
@@ -212,13 +214,13 @@ const fetchNovelFromAPI = async (novelId) => {
   const validateImage = (file) => {
     const validTypes = ['image/jpeg', 'image/png'];
     if (!validTypes.includes(file.type)) {
-      alert('只支持JPG/PNG格式图片');
+      toast.info('只支持JPG/PNG格式图片');
       return false;
     }
     
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
-      alert('图片大小不能超过5MB');
+      toast.info('图片大小不能超过5MB');
       return false;
     }
     

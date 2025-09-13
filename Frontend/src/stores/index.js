@@ -94,7 +94,7 @@ export const readerState = defineStore('reader', {
             if (state.backgroundUrl) {
                 return prefix + state.backgroundUrl;
             }
-            return prefix + 'e26001d0-badc-4d6f-b7ef-e5ebe47642f0.png';  // 默认背景图
+            return prefix + '415116fc-fb23-48f8-96c9-12a99de76e7d.jpg';  // 默认背景图
         },
         recommendBooksCount: (state) => state.recommendBooks.length,
         favoriteBooksCount: (state) => state.favoriteBooks.length,

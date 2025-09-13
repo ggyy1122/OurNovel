@@ -87,6 +87,8 @@
 <script setup>
 import { ref, computed } from 'vue';
 import {useRouter } from 'vue-router'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 //----------------------------------------------------------------------------------------------------------------
 //返回列表
 const router = useRouter();
@@ -190,12 +192,12 @@ const finishCreation = async () => {
       chapters: chapters.value
     });
     
-    alert('小说创建成功！');
+    toast.success('小说创建成功！');
     // 重置表单
     resetForm();
   } catch (error) {
     console.error('创建失败:', error);
-    alert('创建失败，请重试');
+    toast.error('创建失败，请重试');
   }
 };
 

@@ -88,6 +88,8 @@
 import { ref, onMounted } from 'vue';
 import { getAllCategories, createCategory, renameCategory, deleteCategory } from '@/API/Category_API';
 import { getNovelsByCategory } from '@/API/NovelCategory_API';
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
 const loading = ref(false);
 const categories = ref([]);
@@ -123,9 +125,9 @@ const isRepeat = (newName) => {
 
 const confirmInput = () => {
   if (!inputValue.value.trim()) {
-    alert('请输入有效的内容');
+    toast.info('请输入有效的内容');
   } else if (isRepeat(inputValue.value.trim())) {
-    alert('分类名已存在，请重新输入');
+    toast.info('分类名已存在，请重新输入');
     inputValue.value = '';
   } else {
     result.value = inputValue.value.trim();
@@ -154,7 +156,7 @@ const addCategory = async () => {
     getCategoryData();
   } catch (error) {
     console.error('添加分类失败:', error);
-    alert('添加分类失败，请重试。');
+    toast.error('添加分类失败，请重试。');
   } finally {
     loading.value = false;
   }
@@ -167,7 +169,7 @@ const editCategory = async () => {
     getCategoryData();
   } catch (error) {
     console.error('编辑分类失败:', error);
-    alert('编辑分类失败，请重试。');
+    toast.error('编辑分类失败，请重试。');
   } finally {
     loading.value = false;
   }
@@ -178,14 +180,14 @@ const deleteMyCategory = async () => {
   try {
     const response = await getNovelsByCategory(name.value);
     if (response && response.length > 0) {
-      alert('该分类下存在小说，无法删除');
+      toast.error('该分类下存在小说，无法删除');
       return;
     }
     await deleteCategory(name.value);
     getCategoryData();
   } catch (error) {
     console.error('删除分类失败:', error);
-    alert('删除分类失败，请重试。');
+    toast.error('删除分类失败，请重试。');
   } finally {
     loading.value = false;
   }

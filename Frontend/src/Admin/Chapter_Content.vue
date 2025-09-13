@@ -33,6 +33,8 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getChapter } from '@/API/Chapter_API.js'
 import { getNovel } from '@/API/Novel_API.js'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
 
 const route = useRoute()
@@ -66,7 +68,7 @@ onMounted(async () => {
     } else {
       console.error('加载章节失败:', err)
       chapter.value = null
-      alert('加载章节失败，请检查网络或权限。')
+      toast.error('加载章节失败，请检查网络或权限。')
     }
   } finally {
     loading.value = false

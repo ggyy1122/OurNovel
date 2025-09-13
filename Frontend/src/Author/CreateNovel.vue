@@ -142,6 +142,8 @@ import { AuthorcreateNovel } from '@/API/Novel_API'
 import { uploadNovelCover } from '@/API/Novel_Cover_API'
 import { authorStore } from '@/stores/CurrentAuthor'
 import { novelsStore} from '@/stores/Novels'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
 export default {
   data() {
@@ -334,10 +336,10 @@ export default {
           await novelsStore.fetchNovels();
           window.location.href = '/author/novels';
           await novelsStore.fetchNovels();
-          alert('小说创建成功！')
+          toast.success('小说创建成功！')
         } catch (error) {
           console.error('创建小说失败:', error)
-          alert('创建小说失败: ' + (error.response?.data?.message || error.message || '请重试'))
+          toast.error('创建小说失败: ' + (error.response?.data?.message || error.message || '请重试'))
         } finally {
           this.isSubmitting = false
         }

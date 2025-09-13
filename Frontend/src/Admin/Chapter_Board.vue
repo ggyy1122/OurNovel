@@ -57,7 +57,8 @@ import { getAllChapters, reviewChapter } from '@/API/Chapter_API.js'
 import { getNovel } from '@/API/Novel_API.js'
 import { managerState } from '@/stores/index'
 import { storeToRefs } from 'pinia'
-
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 const router = useRouter()
 const chapters = ref([])
 const loading = ref(false)
@@ -88,7 +89,7 @@ const fetchChapters = async () => {
     chapters.value = chaptersWithNames
   } catch (err) {
     console.error('获取未审核章节失败:', err)
-    alert('加载章节数据失败，请检查网络或权限。')
+    toast.error('获取未审核章节失败，请检查网络或权限。')
   } finally {
     loading.value = false
   }
@@ -119,7 +120,7 @@ const approveChapter = async () => {
     inputValue.value = '';
   }
   else {
-    alert('请输入有效的内容');
+    toast.info('请输入有效的内容');
     return;
   }
   try {
@@ -133,7 +134,7 @@ const approveChapter = async () => {
     }
   } catch (err) {
     console.error('审核失败:', err)
-    alert('操作失败，请重试')
+    toast.error('操作失败，请重试')
   }
 }
 

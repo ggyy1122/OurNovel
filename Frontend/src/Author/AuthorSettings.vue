@@ -247,6 +247,8 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { authorStore as author } from '@/stores/CurrentAuthor'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
 const router = useRouter()
 const fileInput = ref(null)
@@ -270,14 +272,14 @@ const deleteAccount = async () => {
     const success = await author.deleteAccount();
     
     if (success) {
-      alert('账号已成功注销');
+      toast.success('账号已成功注销');
       router.push('/L_R/Login');
     } else {
-      alert('注销失败：' + (author.error || '未知错误'));
+      toast.error('注销失败：' + (author.error || '未知错误'));
     }
   } catch (error) {
     console.error('注销出错:', error);
-    alert('注销过程中发生错误');
+    toast.error('注销过程中发生错误');
   } finally {
     author.hideConfirmDialog();
   }

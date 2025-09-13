@@ -103,7 +103,7 @@ const fetchReaderBalance=async()=>{
 }
 const backgroundUrl = computed(() =>
   'https://novelprogram123.oss-cn-hangzhou.aliyuncs.com/' +
-  (reader_state.backgroundUrl || 'e26001d0-badc-4d6f-b7ef-e5ebe47642f0.png')
+  (reader_state.backgroundUrl || '415116fc-fb23-48f8-96c9-12a99de76e7d.jpg')
 )
 //个人主页
 function goReaderHome() {

@@ -56,6 +56,8 @@ import { getRecentReadingsByReaderId, deleteRecentReading } from '@/API/Reader_A
 import { getAuthor } from '@/API/Author_API'
 import { useRouter } from 'vue-router'
 import { SelectNovel_State } from '@/stores/index'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
 const selectNovelState = SelectNovel_State()
 const router = useRouter()
@@ -164,7 +166,7 @@ async function deleteSelected() {
     selectedIds.value.clear()
     batchDeleteMode.value = false
   } catch (e) {
-    alert('批量删除失败，请重试')
+    toast.error('批量删除失败，请重试')
   }
 }
 

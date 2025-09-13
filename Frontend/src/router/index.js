@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Admin_Layout from '@/Admin/Admin_Layout.vue'
 import Dash_board from '@/Admin/Dash_Board.vue'
-import Novels_Board from '@/Admin/Novels_Board.vue'
 import Users_Board from '@/Admin/Users_Board.vue'
 import Chapter_Board from '@/Admin/Chapter_Board.vue'
 import ToBeReviewed_Novels from '@/Admin/ToBeReviewed_Novels.vue'
@@ -100,10 +99,6 @@ const routes = [
             {
                 path: 'dashboard',
                 component: Dash_board
-            },
-            {
-                path: 'novelsboard',
-                component: Novels_Board
             },
             {
                 path: 'users',

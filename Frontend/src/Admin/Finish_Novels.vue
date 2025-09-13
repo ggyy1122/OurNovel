@@ -116,10 +116,12 @@ import { getAllNovels } from '@/API/Novel_API'
 import { getAuthor } from '@/API/Author_API'
 import {getAllCategories} from '@/API/Category_API'
 import{getNovelsByCategory} from '@/API/NovelCategory_API'
-import { current_state } from '@/stores/index'
+import { managerState } from '@/stores/index'
 import { storeToRefs } from 'pinia'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
-const currentState = current_state()
+const currentState = managerState()
 const { id: managerID } = storeToRefs(currentState)
 
 
@@ -148,7 +150,7 @@ const getNovelsData=async () => {
     }
   } catch (error) {
     console.error('获取小说数据失败:', error)
-    alert('加载小说数据失败，请检查网络或权限。')
+    toast.error('加载小说数据失败，请检查网络或权限。')
   } finally {
     loading.value = false
   }
@@ -194,7 +196,7 @@ const selectCategory=async (category) => {
   // 获取作者信息
   } catch (error) {
     console.error('获取小说数据失败:', error)
-    alert('加载小说数据失败，请检查网络或权限。')
+    toast.error('加载小说数据失败，请检查网络或权限。')
   } finally {
     loading.value = false
   }
@@ -226,13 +228,13 @@ const handleSearch = () => {
     );
     // 如果没有结果可提示
     if (showNovels.value.length === 0) {
-      alert('未找到相关小说');
+      toast.info('未找到相关小说');
     }else{
       categoryNovels.value = showNovels.value; // 更新显示的小说列表
       console.log('搜索结果:', showNovels.value);
     }
   } else {
-    alert('请输入搜索内容');
+    toast.info('请输入搜索内容');
   }
 };
 //----------------------------------------------------------------------------------------------------------------
@@ -278,7 +280,7 @@ const confirmInput = () => {
     executeReview();
   }
   else {
-    alert('请输入有效的内容');
+    toast.info('请输入有效的内容');
   }
 };
 
@@ -297,7 +299,7 @@ const executeReview=async()=>{
      console.log('操作成功，小说已审核');
   } catch (error) {
     console.error('操作失败:', error)
-    alert('操作失败，请稍后重试')
+    toast.error('操作失败，请稍后重试')
   } finally {
     loading.value = false // 结束加载
   }

@@ -63,6 +63,8 @@ import { getCollectsByReader, deleteCollect, addOrUpdateCollect } from '@/API/Co
 import { getAuthor } from '@/API/Author_API'
 import { useRouter } from 'vue-router'
 import { updateReader } from '@/API/Reader_API'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
 const selectNovelState = SelectNovel_State()
 const router = useRouter()
@@ -141,7 +143,7 @@ async function cancelCollect(novelId) {
     selectedNovelId.value = null
     await fetchCollects()
   } catch (err) {
-    alert('取消收藏失败：' + (err.message || '请稍后再试'))
+    toast.error('取消收藏失败：' + (err.message || '请稍后再试'))
   }
 }
 
@@ -188,7 +190,7 @@ const pendingNovelId = ref(null)
 
 function updateCollectPublic(novelId) {
   if (!store.readerId) {
-    alert('未检测到登录读者ID')
+    toast.info('未检测到登录读者ID')
     return
   }
   pendingNovelId.value = novelId
@@ -198,10 +200,10 @@ function updateCollectPublic(novelId) {
 async function confirmPublic(choice) {
   try {
     await addOrUpdateCollect(pendingNovelId.value, store.readerId, choice)
-    alert('设置成功：该收藏已设为 ' + (choice === 'yes' ? '公开' : '私密'))
+    toast.success('设置成功：该收藏已设为 ' + (choice === 'yes' ? '公开' : '私密'))
     await fetchCollects()
   } catch (err) {
-    alert('设置公开失败：' + (err.message || '请稍后再试'))
+    toast.error('设置公开失败：' + (err.message || '请稍后再试'))
   } finally {
     isPublicDialogVisible.value = false
     pendingNovelId.value = null
@@ -225,10 +227,10 @@ async function updateCollectVisibility() {
     }
     await updateReader(store.readerId, updateData)
     store.isCollectVisible = isCollectVisible.value
-    alert('收藏可见性已更新')
+    toast.success('收藏可见性已更新')
   } catch (error) {
     console.error('更新收藏可见性失败:', error)
-    alert('更新失败，请稍后再试')
+    toast.error('更新失败，请稍后再试')
   }
 }
 

@@ -49,6 +49,8 @@ import { getRecommendsByReader, deleteRecommend } from '@/API/Recommend_API'
 import { getAuthor } from '@/API/Author_API'
 import { useRouter } from 'vue-router'
 import { updateReader } from '@/API/Reader_API'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
 const selectNovelState = SelectNovel_State()
 const router = useRouter()
@@ -129,7 +131,7 @@ async function cancelRecommend(novelId) {
     selectedNovelId.value = null
     await fetchRecommends()
   } catch (err) {
-    alert('取消推荐失败：' + (err.message || '请稍后再试'))
+    toast.error('取消推荐失败：' + (err.message || '请稍后再试'))
   }
 }
 
@@ -194,10 +196,10 @@ async function updateRecommendVisibility() {
 
     await updateReader(store.readerId, updateData)
     store.isRecommendVisible = isRecommendVisible.value
-    alert('推荐可见性已更新')
+    toast.success('推荐可见性已更新')
   } catch (error) {
     console.error('更新推荐可见性失败:', error)
-    alert('更新失败，请稍后再试')
+    toast.error('更新失败，请稍后再试')
   }
 }
 

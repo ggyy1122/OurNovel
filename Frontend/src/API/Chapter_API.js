@@ -1,7 +1,7 @@
 import request from '@/API/index'
 
 /**
- * 获取所有章节
+ * 获取所有"首次审核"、"审核中"的章节
  * @returns {Promise<Array<Chapter>>} 返回章节数组
  * @typedef {Object} Chapter
  * @property {number} novelId - 所属小说ID

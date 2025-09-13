@@ -171,10 +171,12 @@ const route = useRoute()
 import { getNovel } from '@/API/Novel_API'
 import { getChaptersByNovel,deleteChapter } from '@/API/Chapter_API'
 import{getCategoriesByNovel} from '@/API/NovelCategory_API'
-import { current_state } from '@/stores/index'
+import { managerState } from '@/stores/index'
 import { storeToRefs } from 'pinia'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
-const currentState = current_state()
+const currentState = managerState()
 const { id: managerID } = storeToRefs(currentState)
 
 const novel = ref({
@@ -217,7 +219,7 @@ const getNovelData=async () => {
     }
   } catch (error) {
     console.error('获取小说数据失败:', error)
-    alert('加载小说数据失败，请检查网络或权限。')
+    toast.error('加载小说数据失败，请检查网络或权限。')
   } finally {
     loading.value = false
   }
@@ -256,7 +258,7 @@ const confirmInput = () => {
     executeReview(); // 传入当前章节ID
   }
   else {
-    alert('请输入有效的内容');
+    toast.info('请输入有效的内容');
   }
 };
 

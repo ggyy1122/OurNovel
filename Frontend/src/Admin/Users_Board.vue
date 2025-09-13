@@ -67,6 +67,8 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { getAllReaders, getAllAuthors, deleteReader, deleteAuthorWithNovels } from '@/API/UserManage_API.js'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
 const userType = ref('reader')
 
@@ -171,7 +173,7 @@ const deleteUser = async (id) => {
     }
   } catch (err) {
     console.error('删除失败:', err)
-    alert('删除失败，请检查权限或网络。')
+    toast.error('删除失败，请检查权限或网络。')
   }
 }
 </script>

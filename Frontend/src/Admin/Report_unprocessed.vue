@@ -64,6 +64,8 @@ import { ref, onMounted } from 'vue'
 import {getAllReports,processReport} from '@/API/Report_API'
 import{getComment,setCommentStatus} from '@/API/Comment_API'
 import{useRouter } from 'vue-router'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 //----------------------------------------------------------------------------------------------------------------
 //获取评论数据
 const reports=ref([])
@@ -121,9 +123,9 @@ const reId=ref(0);//表示举报Id
 const comId=ref(0);//表示评论Id
 
 //获取管理员ID
-import { current_state } from '@/stores/index'
+import { managerState } from '@/stores/index'
 import { storeToRefs } from 'pinia'
-const currentState = current_state()
+const currentState = managerState()
 const { id: managerID } = storeToRefs(currentState)
 
 
@@ -135,7 +137,7 @@ if (inputValue.value.trim()) {
     executeReview(); // 传入当前章节ID
   }
   else {
-    alert('请输入有效的内容');
+    toast.info('请输入有效的内容');
   }
 };
 
@@ -157,7 +159,7 @@ const executeReview=async()=>{
      console.log('操作成功，举报已处理');
   } catch (error) {
     console.error('操作失败:', error)
-    alert('操作失败，请稍后重试')
+    toast.error('操作失败，请稍后重试')
   } finally {
     loading.value = false // 结束加载
   }
