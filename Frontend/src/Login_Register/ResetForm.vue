@@ -15,6 +15,20 @@
             </div>
             <div v-if="usernameError" class="error-tip">请输入用户名</div>
 
+            <!-- 手机号输入框部分 -->
+            <div class="input-group" :class="{ 'error-border': phoneError }">
+                <span class="input-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="20" height="20">
+                        <path fill="currentColor"
+                            d="M224 768v96.064a64 64 0 0 0 64 64h448a64 64 0 0 0 64-64V768zm0-64h576V160a64 64 0 0 0-64-64H288a64 64 0 0 0-64 64zm32 288a96 96 0 0 1-96-96V128a96 96 0 0 1 96-96h512a96 96 0 0 1 96 96v768a96 96 0 0 1-96 96zm304-144a48 48 0 1 1-96 0 48 48 0 0 1 96 0">
+                        </path>
+                    </svg>
+                </span>
+                <input type="text" v-model="phone" maxlength="11" placeholder="请输入该用户的手机号码" class="login-input" />
+                <span class="phone-len">{{ phone.length }} / 11</span>
+            </div>
+            <div v-if="phoneError" class="error-tip">请输入11位手机号</div>
+
             <div class="input-group">
                 <span class="input-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="20" height="20">
@@ -58,7 +72,8 @@
                         </path>
                     </svg>
                 </span>
-                <input :type="showPassword1 ? 'text' : 'password'" v-model="confirmPassword" placeholder="请再次输入新密码" class="login-input" />
+                <input :type="showPassword1 ? 'text' : 'password'" v-model="confirmPassword" placeholder="请再次输入新密码"
+                    class="login-input" />
                 <span class="input-eye" @click="showPassword1 = !showPassword1">
                     <svg v-if="!showPassword1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="20"
                         height="20">
@@ -90,11 +105,13 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { current_state } from '@/stores/index';
-import { resetAuthorPassword, resetManagerPassword, resetReaderPassword } from '@/API/Log_API';
+import { resetAuthorPassword, resetReaderPassword } from '@/API/Log_API';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
 const state = current_state();
+const phone = ref("");
+const phoneError = ref(false);
 
 const username = ref("");
 const password = ref("");
@@ -109,26 +126,24 @@ const router = useRouter();
 const handleResetPassword = async () => {
     // Reset error states
     usernameError.value = !username.value;
+    phoneError.value = !phone.value || phone.value.length !== 11;
     passwordError.value = !password.value;
     confirmPasswordError.value = password.value !== confirmPassword.value;
 
-    if (username.value && password.value && !confirmPasswordError.value) {
+    if (username.value && phone.value && password.value && !confirmPasswordError.value) {
         try {
             let response;
             const dto = {
                 [state.value === 0 ? 'readerName' :
                     state.value === 1 ? 'authorName' : 'managerName']: username.value,
+                phone: phone.value,
                 password: password.value
             };
-
             if (state.value === 0) { // 读者
                 response = await resetReaderPassword(dto);
             } else if (state.value === 1) { // 作者
                 response = await resetAuthorPassword(dto);
-            } else if (state.value === 2) { // 管理员
-                response = await resetManagerPassword(dto);
             }
-
             console.log('密码重置成功', response.data);
             toast("密码重置成功，请使用新密码登录", {
                 "type": "success",
@@ -140,10 +155,18 @@ const handleResetPassword = async () => {
             }, 3000);
         } catch (error) {
             console.error('密码重置失败:', error);
-            toast("密码重置失败，请检查用户名或联系管理员", {
-                "type": "error",
-                "dangerouslyHTMLString": true
-            });
+            // 根据后端返回的错误信息显示不同的提示
+            if (error.response?.data?.includes('手机号码不匹配')) {
+                toast("手机号码与注册信息不匹配，请重新输入", {
+                    "type": "error",
+                    "dangerouslyHTMLString": true
+                });
+            } else {
+                toast("密码重置失败，请检查用户名或联系管理员", {
+                    "type": "error",
+                    "dangerouslyHTMLString": true
+                });
+            }
         }
     }
 };
@@ -168,6 +191,19 @@ const returnToLogin = () => {
     text-align: center;
     margin-bottom: 14px;
     margin-top: 0;
+}
+
+.error-border .login-input {
+    border-color: #eb0b0b;
+}
+
+.phone-len {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6f6e6e;
+    font-size: 13px;
 }
 
 .subtitle {

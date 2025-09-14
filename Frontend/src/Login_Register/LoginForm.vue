@@ -51,7 +51,7 @@
                     <input type="checkbox" v-model="rememberMe" />
                     记住我
                 </label>
-                <a class="forgot-link" href="#" @click.prevent="forgotPassword">忘记密码?</a>
+                <a class="forgot-link" href="#" @click.prevent="forgotPassword" v-if="state.value !== 2">忘记密码?</a>
             </div>
             <button type="submit" class="login-btn">登录</button>
         </form>
@@ -64,7 +64,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { current_state, readerState, authorState,managerState } from '@/stores/index';
+import { current_state, readerState, authorState, managerState } from '@/stores/index';
 import { loginAuthor, loginManager, loginReader } from '@/API/Log_API';
 import { getReader, getRecentReadingsByReaderId } from '@/API/Reader_API';
 import { getCollectsByReader } from '@/API/Collect_API';

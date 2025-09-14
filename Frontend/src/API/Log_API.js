@@ -68,6 +68,7 @@ export function resetAuthorPassword(dto) {
         },
         data: {
             authorName: dto.authorName,
+            phone: dto.phone,
             password: dto.password
         }
     })
@@ -260,6 +261,7 @@ export function resetReaderPassword(dto) {
         },
         data: {
             readerName: dto.readerName,
+            phone: dto.phone,
             password: dto.password
         }
     })

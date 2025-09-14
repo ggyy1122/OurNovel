@@ -400,6 +400,7 @@ async function changePassword() {
   try {
     const dto = {
       readerName: store.readerName,
+      phone: store.phone,
       password: newPassword.value
     }
     const response = await resetReaderPassword(dto)
