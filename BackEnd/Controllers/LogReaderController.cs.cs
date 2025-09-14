@@ -82,9 +82,9 @@ namespace OurNovel.Controllers
         /// 重置密码接口，参数为用户名和新密码，返回重置结果
         /// </summary>
         [HttpPost("reset-reader-password")]
-        public async Task<IActionResult> ResetPassword([FromBody] ReaderRegisterDto dto)
+        public async Task<IActionResult> ResetPassword([FromBody] ReaderRegisterDtoWithPhone dto)
         {
-            return await _readerService.ResetPasswordAsync(dto.ReaderName, dto.Password);
+            return await _readerService.ResetPasswordAsync(dto.ReaderName,dto.Phone, dto.Password);
         }
 
         /// <summary>

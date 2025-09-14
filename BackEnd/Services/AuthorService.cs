@@ -61,13 +61,18 @@ namespace OurNovel.Services
         /// <summary>
         /// 重置密码（按用户名）
         /// </summary>
-        public async Task<IActionResult> ResetPasswordAsync(string authorName, string newPassword)
+        public async Task<IActionResult> ResetPasswordAsync(string authorName,string phone, string newPassword)
         {
             var author = _context.Authors.FirstOrDefault(a => a.AuthorName == authorName);
             if (author == null)
             {
                 return new NotFoundObjectResult("用户不存在");
             }
+                        // 验证手机号码是否匹配
+    if (author.Phone != phone)
+    {
+        return new BadRequestObjectResult("手机号码不匹配");
+    }
 
             author.Password = PasswordHasher.HashPassword(newPassword);
             await _context.SaveChangesAsync();

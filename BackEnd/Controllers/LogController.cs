@@ -85,9 +85,9 @@ namespace OurNovel.Controllers
         /// 重置作者密码，不判断是否与原密码相同，类似忘记密码处理 提供用户名和新密码）
         /// </summary>
         [HttpPost("reset-author-password")]
-        public async Task<IActionResult> ResetPassword([FromBody] AuthorRegisterDto dto)
+        public async Task<IActionResult> ResetPassword([FromBody] AuthorRegisterDtoWithPhone dto)
         {
-            return await _authorService.ResetPasswordAsync(dto.AuthorName, dto.Password);
+            return await _authorService.ResetPasswordAsync(dto.AuthorName,dto.Phone, dto.Password);
         }
 
         /// <summary>
